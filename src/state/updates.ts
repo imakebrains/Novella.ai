@@ -21,8 +21,12 @@ export function currentVersion(): string {
   return typeof __APP_VERSION__ === "string" ? __APP_VERSION__ : "0.0.0";
 }
 
+/** The home repository. Ships as the default so the update check works out
+    of the box; a writer running their own fork can point it elsewhere. */
+const DEFAULT_REPO = "imakebrains/Novella.ai";
+
 export function updateRepo(): string {
-  return localStorage.getItem(REPO_KEY) ?? "";
+  return localStorage.getItem(REPO_KEY) ?? DEFAULT_REPO;
 }
 
 export function setUpdateRepo(repo: string): void {

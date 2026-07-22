@@ -1,0 +1,69 @@
+name: Release
+
+# Builds the desktop installers and publishes a GitHub Release whenever a
+# version tag is pushed (e.g. `git tag v0.2.0 && git push origin v0.2.0`).
+# The in-app updater reads these releases, so this is the whole supply line:
+# tag -> CI build -> release with installers -> "Download update" button.
+
+on:
+  push:
+    tags:
+      - "v*"
+  # Lets you build a release by hand from the Actions tab without tagging.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to release (e.g. v0.1.0)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-latest
+            args: ""
+          - platform: macos-latest
+            args: "--target universal-apple-darwin"
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: Cache Rust build
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify before building
+        run: npm run verify
+
+      - name: Build and publish the release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.event.inputs.tag || github.ref_name }}
+          releaseName: "Novella ${{ github.event.inputs.tag || github.ref_name }}"
+          releaseBody: "Download the installer for your platform below. Novella checks here for updates automatically."
+          releaseDraft: false
+          prerelease: false
+          args: ${{ matrix.args }}
