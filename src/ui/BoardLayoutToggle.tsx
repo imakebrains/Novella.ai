@@ -13,7 +13,7 @@ import { boardStore, MANUSCRIPT_BOARD, useBoards } from "../state/boards";
    boards — so it exists in every layout. The plot grid is manuscript-
    specific, so picking a custom board from it lands in Cards. */
 
-export type BoardLayout = "cards" | "grid";
+export type BoardLayout = "cards" | "grid" | "web" | "stats";
 
 export function BoardPicker({
   boardId,
@@ -81,6 +81,13 @@ export function BoardPicker({
   );
 }
 
+const LAYOUTS: { id: BoardLayout; label: string; title: string }[] = [
+  { id: "cards", label: "Cards", title: "Loose cards" },
+  { id: "grid", label: "Grid", title: "Plot grid — threads across chapters" },
+  { id: "web", label: "Web", title: "The story bible as a living map of who connects to whom" },
+  { id: "stats", label: "Stats", title: "Pacing — words, threads and tasks across chapters" },
+];
+
 export function BoardLayoutToggle({
   layout,
   setLayout,
@@ -90,22 +97,17 @@ export function BoardLayoutToggle({
 }) {
   return (
     <div className="view-switch board-layout" role="group" aria-label="Board layout">
-      <button
-        className={layout === "cards" ? "on" : ""}
-        onClick={() => setLayout("cards")}
-        aria-pressed={layout === "cards"}
-        title="Loose cards"
-      >
-        Cards
-      </button>
-      <button
-        className={layout === "grid" ? "on" : ""}
-        onClick={() => setLayout("grid")}
-        aria-pressed={layout === "grid"}
-        title="Plot grid — threads across chapters"
-      >
-        Grid
-      </button>
+      {LAYOUTS.map((l) => (
+        <button
+          key={l.id}
+          className={layout === l.id ? "on" : ""}
+          onClick={() => setLayout(l.id)}
+          aria-pressed={layout === l.id}
+          title={l.title}
+        >
+          {l.label}
+        </button>
+      ))}
     </div>
   );
 }

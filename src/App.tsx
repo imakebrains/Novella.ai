@@ -13,6 +13,8 @@ import { SEED_FILES } from "./seed/seedWorld";
 import { Resizer, usePaneWidth } from "./ui/Resizer";
 import { Corkboard } from "./ui/Corkboard";
 import { PlotGrid } from "./ui/PlotGrid";
+import { RelationshipWeb } from "./ui/RelationshipWeb";
+import { BoardStats } from "./ui/BoardStats";
 import type { BoardLayout } from "./ui/BoardLayoutToggle";
 import { RecoveryBanner } from "./ui/RecoveryBanner";
 import { useAutosave, type SaveState } from "./state/autosave";
@@ -294,6 +296,24 @@ export default function App() {
       {mode === "board" ? (
         boardLayout === "grid" ? (
           <PlotGrid
+            onOpen={(id) => {
+              store.open(id);
+              setMode("write");
+            }}
+            layout={boardLayout}
+            setLayout={setBoardLayout}
+          />
+        ) : boardLayout === "web" ? (
+          <RelationshipWeb
+            onOpen={(id) => {
+              store.open(id);
+              setMode("write");
+            }}
+            layout={boardLayout}
+            setLayout={setBoardLayout}
+          />
+        ) : boardLayout === "stats" ? (
+          <BoardStats
             onOpen={(id) => {
               store.open(id);
               setMode("write");
