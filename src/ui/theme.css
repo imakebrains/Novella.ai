@@ -1,0 +1,338 @@
+/* ============================================================
+   Novella themes
+
+   Five palettes drawn from the genre cards, not a light/dark
+   switch. Each one is a complete world: a writer working on a
+   paranormal romance shouldn't have to look at the same chrome
+   as someone writing inspirational fiction.
+
+   Nothing here is pure #000 or #fff. Flat black on flat white is
+   what makes software feel like a spreadsheet.
+
+   Every theme defines the same token names, so no component ever
+   needs to know which theme is active.
+   ============================================================ */
+
+:root {
+  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua",
+    Palatino, Georgia, serif;
+  --font-prose: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --font-ui: ui-sans-serif, system-ui, "Segoe UI", -apple-system, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "Consolas", monospace;
+
+  --text-xs: 0.6875rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-prose: 1.0625rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 18px;
+  --space-5: 26px;
+  --space-6: 38px;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+
+  --pane-left: 268px;
+  --pane-right: 340px;
+
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  /* Shadow sets, shared by theme brightness. */
+  --shadow-dark-sm: 0 1px 3px rgb(0 0 0 / 0.45);
+  --shadow-dark: 0 8px 28px rgb(0 0 0 / 0.55);
+  --shadow-dark-lg: 0 20px 60px rgb(0 0 0 / 0.65);
+  --shadow-light-sm: 0 1px 3px rgb(90 70 50 / 0.1);
+  --shadow-light: 0 8px 28px rgb(90 70 50 / 0.14);
+  --shadow-light-lg: 0 20px 60px rgb(90 70 50 / 0.2);
+}
+
+/* ============================================================
+   EMBER — near-black, candlelight gold, banked heat
+   The default. Low light, something still burning.
+   ============================================================ */
+:root,
+:root[data-theme="ember"] {
+  --bg-app: #100e10;
+  --bg-pane: #171417;
+  --bg-editor: #131113;
+  --bg-raised: #1f1b1f;
+  --bg-hover: #272227;
+  --bg-active: #322b32;
+
+  --fg-primary: #f2e9dd;
+  --fg-secondary: #b3a698;
+  --fg-muted: #7a6f68;
+
+  --border: #272127;
+  --border-strong: #3a323a;
+
+  --accent: #e8a33d;
+  --accent-soft: rgb(232 163 61 / 0.14);
+  --accent-fg: #131113;
+  --link: #efb75f;
+  --danger: #d05a5a;
+  --success: #8fae7d;
+
+  --shadow-sm: var(--shadow-dark-sm);
+  --shadow: var(--shadow-dark);
+  --shadow-lg: var(--shadow-dark-lg);
+
+  --type-character: #e8a33d;
+  --type-location: #93b58a;
+  --type-lore: #c09ad0;
+  --type-faction: #dd8f6c;
+  --type-object: #d7bd77;
+  --type-chapter: #d4788f;
+  --type-note: #a3958a;
+  --type-prompt: #8fa9c4;
+}
+
+/* ============================================================
+   VELLUM — parchment, pressed flowers, bronze
+   ============================================================ */
+:root[data-theme="vellum"] {
+  --bg-app: #e9e0cd;
+  --bg-pane: #f2ead9;
+  --bg-editor: #faf5e9;
+  --bg-raised: #faf5e9;
+  --bg-hover: #e2d7c0;
+  --bg-active: #d8cab0;
+
+  --fg-primary: #2d2419;
+  --fg-secondary: #5f5140;
+  --fg-muted: #8f8069;
+
+  --border: #d8cab0;
+  --border-strong: #bda98a;
+
+  --accent: #a9502f;
+  --accent-soft: rgb(169 80 47 / 0.1);
+  --accent-fg: #faf5e9;
+  --link: #8c4227;
+  --danger: #b23b2c;
+  --success: #5d7a4d;
+
+  --shadow-sm: var(--shadow-light-sm);
+  --shadow: var(--shadow-light);
+  --shadow-lg: var(--shadow-light-lg);
+
+  --type-character: #a9502f;
+  --type-location: #5d7a4d;
+  --type-lore: #6f5591;
+  --type-faction: #b5673a;
+  --type-object: #99762c;
+  --type-chapter: #a5486a;
+  --type-note: #7d7062;
+  --type-prompt: #4a6d85;
+}
+
+/* ============================================================
+   NOCTURNE — deep water, moonlight, something below it
+   ============================================================ */
+:root[data-theme="nocturne"] {
+  --bg-app: #0f151c;
+  --bg-pane: #141d27;
+  --bg-editor: #111922;
+  --bg-raised: #1b2733;
+  --bg-hover: #22303e;
+  --bg-active: #2b3b4b;
+
+  --fg-primary: #e6edf3;
+  --fg-secondary: #9fb0c0;
+  --fg-muted: #6b7d8d;
+
+  --border: #1f2b37;
+  --border-strong: #33465a;
+
+  --accent: #f2a6b8;
+  --accent-soft: rgb(242 166 184 / 0.13);
+  --accent-fg: #111922;
+  --link: #f7bcca;
+  --danger: #e0616b;
+  --success: #6fbf9b;
+
+  --shadow-sm: var(--shadow-dark-sm);
+  --shadow: var(--shadow-dark);
+  --shadow-lg: var(--shadow-dark-lg);
+
+  --type-character: #f2a6b8;
+  --type-location: #6fbf9b;
+  --type-lore: #a99ae0;
+  --type-faction: #e0906b;
+  --type-object: #d9c46f;
+  --type-chapter: #7fb3e0;
+  --type-note: #8fa0b0;
+  --type-prompt: #6fa8c4;
+}
+
+/* ============================================================
+   DRIFTWOOD — warm concrete, coffee, soft wool
+   ============================================================ */
+:root[data-theme="driftwood"] {
+  --bg-app: #262220;
+  --bg-pane: #2e2a27;
+  --bg-editor: #2a2623;
+  --bg-raised: #38322e;
+  --bg-hover: #423b36;
+  --bg-active: #4d453f;
+
+  --fg-primary: #f0e9e2;
+  --fg-secondary: #b8ada3;
+  --fg-muted: #857a71;
+
+  --border: #3a3430;
+  --border-strong: #4f4741;
+
+  --accent: #d9a68c;
+  --accent-soft: rgb(217 166 140 / 0.14);
+  --accent-fg: #2a2623;
+  --link: #e3b9a3;
+  --danger: #d4796c;
+  --success: #9ab586;
+
+  --shadow-sm: var(--shadow-dark-sm);
+  --shadow: var(--shadow-dark);
+  --shadow-lg: var(--shadow-dark-lg);
+
+  --type-character: #d9a68c;
+  --type-location: #9ab586;
+  --type-lore: #b0a0cc;
+  --type-faction: #d9a06c;
+  --type-object: #d3bd82;
+  --type-chapter: #cf90a4;
+  --type-note: #a89c92;
+  --type-prompt: #8fa8bb;
+}
+
+/* ============================================================
+   LINEN — morning light, washed cotton, terracotta
+   ============================================================ */
+:root[data-theme="linen"] {
+  --bg-app: #f3e6df;
+  --bg-pane: #faf0ea;
+  --bg-editor: #fffaf6;
+  --bg-raised: #fffaf6;
+  --bg-hover: #eddcd3;
+  --bg-active: #e3cec2;
+
+  --fg-primary: #332722;
+  --fg-secondary: #6a564c;
+  --fg-muted: #9a8579;
+
+  --border: #e5d3c9;
+  --border-strong: #c9ae9f;
+
+  --accent: #b5563a;
+  --accent-soft: rgb(181 86 58 / 0.1);
+  --accent-fg: #fffaf6;
+  --link: #9a4630;
+  --danger: #b03a2e;
+  --success: #5f7d55;
+
+  --shadow-sm: var(--shadow-light-sm);
+  --shadow: var(--shadow-light);
+  --shadow-lg: var(--shadow-light-lg);
+
+  --type-character: #b5563a;
+  --type-location: #5f7d55;
+  --type-lore: #7a5d93;
+  --type-faction: #c07040;
+  --type-object: #a08030;
+  --type-chapter: #a8556e;
+  --type-note: #85756a;
+  --type-prompt: #55738a;
+}
+
+/* Someone who prefers light and hasn't chosen yet gets Romantasy
+   rather than the near-black default. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --bg-app: #e9e0cd;
+    --bg-pane: #f2ead9;
+    --bg-editor: #faf5e9;
+    --bg-raised: #faf5e9;
+    --bg-hover: #e2d7c0;
+    --bg-active: #d8cab0;
+    --fg-primary: #2d2419;
+    --fg-secondary: #5f5140;
+    --fg-muted: #8f8069;
+    --border: #d8cab0;
+    --border-strong: #bda98a;
+    --accent: #a9502f;
+    --accent-soft: rgb(169 80 47 / 0.1);
+    --accent-fg: #faf5e9;
+    --link: #8c4227;
+    --danger: #b23b2c;
+    --success: #5d7a4d;
+    --shadow-sm: var(--shadow-light-sm);
+    --shadow: var(--shadow-light);
+    --shadow-lg: var(--shadow-light-lg);
+    --type-character: #a9502f;
+    --type-location: #5d7a4d;
+    --type-lore: #6f5591;
+    --type-faction: #b5673a;
+    --type-object: #99762c;
+    --type-chapter: #a5486a;
+    --type-note: #7d7062;
+    --type-prompt: #4a6d85;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-ui);
+  font-size: var(--text-base);
+  color: var(--fg-primary);
+  background: var(--bg-app);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}

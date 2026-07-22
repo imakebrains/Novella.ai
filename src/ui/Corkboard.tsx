@@ -1,0 +1,309 @@
+import { useRef, useState } from "react";
+import type { Note } from "../core/vault";
+import { store, useVaultVersion } from "../state/vaultStore";
+import { stripWikiLinks } from "../ai/context";
+import { countWords } from "../analysis/prose";
+import { taskProgress } from "../core/tasks";
+import { useActiveProject } from "../state/projects";
+import { BoardLayoutToggle, type BoardLayout } from "./BoardLayoutToggle";
+
+/* The corkboard.
+
+   Every chapter as a card, dragged to reorder. Order is stored as a
+   frontmatter number, so it survives to disk and never requires renaming
+   files — renaming would break every [[link]] pointing at them.
+
+   Dragging is pointer-based rather than HTML5 drag-and-drop. The first
+   version used `draggable`, which silently doesn't work here: most of the
+   card is a <button> (so it can be clicked to open), and browsers refuse
+   to start a native drag from inside a button. Only a thin strip at the
+   top was grabbable, which felt broken. Pointer events have no such
+   restriction, work with touch and pen, and let the card follow the
+   cursor properly. */
+
+const DRAG_THRESHOLD_PX = 5;
+
+export function Corkboard({
+  onOpen,
+  layout,
+  setLayout,
+}: {
+  onOpen: (id: string) => void;
+  layout: BoardLayout;
+  setLayout: (l: BoardLayout) => void;
+}) {
+  useVaultVersion();
+  const project = useActiveProject();
+  const chapters = store.orderedChapters();
+
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [overIndex, setOverIndex] = useState<number | null>(null);
+  // How far the dragged card has moved from where it was grabbed. The card
+  // is translated by this so it physically follows the cursor — a card that
+  // stays pinned in place while you drag reads as broken.
+  const [offset, setOffset] = useState<{ x: number; y: number } | null>(null);
+
+  // Mutable drag bookkeeping. Refs, not state: pointermove fires far
+  // faster than React re-renders, and the first few moves would be lost
+  // waiting for state to settle.
+  const drag = useRef<{
+    id: string;
+    startX: number;
+    startY: number;
+    active: boolean;
+  } | null>(null);
+
+  /** Which card index sits under a point, by hit-testing the rendered cards.
+      The dragged card is skipped — it's moving with the cursor, so it would
+      otherwise always be the answer. */
+  const indexAt = (x: number, y: number, skipId?: string | null): number | null => {
+    const grid = gridRef.current;
+    if (!grid) return null;
+    for (const card of grid.querySelectorAll<HTMLElement>("[data-card-index]")) {
+      if (skipId && card.dataset.cardId === skipId) continue;
+      const r = card.getBoundingClientRect();
+      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
+        return Number(card.dataset.cardIndex);
+      }
+    }
+    return null;
+  };
+
+  const commit = (fromId: string, toIndex: number) => {
+    const ids = chapters.map((c) => c.id);
+    const from = ids.indexOf(fromId);
+    if (from < 0 || toIndex < 0 || from === toIndex) return;
+    ids.splice(toIndex, 0, ids.splice(from, 1)[0]!);
+    store.reorderChapters(ids);
+  };
+
+  const onPointerDown = (e: React.PointerEvent<HTMLElement>, id: string) => {
+    // Ignore the nudge buttons — they have their own job.
+    if ((e.target as HTMLElement).closest("[data-no-drag]")) return;
+    if (e.button !== 0) return;
+
+    // Capture keeps the drag alive when the cursor outruns the card.
+    // It can throw if the pointer is already released; a failed capture
+    // shouldn't take dragging down with it.
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      /* drag still works, just without capture */
+    }
+    drag.current = { id, startX: e.clientX, startY: e.clientY, active: false };
+  };
+
+  const onPointerMove = (e: React.PointerEvent<HTMLElement>) => {
+    const d = drag.current;
+    if (!d) return;
+
+    if (!d.active) {
+      // A click shouldn't become a drag; require real movement first,
+      // otherwise opening a chapter would be impossible.
+      const moved = Math.hypot(e.clientX - d.startX, e.clientY - d.startY);
+      if (moved < DRAG_THRESHOLD_PX) return;
+      d.active = true;
+      setDragId(d.id);
+    }
+
+    setOffset({ x: e.clientX - d.startX, y: e.clientY - d.startY });
+
+    const idx = indexAt(e.clientX, e.clientY, d.id);
+    if (idx !== null) setOverIndex(idx);
+  };
+
+  const onPointerUp = (e: React.PointerEvent<HTMLElement>, id: string) => {
+    const d = drag.current;
+    drag.current = null;
+
+    try {
+      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      }
+    } catch {
+      /* already released */
+    }
+
+    if (d?.active) {
+      const idx = indexAt(e.clientX, e.clientY, d.id);
+      if (idx !== null) commit(d.id, idx);
+    } else {
+      // Never moved — treat as a click and open the chapter.
+      onOpen(id);
+    }
+
+    setDragId(null);
+    setOverIndex(null);
+    setOffset(null);
+  };
+
+  const cancelDrag = () => {
+    drag.current = null;
+    setDragId(null);
+    setOverIndex(null);
+    setOffset(null);
+  };
+
+  if (chapters.length === 0) {
+    return (
+      <main className="corkboard">
+        <div className="empty-state">
+          <p>No chapters yet.</p>
+          <p className="muted">
+            Anything typed <code>chapter</code> or <code>scene</code> shows up here.
+          </p>
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className="corkboard">
+      {project?.banner && (
+        <div
+          className="board-banner"
+          style={{ backgroundImage: `url(${project.banner})` }}
+          role="img"
+          aria-label={`Cover art for ${project.name}`}
+        >
+          <span className="board-banner-title">{project.name}</span>
+        </div>
+      )}
+
+      <header className="board-head">
+        <div className="board-head-left">
+          <h1 className="board-title">{project?.name ?? "Manuscript"}</h1>
+          <span className="board-meta">
+            {chapters.length} {chapters.length === 1 ? "chapter" : "chapters"} ·{" "}
+            {chapters.reduce((sum, c) => sum + countWords(c.body), 0).toLocaleString()} words ·
+            drag to reorder
+          </span>
+        </div>
+        <div className="board-head-right">
+          <BoardLayoutToggle layout={layout} setLayout={setLayout} />
+        </div>
+      </header>
+
+      <div className="board-grid" ref={gridRef}>
+        {chapters.map((chapter, i) => (
+          <Card
+            key={chapter.id}
+            note={chapter}
+            index={i}
+            dragging={dragId === chapter.id}
+            dropTarget={overIndex === i && dragId !== null && dragId !== chapter.id}
+            offset={dragId === chapter.id ? offset : null}
+            onPointerDown={(e) => onPointerDown(e, chapter.id)}
+            onPointerMove={onPointerMove}
+            onPointerUp={(e) => onPointerUp(e, chapter.id)}
+            onPointerCancel={cancelDrag}
+            onNudge={(dir) => {
+              const ids = chapters.map((c) => c.id);
+              const target = i + dir;
+              if (target < 0 || target >= ids.length) return;
+              ids.splice(target, 0, ids.splice(i, 1)[0]!);
+              store.reorderChapters(ids);
+            }}
+          />
+        ))}
+      </div>
+    </main>
+  );
+}
+
+function Card({
+  note,
+  index,
+  dragging,
+  dropTarget,
+  offset,
+  onPointerDown,
+  onPointerMove,
+  onPointerUp,
+  onPointerCancel,
+  onNudge,
+}: {
+  note: Note;
+  index: number;
+  dragging: boolean;
+  dropTarget: boolean;
+  offset: { x: number; y: number } | null;
+  onPointerDown: (e: React.PointerEvent<HTMLElement>) => void;
+  onPointerMove: (e: React.PointerEvent<HTMLElement>) => void;
+  onPointerUp: (e: React.PointerEvent<HTMLElement>) => void;
+  onPointerCancel: () => void;
+  onNudge: (dir: -1 | 1) => void;
+}) {
+  const words = countWords(note.body);
+  const pov = typeof note.data.pov === "string" ? stripWikiLinks(note.data.pov).trim() : null;
+  const synopsis =
+    typeof note.data.synopsis === "string"
+      ? note.data.synopsis
+      : stripWikiLinks(note.body).replace(/\s+/g, " ").trim();
+  const beats = store.beatsOf(note);
+  const tasks = taskProgress(note.body);
+
+  return (
+    <article
+      className={`board-card ${dragging ? "dragging" : ""} ${dropTarget ? "drop-target" : ""}`}
+      data-card-index={index}
+      data-card-id={note.id}
+      style={
+        offset
+          ? { transform: `translate(${offset.x}px, ${offset.y}px) rotate(1.5deg)` }
+          : undefined
+      }
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerCancel}
+      tabIndex={0}
+      role="button"
+      aria-label={`${note.title}. Chapter ${index + 1}. Click to open.`}
+      onKeyDown={(e) => {
+        if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          onNudge(-1);
+        } else if (e.key === "ArrowRight") {
+          e.preventDefault();
+          onNudge(1);
+        }
+      }}
+    >
+      {/* No arrow buttons — the card is dragged, full stop. Keyboard users
+          still get ← / → via onKeyDown below, which stays out of the way. */}
+      <div className="card-top">
+        <span className="card-index">{index + 1}</span>
+        {store.isDirty(note.id) && <span className="dot-dirty" title="Unsaved" />}
+      </div>
+
+      <div className="card-body">
+        <h2 className="card-title">{note.title}</h2>
+        {synopsis ? (
+          <p className="card-synopsis">{synopsis.slice(0, 220)}</p>
+        ) : (
+          <p className="card-synopsis empty">Nothing written yet.</p>
+        )}
+      </div>
+
+      <footer className="card-foot">
+        {pov && (
+          <span className="chip">
+            <span className="type-dot" data-type="character" /> {pov}
+          </span>
+        )}
+        {beats.length > 0 && <span className="chip">{beats.length} beats</span>}
+        {tasks.total > 0 && (
+          <span
+            className={`chip task-chip ${tasks.done === tasks.total ? "all-done" : ""}`}
+            title={`${tasks.done} of ${tasks.total} tasks done`}
+          >
+            ✓ {tasks.done}/{tasks.total}
+          </span>
+        )}
+        <span className="card-words">{words.toLocaleString()}w</span>
+      </footer>
+    </article>
+  );
+}
