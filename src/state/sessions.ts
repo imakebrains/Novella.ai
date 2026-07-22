@@ -131,6 +131,12 @@ export function wordsToday(): number {
   return state.days[dayKey()]?.words ?? 0;
 }
 
+/** Net words recorded on any calendar day, zero when nothing was. The
+    calendar reads this for any month, not just a recent window. */
+export function wordsOn(day: string): number {
+  return state.days[day]?.words ?? 0;
+}
+
 /** A day counts toward a streak if net words met the goal. With no goal
     set, any positive progress counts — the streak still means "I wrote". */
 function dayMetGoal(record: DayRecord | undefined, goal: number): boolean {

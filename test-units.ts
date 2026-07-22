@@ -25,6 +25,7 @@ import { parseMusicUrl, MUSIC_PRESETS } from "./src/state/music";
 import { weekOf } from "./src/state/planner";
 import { agentIsDue } from "./src/state/agents";
 import { compareVersions } from "./src/state/updates";
+import { defaultBanner } from "./src/seed/bannerArt";
 
 let failures = 0;
 let checks = 0;
@@ -644,6 +645,19 @@ lied, and Wren had known that since she was nine.
   check("updates: leading v is ignored", compareVersions("v1.2.3", "1.2.3"), 0);
   check("updates: missing segments count as zero", compareVersions("1.2", "1.2.0"), 0);
   check("updates: major beats everything", compareVersions("2.0.0", "1.9.9"), 1);
+}
+
+/* ---------- default banner art ---------- */
+
+{
+  const a1 = defaultBanner("Ashcroft Hollow");
+  const a2 = defaultBanner("Ashcroft Hollow");
+  const b = defaultBanner("River Test");
+  ok("banner: is an inline SVG data url", a1.startsWith("data:image/svg+xml"));
+  check("banner: deterministic for a name", a1, a2);
+  ok("banner: different names get different art", a1 !== b);
+  ok("banner: case and spacing don't change the art", defaultBanner("  ASHCROFT hollow ") === a1);
+  ok("banner: empty name still yields art", defaultBanner("").startsWith("data:image/svg+xml"));
 }
 
 /* ---------- report ---------- */

@@ -44,7 +44,7 @@ export function CodexPane() {
   return (
     <nav className="pane pane-left">
       <div className="pane-head">
-        <span className="pane-title">Codex</span>
+        <span className="pane-title">Story Bible</span>
         <span className="count">{store.vault.all().length}</span>
       </div>
 

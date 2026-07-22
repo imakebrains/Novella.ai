@@ -7,17 +7,47 @@ import { store, useVaultVersion } from "../state/vaultStore";
 
    Tasks are plain `- [ ]` lines living wherever they were written; this
    panel is just a lens over them. Ticking one here edits the underlying
-   note exactly as typing in the editor would, so autosave, drafts and
-   history all treat it as the edit it is.
+   note exactly as typing in the editor would.
 
-   Open tasks lead. Done tasks collapse behind a toggle — a wall of
-   ticked boxes is history, not a to-do list. */
+   Checking a task does NOT teleport it by default. A checklist is a
+   document — "third item, done" is information, and a list that
+   reshuffles itself under your eyes stops being trustworthy. Writers
+   who prefer the tidy-up can switch it per taste:
+
+     in place  — done items stay exactly where they are (default)
+     bottom    — done items sink below the open ones, per note
+     archive   — done items collapse into an Archive section
+*/
+
+type DoneMode = "in-place" | "bottom" | "archive";
+
+const MODE_KEY = "novella.tasks.doneMode";
+
+const MODES: { id: DoneMode; label: string; blurb: string }[] = [
+  { id: "in-place", label: "In place", blurb: "Done items stay where they are" },
+  { id: "bottom", label: "Sink", blurb: "Done items drop below open ones" },
+  { id: "archive", label: "Archive", blurb: "Done items collapse into an archive" },
+];
+
+function readMode(): DoneMode {
+  const raw = localStorage.getItem(MODE_KEY);
+  return raw === "bottom" || raw === "archive" ? raw : "in-place";
+}
 
 export function TasksPanel() {
   useVaultVersion();
-  const [showDone, setShowDone] = useState(false);
-  const active = store.active();
+  const [mode, setMode] = useState<DoneMode>(readMode);
+  const [archiveOpen, setArchiveOpen] = useState(false);
   const all = store.allTasks();
+
+  const pickMode = (m: DoneMode) => {
+    setMode(m);
+    try {
+      localStorage.setItem(MODE_KEY, m);
+    } catch {
+      /* preference only */
+    }
+  };
 
   if (all.length === 0) {
     return (
@@ -25,7 +55,7 @@ export function TasksPanel() {
         <p className="hint">No tasks yet.</p>
         <p className="hint">
           Type <code>- [ ] something to do</code> on its own line in any note — a chapter, a
-          codex entry, anywhere — and it shows up here as a real checkbox.
+          story bible entry, anywhere — and it shows up here as a real checkbox.
         </p>
       </div>
     );
@@ -34,7 +64,8 @@ export function TasksPanel() {
   const open = all.filter(({ task }) => !task.done);
   const done = all.filter(({ task }) => task.done);
 
-  // Group by note, preserving allTasks() order (manuscript first).
+  // Group by note, preserving allTasks() order (manuscript first). What
+  // lands in each group depends on the done-mode.
   const grouped = (items: typeof all) => {
     const byNote = new Map<string, { note: Note; tasks: BodyTask[] }>();
     for (const { note, task } of items) {
@@ -45,28 +76,54 @@ export function TasksPanel() {
     return [...byNote.values()];
   };
 
+  // in-place: everything, document order. bottom: open then done, within
+  // each note. archive: open only, done behind the toggle.
+  const mainGroups =
+    mode === "in-place"
+      ? grouped(all)
+      : mode === "bottom"
+        ? grouped(all).map((g) => ({
+            ...g,
+            tasks: [...g.tasks.filter((t) => !t.done), ...g.tasks.filter((t) => t.done)],
+          }))
+        : grouped(open);
+
   return (
     <div className="tasks-panel">
-      <p className="hint tasks-summary">
-        {open.length} open · {done.length} done
-      </p>
+      <div className="tasks-toolbar">
+        <span className="hint tasks-summary">
+          {open.length} open · {done.length} done
+        </span>
+        <div className="tasks-mode" role="radiogroup" aria-label="Where done items go">
+          {MODES.map((m) => (
+            <button
+              key={m.id}
+              className={`tasks-mode-btn ${mode === m.id ? "on" : ""}`}
+              role="radio"
+              aria-checked={mode === m.id}
+              title={m.blurb}
+              onClick={() => pickMode(m.id)}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
-      {open.length === 0 ? (
-        <p className="hint">Everything's ticked. Go write.</p>
+      {mainGroups.length === 0 && mode === "archive" ? (
+        <p className="hint">Everything's ticked and archived. Go write.</p>
       ) : (
-        grouped(open).map(({ note, tasks }) => (
-          <TaskGroup key={note.id} note={note} tasks={tasks} activeId={active?.id} />
-        ))
+        mainGroups.map(({ note, tasks }) => <TaskGroup key={note.id} note={note} tasks={tasks} />)
       )}
 
-      {done.length > 0 && (
+      {mode === "archive" && done.length > 0 && (
         <>
-          <button className="btn-ghost tasks-done-toggle" onClick={() => setShowDone((v) => !v)}>
-            {showDone ? "Hide" : "Show"} {done.length} done
+          <button className="btn-ghost tasks-done-toggle" onClick={() => setArchiveOpen((v) => !v)}>
+            {archiveOpen ? "Hide" : "Show"} archive ({done.length})
           </button>
-          {showDone &&
+          {archiveOpen &&
             grouped(done).map(({ note, tasks }) => (
-              <TaskGroup key={note.id} note={note} tasks={tasks} activeId={active?.id} />
+              <TaskGroup key={note.id} note={note} tasks={tasks} />
             ))}
         </>
       )}
@@ -74,21 +131,13 @@ export function TasksPanel() {
   );
 }
 
-function TaskGroup({
-  note,
-  tasks,
-  activeId,
-}: {
-  note: Note;
-  tasks: BodyTask[];
-  activeId: string | undefined;
-}) {
+function TaskGroup({ note, tasks }: { note: Note; tasks: BodyTask[] }) {
   return (
     <section className="task-group">
       <button
         className="task-group-head"
         onClick={() => store.open(note.id)}
-        title={activeId === note.id ? "This note is open" : `Open ${note.title}`}
+        title={`Open ${note.title}`}
       >
         <span className="type-dot" data-type={note.type} />
         <span className="task-group-title">{note.title}</span>

@@ -5,10 +5,8 @@ import { InspectorPane } from "./ui/InspectorPane";
 import { SettingsModal } from "./ui/SettingsModal";
 import { ExportModal } from "./ui/ExportModal";
 import { ImportModal } from "./ui/ImportModal";
-import { GoalMeter } from "./ui/GoalMeter";
 import { QuickCreate } from "./ui/QuickCreate";
 import { MusicDock } from "./ui/MusicDock";
-import { PlannerModal } from "./ui/PlannerModal";
 import { ProjectsPanel } from "./ui/ProjectsPanel";
 import { hydrateProjectBanner, projectStore, useActiveProject } from "./state/projects";
 import { SEED_FILES } from "./seed/seedWorld";
@@ -35,7 +33,6 @@ export default function App() {
   const [importOpen, setImportOpen] = useState(false);
   const [projectsOpen, setProjectsOpen] = useState(false);
   const [musicOpen, setMusicOpen] = useState(false);
-  const [plannerOpen, setPlannerOpen] = useState(false);
   const activeProject = useActiveProject();
   const left = usePaneWidth("left", 268);
   const right = usePaneWidth("right", 340);
@@ -212,7 +209,6 @@ export default function App() {
             </button>
           </div>
           <span className="stat">{totalWords.toLocaleString()} words</span>
-          <GoalMeter onOpen={() => setSettingsOpen(true)} />
           <SaveStatus state={saveState} lastSaved={lastSaved} dirty={dirty} persistent={persistent} />
           {dirty > 0 && (
             <button
@@ -231,7 +227,7 @@ export default function App() {
           <button
             className={`icon-btn ${leftOpen ? "on" : ""}`}
             onClick={() => setLeftOpen((v) => !v)}
-            title="Toggle Codex"
+            title="Toggle Story Bible"
           >
             ▤
           </button>
@@ -241,21 +237,6 @@ export default function App() {
             title="Toggle Inspector"
           >
             ▥
-          </button>
-          <button
-            className={`icon-btn ${musicOpen ? "on" : ""}`}
-            onClick={() => setMusicOpen((v) => !v)}
-            title="Writing music"
-            aria-pressed={musicOpen}
-          >
-            ♪
-          </button>
-          <button
-            className={`icon-btn ${plannerOpen ? "on" : ""}`}
-            onClick={() => setPlannerOpen(true)}
-            title="Weekly planner"
-          >
-            ▦▤
           </button>
           <button
             className={`icon-btn ${focus ? "on" : ""}`}
@@ -368,7 +349,7 @@ export default function App() {
             onReset={right.reset}
           />
         )}
-        {!focus && rightOpen && <InspectorPane />}
+        {!focus && rightOpen && <InspectorPane onShowMusicPlayer={() => setMusicOpen(true)} />}
       </div>
       )}
 
@@ -380,7 +361,6 @@ export default function App() {
 
       <MusicDock open={musicOpen} onClose={() => setMusicOpen(false)} />
 
-      {plannerOpen && <PlannerModal onClose={() => setPlannerOpen(false)} />}
       {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
       {exportOpen && <ExportModal onClose={() => setExportOpen(false)} />}
       {importOpen && <ImportModal onClose={() => setImportOpen(false)} />}

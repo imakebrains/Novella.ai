@@ -38,6 +38,11 @@ export type AgentTrigger =
 export interface Agent {
   id: string;
   name: string;
+  /** What this agent is FOR, in a sentence — shown on cards and lists. */
+  description: string;
+  /** A short sample of the kind of report it writes, so you know what
+      you're signing up for before it ever runs. */
+  example: string;
   /** What it's asked to do, in the writer's words. */
   instructions: string;
   scope: AgentScope;
@@ -103,14 +108,22 @@ export function describeTrigger(t: AgentTrigger): string {
 export const AGENT_TEMPLATES: Omit<Agent, "id" | "lastRunAt" | "lastStatus" | "lastError">[] = [
   {
     name: "Continuity sentinel",
+    description:
+      "Reads the whole manuscript once a day and lists continuity slips — names spelled two ways, eyes that change colour, timelines that don't add up.",
+    example:
+      "• Ch 2: Mira's scarf is \"emerald\"; Ch 5 calls it \"grey wool\" — same scarf?\n• Ch 3 says the funeral was \"last spring\", Ch 4 says \"two winters back\".",
     instructions:
-      "Read the manuscript for continuity slips: names spelled two ways, eye colours that change, timeline impossibilities, objects that vanish or teleport, weather or seasons that contradict. List each suspected slip with the chapter it appears in and a one-line quote. If you find nothing, say so briefly.",
+      "Read the manuscript for continuity slips: names spelled two ways, physical details that change, timeline impossibilities, objects that vanish or teleport, weather or seasons that contradict. List each suspected slip with the chapter it appears in and a one-line quote. If you find nothing, say so briefly.",
     scope: "manuscript",
     trigger: { kind: "daily" },
     enabled: true,
   },
   {
-    name: "Daily recap",
+    name: "Story-so-far recap",
+    description:
+      "When you open Novella, a fresh 200-word editor's note on where the story stands and the most pressing open question — so you start writing, not re-reading.",
+    example:
+      "Wren has traded the memory and doesn't know what she lost. The map contradicts the coast. Open thread: nobody has explained why the Archivist wanted THAT memory.",
     instructions:
       "Summarise the current state of the manuscript in under 200 words: where the story stands, which threads are open, and the single most pressing unanswered question. Write it as a note from an attentive editor, not a book report.",
     scope: "manuscript",
@@ -119,6 +132,10 @@ export const AGENT_TEMPLATES: Omit<Agent, "id" | "lastRunAt" | "lastStatus" | "l
   },
   {
     name: "Prose doctor",
+    description:
+      "Half an hour after you save, it critiques the open chapter's prose — echoes, filter words, dialogue that explains instead of speaks — with quoted examples.",
+    example:
+      "• \"suddenly\" appears 4× in this chapter — each steals the surprise it announces.\n• \"She felt the cold creep in\" → let the cold act: \"The cold crept in.\"",
     instructions:
       "Critique the current chapter's prose: flag echoes (repeated distinctive words), filter words, sentences that trip the tongue, and dialogue that explains instead of speaks. Quote each offender briefly and suggest one sharper alternative. Be specific and kind.",
     scope: "active-chapter",
@@ -126,10 +143,26 @@ export const AGENT_TEMPLATES: Omit<Agent, "id" | "lastRunAt" | "lastStatus" | "l
     enabled: true,
   },
   {
-    name: "Codex gardener",
+    name: "Bible gardener",
+    description:
+      "Compares the story bible to the manuscript daily: who's in the prose but missing an entry, which entries the prose contradicts, what's gone stale.",
+    example:
+      "• \"Doctor Halloway\" appears in Ch 2 and 4 — no bible entry yet.\n• Bible says the Drift moves nightly; Ch 3 has it resting \"a fortnight\".",
     instructions:
-      "Compare the codex to the manuscript. List: characters or places named in prose that have no codex entry; codex entries the prose never mentions; and codex facts the prose contradicts. Give file-worthy one-line suggestions, nothing more.",
+      "Compare the story bible to the manuscript. List: characters or places named in prose that have no bible entry; entries the prose never mentions; and bible facts the prose contradicts. Give file-worthy one-line suggestions, nothing more.",
     scope: "everything",
+    trigger: { kind: "daily" },
+    enabled: true,
+  },
+  {
+    name: "Grammar sweep",
+    description:
+      "A nightly pass over the open chapter for typos, doubled words, missing punctuation and tense slips — the mechanical stuff, quoted so it's easy to find.",
+    example:
+      "• \"the the harbor\" — doubled word.\n• \"She walk to the gate\" — tense slip (walks/walked).",
+    instructions:
+      "Proofread the current chapter for mechanics only: typos, doubled words, missing or doubled punctuation, tense slips, subject-verb disagreements. Quote each error with enough surrounding words to find it. Do not comment on style or story.",
+    scope: "active-chapter",
     trigger: { kind: "daily" },
     enabled: true,
   },
@@ -155,7 +188,10 @@ function emit(): void {
 
 function normalize(raw: unknown): Agent[] {
   if (!Array.isArray(raw)) return [];
-  return raw.filter((a): a is Agent => !!a && typeof a === "object" && "id" in a && "trigger" in a);
+  return raw
+    .filter((a): a is Agent => !!a && typeof a === "object" && "id" in a && "trigger" in a)
+    // Agents saved before descriptions existed load with empty ones.
+    .map((a) => ({ ...a, description: a.description ?? "", example: a.example ?? "" }));
 }
 
 async function load(): Promise<void> {

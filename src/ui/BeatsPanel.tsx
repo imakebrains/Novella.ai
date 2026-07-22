@@ -27,6 +27,7 @@ export function BeatsPanel() {
   const [open, setOpen] = useState(true);
   const [draft, setDraft] = useState("");
   const [busyIndex, setBusyIndex] = useState<number | null>(null);
+  const [suggesting, setSuggesting] = useState(false);
   const [output, setOutput] = useState<{ index: number; text: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const abort = useRef<AbortController | null>(null);
@@ -41,6 +42,35 @@ export function BeatsPanel() {
     if (!text) return;
     commit([...beats, text]);
     setDraft("");
+  };
+
+  /** The reverse direction: read the prose and propose what happens next.
+      Suggestions land as ordinary beats the writer can edit or delete —
+      never straight into the chapter. */
+  const suggestBeats = async () => {
+    setSuggesting(true);
+    setError(null);
+    try {
+      const text = await generate({
+        system:
+          "You plan scenes for a novelist. Answer with plain lines only — no numbering, no bullets, no commentary.",
+        prompt: `Here is the chapter "${active.title}" so far:\n\n${active.body.trim() || "(nothing written yet)"}\n\n${
+          beats.length ? `Beats already planned:\n${beats.join("\n")}\n\n` : ""
+        }Propose the next 3 beats — what should happen next, one short line each. Concrete events, not themes.`,
+        maxTokens: 200,
+      });
+      const proposed = text
+        .split("\n")
+        .map((line) => line.replace(/^[\s\d.\-•*]+/, "").trim())
+        .filter((line) => line.length > 3)
+        .slice(0, 3);
+      if (proposed.length === 0) throw new Error("The model returned nothing usable — try again.");
+      commit([...beats, ...proposed]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setSuggesting(false);
+    }
   };
 
   const expand = async (index: number) => {
@@ -105,7 +135,10 @@ export function BeatsPanel() {
         <div className="beats-body">
           {beats.length === 0 && (
             <p className="hint">
-              Sketch what has to happen, one line per beat. Then draft them one at a time.
+              Beats are your plan for this chapter — one line per thing that has to happen.
+              Write them yourself, or let <em>Suggest next beats</em> read the prose and
+              propose some. "Write this beat" then turns a single line into prose, held for
+              your review before anything enters the chapter.
             </p>
           )}
 
@@ -121,10 +154,10 @@ export function BeatsPanel() {
                 <button
                   className="beat-action"
                   onClick={() => void expand(i)}
-                  disabled={busyIndex !== null}
-                  title="Draft this beat into prose"
+                  disabled={busyIndex !== null || suggesting}
+                  title="Turn this one beat into prose, shown for review first"
                 >
-                  {busyIndex === i ? "…" : "Draft"}
+                  {busyIndex === i ? "Writing…" : "Write this beat"}
                 </button>
                 <button
                   className="beat-action ghost"
@@ -149,10 +182,18 @@ export function BeatsPanel() {
                   addBeat();
                 }
               }}
-              placeholder="Add a beat…"
+              placeholder="What happens next? Add it as a beat…"
             />
             <button className="beat-action" onClick={addBeat} disabled={!draft.trim()}>
               Add
+            </button>
+            <button
+              className="beat-action ghost"
+              onClick={() => void suggestBeats()}
+              disabled={suggesting || busyIndex !== null}
+              title="Read the chapter and propose the next few beats"
+            >
+              {suggesting ? "Thinking…" : "✦ Suggest next beats"}
             </button>
           </div>
 
@@ -163,7 +204,7 @@ export function BeatsPanel() {
               <div className="generated">{output.text || "…"}</div>
               <div className="btn-row">
                 <button className="btn-primary" onClick={accept} disabled={busyIndex !== null}>
-                  Insert &amp; clear beat
+                  Add to chapter
                 </button>
                 {busyIndex !== null ? (
                   <button className="btn-ghost" onClick={() => abort.current?.abort()}>

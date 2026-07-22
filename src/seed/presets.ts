@@ -20,9 +20,10 @@ export interface ProjectPreset {
 
 const CHARACTER_SHEET = `---
 type: character
-name: NAME
+name: New Character
 ---
-Swap NAME above for theirs, and link them from prose with [[double brackets]].
+Rename this entry to theirs (the \`name:\` line above), then link them from
+prose with [[double brackets]].
 
 What do they want, and what do they tell people they want?
 
@@ -36,8 +37,10 @@ Who knew them before the story starts?
 
 const LOCATION_SHEET = `---
 type: location
-name: PLACE
+name: First Place
 ---
+Rename this entry to the place's real name (the \`name:\` line above).
+
 What does this place look like at its best hour? Its worst?
 
 Who holds power here, and who actually runs it?

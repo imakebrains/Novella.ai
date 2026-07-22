@@ -12,6 +12,7 @@ import {
 import { isTauri, storage } from "../storage";
 import type { WebStorage } from "../storage/webStorage";
 import { PRESETS, presetById } from "../seed/presets";
+import { defaultBanner } from "../seed/bannerArt";
 
 /* The projects screen.
 
@@ -176,7 +177,7 @@ export function ProjectsPanel({ onClose }: { onClose: () => void }) {
           <p className="hint">
             Each project is its own folder. Characters, locations and links never cross
             between them. Writing a series? Keep the books in one project so they share a
-            codex.
+            story bible.
           </p>
 
           <div className="preset-row" role="radiogroup" aria-label="Start from">
@@ -287,11 +288,17 @@ function ProjectCard({
 
   return (
     <article className={`project-card ${active ? "active" : ""}`}>
+      {/* No cover chosen yet? Show generated art seeded by the name, so a
+          fresh project never sits there as a grey rectangle. The moment a
+          real cover is set, it takes over. */}
       <div
         className="project-banner"
-        style={project.banner ? { backgroundImage: `url(${project.banner})` } : undefined}
+        style={{
+          // Quoted url(): the generated SVG data URL contains parentheses
+          // (hsl colours), which break an unquoted CSS url() outright.
+          backgroundImage: `url("${project.banner ?? defaultBanner(project.name)}")`,
+        }}
       >
-        {!project.banner && <span className="project-banner-empty">No cover</span>}
         <div className="project-banner-actions">
           <button
             className="banner-btn"

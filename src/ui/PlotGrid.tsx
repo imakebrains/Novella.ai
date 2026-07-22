@@ -6,7 +6,8 @@ import { countWords } from "../analysis/prose";
 import { taskProgress } from "../core/tasks";
 import { useActiveProject } from "../state/projects";
 import { plotStore, threadColor, usePlotThreads, type PlotThread } from "../state/plot";
-import { BoardLayoutToggle, type BoardLayout } from "./BoardLayoutToggle";
+import { BoardLayoutToggle, BoardPicker, type BoardLayout } from "./BoardLayoutToggle";
+import { MANUSCRIPT_BOARD } from "../state/boards";
 
 /* The plot grid.
 
@@ -140,6 +141,15 @@ export function PlotGrid({
           </span>
         </div>
         <div className="board-head-right">
+          <BoardPicker
+            boardId={MANUSCRIPT_BOARD}
+            onPick={(id) => {
+              // The grid is the manuscript's view; a custom board opens
+              // as cards, where any mix of notes makes sense.
+              localStorage.setItem("novella.activeBoard", id);
+              if (id !== MANUSCRIPT_BOARD) setLayout("cards");
+            }}
+          />
           <button className="btn-ghost" onClick={() => plotStore.add("New thread")}>
             + Thread
           </button>

@@ -273,6 +273,16 @@ export class VaultStore {
     this.emit();
   }
 
+  /** Replace a note's tags. Tags live on note.tags (not data), which is
+      what serializeNote writes back to frontmatter. */
+  setTags(id: string, tags: string[]): void {
+    const note = this.index.get(id);
+    if (!note) return;
+    note.tags = [...new Set(tags.map((t) => t.trim()).filter(Boolean))];
+    this.dirty.add(id);
+    this.emit();
+  }
+
   setFrontmatterField(id: string, key: string, value: unknown): void {
     const note = this.index.get(id);
     if (!note) return;
@@ -440,12 +450,18 @@ export class VaultStore {
       never silently writes files the writer didn't ask for. Edit one and
       it becomes a real file on the next save. */
   ensureBuiltinPrompts(): void {
-    if (this.index.byType("prompt").length > 0) return;
+    // Merge by name rather than all-or-nothing: a project that already has
+    // prompt notes still receives built-ins ADDED since it was created,
+    // while the writer's own prompts and edits are never touched.
+    const have = new Set(this.index.byType("prompt").map((n) => n.title.toLowerCase()));
+    let added = false;
     for (const seed of BUILTIN_PROMPTS) {
+      if (have.has(seed.name.toLowerCase())) continue;
       const file = seed.name.trim().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
       this.index.add(parseNote(`Prompts/${file}.md`, promptSeedToMarkdown(seed)));
+      added = true;
     }
-    this.emit();
+    if (added) this.emit();
   }
 
   prompts(): Note[] {

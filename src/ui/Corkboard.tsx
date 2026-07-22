@@ -5,7 +5,9 @@ import { stripWikiLinks } from "../ai/context";
 import { countWords } from "../analysis/prose";
 import { taskProgress } from "../core/tasks";
 import { useActiveProject } from "../state/projects";
-import { BoardLayoutToggle, type BoardLayout } from "./BoardLayoutToggle";
+import { boardStore, MANUSCRIPT_BOARD, useBoards } from "../state/boards";
+import { plotStore, threadColor, usePlotThreads } from "../state/plot";
+import { BoardLayoutToggle, BoardPicker, type BoardLayout } from "./BoardLayoutToggle";
 
 /* The corkboard.
 
@@ -34,7 +36,27 @@ export function Corkboard({
 }) {
   useVaultVersion();
   const project = useActiveProject();
-  const chapters = store.orderedChapters();
+  const boards = useBoards();
+  usePlotThreads();
+  const [boardId, setBoardId] = useState<string>(
+    () => localStorage.getItem("novella.activeBoard") ?? MANUSCRIPT_BOARD,
+  );
+
+  // The manuscript board is the chapters in reading order. A custom board
+  // is whatever notes were put on it, in the board's own order — reordering
+  // one never touches the book.
+  const customBoard = boards.find((b) => b.id === boardId);
+  const onManuscript = !customBoard;
+  const chapters = onManuscript
+    ? store.orderedChapters()
+    : (customBoard?.noteIds ?? [])
+        .map((id) => store.vault.get(id))
+        .filter((n): n is NonNullable<typeof n> => Boolean(n));
+
+  const pickBoard = (id: string) => {
+    setBoardId(id);
+    localStorage.setItem("novella.activeBoard", id);
+  };
 
   const gridRef = useRef<HTMLDivElement>(null);
   const [dragId, setDragId] = useState<string | null>(null);
@@ -75,7 +97,8 @@ export function Corkboard({
     const from = ids.indexOf(fromId);
     if (from < 0 || toIndex < 0 || from === toIndex) return;
     ids.splice(toIndex, 0, ids.splice(from, 1)[0]!);
-    store.reorderChapters(ids);
+    if (onManuscript) store.reorderChapters(ids);
+    else boardStore.setOrder(boardId, ids);
   };
 
   const onPointerDown = (e: React.PointerEvent<HTMLElement>, id: string) => {
@@ -145,19 +168,6 @@ export function Corkboard({
     setOffset(null);
   };
 
-  if (chapters.length === 0) {
-    return (
-      <main className="corkboard">
-        <div className="empty-state">
-          <p>No chapters yet.</p>
-          <p className="muted">
-            Anything typed <code>chapter</code> or <code>scene</code> shows up here.
-          </p>
-        </div>
-      </main>
-    );
-  }
-
   return (
     <main className="corkboard">
       {project?.banner && (
@@ -173,17 +183,56 @@ export function Corkboard({
 
       <header className="board-head">
         <div className="board-head-left">
-          <h1 className="board-title">{project?.name ?? "Manuscript"}</h1>
+          <h1 className="board-title">
+            {onManuscript ? (project?.name ?? "Manuscript") : customBoard.name}
+          </h1>
           <span className="board-meta">
-            {chapters.length} {chapters.length === 1 ? "chapter" : "chapters"} ·{" "}
+            {chapters.length} {chapters.length === 1 ? "card" : "cards"} ·{" "}
             {chapters.reduce((sum, c) => sum + countWords(c.body), 0).toLocaleString()} words ·
             drag to reorder
+            {!onManuscript && " · this board's order only — the book is untouched"}
           </span>
         </div>
         <div className="board-head-right">
-          <BoardLayoutToggle layout={layout} setLayout={setLayout} />
+          <BoardPicker boardId={onManuscript ? MANUSCRIPT_BOARD : boardId} onPick={pickBoard} />
+          {!onManuscript && (
+            <button
+              className="btn-ghost"
+              onClick={() => {
+                if (confirm(`Delete the "${customBoard.name}" board? The notes on it are untouched.`)) {
+                  boardStore.remove(boardId);
+                  pickBoard(MANUSCRIPT_BOARD);
+                }
+              }}
+              title="Delete this board (its notes stay)"
+            >
+              Delete board
+            </button>
+          )}
+          {onManuscript && <BoardLayoutToggle layout={layout} setLayout={setLayout} />}
         </div>
       </header>
+
+      {chapters.length === 0 && (
+        <div className="empty-state">
+          {onManuscript ? (
+            <>
+              <p>No chapters yet.</p>
+              <p className="muted">
+                Anything typed <code>chapter</code> or <code>scene</code> shows up here.
+              </p>
+            </>
+          ) : (
+            <>
+              <p>Nothing on this board yet.</p>
+              <p className="muted">
+                Right-click in the editor and choose <em>Add to board</em> to pin any
+                chapter or note here.
+              </p>
+            </>
+          )}
+        </div>
+      )}
 
       <div className="board-grid" ref={gridRef}>
         {chapters.map((chapter, i) => (
@@ -191,6 +240,7 @@ export function Corkboard({
             key={chapter.id}
             note={chapter}
             index={i}
+            boardId={onManuscript ? null : boardId}
             dragging={dragId === chapter.id}
             dropTarget={overIndex === i && dragId !== null && dragId !== chapter.id}
             offset={dragId === chapter.id ? offset : null}
@@ -215,6 +265,7 @@ export function Corkboard({
 function Card({
   note,
   index,
+  boardId,
   dragging,
   dropTarget,
   offset,
@@ -226,6 +277,8 @@ function Card({
 }: {
   note: Note;
   index: number;
+  /** Set when this card sits on a custom board — enables "remove". */
+  boardId: string | null;
   dragging: boolean;
   dropTarget: boolean;
   offset: { x: number; y: number } | null;
@@ -235,6 +288,8 @@ function Card({
   onPointerCancel: () => void;
   onNudge: (dir: -1 | 1) => void;
 }) {
+  const [addingTag, setAddingTag] = useState(false);
+  const [tagDraft, setTagDraft] = useState("");
   const words = countWords(note.body);
   const pov = typeof note.data.pov === "string" ? stripWikiLinks(note.data.pov).trim() : null;
   const synopsis =
@@ -243,6 +298,18 @@ function Card({
       : stripWikiLinks(note.body).replace(/\s+/g, " ").trim();
   const beats = store.beatsOf(note);
   const tasks = taskProgress(note.body);
+  // Which plot threads run through this chapter — shown as colour dots so
+  // the cards carry the grid's information without the grid.
+  const threadDots = plotStore
+    .columns()
+    .filter((t) => store.plotPointsOf(note, t.id).length > 0);
+
+  const commitTag = () => {
+    const tag = tagDraft.trim();
+    if (tag) store.setTags(note.id, [...note.tags, tag]);
+    setTagDraft("");
+    setAddingTag(false);
+  };
 
   return (
     <article
@@ -288,10 +355,60 @@ function Card({
       </div>
 
       <footer className="card-foot">
+        {threadDots.length > 0 && (
+          <span className="card-threads" data-no-drag>
+            {threadDots.map((t) => (
+              <span
+                key={t.id}
+                className="thread-dot"
+                style={{ background: threadColor(t.color) }}
+                title={`Thread: ${t.name}`}
+              />
+            ))}
+          </span>
+        )}
         {pov && (
           <span className="chip">
             <span className="type-dot" data-type="character" /> {pov}
           </span>
+        )}
+        {note.tags.map((tag) => (
+          <span key={tag} className="chip tag-chip" title={`Tagged ${tag}`}>
+            #{tag}
+          </span>
+        ))}
+        {addingTag ? (
+          <input
+            className="tag-input"
+            data-no-drag
+            autoFocus
+            value={tagDraft}
+            placeholder="tag…"
+            onChange={(e) => setTagDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") commitTag();
+              else if (e.key === "Escape") {
+                setAddingTag(false);
+                setTagDraft("");
+              }
+            }}
+            onBlur={commitTag}
+            onPointerDown={(e) => e.stopPropagation()}
+            aria-label={`Add a tag to ${note.title}`}
+          />
+        ) : (
+          <button
+            className="chip tag-add"
+            data-no-drag
+            title="Add a tag"
+            onClick={(e) => {
+              e.stopPropagation();
+              setAddingTag(true);
+            }}
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            +
+          </button>
         )}
         {beats.length > 0 && <span className="chip">{beats.length} beats</span>}
         {tasks.total > 0 && (
@@ -303,6 +420,20 @@ function Card({
           </span>
         )}
         <span className="card-words">{words.toLocaleString()}w</span>
+        {boardId && (
+          <button
+            className="chip board-remove"
+            data-no-drag
+            title="Take this card off the board (the note itself stays)"
+            onClick={(e) => {
+              e.stopPropagation();
+              boardStore.removeNote(boardId, note.id);
+            }}
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            ✕
+          </button>
+        )}
       </footer>
     </article>
   );

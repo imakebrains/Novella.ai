@@ -22,6 +22,7 @@ import {
   KIND_LABEL,
 } from "./critiqueExtension";
 import { taskCheckboxes } from "./taskCheckboxes";
+import { boardStore, useBoards } from "../state/boards";
 import type { IssueKind } from "../analysis/prose";
 
 /* Autocomplete inside [[ ]]. Sourced from the live vault every
@@ -90,6 +91,7 @@ export function EditorPane() {
   // Which inline critique markers are on. Mirrored into a ref so a newly
   // created view can pick them up without waiting for a render.
   const [kinds, setKinds] = useState<Set<IssueKind>>(new Set());
+  const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
   const kindsRef = useRef(kinds);
   kindsRef.current = kinds;
 
@@ -212,7 +214,7 @@ export function EditorPane() {
       <main className="editor">
         <div className="empty-state">
           <p>No note open.</p>
-          <p className="muted">Pick something from the Codex to start writing.</p>
+          <p className="muted">Pick something from the Story Bible to start writing.</p>
         </div>
       </main>
     );
@@ -246,7 +248,118 @@ export function EditorPane() {
         </div>
       </header>
       {active.type === "chapter" || active.type === "scene" ? <BeatsPanel /> : null}
-      <div className="editor-surface" ref={host} />
+      <div
+        className="editor-surface"
+        ref={host}
+        onContextMenu={(e) => {
+          // Our own menu: pin the open note to a board from where you're
+          // writing. CodeMirror has no native spellcheck menu to lose.
+          e.preventDefault();
+          setMenu({ x: e.clientX, y: e.clientY });
+        }}
+      />
+      {menu && (
+        <EditorContextMenu
+          x={menu.x}
+          y={menu.y}
+          noteId={active.id}
+          noteTitle={active.title}
+          onClose={() => setMenu(null)}
+        />
+      )}
     </main>
+  );
+}
+
+/* ---------------- right-click menu ---------------- */
+
+function EditorContextMenu({
+  x,
+  y,
+  noteId,
+  noteTitle,
+  onClose,
+}: {
+  x: number;
+  y: number;
+  noteId: string;
+  noteTitle: string;
+  onClose: () => void;
+}) {
+  const boards = useBoards();
+  const [naming, setNaming] = useState(false);
+  const [name, setName] = useState("");
+
+  useEffect(() => {
+    const away = (e: MouseEvent) => {
+      if (!(e.target as HTMLElement).closest(".editor-menu")) onClose();
+    };
+    const key = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("mousedown", away);
+    window.addEventListener("keydown", key);
+    return () => {
+      window.removeEventListener("mousedown", away);
+      window.removeEventListener("keydown", key);
+    };
+  }, [onClose]);
+
+  // Keep the menu on screen near the pointer.
+  const style: React.CSSProperties = {
+    left: Math.min(x, window.innerWidth - 240),
+    top: Math.min(y, window.innerHeight - 200),
+  };
+
+  return (
+    <div className="editor-menu" style={style} role="menu" aria-label="Editor menu">
+      <div className="editor-menu-title">“{noteTitle}”</div>
+      <div className="editor-menu-label">Add to board</div>
+      {boards.length === 0 && !naming && (
+        <p className="editor-menu-empty">No boards yet — make one:</p>
+      )}
+      {boards.map((b) => {
+        const on = b.noteIds.includes(noteId);
+        return (
+          <button
+            key={b.id}
+            role="menuitem"
+            className="editor-menu-item"
+            onClick={() => {
+              if (on) boardStore.removeNote(b.id, noteId);
+              else boardStore.addNote(b.id, noteId);
+              onClose();
+            }}
+          >
+            {on ? "✓ " : ""}
+            {b.name}
+            {on && <span className="editor-menu-hint"> — remove</span>}
+          </button>
+        );
+      })}
+      {naming ? (
+        <input
+          className="editor-menu-input"
+          autoFocus
+          value={name}
+          placeholder="New board name…"
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              const board = boardStore.add(name);
+              boardStore.addNote(board.id, noteId);
+              onClose();
+            } else if (e.key === "Escape") {
+              onClose();
+            }
+          }}
+          aria-label="New board name"
+        />
+      ) : (
+        <button role="menuitem" className="editor-menu-item" onClick={() => setNaming(true)}>
+          + New board…
+        </button>
+      )}
+    </div>
   );
 }

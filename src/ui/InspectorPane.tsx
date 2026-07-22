@@ -10,63 +10,138 @@ import { CritiquePanel } from "./CritiquePanel";
 import { HistoryPanel } from "./HistoryPanel";
 import { TasksPanel } from "./TasksPanel";
 import { SetupPanel } from "./SetupPanel";
+import { CalendarTab } from "./CalendarTab";
+import { GoalsTab } from "./GoalsTab";
+import { MusicTab } from "./MusicTab";
+import { tabPrefs, useTabPrefs, type TabId } from "./inspectorTabs";
 
-type Tab = "links" | "critique" | "tasks" | "history" | "assistant";
+/* The inspector: the writer's toolbelt, arranged by the writer.
 
-export function InspectorPane() {
+   Every tab can be dragged to reorder or closed outright (the + menu
+   brings closed ones back). Someone who never uses Critique shouldn't
+   look at it every day; someone who lives in Tasks can put it first.
+
+   Needing the active note is per-tab: Calendar, Goals, Tasks and Music
+   are project-wide and work with nothing open. */
+
+const TAB_DEFS: Record<TabId, { label: string; title: string; needsNote: boolean }> = {
+  links: { label: "Links", title: "Backlinks and references for this note", needsNote: true },
+  critique: { label: "Critique", title: "Prose analysis of this note", needsNote: true },
+  tasks: { label: "Tasks", title: "Every to-do across the project", needsNote: false },
+  history: { label: "History", title: "Earlier versions of this note", needsNote: true },
+  assistant: { label: "Assistant", title: "Draft with your connected AI", needsNote: true },
+  goals: { label: "Goals", title: "Daily goal, streak and the month's writing", needsNote: false },
+  calendar: { label: "Calendar", title: "A real calendar with your plans on it", needsNote: false },
+  music: { label: "Music", title: "This project's writing music", needsNote: false },
+};
+
+export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => void }) {
   useVaultVersion();
-  const [tab, setTab] = useState<Tab>("links");
+  const prefs = useTabPrefs();
+  const [plusOpen, setPlusOpen] = useState(false);
+  const dragFrom = useRef<TabId | null>(null);
   const active = store.active();
+  const visible = tabPrefs.visible();
+  const tab = prefs.active;
+
+  const renderTab = (id: TabId) => {
+    if (TAB_DEFS[id].needsNote && !active) return <p className="empty-note">Nothing open.</p>;
+    switch (id) {
+      case "links":
+        return <LinksTab />;
+      case "critique":
+        return <CritiquePanel />;
+      case "tasks":
+        return <TasksPanel />;
+      case "history":
+        return <HistoryPanel />;
+      case "assistant":
+        return <AssistantTab />;
+      case "goals":
+        return <GoalsTab />;
+      case "calendar":
+        return <CalendarTab />;
+      case "music":
+        return <MusicTab onShowPlayer={onShowMusicPlayer} />;
+    }
+  };
 
   return (
     <aside className="pane pane-right">
-      <div className="pane-head tabs">
-        <button className={`tab ${tab === "links" ? "on" : ""}`} onClick={() => setTab("links")}>
-          Links
-        </button>
-        <button
-          className={`tab ${tab === "critique" ? "on" : ""}`}
-          onClick={() => setTab("critique")}
-        >
-          Critique
-        </button>
-        <button
-          className={`tab ${tab === "tasks" ? "on" : ""}`}
-          onClick={() => setTab("tasks")}
-          title="Every to-do across the project"
-        >
-          Tasks
-        </button>
-        <button
-          className={`tab ${tab === "history" ? "on" : ""}`}
-          onClick={() => setTab("history")}
-          title="Earlier versions of this note"
-        >
-          History
-        </button>
-        <button
-          className={`tab ${tab === "assistant" ? "on" : ""}`}
-          onClick={() => setTab("assistant")}
-        >
-          Assistant
-        </button>
-      </div>
+      <div className="pane-head tabs inspector-tabs">
+        {visible.map((id) => (
+          <button
+            key={id}
+            className={`tab ${tab === id ? "on" : ""}`}
+            title={TAB_DEFS[id].title}
+            draggable
+            onDragStart={(e) => {
+              dragFrom.current = id;
+              e.dataTransfer.effectAllowed = "move";
+            }}
+            onDragOver={(e) => {
+              if (dragFrom.current && dragFrom.current !== id) e.preventDefault();
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              if (dragFrom.current && dragFrom.current !== id) {
+                tabPrefs.moveBefore(dragFrom.current, id);
+              }
+              dragFrom.current = null;
+            }}
+            onDragEnd={() => {
+              dragFrom.current = null;
+            }}
+            onClick={() => tabPrefs.setActive(id)}
+          >
+            {TAB_DEFS[id].label}
+            {visible.length > 1 && (
+              <span
+                className="tab-close"
+                role="button"
+                aria-label={`Close the ${TAB_DEFS[id].label} tab`}
+                title="Close (bring back with +)"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  tabPrefs.hide(id);
+                }}
+              >
+                ×
+              </span>
+            )}
+          </button>
+        ))}
 
-      <div className="pane-scroll">
-        {!active ? (
-          <p className="empty-note">Nothing open.</p>
-        ) : tab === "links" ? (
-          <LinksTab />
-        ) : tab === "critique" ? (
-          <CritiquePanel />
-        ) : tab === "tasks" ? (
-          <TasksPanel />
-        ) : tab === "history" ? (
-          <HistoryPanel />
-        ) : (
-          <AssistantTab />
+        {prefs.hidden.length > 0 && (
+          <div className="tab-plus-wrap">
+            <button
+              className="tab tab-plus"
+              onClick={() => setPlusOpen((v) => !v)}
+              title="Closed tabs"
+              aria-expanded={plusOpen}
+            >
+              +
+            </button>
+            {plusOpen && (
+              <div className="tab-plus-pop" onMouseLeave={() => setPlusOpen(false)}>
+                {prefs.hidden.map((id) => (
+                  <button
+                    key={id}
+                    onClick={() => {
+                      tabPrefs.show(id);
+                      setPlusOpen(false);
+                    }}
+                  >
+                    {TAB_DEFS[id].label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         )}
       </div>
+
+      <div className="pane-scroll">{renderTab(tab)}</div>
     </aside>
   );
 }
@@ -275,10 +350,10 @@ function AssistantTab() {
 
       <Section title="Context for this scene">
         <p className="hint">
-          Only the codex entries this scene references get sent — not the whole bible.
+          Only the story bible entries this scene references get sent — never the whole thing.
         </p>
         {ctx.referenced.length === 0 ? (
-          <p className="hint">No codex entries referenced yet.</p>
+          <p className="hint">No story bible entries referenced yet.</p>
         ) : (
           ctx.referenced.map((n) => (
             <button key={n.id} className="link-row" onClick={() => store.open(n.id)}>
