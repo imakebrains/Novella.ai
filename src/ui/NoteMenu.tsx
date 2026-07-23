@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { store } from "../state/vaultStore";
 import { boardStore, useBoards } from "../state/boards";
+import { deleteNoteWithUndo } from "../state/deleteNote";
 import { stripWikiLinks } from "../ai/context";
 import { saveExport } from "../export/save";
 
@@ -167,6 +168,18 @@ export function NoteMenu({
           {extra.label}
         </button>
       ))}
+
+      <button
+        role="menuitem"
+        className="editor-menu-item danger"
+        title="Deletes this note. Undo is offered, and a copy is kept in the project's trash."
+        onClick={() => {
+          void deleteNoteWithUndo(noteId);
+          onClose();
+        }}
+      >
+        Delete note
+      </button>
     </div>
   );
 }

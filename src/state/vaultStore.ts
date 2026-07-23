@@ -519,6 +519,63 @@ export class VaultStore {
     return names.sort((a, b) => a.localeCompare(b));
   }
 
+  /** Rename a note in place. The file stays put (moving it would break
+      nothing — but there's no need), and the OLD title keeps resolving in
+      the link index, alias-like, so existing [[links]] don't go dangling
+      the moment a name changes. */
+  renameNote(id: string, title: string): void {
+    const note = this.index.get(id);
+    const clean = title.trim();
+    if (!note || !clean || note.title === clean) return;
+    note.title = clean;
+    note.data.name = clean;
+    // Re-registering adds the new title to the resolve map; the old entry
+    // stays behind and still points here.
+    this.index.add(note);
+    this.dirty.add(id);
+    this.emit();
+  }
+
+  /** Delete a note. Returns a snapshot restoreNote() accepts, so the UI
+      can offer undo instead of a scary confirm dialog. On disk the file
+      is copied into .novella/trash/ before being removed — if the undo
+      toast is missed, the words still exist somewhere. */
+  async deleteNote(id: string): Promise<{ note: Note; wasActive: boolean } | null> {
+    const note = this.index.get(id);
+    if (!note) return null;
+    const wasActive = this.activeId === id;
+
+    this.index.remove(id);
+    this.dirty.delete(id);
+    if (wasActive) {
+      this.activeId = this.orderedChapters()[0]?.id ?? this.index.all()[0]?.id;
+    }
+    this.emit();
+
+    if (this.root) {
+      const backing = storage();
+      const stamp = new Date().toISOString().slice(0, 16).replace(/[T:]/g, "-");
+      const name = note.path.split("/").pop() ?? "note.md";
+      try {
+        await backing.write(this.root, `.novella/trash/${stamp}-${name}`, serializeNote(note));
+        await backing.remove(this.root, note.path);
+      } catch (err) {
+        this.lastError = err instanceof Error ? err.message : String(err);
+        this.emit();
+      }
+    }
+    return { note, wasActive };
+  }
+
+  /** Put a deleted note back exactly as it was — the undo half. */
+  restoreNote(snapshot: { note: Note; wasActive: boolean }): void {
+    this.index.add(snapshot.note);
+    this.dirty.add(snapshot.note.id);
+    if (snapshot.wasActive) this.activeId = snapshot.note.id;
+    this.emit();
+    void this.saveAll();
+  }
+
   /** Promote any note into the manuscript: it becomes a chapter and takes
       the next order number. The file stays where it is — moving it would
       break links — only its role changes. */

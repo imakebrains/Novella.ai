@@ -13,7 +13,7 @@ import { boardStore, MANUSCRIPT_BOARD, useBoards } from "../state/boards";
    boards — so it exists in every layout. The plot grid is manuscript-
    specific, so picking a custom board from it lands in Cards. */
 
-export type BoardLayout = "cards" | "grid" | "web" | "stats";
+export type BoardLayout = "cards" | "grid" | "table" | "web" | "stats";
 
 export function BoardPicker({
   boardId,
@@ -84,6 +84,7 @@ export function BoardPicker({
 const LAYOUTS: { id: BoardLayout; label: string; title: string }[] = [
   { id: "cards", label: "Cards", title: "Loose cards" },
   { id: "grid", label: "Grid", title: "Plot grid — threads across chapters" },
+  { id: "table", label: "Table", title: "The manuscript as a sortable table" },
   { id: "web", label: "Web", title: "The codex as a living map of who connects to whom" },
   { id: "stats", label: "Stats", title: "Pacing — words, threads and tasks across chapters" },
 ];

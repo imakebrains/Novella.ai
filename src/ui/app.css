@@ -685,6 +685,139 @@
   border-top: 1px solid var(--border);
 }
 
+/* ---------- undo toast ---------- */
+
+.undo-toast {
+  position: fixed;
+  bottom: var(--space-5);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-4);
+  background: var(--bg-pane);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  font-size: var(--text-sm);
+  color: var(--fg-primary);
+}
+
+.undo-btn {
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: var(--space-1) var(--space-2);
+}
+.undo-btn:hover {
+  text-decoration: underline;
+}
+
+.undo-dismiss {
+  border: none;
+  background: transparent;
+  color: var(--fg-muted);
+  font: inherit;
+  cursor: pointer;
+  padding: var(--space-1);
+}
+.undo-dismiss:hover {
+  color: var(--fg-primary);
+}
+
+/* ---------- Ctrl+K command palette ---------- */
+
+.palette-backdrop {
+  /* Sits near the top like every palette people already know, not
+     vertically centered like a settings modal. */
+  place-items: start center;
+  padding-top: 14vh;
+}
+
+.palette {
+  display: flex;
+  flex-direction: column;
+  width: min(560px, 100%);
+  max-height: 60vh;
+  background: var(--bg-pane);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.palette-input {
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  color: var(--fg-primary);
+  font: inherit;
+  font-size: var(--text-base);
+  padding: var(--space-3) var(--space-4);
+  outline: none;
+}
+
+.palette-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-1);
+}
+
+.palette-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--fg-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.palette-row.picked {
+  background: var(--bg-hover);
+}
+
+.palette-kind {
+  flex: none;
+  width: 1.1em;
+  color: var(--fg-muted);
+}
+
+.palette-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.palette-hint {
+  flex: none;
+  color: var(--fg-muted);
+  font-size: var(--text-xs);
+}
+
+.palette-empty {
+  padding: var(--space-3) var(--space-4);
+}
+
+.palette-foot {
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  border-top: 1px solid var(--border);
+  font-size: var(--text-xs);
+}
+
 .settings-group {
   margin-bottom: var(--space-5);
 }
@@ -4397,6 +4530,98 @@ body.focus-mode .cm-editor {
   gap: var(--space-4);
 }
 
+/* ---------- Table layout ---------- */
+
+.table-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 0 var(--space-4) var(--space-6);
+}
+
+.chapter-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.chapter-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--bg-app);
+  border-bottom: 1px solid var(--border-strong);
+  padding: 0;
+  text-align: left;
+}
+.chapter-table th.num,
+.chapter-table td.num {
+  text-align: right;
+}
+
+.table-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  background: transparent;
+  color: var(--fg-secondary);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.chapter-table th.num .table-sort {
+  justify-content: flex-end;
+}
+.table-sort:hover,
+.table-sort.on {
+  color: var(--fg-primary);
+}
+.sort-dir {
+  font-size: 0.7em;
+}
+
+.chapter-table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+  vertical-align: baseline;
+}
+.chapter-table tbody tr {
+  cursor: pointer;
+}
+.chapter-table tbody tr:hover td {
+  background: var(--bg-hover);
+}
+
+.table-title {
+  font-weight: 500;
+  color: var(--fg-primary);
+}
+
+.chapter-table .faint {
+  color: var(--fg-muted);
+}
+.chapter-table .tasks-done {
+  color: var(--success);
+}
+
+.table-tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+.table-tag {
+  padding: 1px var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: var(--text-xs);
+  color: var(--fg-secondary);
+  white-space: nowrap;
+}
+
 .stats-chart {
   display: flex;
   align-items: stretch;
@@ -4651,4 +4876,48 @@ body.focus-mode .cm-editor {
 .add-cards-type {
   font-size: var(--text-xs);
   color: var(--fg-muted);
+}
+
+/* ---------- editable title + word-level diff ---------- */
+
+.editor-title-input {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 0 var(--space-1);
+  margin-left: calc(-1 * var(--space-1));
+  width: 100%;
+  min-width: 0;
+}
+
+.editor-title-input:hover {
+  border-color: var(--border);
+}
+
+.editor-title-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--bg-raised);
+}
+
+.editor-title-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.diff-row.rewrite {
+  background: none;
+  border-left: 3px solid var(--border-strong);
+}
+
+.diff-word.add {
+  background: color-mix(in srgb, var(--success) 22%, transparent);
+  border-radius: 3px;
+}
+
+.diff-word.remove {
+  background: color-mix(in srgb, var(--danger) 18%, transparent);
+  border-radius: 3px;
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--danger) 55%, transparent);
 }

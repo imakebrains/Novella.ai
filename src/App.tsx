@@ -3,6 +3,7 @@ import { CodexPane } from "./ui/CodexPane";
 import { EditorPane } from "./ui/EditorPane";
 import { InspectorPane } from "./ui/InspectorPane";
 import { SettingsModal } from "./ui/SettingsModal";
+import { CommandPalette, type PaletteCommand } from "./ui/CommandPalette";
 import { ExportModal } from "./ui/ExportModal";
 import { ImportModal } from "./ui/ImportModal";
 import { QuickCreate } from "./ui/QuickCreate";
@@ -13,10 +14,12 @@ import { SEED_FILES } from "./seed/seedWorld";
 import { Resizer, usePaneWidth } from "./ui/Resizer";
 import { Corkboard } from "./ui/Corkboard";
 import { PlotGrid } from "./ui/PlotGrid";
+import { TableView } from "./ui/TableView";
 import { RelationshipWeb } from "./ui/RelationshipWeb";
 import { BoardStats } from "./ui/BoardStats";
 import type { BoardLayout } from "./ui/BoardLayoutToggle";
 import { RecoveryBanner } from "./ui/RecoveryBanner";
+import { UndoToastHost } from "./ui/UndoToastHost";
 import { useAutosave, type SaveState } from "./state/autosave";
 import { probeSetup } from "./setupProbe";
 import { installAgentRunner } from "./state/agentRunner";
@@ -35,6 +38,7 @@ export default function App() {
   const [importOpen, setImportOpen] = useState(false);
   const [projectsOpen, setProjectsOpen] = useState(false);
   const [musicOpen, setMusicOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
   const activeProject = useActiveProject();
   const left = usePaneWidth("left", 268);
   const right = usePaneWidth("right", 340);
@@ -131,12 +135,16 @@ export default function App() {
     void boot();
   }, []);
 
-  // Keyboard: Ctrl/Cmd+S saves; Ctrl/Cmd+Shift+F toggles focus mode; Esc
-  // leaves focus mode, since it's the one mode you might want out of in a
-  // hurry without reaching for a shortcut you've forgotten.
+  // Keyboard: Ctrl/Cmd+K opens the palette; Ctrl/Cmd+S saves;
+  // Ctrl/Cmd+Shift+F toggles focus mode; Esc leaves focus mode, since
+  // it's the one mode you might want out of in a hurry without reaching
+  // for a shortcut you've forgotten.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPaletteOpen((v) => !v);
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
         e.preventDefault();
         void store.saveAll();
       } else if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "f") {
@@ -171,6 +179,24 @@ export default function App() {
     .reduce((sum, n) => sum + (n.body.trim() ? n.body.trim().split(/\s+/).length : 0), 0);
 
   const vaultLabel = root ? (root.split(/[\\/]/).pop() ?? root) : "Seed World";
+
+  // Everything the titlebar can do, reachable from the keyboard. The
+  // palette closes itself before running, so commands that open a modal
+  // don't stack two layers.
+  const paletteCommands: PaletteCommand[] = [
+    { id: "write", label: "Go to Write", hint: "view", run: () => setMode("write") },
+    { id: "board", label: "Go to Board", hint: "view", run: () => setMode("board") },
+    { id: "focus", label: focus ? "Leave focus mode" : "Enter focus mode", hint: "Ctrl+Shift+F", run: () => setFocus((v) => !v) },
+    { id: "save", label: "Save all", hint: "Ctrl+S", run: () => void store.saveAll() },
+    { id: "export", label: "Export or back up…", run: () => setExportOpen(true) },
+    { id: "import", label: "Import manuscript…", run: () => setImportOpen(true) },
+    { id: "projects", label: "Switch project…", run: () => setProjectsOpen(true) },
+    { id: "settings", label: "Open Settings", run: () => setSettingsOpen(true) },
+    { id: "music", label: "Open music player", run: () => setMusicOpen(true) },
+    { id: "theme", label: `Change theme (now: ${themeInfo.name})`, run: cycleTheme },
+    { id: "left", label: leftOpen ? "Hide codex pane" : "Show codex pane", run: () => setLeftOpen((v) => !v) },
+    { id: "right", label: rightOpen ? "Hide inspector" : "Show inspector", run: () => setRightOpen((v) => !v) },
+  ];
 
   return (
     <div className="app">
@@ -232,7 +258,7 @@ export default function App() {
           <button
             className={`icon-btn ${leftOpen ? "on" : ""}`}
             onClick={() => setLeftOpen((v) => !v)}
-            title="Toggle Story Bible"
+            title="Toggle codex pane"
           >
             ▤
           </button>
@@ -293,6 +319,15 @@ export default function App() {
       {mode === "board" ? (
         boardLayout === "grid" ? (
           <PlotGrid
+            onOpen={(id) => {
+              store.open(id);
+              setMode("write");
+            }}
+            layout={boardLayout}
+            setLayout={setBoardLayout}
+          />
+        ) : boardLayout === "table" ? (
+          <TableView
             onOpen={(id) => {
               store.open(id);
               setMode("write");
@@ -379,7 +414,18 @@ export default function App() {
       )}
 
       <MusicDock open={musicOpen} onClose={() => setMusicOpen(false)} />
+      <UndoToastHost />
 
+      {paletteOpen && (
+        <CommandPalette
+          commands={paletteCommands}
+          onOpenNote={(id) => {
+            store.open(id);
+            setMode("write");
+          }}
+          onClose={() => setPaletteOpen(false)}
+        />
+      )}
       {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
       {exportOpen && <ExportModal onClose={() => setExportOpen(false)} />}
       {importOpen && <ImportModal onClose={() => setImportOpen(false)} />}

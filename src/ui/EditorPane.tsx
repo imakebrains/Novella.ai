@@ -23,6 +23,7 @@ import {
   KIND_LABEL,
 } from "./critiqueExtension";
 import { taskCheckboxes } from "./taskCheckboxes";
+import { moveParagraph } from "../core/paragraphs";
 import { boardStore, useBoards } from "../state/boards";
 import { SLASH_TRIGGER, SLASH_INSERT, matchSlashCommands } from "./slashCommands";
 import type { IssueKind } from "../analysis/prose";
@@ -159,6 +160,7 @@ export function EditorPane() {
   // created view can pick them up without waiting for a render.
   const [kinds, setKinds] = useState<Set<IssueKind>>(new Set());
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
+  const [titleDraft, setTitleDraft] = useState<string | null>(null);
   const kindsRef = useRef(kinds);
   kindsRef.current = kinds;
 
@@ -219,7 +221,41 @@ export function EditorPane() {
         history(),
         closeBrackets(),
         autocompletion({ override: [wikiLinkSource, slashCommandSource], activateOnTyping: true }),
-        keymap.of([...closeBracketsKeymap, ...completionKeymap, ...historyKeymap, ...defaultKeymap]),
+        keymap.of([
+          // Alt+arrows move the paragraph under the cursor — Notion's block
+          // drag, sized to prose. Registered ahead of the defaults so
+          // nothing shadows it.
+          {
+            key: "Alt-ArrowUp",
+            run: (v) => {
+              const moved = moveParagraph(v.state.doc.toString(), v.state.selection.main.head, -1);
+              if (!moved) return false;
+              v.dispatch({
+                changes: { from: 0, to: v.state.doc.length, insert: moved.body },
+                selection: { anchor: moved.cursor },
+                scrollIntoView: true,
+              });
+              return true;
+            },
+          },
+          {
+            key: "Alt-ArrowDown",
+            run: (v) => {
+              const moved = moveParagraph(v.state.doc.toString(), v.state.selection.main.head, 1);
+              if (!moved) return false;
+              v.dispatch({
+                changes: { from: 0, to: v.state.doc.length, insert: moved.body },
+                selection: { anchor: moved.cursor },
+                scrollIntoView: true,
+              });
+              return true;
+            },
+          },
+          ...closeBracketsKeymap,
+          ...completionKeymap,
+          ...historyKeymap,
+          ...defaultKeymap,
+        ]),
         markdown(),
         syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
         critiqueExtension(),
@@ -292,8 +328,29 @@ export function EditorPane() {
   return (
     <main className="editor">
       <header className="editor-head">
-        <div>
-          <h1 className="editor-title">{active.title}</h1>
+        <div className="editor-title-wrap">
+          <input
+            className="editor-title editor-title-input"
+            value={titleDraft ?? active.title}
+            onChange={(e) => setTitleDraft(e.target.value)}
+            onFocus={() => setTitleDraft(active.title)}
+            onBlur={(e) => {
+              // Read the field itself, not state — a blur that lands in the
+              // same tick as the last keystroke would otherwise see a stale
+              // draft and quietly drop the rename.
+              store.renameNote(active.id, e.currentTarget.value);
+              setTitleDraft(null);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+              else if (e.key === "Escape") {
+                setTitleDraft(null);
+                (e.target as HTMLInputElement).blur();
+              }
+            }}
+            aria-label="Note title — edit to rename"
+            title="Click to rename. Old links keep working."
+          />
           <div className="editor-path">{active.path}</div>
         </div>
         <div className="editor-meta">

@@ -1,4 +1,6 @@
 import { store } from "./state/vaultStore";
+import { boardStore } from "./state/boards";
+import { deleteNoteWithUndo } from "./state/deleteNote";
 import { pluginHost } from "./plugins/runtime";
 import { probeSetup } from "./setupProbe";
 import { profileStore } from "./state/profile";
@@ -92,6 +94,8 @@ export function installDevtools(): void {
     render: async (format: Format = "docx") => render(compileManuscript({}), format),
     /** Escape hatches for poking at internals during development. */
     store,
+    boards: boardStore,
+    deleteNoteWithUndo,
     pluginHost,
     profile: profileStore,
     projects: projectStore,

@@ -8,7 +8,7 @@ import {
   subscribeHistory,
   type Revision,
 } from "../state/history";
-import { diffParagraphs, relativeTime } from "./diff";
+import { diffParagraphs, diffWords, relativeTime } from "./diff";
 
 /* Revision history for the open note.
 
@@ -141,19 +141,42 @@ function Diff({ from, to }: { from: string; to: string }) {
         <span className="swatch remove" /> in this version ·{" "}
         <span className="swatch add" /> in the editor now
       </p>
-      {rows.map((row, i) =>
-        row.kind === "same" ? (
+      {rows.map((row, i) => {
+        if (row.kind === "same") {
           // Unchanged prose is collapsed to a marker; showing an entire
           // untouched chapter to highlight one edited paragraph buries it.
-          <p key={i} className="diff-same" title={row.text}>
-            {row.text.length > 90 ? `${row.text.slice(0, 90)}…` : row.text}
-          </p>
-        ) : (
+          return (
+            <p key={i} className="diff-same" title={row.text}>
+              {row.text.length > 90 ? `${row.text.slice(0, 90)}…` : row.text}
+            </p>
+          );
+        }
+
+        // A remove followed by an add is a REWRITE of one paragraph —
+        // show it once with the changed words marked, instead of striking
+        // the whole thing for a swapped adjective.
+        const next = rows[i + 1];
+        if (row.kind === "remove" && next?.kind === "add") {
+          return (
+            <p key={i} className="diff-row rewrite">
+              {diffWords(row.text, next.text).map((run, j) => (
+                <span key={j} className={`diff-word ${run.kind}`}>
+                  {run.text}
+                </span>
+              ))}
+            </p>
+          );
+        }
+        if (row.kind === "add" && rows[i - 1]?.kind === "remove") {
+          return null; // consumed by the rewrite row above
+        }
+
+        return (
           <p key={i} className={`diff-row ${row.kind}`}>
             {row.text}
           </p>
-        ),
-      )}
+        );
+      })}
     </div>
   );
 }

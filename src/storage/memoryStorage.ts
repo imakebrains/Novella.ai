@@ -19,7 +19,11 @@ export class MemoryStorage implements VaultStorage {
   }
 
   async readAll(): Promise<VaultFile[]> {
-    return [...this.files.entries()].map(([path, contents]) => ({ path, contents }));
+    // Same rule as the real adapters: dotfolders (.novella/trash) are
+    // config and recovery data, not notes.
+    return [...this.files.entries()]
+      .filter(([path]) => !path.startsWith(".") && !path.includes("/."))
+      .map(([path, contents]) => ({ path, contents }));
   }
 
   async write(_root: string, relPath: string, contents: string): Promise<void> {

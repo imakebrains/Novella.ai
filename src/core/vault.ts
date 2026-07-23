@@ -95,6 +95,14 @@ export class Vault {
     for (const a of note.aliases) this.resolve.set(norm(a), note.id);
   }
 
+  /** Forget a note. Only resolve entries that still point at it are
+      dropped — a later note may have claimed the same title. */
+  remove(id: string) {
+    if (!this.notes.delete(id)) return;
+    for (const [key, val] of this.resolve)
+      if (val === id) this.resolve.delete(key);
+  }
+
   all(): Note[] { return [...this.notes.values()]; }
   get(id: string): Note | undefined { return this.notes.get(id); }
   byType(type: NoteType): Note[] { return this.all().filter((n) => n.type === type); }

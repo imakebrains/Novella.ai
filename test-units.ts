@@ -8,7 +8,10 @@
    filesystem, or a live model is verified in the browser instead. */
 
 import { thin, type Revision } from "./src/state/history";
-import { diffParagraphs, relativeTime } from "./src/ui/diff";
+import { diffParagraphs, diffWords, relativeTime } from "./src/ui/diff";
+import { moveParagraph } from "./src/core/paragraphs";
+import { matchPalette } from "./src/ui/palette";
+import { sortTable } from "./src/ui/chapterTable";
 import { acceptsTemperature } from "./src/ai/models";
 import { parseNote, serializeNote, extractWikiLinks } from "./src/core/vault";
 import {
@@ -792,6 +795,62 @@ lied, and Wren had known that since she was nine.
   check("sprint: formats zero", formatClock(0), "0:00");
 }
 
+/* ---------- paragraph moves ---------- */
+
+{
+  const body = "First para.\n\nSecond para here.\n\nThird one.";
+  // Cursor inside "Second" (offset of 'S' + 3).
+  const cur = body.indexOf("Second") + 3;
+
+  const up = moveParagraph(body, cur, -1)!;
+  check("para: move up swaps with the previous", up.body, "Second para here.\n\nFirst para.\n\nThird one.");
+  ok("para: cursor rides along upward", up.body.slice(up.cursor - 3, up.cursor) === "Sec");
+
+  const down = moveParagraph(body, cur, 1)!;
+  check("para: move down swaps with the next", down.body, "First para.\n\nThird one.\n\nSecond para here.");
+  ok("para: cursor rides along downward", down.body.slice(down.cursor - 3, down.cursor) === "Sec");
+
+  check("para: first paragraph cannot move up", moveParagraph(body, 2, -1), null);
+  check("para: last paragraph cannot move down", moveParagraph(body, body.length - 2, 1), null);
+  check("para: single paragraph goes nowhere", moveParagraph("only one", 3, 1), null);
+  check("para: empty body goes nowhere", moveParagraph("", 0, -1), null);
+
+  // Multi-line paragraphs move as one block.
+  const multi = "A line\nstill A.\n\nB block.";
+  const moved = moveParagraph(multi, 2, 1)!;
+  check("para: multi-line blocks move whole", moved.body, "B block.\n\nA line\nstill A.");
+}
+
+/* ---------- word-level diff ---------- */
+
+{
+  const runs = diffWords("The grey scarf hung there.", "The emerald scarf hung there.");
+  check(
+    "words: only the changed word is marked",
+    runs.map((r) => r.kind),
+    ["same", "remove", "add", "same"],
+  );
+  ok("words: removed text is the old word", runs[1]!.text.trim() === "grey");
+  ok("words: added text is the new word", runs[2]!.text.trim() === "emerald");
+
+  // Joining each side's runs must reproduce that side exactly.
+  const from = "one two three four";
+  const to = "one 2 three four five";
+  const r2 = diffWords(from, to);
+  check(
+    "words: joining same+remove rebuilds the old text",
+    r2.filter((r) => r.kind !== "add").map((r) => r.text).join("").trim(),
+    from,
+  );
+  check(
+    "words: joining same+add rebuilds the new text",
+    r2.filter((r) => r.kind !== "remove").map((r) => r.text).join("").trim(),
+    to,
+  );
+
+  check("words: identical text is one same-run", diffWords("a b c", "a b c").length, 1);
+}
+
 /* ---------- backup filenames ---------- */
 
 {
@@ -803,6 +862,82 @@ lied, and Wren had known that since she was nine.
   );
   check("backup: empty name still yields a filename", backupFilename("", at), "project-backup-2026-07-23-1405.zip");
   ok("backup: absurd names get truncated", backupFilename("x".repeat(200), at).length < 90);
+}
+
+/* ---------- palette matching ---------- */
+
+{
+  const items = [
+    { id: "c1", label: "Go to Board", kind: "command" as const },
+    { id: "n1", label: "The Compass That Lies", kind: "chapter" as const },
+    { id: "n2", label: "Wren Calloway", kind: "note" as const },
+    { id: "n3", label: "Board of Governors", kind: "note" as const },
+    { id: "n4", label: "Harbor at Dusk", kind: "note" as const },
+  ];
+
+  const empty = matchPalette("", items, 3);
+  check("palette: empty query keeps given order", empty.map((i) => i.id).join(","), "c1,n1,n2");
+
+  const board = matchPalette("board", items);
+  check("palette: whole-label prefix beats word prefix", board[0]!.id, "n3");
+  check("palette: word-boundary match still included", board.map((i) => i.id).includes("c1"), true);
+
+  const sub = matchPalette("tcl", items);
+  check("palette: subsequence finds initials", sub[0]!.id, "n1");
+
+  check("palette: case-insensitive", matchPalette("WREN", items)[0]!.id, "n2");
+  check("palette: no match yields empty", matchPalette("zzz", items).length, 0);
+  ok("palette: limit respected", matchPalette("", items, 2).length === 2);
+}
+
+/* ---------- table sorting ---------- */
+
+{
+  const row = (
+    id: string,
+    order: number,
+    title: string,
+    words: number,
+    tasksDone: number,
+    tasksTotal: number,
+    tags: string[] = [],
+  ) => ({ id, order, title, words, tasksDone, tasksTotal, tags });
+  const rows = [
+    row("a", 1, "Cliffs", 900, 1, 2),
+    row("b", 2, "Anchor", 300, 0, 0),
+    row("c", 3, "Beacon", 1200, 2, 2, ["storm"]),
+  ];
+
+  check(
+    "table: default order is book order",
+    sortTable(rows, "order", 1).map((r) => r.id).join(""),
+    "abc",
+  );
+  check(
+    "table: title sort is alphabetical",
+    sortTable(rows, "title", 1).map((r) => r.id).join(""),
+    "bca",
+  );
+  check(
+    "table: words descending",
+    sortTable(rows, "words", -1).map((r) => r.id).join(""),
+    "cab",
+  );
+  check(
+    "table: tasks ascending — least done first, no-tasks last",
+    sortTable(rows, "tasks", 1).map((r) => r.id).join(""),
+    "acb",
+  );
+  check(
+    "table: tasks descending still keeps no-tasks last",
+    sortTable(rows, "tasks", -1).map((r) => r.id).join(""),
+    "cab",
+  );
+  check(
+    "table: input order untouched (returns a copy)",
+    rows.map((r) => r.id).join(""),
+    "abc",
+  );
 }
 
 /* ---------- report ---------- */

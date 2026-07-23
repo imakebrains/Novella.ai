@@ -91,8 +91,10 @@ export class WebStorage implements VaultStorage {
       const path = String(key).slice(root.length + SEP.length);
       const entry = values[i] as Entry | undefined;
       // Parity with the disk adapter: the vault is .md files; anything
-      // else (covers, history) is fetched explicitly via readBytes.
-      if (typeof entry?.text === "string" && path.toLowerCase().endsWith(".md")) {
+      // else (covers, history) is fetched explicitly via readBytes, and
+      // dotfolders (.novella/trash keeps deleted notes) aren't the book.
+      const hidden = path.startsWith(".") || path.includes("/.");
+      if (!hidden && typeof entry?.text === "string" && path.toLowerCase().endsWith(".md")) {
         out.push({ path, contents: entry.text });
       }
     });
