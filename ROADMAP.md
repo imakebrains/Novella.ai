@@ -34,10 +34,7 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
 
 ## Next up
 
-- [ ] **Slash commands in the editor** — type `/` on a blank line for a
-      menu: task, scene break, beat, heading, link to entry, new character…
-      Notion's signature interaction and its fastest habit; CodeMirror's
-      autocomplete API makes this a natural fit. (Notion round, 2026-07-23)
+- [x] **Slash commands in the editor** — shipped 2026-07-22.
 - [ ] **Writing sprints (the fourth app)** — a sprint timer wired to the word
       counter: pick 15/25/45 min, it counts the words written *during* that
       sprint and logs them beside the session history, with a gentle finish
@@ -156,3 +153,14 @@ scale; nothing but use would have caught it.
   single ring with a canvas that grows with the cast, clipped labels, and made
   the test share the renderer's arc budget so the two can't drift apart again.
   Five QA findings and three research-driven features added above.
+- 2026-07-22 — Slash commands in the editor: `/` on a blank line opens a
+  menu (task, scene break, heading, beat, link to entry, new character).
+  Plain-text ones use CodeMirror's autocomplete `apply`; "link" reopens the
+  existing `[[` completion so the writer keeps typing; "beat" and "new
+  character" reach into the vault store. Found and fixed one bug of my own
+  along the way: the first "beat" implementation called `setBeats` with a
+  blank entry, which the store silently strips — switched it to a small
+  `editorBridge` hand-off (like the existing insert-into-editor bridge) that
+  opens the Beats panel and focuses its draft input instead. 193 unit checks
+  (6 new, in `slashCommands.ts` — the pure trigger regex and command list),
+  `npm run verify` green, all six commands exercised live in the dev server.

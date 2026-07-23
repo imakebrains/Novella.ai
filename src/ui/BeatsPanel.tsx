@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { store, useVaultVersion } from "../state/vaultStore";
 import { buildFromTemplate } from "../ai/prompts";
 import { generate } from "../ai/generate";
-import { insertIntoEditor } from "./editorBridge";
+import { insertIntoEditor, registerBeatFocus } from "./editorBridge";
 
 /* Scene beats — the drafting loop.
 
@@ -31,6 +31,17 @@ export function BeatsPanel() {
   const [output, setOutput] = useState<{ index: number; text: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const abort = useRef<AbortController | null>(null);
+  const draftInput = useRef<HTMLInputElement>(null);
+
+  // Let the editor's "/beat" slash command hand off here: open the panel
+  // and put the cursor in the draft field, ready to type.
+  useEffect(() => {
+    registerBeatFocus(() => {
+      setOpen(true);
+      setTimeout(() => draftInput.current?.focus(), 0);
+    });
+    return () => registerBeatFocus(null);
+  }, []);
 
   if (!active) return null;
   const beats = store.beatsOf(active);
@@ -173,6 +184,7 @@ export function BeatsPanel() {
 
           <div className="beat-add">
             <input
+              ref={draftInput}
               className="beat-text"
               value={draft}
               onChange={(e) => setDraft(e.target.value)}

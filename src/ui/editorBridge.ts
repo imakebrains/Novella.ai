@@ -17,6 +17,23 @@ export function registerEditorInsert(fn: InsertFn | null): void {
   insertFn = fn;
 }
 
+/* Same problem, opposite direction: the editor's "/beat" slash command
+   needs to open the Beats panel and focus its draft input. A beat can't
+   be added as inline prose text — setBeats() scrubs blank entries, and a
+   beat lives in note.data.beats, not the body — so the slash command
+   hands off to whatever the mounted BeatsPanel registers here instead. */
+let beatFocusFn: (() => void) | null = null;
+
+export function registerBeatFocus(fn: (() => void) | null): void {
+  beatFocusFn = fn;
+}
+
+export function focusBeatDraft(): boolean {
+  if (!beatFocusFn) return false;
+  beatFocusFn();
+  return true;
+}
+
 export function editorReady(): boolean {
   return insertFn !== null;
 }

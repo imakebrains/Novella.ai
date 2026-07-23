@@ -27,6 +27,7 @@ import { agentIsDue } from "./src/state/agents";
 import { compareVersions } from "./src/state/updates";
 import { defaultBanner } from "./src/seed/bannerArt";
 import { ARC_PER_LABEL, clipLabel, LABEL_MAX_CHARS, ringPositions, webCanvasSize } from "./src/ui/webLayout";
+import { SLASH_COMMANDS, SLASH_TRIGGER, SLASH_INSERT, matchSlashCommands } from "./src/ui/slashCommands";
 
 let failures = 0;
 let checks = 0;
@@ -726,6 +727,40 @@ lied, and Wren had known that since she was nine.
     clipLabel("Archmagister Corvane the Undying").endsWith("…"),
   );
   ok("web: the arc budget covers a full-width label", ARC_PER_LABEL >= LABEL_MAX_CHARS * 7);
+}
+
+/* ---------- slash commands ---------- */
+
+{
+  // The trigger only fires on a blank line: "/" alone or "/" plus word
+  // characters, with nothing before it and nothing after the cursor.
+  ok("slash: bare / matches", SLASH_TRIGGER.test("/"));
+  ok("slash: /task matches", SLASH_TRIGGER.test("/task"));
+  ok("slash: and/or does not match", !SLASH_TRIGGER.test("and/or"));
+  ok("slash: trailing space does not match", !SLASH_TRIGGER.test("/task "));
+  ok("slash: a bare URL slash does not match", !SLASH_TRIGGER.test("https://"));
+
+  check("slash: empty query returns every command", matchSlashCommands(""), SLASH_COMMANDS);
+  ok(
+    "slash: 'task' query matches the task command",
+    matchSlashCommands("task").some((c) => c.id === "task"),
+  );
+  ok(
+    "slash: 'link' query matches by label substring",
+    matchSlashCommands("link to").some((c) => c.id === "link"),
+  );
+  check("slash: nonsense query matches nothing", matchSlashCommands("zzz"), []);
+
+  // Plain-text commands must exist for every id that isn't handled by
+  // store-reaching logic in EditorPane (beat, link, character).
+  const storeBacked = new Set(["beat", "link", "character"]);
+  for (const cmd of SLASH_COMMANDS) {
+    if (storeBacked.has(cmd.id)) continue;
+    ok(`slash: '${cmd.id}' has a plain-text insert`, SLASH_INSERT[cmd.id] !== undefined);
+  }
+  check("slash: task inserts a checkbox line", SLASH_INSERT["task"], "- [ ] ");
+  check("slash: scene-break inserts the marker", SLASH_INSERT["scene-break"], "* * *");
+  check("slash: heading inserts an H2 marker", SLASH_INSERT["heading"], "## ");
 }
 
 /* ---------- report ---------- */

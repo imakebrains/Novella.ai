@@ -9,11 +9,12 @@ import {
   closeBrackets,
   closeBracketsKeymap,
   completionKeymap,
+  startCompletion,
   type CompletionContext,
   type CompletionResult,
 } from "@codemirror/autocomplete";
 import { store, useVaultVersion } from "../state/vaultStore";
-import { registerEditorInsert } from "./editorBridge";
+import { registerEditorInsert, focusBeatDraft } from "./editorBridge";
 import { BeatsPanel } from "./BeatsPanel";
 import {
   critiqueExtension,
@@ -23,6 +24,7 @@ import {
 } from "./critiqueExtension";
 import { taskCheckboxes } from "./taskCheckboxes";
 import { boardStore, useBoards } from "../state/boards";
+import { SLASH_TRIGGER, SLASH_INSERT, matchSlashCommands } from "./slashCommands";
 import type { IssueKind } from "../analysis/prose";
 
 /* Autocomplete inside [[ ]]. Sourced from the live vault every
@@ -42,6 +44,71 @@ function wikiLinkSource(ctx: CompletionContext): CompletionResult | null {
     })),
     validFor: /^[^\]\n]*$/,
   };
+}
+
+/* Slash-command menu. Fires on a blank line only (see SLASH_TRIGGER) —
+   the command word itself becomes the completion, and applying one
+   replaces it in place rather than inserting after it. */
+function slashCommandSource(ctx: CompletionContext): CompletionResult | null {
+  const before = ctx.matchBefore(SLASH_TRIGGER);
+  if (!before) return null;
+
+  const query = before.text.slice(1);
+  const commands = matchSlashCommands(query);
+  if (commands.length === 0) return null;
+
+  return {
+    from: before.from,
+    options: commands.map((cmd) => ({
+      label: `/${cmd.label}`,
+      detail: cmd.hint,
+      type: "keyword",
+      apply: (view: EditorView, _completion, from: number, to: number) => {
+        applySlashCommand(cmd.id, view, from, to);
+      },
+    })),
+    validFor: /^\/\w*$/,
+  };
+}
+
+/* Plain-text commands insert fixed prose (SLASH_INSERT). The rest reach
+   into the vault: a beat lands in the chapter's beat plan rather than the
+   prose itself, a link reopens the [[ menu so the writer keeps typing,
+   and a new character is created on the spot and linked in immediately —
+   no trip to the codex to break the writer's flow. */
+function applySlashCommand(id: string, view: EditorView, from: number, to: number): void {
+  const plain = SLASH_INSERT[id];
+  if (plain !== undefined) {
+    view.dispatch({ changes: { from, to, insert: plain } });
+    return;
+  }
+
+  if (id === "link") {
+    view.dispatch({ changes: { from, to, insert: "[[" } });
+    startCompletion(view);
+    return;
+  }
+
+  if (id === "beat") {
+    view.dispatch({ changes: { from, to, insert: "" } });
+    focusBeatDraft();
+    return;
+  }
+
+  if (id === "character") {
+    const active = store.active();
+    if (!active) {
+      view.dispatch({ changes: { from, to, insert: "" } });
+      return;
+    }
+    const name = `Character ${store.vault.byType("character").length + 1}`;
+    store.createFromDanglingLink(name, "character");
+    const insert = `[[${name}]]`;
+    view.dispatch({
+      changes: { from, to, insert },
+      selection: { anchor: from + insert.length },
+    });
+  }
 }
 
 /* Editor chrome. Kept in CodeMirror's theme system rather than app.css so
@@ -151,7 +218,7 @@ export function EditorPane() {
       extensions: [
         history(),
         closeBrackets(),
-        autocompletion({ override: [wikiLinkSource], activateOnTyping: true }),
+        autocompletion({ override: [wikiLinkSource, slashCommandSource], activateOnTyping: true }),
         keymap.of([...closeBracketsKeymap, ...completionKeymap, ...historyKeymap, ...defaultKeymap]),
         markdown(),
         syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
