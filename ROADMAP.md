@@ -40,18 +40,12 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
 - [x] **Table view for the manuscript** — shipped 2026-07-23.
 - [x] **Alt+↑/↓ moves the current paragraph** — shipped 2026-07-23.
 - [x] **Note templates** — shipped 2026-07-23: right-click → Save as template (Templates/, `(template)` suffix so links never mis-resolve); + New stamps from it with {{name}}/{{date}}.
-- [ ] **Drag images onto board cards** — drop an image file on a chapter card
-      for card art; downscale like project covers; store at
-      `.novella/images/<note-id>.jpg` via `storage()` so it travels (IDB on
-      web, disk on desktop); hydrate on board render; removable.
+- [x] **Drag images onto board cards** — shipped 2026-07-23: drop → downscaled JPEG at `.novella/images/<note-id>.jpg` (travels with the folder), lazy-hydrated on board render, ✕ to remove.
 - [x] **Personalization: accent color + prose font/size** — shipped 2026-07-23: Settings → Appearance, on top of any theme, per device; reset button.
 - [x] **Quiet first run** — shipped 2026-07-23: first launch opens the editor alone on the seed chapter; Codex/Tools one labeled click away; pane choices remembered.
 - [x] **Rename notes in place** — shipped 2026-07-23.
 - [x] **Word-level diff inside History's changed paragraphs** — shipped 2026-07-23.
-- [ ] **Continuity checks, deterministic tier** — no model: characters
-      appearing before their first-introduced chapter, frontmatter fact
-      fields (age, eye colour) contradicted by other frontmatter, dangling
-      links older than N days. Panel in the Inspector; pure checks + tests.
+- [x] **Continuity checks, deterministic tier** — shipped 2026-07-23: Continuity inspector tab; provable checks only (early mention via `introduced:`, near-duplicate codex names, dangling links with counts, unordered chapters, unknown POV); click opens the note; 9 unit checks.
 - [ ] **OS keychain for API keys (desktop)** — Tauri command pair
       (`keyring` crate) storing provider secrets; fall back to in-memory on
       web. Removes the re-enter-each-session cost.

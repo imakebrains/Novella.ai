@@ -13,7 +13,8 @@ import { moveParagraph } from "./src/core/paragraphs";
 import { matchPalette } from "./src/ui/palette";
 import { sortTable } from "./src/ui/chapterTable";
 import { acceptsTemperature } from "./src/ai/models";
-import { parseNote, serializeNote, extractWikiLinks } from "./src/core/vault";
+import { parseNote, serializeNote, extractWikiLinks, Vault } from "./src/core/vault";
+import { checkContinuity } from "./src/analysis/continuity";
 import {
   chapterFilename,
   chapterToMarkdown,
@@ -938,6 +939,44 @@ lied, and Wren had known that since she was nine.
     rows.map((r) => r.id).join(""),
     "abc",
   );
+}
+
+/* ---------- continuity checks ---------- */
+
+{
+  const v = new Vault();
+  const mk = (path: string, raw: string) => v.add(parseNote(path, raw));
+
+  mk("Manuscript/One.md", "---\ntype: chapter\nname: One\norder: 1\npov: Wren\n---\nShe passed [[The Stranger]] on the quay. [[Nobody Yet]] waved.");
+  mk("Manuscript/Two.md", "---\ntype: chapter\nname: Two\norder: 2\npov: \"[[Ghost Captain]]\"\n---\nCalm water. [[Nobody Yet]] again.");
+  mk("Manuscript/Loose.md", "---\ntype: chapter\nname: Loose\n---\nNo order field here.");
+  mk("Codex/Characters/Wren.md", "---\ntype: character\nname: Wren\n---\n");
+  mk("Codex/Characters/Stranger.md", "---\ntype: character\nname: The Stranger\nintroduced: 2\n---\n");
+  mk("Codex/Characters/Wren2.md", "---\ntype: character\nname: wren!\n---\n");
+
+  const found = checkContinuity(v);
+  const kinds = (k: string) => found.filter((f) => f.kind === k);
+
+  check("continuity: early mention caught via introduced:", kinds("early-mention").length, 1);
+  ok(
+    "continuity: early mention names both chapters",
+    kinds("early-mention")[0]!.message.includes("chapter 1") &&
+      kinds("early-mention")[0]!.message.includes("chapter 2"),
+  );
+  check("continuity: near-duplicate names caught", kinds("duplicate-name").length, 1);
+  check("continuity: dangling link counted across chapters", kinds("dangling").length, 1);
+  ok("continuity: dangling counts mentions", kinds("dangling")[0]!.message.includes("2 times"));
+  check("continuity: unordered chapter flagged", kinds("unordered").length, 1);
+  check("continuity: unknown POV flagged once (Wren resolves)", kinds("pov-unknown").length, 1);
+  ok(
+    "continuity: unknown POV names the ghost",
+    kinds("pov-unknown")[0]!.message.includes("Ghost Captain"),
+  );
+
+  // A clean vault stays silent.
+  const clean = new Vault();
+  clean.add(parseNote("Manuscript/Solo.md", "---\ntype: chapter\nname: Solo\norder: 1\n---\nJust prose."));
+  check("continuity: clean vault has no findings", checkContinuity(clean).length, 0);
 }
 
 /* ---------- report ---------- */

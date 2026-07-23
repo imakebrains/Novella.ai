@@ -3,6 +3,7 @@ import type { Note } from "../core/vault";
 import { store, useVaultVersion } from "../state/vaultStore";
 import { stripWikiLinks } from "../ai/context";
 import { cardDerived } from "./cardDerived";
+import { cardImageOf, removeCardImage, setCardImage, useCardImages } from "../state/cardImages";
 import { useActiveProject } from "../state/projects";
 import { boardStore, MANUSCRIPT_BOARD, useBoards } from "../state/boards";
 import { plotStore, threadColor, usePlotThreads } from "../state/plot";
@@ -399,6 +400,8 @@ function Card({
 }) {
   const [addingTag, setAddingTag] = useState(false);
   const [tagDraft, setTagDraft] = useState("");
+  useCardImages();
+  const art = cardImageOf(note.id);
   const derived = cardDerived(note);
   const words = derived.words;
   const tasks = derived.tasks;
@@ -434,6 +437,19 @@ function Card({
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerCancel}
       onContextMenu={onContextMenu}
+      onDragOver={(e) => {
+        if ([...e.dataTransfer.items].some((i) => i.kind === "file")) {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = "copy";
+        }
+      }}
+      onDrop={(e) => {
+        const file = [...e.dataTransfer.files].find((f) => f.type.startsWith("image/"));
+        if (!file) return;
+        e.preventDefault();
+        e.stopPropagation();
+        void setCardImage(note.id, file);
+      }}
       tabIndex={0}
       role="button"
       aria-label={`${note.title}. Chapter ${index + 1}. Click to open.`}
@@ -447,6 +463,22 @@ function Card({
         }
       }}
     >
+      {art && (
+        <div className="card-art-wrap" data-no-drag>
+          <img className="card-art" src={art} alt="" draggable={false} />
+          <button
+            className="card-art-remove"
+            title="Remove this image"
+            onClick={(e) => {
+              e.stopPropagation();
+              void removeCardImage(note.id);
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* No arrow buttons — the card is dragged, full stop. Keyboard users
           still get ← / → via onKeyDown below, which stays out of the way. */}
       <div className="card-top">

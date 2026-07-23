@@ -20,6 +20,7 @@ export type TabId =
   | "tasks"
   | "history"
   | "assistant"
+  | "continuity"
   | "goals"
   | "calendar"
   | "music";
@@ -30,6 +31,7 @@ export const ALL_TABS: TabId[] = [
   "tasks",
   "history",
   "assistant",
+  "continuity",
   "goals",
   "calendar",
   "music",

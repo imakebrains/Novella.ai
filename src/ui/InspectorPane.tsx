@@ -7,6 +7,7 @@ import { buildFromTemplate, usedVariables } from "../ai/prompts";
 import { generate } from "../ai/generate";
 import { insertIntoEditor } from "./editorBridge";
 import { CritiquePanel } from "./CritiquePanel";
+import { ContinuityPanel } from "./ContinuityPanel";
 import { HistoryPanel } from "./HistoryPanel";
 import { TasksPanel } from "./TasksPanel";
 import { SetupPanel } from "./SetupPanel";
@@ -30,6 +31,11 @@ const TAB_DEFS: Record<TabId, { label: string; title: string; needsNote: boolean
   tasks: { label: "Tasks", title: "Every to-do across the project", needsNote: false },
   history: { label: "History", title: "Earlier versions of this note", needsNote: true },
   assistant: { label: "Assistant", title: "Draft with your connected AI", needsNote: true },
+  continuity: {
+    label: "Continuity",
+    title: "Provable slips: early mentions, duplicate names, dangling links",
+    needsNote: false,
+  },
   goals: { label: "Goals", title: "Daily goal, streak and the month's writing", needsNote: false },
   calendar: { label: "Calendar", title: "A real calendar with your plans on it", needsNote: false },
   music: { label: "Music", title: "This project's writing music", needsNote: false },
@@ -57,6 +63,8 @@ export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => 
         return <HistoryPanel />;
       case "assistant":
         return <AssistantTab />;
+      case "continuity":
+        return <ContinuityPanel />;
       case "goals":
         return <GoalsTab />;
       case "calendar":
