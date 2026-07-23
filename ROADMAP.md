@@ -35,13 +35,7 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
 ## Next up
 
 - [x] **Slash commands in the editor** — shipped 2026-07-22.
-- [ ] **Writing sprints (the fourth app)** — a sprint timer wired to the word
-      counter: pick 15/25/45 min, it counts the words written *during* that
-      sprint and logs them beside the session history, with a gentle finish
-      chime. An entire app category exists just for this (Write/Sprint,
-      Ohwrite, Write or Die, Pomowatch, Trackbear) and writers run it in
-      parallel with their writing app — the single clearest "collapse another
-      app" win on the board. Lives in the Goals tab.
+- [x] **Writing sprints (the fourth app)** — shipped 2026-07-23.
 - [ ] **Ctrl+K everywhere** — one palette over titles, aliases, tags, prose,
       tasks, boards and commands; Enter jumps. Named as a core Obsidian
       strength (Omnisearch) and the muscle memory every Notion user brings.
@@ -164,3 +158,18 @@ scale; nothing but use would have caught it.
   opens the Beats panel and focuses its draft input instead. 193 unit checks
   (6 new, in `slashCommands.ts` — the pure trigger regex and command list),
   `npm run verify` green, all six commands exercised live in the dev server.
+- 2026-07-23 — Writing sprints, the fourth app: pick 15/25/45 min in the
+  Goals tab, a countdown ticks down against `manuscriptWordCount()` (the
+  same sampler the daily goal already uses, so the two numbers never
+  disagree), and the net words written during the sprint show live. Stopping
+  early logs the sprint as incomplete; running out logs it complete and
+  plays a synthesized two-tone chime (Web Audio API — no bundled asset, no
+  Tauri config change). A sprint missed while the app was closed settles up
+  the moment the Goals tab remounts rather than drifting. New
+  `src/state/sprints.ts` (pure `remainingSeconds`/`formatClock` + a
+  localStorage-backed store, same `useSyncExternalStore` shape as
+  `sessions.ts`) and `src/ui/{SprintTimer,chime}.ts`. 201 unit checks (8 new),
+  `npm run verify` green, exercised live: started a sprint, typed into the
+  chapter and watched the live count track it, stopped one early (logged
+  "stopped early"), and seeded a near-expired sprint through localStorage to
+  confirm the auto-finish + chime path fires cleanly on reload.

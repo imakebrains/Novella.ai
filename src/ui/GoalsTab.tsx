@@ -1,5 +1,6 @@
 import { useProfile } from "../state/profile";
 import { SessionSummary } from "./GoalMeter";
+import { SprintTimer } from "./SprintTimer";
 import { currentStreak, useSessions, wordsToday } from "../state/sessions";
 
 /* Goals, promoted from a titlebar trinket to a proper tab.
@@ -56,6 +57,8 @@ export function GoalsTab() {
         />
         words
       </label>
+
+      <SprintTimer />
 
       <SessionSummary />
       <p className="hint">

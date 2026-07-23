@@ -19,6 +19,7 @@ import {
 } from "./src/import/manuscript";
 import { extractEntities } from "./src/import/entities";
 import { computeStreak } from "./src/state/sessions";
+import { formatClock, remainingSeconds } from "./src/state/sprints";
 import { assembleColumns, threadColor, PALETTE } from "./src/state/plot";
 import { extractTasks, toggleTaskAt, taskProgress } from "./src/core/tasks";
 import { parseMusicUrl, MUSIC_PRESETS } from "./src/state/music";
@@ -761,6 +762,33 @@ lied, and Wren had known that since she was nine.
   check("slash: task inserts a checkbox line", SLASH_INSERT["task"], "- [ ] ");
   check("slash: scene-break inserts the marker", SLASH_INSERT["scene-break"], "* * *");
   check("slash: heading inserts an H2 marker", SLASH_INSERT["heading"], "## ");
+}
+
+/* ---------- writing sprints ---------- */
+{
+  const start = new Date("2026-07-21T15:00:00").getTime();
+
+  check("sprint: full time left at the start", remainingSeconds(start, 25, start), 25 * 60);
+  check(
+    "sprint: counts down as time passes",
+    remainingSeconds(start, 25, start + 10 * 60_000),
+    15 * 60,
+  );
+  check("sprint: zero right at the deadline", remainingSeconds(start, 25, start + 25 * 60_000), 0);
+  check(
+    "sprint: never negative once overdue",
+    remainingSeconds(start, 25, start + 40 * 60_000),
+    0,
+  );
+  check(
+    "sprint: rounds partial seconds up so the display never reads 0:00 early",
+    remainingSeconds(start, 25, start + 25 * 60_000 - 400),
+    1,
+  );
+
+  check("sprint: formats sub-minute seconds with a leading zero", formatClock(65), "1:05");
+  check("sprint: formats a whole minute", formatClock(900), "15:00");
+  check("sprint: formats zero", formatClock(0), "0:00");
 }
 
 /* ---------- report ---------- */
