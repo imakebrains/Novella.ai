@@ -4249,7 +4249,7 @@ body.focus-mode .cm-editor {
 .web-label {
   fill: var(--fg-primary);
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: 13px;
   text-anchor: middle;
   pointer-events: none;
 }
@@ -4396,4 +4396,136 @@ body.focus-mode .cm-editor {
 
 .coverage-cell.on {
   border-color: transparent;
+}
+
+/* ---------- inspector tab strip: wrap WITHOUT overlaying content ----------
+   The pane head has a fixed height everywhere else, but a strip that can
+   wrap to two or three rows must be allowed to grow — the screenshot bug
+   was the Assistant panel painting on top of the third row's Music tab. */
+
+.pane-head.inspector-tabs {
+  height: auto;
+  min-height: 42px;
+  align-items: center;
+  padding: var(--space-1) var(--space-2);
+  row-gap: 2px;
+}
+
+.inspector-tabs .tab {
+  padding: 3px var(--space-2);
+}
+
+/* ---------- titlebar: three zones, switcher truly centered ----------
+   left | center | right as a grid. The switcher sits in the middle of the
+   WINDOW, not wherever the right-hand cluster happens to end — the old
+   flex layout read as right-heavy because it was. */
+
+.titlebar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.titlebar .brand {
+  justify-self: start;
+}
+
+.titlebar-center {
+  justify-self: center;
+}
+
+.titlebar-right {
+  justify-self: end;
+}
+
+/* ---------- codex head: the project's own name + doorways ---------- */
+
+.pane-head.codex-head {
+  gap: var(--space-1);
+}
+
+.codex-head .pane-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.codex-head .count {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.codex-head .icon-btn {
+  font-size: var(--text-sm);
+}
+
+/* ---------- tab manager additions ---------- */
+
+.tab-plus-title {
+  font-size: 10px;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--space-1) var(--space-2) 2px;
+}
+
+.tab-plus-check {
+  display: inline-block;
+  width: 14px;
+  color: var(--success);
+}
+
+.tab-plus-hint {
+  font-size: 10px;
+  color: var(--fg-muted);
+  padding: var(--space-1) var(--space-2);
+  border-top: 1px solid var(--border);
+  margin-top: 2px;
+}
+
+.editor-menu-item.danger {
+  color: var(--danger);
+}
+
+/* ---------- add-cards picker ---------- */
+
+.add-cards-modal {
+  max-width: 460px;
+}
+
+.add-cards-list {
+  list-style: none;
+  margin: var(--space-2) 0;
+  padding: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.add-cards-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.add-cards-row:hover {
+  background: var(--bg-hover);
+}
+
+.add-cards-name {
+  flex: 1;
+  font-size: var(--text-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.add-cards-type {
+  font-size: var(--text-xs);
+  color: var(--fg-muted);
 }

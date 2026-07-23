@@ -8,6 +8,7 @@ import { useActiveProject } from "../state/projects";
 import { boardStore, MANUSCRIPT_BOARD, useBoards } from "../state/boards";
 import { plotStore, threadColor, usePlotThreads } from "../state/plot";
 import { BoardLayoutToggle, BoardPicker, type BoardLayout } from "./BoardLayoutToggle";
+import { NoteMenu } from "./NoteMenu";
 
 /* The corkboard.
 
@@ -41,6 +42,8 @@ export function Corkboard({
   const [boardId, setBoardId] = useState<string>(
     () => localStorage.getItem("novella.activeBoard") ?? MANUSCRIPT_BOARD,
   );
+  const [cardMenu, setCardMenu] = useState<{ id: string; x: number; y: number } | null>(null);
+  const [adding, setAdding] = useState(false);
 
   // The manuscript board is the chapters in reading order. A custom board
   // is whatever notes were put on it, in the board's own order — reordering
@@ -196,6 +199,11 @@ export function Corkboard({
         <div className="board-head-right">
           <BoardPicker boardId={onManuscript ? MANUSCRIPT_BOARD : boardId} onPick={pickBoard} />
           {!onManuscript && (
+            <button className="btn-primary" onClick={() => setAdding(true)}>
+              + Add cards
+            </button>
+          )}
+          {!onManuscript && (
             <button
               className="btn-ghost"
               onClick={() => {
@@ -226,8 +234,8 @@ export function Corkboard({
             <>
               <p>Nothing on this board yet.</p>
               <p className="muted">
-                Right-click in the editor and choose <em>Add to board</em> to pin any
-                chapter or note here.
+                Press <em>+ Add cards</em> above to pin chapters and notes here — or
+                right-click anything in the left pane or the editor.
               </p>
             </>
           )}
@@ -248,6 +256,10 @@ export function Corkboard({
             onPointerMove={onPointerMove}
             onPointerUp={(e) => onPointerUp(e, chapter.id)}
             onPointerCancel={cancelDrag}
+            onContextMenu={(e) => {
+              e.preventDefault();
+              setCardMenu({ id: chapter.id, x: e.clientX, y: e.clientY });
+            }}
             onNudge={(dir) => {
               const ids = chapters.map((c) => c.id);
               const target = i + dir;
@@ -258,7 +270,103 @@ export function Corkboard({
           />
         ))}
       </div>
+
+      {cardMenu && (
+        <NoteMenu
+          noteId={cardMenu.id}
+          x={cardMenu.x}
+          y={cardMenu.y}
+          onClose={() => setCardMenu(null)}
+          onOpenNote={() => onOpen(cardMenu.id)}
+          extras={
+            onManuscript
+              ? []
+              : [
+                  {
+                    label: "Remove from this board",
+                    danger: true,
+                    action: () => boardStore.removeNote(boardId, cardMenu.id),
+                  },
+                ]
+          }
+        />
+      )}
+
+      {adding && !onManuscript && customBoard && (
+        <AddCardsPicker
+          boardId={boardId}
+          onClose={() => setAdding(false)}
+        />
+      )}
     </main>
+  );
+}
+
+/* The add-cards picker — a custom board fills from here.
+
+   Every note in the project, tick to pin. This answered a real confusion:
+   a fresh board looked like a dead end because the only way onto it was a
+   right-click somewhere else entirely. */
+function AddCardsPicker({ boardId, onClose }: { boardId: string; onClose: () => void }) {
+  useVaultVersion();
+  const [query, setQuery] = useState("");
+  const board = boardStore.get(boardId);
+  const q = query.trim().toLowerCase();
+  const notes = store.vault
+    .all()
+    .filter((n) => n.type !== "prompt")
+    .filter((n) => !q || n.title.toLowerCase().includes(q))
+    .sort((a, b) => a.title.localeCompare(b.title));
+
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal add-cards-modal" onClick={(e) => e.stopPropagation()}>
+        <header className="modal-head">
+          <h2>Add to “{board?.name ?? "board"}”</h2>
+          <button className="icon-btn" onClick={onClose} title="Done (Esc)">
+            ✕
+          </button>
+        </header>
+        <div className="modal-body">
+          <input
+            className="search bare"
+            autoFocus
+            value={query}
+            placeholder="Filter notes…"
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") onClose();
+            }}
+            aria-label="Filter notes"
+          />
+          <ul className="add-cards-list">
+            {notes.map((n) => {
+              const on = board?.noteIds.includes(n.id) ?? false;
+              return (
+                <li key={n.id}>
+                  <label className="add-cards-row">
+                    <input
+                      type="checkbox"
+                      checked={on}
+                      onChange={() => {
+                        if (on) boardStore.removeNote(boardId, n.id);
+                        else boardStore.addNote(boardId, n.id);
+                      }}
+                    />
+                    <span className="type-dot" data-type={n.type} />
+                    <span className="add-cards-name">{n.title}</span>
+                    <span className="add-cards-type">{n.type}</span>
+                  </label>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="hint">
+            Cards are the notes themselves — pinning one here never copies or moves it.
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -273,6 +381,7 @@ function Card({
   onPointerMove,
   onPointerUp,
   onPointerCancel,
+  onContextMenu,
   onNudge,
 }: {
   note: Note;
@@ -286,6 +395,7 @@ function Card({
   onPointerMove: (e: React.PointerEvent<HTMLElement>) => void;
   onPointerUp: (e: React.PointerEvent<HTMLElement>) => void;
   onPointerCancel: () => void;
+  onContextMenu: (e: React.MouseEvent<HTMLElement>) => void;
   onNudge: (dir: -1 | 1) => void;
 }) {
   const [addingTag, setAddingTag] = useState(false);
@@ -325,6 +435,7 @@ function Card({
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerCancel}
+      onContextMenu={onContextMenu}
       tabIndex={0}
       role="button"
       aria-label={`${note.title}. Chapter ${index + 1}. Click to open.`}

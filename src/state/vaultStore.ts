@@ -519,6 +519,23 @@ export class VaultStore {
     return names.sort((a, b) => a.localeCompare(b));
   }
 
+  /** Promote any note into the manuscript: it becomes a chapter and takes
+      the next order number. The file stays where it is — moving it would
+      break links — only its role changes. */
+  convertToChapter(id: string): void {
+    const note = this.index.get(id);
+    if (!note || note.type === "chapter" || note.type === "scene") return;
+    const last = this.orderedChapters().reduce(
+      (max, n) => (typeof n.data.order === "number" ? Math.max(max, n.data.order) : max),
+      0,
+    );
+    note.type = "chapter";
+    note.data.type = "chapter";
+    note.data.order = last + 1;
+    this.dirty.add(id);
+    this.emit();
+  }
+
   /** Create a note at an exact path — for callers that know where a file
       belongs (agent reports), rather than the type-to-folder guess that
       createFromDanglingLink makes. */

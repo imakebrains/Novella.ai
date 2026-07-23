@@ -177,7 +177,7 @@ export function ProjectsPanel({ onClose }: { onClose: () => void }) {
           <p className="hint">
             Each project is its own folder. Characters, locations and links never cross
             between them. Writing a series? Keep the books in one project so they share a
-            story bible.
+            codex.
           </p>
 
           <div className="preset-row" role="radiogroup" aria-label="Start from">

@@ -305,3 +305,22 @@ belong later as an optional AI-provider plugin, not a dependency.
 - [Campfire Write Review — Kindlepreneur](https://kindlepreneur.com/campfire-write-review/)
 - [The 10 Best Distraction-Free Writing Apps of 2026](https://selfpublishing.com/distraction-free-writing-apps/)
 - [Novlr — the creative writing workspace](https://www.novlr.org/)
+
+---
+
+# Round 6 — Notion, properly
+
+How Notion actually works, and why people leave it. Sources: [ClickUp's Notion review](https://clickup.com/learn/topic/productivity/tools/notion/), [eesel's review](https://www.eesel.ai/blog/notion-review), [why-users-abandon pieces](https://medium.com/@ruslansmelniks/why-users-abandon-notion-complexity-limitations-and-the-rise-of-ai-alternatives-cba91a95b535), [XDA on leaving Notion](https://www.xda-developers.com/finally-understand-why-people-leave-notion/).
+
+**What makes Notion Notion** — blocks (everything is a movable block), slash
+commands (`/` inserts anything), and one dataset with many views (the same
+database as table, kanban, gallery, calendar, timeline). Templates mean no
+blank page. These are the interactions worth absorbing, writer-shaped:
+slash commands in the editor, Table/Timeline views of the manuscript,
+Alt+arrow paragraph moves.
+
+**Why people quit it** — the tax: workspaces slow down as they grow, no true
+offline mode, weak mobile, notes buried five layers deep, and export/lock-in
+pain. Every one of these is a Novella strength by construction (local files,
+measured-fast at 118 notes, flat structure, plain Markdown). These become
+standing guardrails in ROADMAP.md, not one-off features.

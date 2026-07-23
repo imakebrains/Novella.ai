@@ -55,7 +55,7 @@ export function TasksPanel() {
         <p className="hint">No tasks yet.</p>
         <p className="hint">
           Type <code>- [ ] something to do</code> on its own line in any note — a chapter, a
-          story bible entry, anywhere — and it shows up here as a real checkbox.
+          codex entry, anywhere — and it shows up here as a real checkbox.
         </p>
       </div>
     );

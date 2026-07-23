@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import type { Note } from "../core/vault";
 import { store, useVaultVersion } from "../state/vaultStore";
+import { useActiveProject } from "../state/projects";
+import { NoteMenu } from "./NoteMenu";
 
 /* Order matters — manuscript sits above the world bible, because
    that's what a writer reaches for most. */
@@ -16,10 +18,18 @@ const GROUPS: { type: string; label: string }[] = [
   { type: "prompt", label: "Prompts" },
 ];
 
-export function CodexPane() {
+export function CodexPane({
+  onImport,
+  onExport,
+}: {
+  onImport: () => void;
+  onExport: () => void;
+}) {
   useVaultVersion();
+  const project = useActiveProject();
   const [query, setQuery] = useState("");
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const [menu, setMenu] = useState<{ id: string; x: number; y: number } | null>(null);
 
   const activeId = store.activeIdOrUndefined();
   const matches = useMemo(
@@ -43,9 +53,17 @@ export function CodexPane() {
 
   return (
     <nav className="pane pane-left">
-      <div className="pane-head">
-        <span className="pane-title">Story Bible</span>
+      <div className="pane-head codex-head">
+        <span className="pane-title" title="This project">
+          {project?.name ?? "Project"}
+        </span>
         <span className="count">{store.vault.all().length}</span>
+        <button className="icon-btn" onClick={onImport} title="Import a manuscript">
+          ⤒
+        </button>
+        <button className="icon-btn" onClick={onExport} title="Export the manuscript">
+          ⤓
+        </button>
       </div>
 
       <div className="search-wrap">
@@ -85,6 +103,10 @@ export function CodexPane() {
                       <button
                         className={`note-item ${note.id === activeId ? "active" : ""}`}
                         onClick={() => store.open(note.id)}
+                        onContextMenu={(e) => {
+                          e.preventDefault();
+                          setMenu({ id: note.id, x: e.clientX, y: e.clientY });
+                        }}
                         title={note.path}
                       >
                         <span className="note-name">{note.title}</span>
@@ -127,6 +149,15 @@ export function CodexPane() {
           </section>
         )}
       </div>
+
+      {menu && (
+        <NoteMenu
+          noteId={menu.id}
+          x={menu.x}
+          y={menu.y}
+          onClose={() => setMenu(null)}
+        />
+      )}
     </nav>
   );
 }

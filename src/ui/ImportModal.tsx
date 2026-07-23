@@ -248,12 +248,12 @@ export function ImportModal({ onClose }: { onClose: () => void }) {
                 </h3>
                 {entities.length === 0 ? (
                   <p className="hint">
-                    No recurring names stood out. You can always add story bible entries by hand.
+                    No recurring names stood out. You can always add codex entries by hand.
                   </p>
                 ) : (
                   <>
                     <p className="hint">
-                      Ticked entries become story bible notes. Nothing here is created unless you
+                      Ticked entries become codex notes. Nothing here is created unless you
                       say so — and unticking costs one click.
                     </p>
                     <div className="btn-row">
@@ -310,7 +310,7 @@ export function ImportModal({ onClose }: { onClose: () => void }) {
               <div className="btn-row import-actions">
                 <button className="btn-primary" onClick={() => void commit()} disabled={!!busy}>
                   Import {chapters.length} {chapters.length === 1 ? "chapter" : "chapters"}
-                  {picked.size > 0 && ` and ${picked.size} story bible ${picked.size === 1 ? "entry" : "entries"}`}
+                  {picked.size > 0 && ` and ${picked.size} codex ${picked.size === 1 ? "entry" : "entries"}`}
                 </button>
                 <button className="btn-ghost" onClick={() => setStage("choose")} disabled={!!busy}>
                   Back
@@ -324,11 +324,11 @@ export function ImportModal({ onClose }: { onClose: () => void }) {
               <p>
                 Imported {summary.chapters} {summary.chapters === 1 ? "chapter" : "chapters"}
                 {summary.codex > 0 &&
-                  ` and ${summary.codex} story bible ${summary.codex === 1 ? "entry" : "entries"}`}
+                  ` and ${summary.codex} codex ${summary.codex === 1 ? "entry" : "entries"}`}
                 .
               </p>
               <p className="hint">
-                Story bible entries start nearly empty on purpose — they're a place for what you
+                Codex entries start nearly empty on purpose — they're a place for what you
                 know, not a guess at it. Link them from your prose with [[double brackets]].
               </p>
               <div className="btn-row">

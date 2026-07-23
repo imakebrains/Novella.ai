@@ -112,33 +112,43 @@ export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => 
           </button>
         ))}
 
-        {prefs.hidden.length > 0 && (
-          <div className="tab-plus-wrap">
-            <button
-              className="tab tab-plus"
-              onClick={() => setPlusOpen((v) => !v)}
-              title="Closed tabs"
-              aria-expanded={plusOpen}
-            >
-              +
-            </button>
-            {plusOpen && (
-              <div className="tab-plus-pop" onMouseLeave={() => setPlusOpen(false)}>
-                {prefs.hidden.map((id) => (
+        {/* Always present — a closed tab must never be a dead end. Lists
+            every tab with its state, so it reads as the manager it is. */}
+        <div className="tab-plus-wrap">
+          <button
+            className="tab tab-plus"
+            onClick={() => setPlusOpen((v) => !v)}
+            title="Show or hide tabs"
+            aria-expanded={plusOpen}
+          >
+            +
+          </button>
+          {plusOpen && (
+            <div className="tab-plus-pop" onMouseLeave={() => setPlusOpen(false)}>
+              <div className="tab-plus-title">Tabs</div>
+              {prefs.order.map((id) => {
+                const shown = !prefs.hidden.includes(id);
+                return (
                   <button
                     key={id}
+                    className={shown ? "shown" : ""}
                     onClick={() => {
-                      tabPrefs.show(id);
-                      setPlusOpen(false);
+                      if (shown) tabPrefs.hide(id);
+                      else {
+                        tabPrefs.show(id);
+                        setPlusOpen(false);
+                      }
                     }}
                   >
+                    <span className="tab-plus-check">{shown ? "✓" : ""}</span>
                     {TAB_DEFS[id].label}
                   </button>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+                );
+              })}
+              <div className="tab-plus-hint">Drag tabs to reorder · × hides</div>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="pane-scroll">{renderTab(tab)}</div>
@@ -350,10 +360,10 @@ function AssistantTab() {
 
       <Section title="Context for this scene">
         <p className="hint">
-          Only the story bible entries this scene references get sent — never the whole thing.
+          Only the codex entries this scene references get sent — never the whole thing.
         </p>
         {ctx.referenced.length === 0 ? (
-          <p className="hint">No story bible entries referenced yet.</p>
+          <p className="hint">No codex entries referenced yet.</p>
         ) : (
           ctx.referenced.map((n) => (
             <button key={n.id} className="link-row" onClick={() => store.open(n.id)}>

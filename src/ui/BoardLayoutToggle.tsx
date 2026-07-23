@@ -84,7 +84,7 @@ export function BoardPicker({
 const LAYOUTS: { id: BoardLayout; label: string; title: string }[] = [
   { id: "cards", label: "Cards", title: "Loose cards" },
   { id: "grid", label: "Grid", title: "Plot grid — threads across chapters" },
-  { id: "web", label: "Web", title: "The story bible as a living map of who connects to whom" },
+  { id: "web", label: "Web", title: "The codex as a living map of who connects to whom" },
   { id: "stats", label: "Stats", title: "Pacing — words, threads and tasks across chapters" },
 ];
 

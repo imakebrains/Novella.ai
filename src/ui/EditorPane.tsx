@@ -214,7 +214,7 @@ export function EditorPane() {
       <main className="editor">
         <div className="empty-state">
           <p>No note open.</p>
-          <p className="muted">Pick something from the Story Bible to start writing.</p>
+          <p className="muted">Pick a chapter or note from the left to start writing.</p>
         </div>
       </main>
     );

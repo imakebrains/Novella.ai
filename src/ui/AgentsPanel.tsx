@@ -23,7 +23,7 @@ import { providerAvailable } from "../ai/generate";
 const SCOPES: { id: AgentScope; label: string }[] = [
   { id: "active-chapter", label: "Open chapter" },
   { id: "manuscript", label: "Whole manuscript" },
-  { id: "codex", label: "Story bible" },
+  { id: "codex", label: "Codex" },
   { id: "everything", label: "Everything" },
 ];
 

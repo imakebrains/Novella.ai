@@ -193,7 +193,7 @@ export default function App() {
           />
         </div>
 
-        <div className="titlebar-right">
+        <div className="titlebar-center">
           <div className="view-switch main-views" role="group" aria-label="View">
             <button
               className={mode === "write" ? "on" : ""}
@@ -210,6 +210,9 @@ export default function App() {
               <span className="view-icon">▦</span> Board
             </button>
           </div>
+        </div>
+
+        <div className="titlebar-right">
           <span className="stat">{totalWords.toLocaleString()} words</span>
           <SaveStatus state={saveState} lastSaved={lastSaved} dirty={dirty} persistent={persistent} />
           {dirty > 0 && (
@@ -255,12 +258,6 @@ export default function App() {
             aria-label={`Theme: ${themeInfo.name}. Click to change.`}
           >
             <span className="theme-dot" style={{ background: themeInfo.swatch[2] }} />
-          </button>
-          <button className="icon-btn" onClick={() => setImportOpen(true)} title="Import a manuscript">
-            ⤒
-          </button>
-          <button className="icon-btn" onClick={() => setExportOpen(true)} title="Export manuscript">
-            ⤓
           </button>
           <button className="icon-btn" onClick={() => setSettingsOpen(true)} title="Settings">
             ⚙
@@ -351,7 +348,9 @@ export default function App() {
                 .join(" "),
         }}
       >
-        {!focus && leftOpen && <CodexPane />}
+        {!focus && leftOpen && (
+          <CodexPane onImport={() => setImportOpen(true)} onExport={() => setExportOpen(true)} />
+        )}
         {!focus && leftOpen && (
           <Resizer
             side="left"

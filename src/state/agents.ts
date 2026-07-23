@@ -143,13 +143,13 @@ export const AGENT_TEMPLATES: Omit<Agent, "id" | "lastRunAt" | "lastStatus" | "l
     enabled: true,
   },
   {
-    name: "Bible gardener",
+    name: "Codex gardener",
     description:
-      "Compares the story bible to the manuscript daily: who's in the prose but missing an entry, which entries the prose contradicts, what's gone stale.",
+      "Compares the codex to the manuscript daily: who's in the prose but missing an entry, which entries the prose contradicts, what's gone stale.",
     example:
-      "• \"Doctor Halloway\" appears in Ch 2 and 4 — no bible entry yet.\n• Bible says the Drift moves nightly; Ch 3 has it resting \"a fortnight\".",
+      "• \"Doctor Halloway\" appears in Ch 2 and 4 — no codex entry yet.\n• Codex says the Drift moves nightly; Ch 3 has it resting \"a fortnight\".",
     instructions:
-      "Compare the story bible to the manuscript. List: characters or places named in prose that have no bible entry; entries the prose never mentions; and bible facts the prose contradicts. Give file-worthy one-line suggestions, nothing more.",
+      "Compare the codex to the manuscript. List: characters or places named in prose that have no codex entry; entries the prose never mentions; and codex facts the prose contradicts. Give file-worthy one-line suggestions, nothing more.",
     scope: "everything",
     trigger: { kind: "daily" },
     enabled: true,

@@ -26,6 +26,7 @@ import { weekOf } from "./src/state/planner";
 import { agentIsDue } from "./src/state/agents";
 import { compareVersions } from "./src/state/updates";
 import { defaultBanner } from "./src/seed/bannerArt";
+import { ARC_PER_LABEL, clipLabel, LABEL_MAX_CHARS, ringPositions, webCanvasSize } from "./src/ui/webLayout";
 
 let failures = 0;
 let checks = 0;
@@ -658,6 +659,73 @@ lied, and Wren had known that since she was nine.
   ok("banner: different names get different art", a1 !== b);
   ok("banner: case and spacing don't change the art", defaultBanner("  ASHCROFT hollow ") === a1);
   ok("banner: empty name still yields art", defaultBanner("").startsWith("data:image/svg+xml"));
+}
+
+/* ---------- relationship web layout ---------- */
+
+/* The single-ring version put 44 entries on one circle and a quarter of the
+   labels collided. These lock in the multi-ring rule that replaced it. */
+{
+  check("web: nothing to place", ringPositions(0).length, 0);
+  check("web: places exactly what it's asked to", ringPositions(44).length, 44);
+  check("web: a tiny bible stays on one ring", new Set(ringPositions(6).map((p) => p.ring)).size, 1);
+
+  const big = ringPositions(44);
+  ok("web: a big bible spreads over several rings", new Set(big.map((p) => p.ring)).size >= 2);
+  ok("web: labels alternate above and below", big.some((p) => p.below) && big.some((p) => !p.below));
+
+  // The real defect: neighbouring labels overlapping. Approximate a label as
+  // a box at the node and assert no two collide.
+  const collisions = (n: number): number => {
+    const pts = ringPositions(n).map((p) => ({
+      x: p.x,
+      y: p.y + (p.below ? 15 : -12),
+      w: ARC_PER_LABEL,
+      h: 15,
+    }));
+    let hits = 0;
+    for (let i = 0; i < pts.length; i++) {
+      for (let j = i + 1; j < pts.length; j++) {
+        const a = pts[i]!;
+        const b = pts[j]!;
+        if (
+          Math.abs(a.x - b.x) < (a.w + b.w) / 2 &&
+          Math.abs(a.y - b.y) < (a.h + b.h) / 2
+        ) {
+          hits++;
+        }
+      }
+    }
+    return hits;
+  };
+  check("web: 20 entries never collide", collisions(20), 0);
+  check("web: 44 entries never collide", collisions(44), 0);
+  check("web: 80 entries never collide", collisions(80), 0);
+
+  // Everything must land inside the drawing box, or nodes clip off-canvas.
+  // The box grows with the cast, so it's asked for rather than assumed.
+  for (const n of [6, 44, 80, 200]) {
+    const box = webCanvasSize(n);
+    ok(
+      `web: all ${n} nodes stay inside the ${box}px canvas`,
+      ringPositions(n).every((p) => p.x > 30 && p.x < box - 30 && p.y > 30 && p.y < box - 30),
+    );
+  }
+  ok("web: the canvas grows with the cast", webCanvasSize(200) > webCanvasSize(20));
+  check("web: 200 entries never collide", collisions(200), 0);
+
+  // Labels are clipped so one operatic name can't set the spacing for the
+  // whole map — and the arc budget must actually cover a clipped label.
+  check("web: short names pass through", clipLabel("Wren"), "Wren");
+  ok(
+    "web: long names are clipped",
+    clipLabel("Archmagister Corvane the Undying").length <= LABEL_MAX_CHARS,
+  );
+  ok(
+    "web: clipped names show an ellipsis",
+    clipLabel("Archmagister Corvane the Undying").endsWith("…"),
+  );
+  ok("web: the arc budget covers a full-width label", ARC_PER_LABEL >= LABEL_MAX_CHARS * 7);
 }
 
 /* ---------- report ---------- */

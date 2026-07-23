@@ -11,8 +11,8 @@ import { store } from "../state/vaultStore";
 const KINDS: { type: string; label: string; hint: string }[] = [
   { type: "chapter", label: "Chapter", hint: "Lands at the end of the manuscript" },
   { type: "scene", label: "Scene", hint: "A smaller unit — also on the board" },
-  { type: "character", label: "Character", hint: "Story bible entry, linkable with [[name]]" },
-  { type: "location", label: "Location", hint: "Story bible entry for a place" },
+  { type: "character", label: "Character", hint: "Codex entry, linkable with [[name]]" },
+  { type: "location", label: "Location", hint: "Codex entry for a place" },
   { type: "note", label: "Note", hint: "Checklists, research, anything" },
 ];
 
