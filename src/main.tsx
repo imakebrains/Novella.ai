@@ -4,6 +4,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import { ErrorBoundary } from "./ui/ErrorBoundary";
 import { installDevtools } from "./devtools";
+import { bootPersonalization } from "./ui/personalize";
 import { pluginHost } from "./plugins/runtime";
 import { ollamaStreamingProvider } from "./plugins/providers/ollama";
 import { openAICompatibleProvider } from "./plugins/providers/openaiCompatible";
@@ -28,6 +29,9 @@ pluginHost.register(openAICompatibleProvider);
 
 // Dev-only; the bundler drops this entirely in production builds.
 installDevtools();
+
+// Saved accent/font/size overrides, before first paint.
+bootPersonalization();
 
 const root = document.getElementById("root");
 if (!root) throw new Error("Missing #root element");

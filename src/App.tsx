@@ -31,8 +31,14 @@ export default function App() {
   useVaultVersion();
   const { cycle: cycleTheme, info: themeInfo } = useTheme();
   const [loaded, setLoaded] = useState(false);
-  const [leftOpen, setLeftOpen] = useState(true);
-  const [rightOpen, setRightOpen] = useState(true);
+  // Pane toggles are remembered; the first-run branch below closes both
+  // so a new writer meets one calm page, not three panes of controls.
+  const [leftOpen, setLeftOpen] = useState(
+    () => localStorage.getItem("novella.pane.left") !== "0",
+  );
+  const [rightOpen, setRightOpen] = useState(
+    () => localStorage.getItem("novella.pane.right") !== "0",
+  );
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
@@ -94,6 +100,11 @@ export default function App() {
       if (store.vault.all().length === 0) store.loadSeed();
 
       if (projectStore.all().length === 0) {
+        // Genuinely the first launch: quiet by default. The panes exist
+        // one click away ("Codex", "Tools" in the titlebar) — depth on
+        // demand instead of a cockpit on day one.
+        setLeftOpen(false);
+        setRightOpen(false);
         if (storage().kind === "web") {
           // Browser first run: the seed world becomes a REAL project in
           // IndexedDB, so everything done to it persists. The browser is a
@@ -168,6 +179,13 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("novella.boardLayout", boardLayout);
   }, [boardLayout]);
+
+  useEffect(() => {
+    localStorage.setItem("novella.pane.left", leftOpen ? "1" : "0");
+  }, [leftOpen]);
+  useEffect(() => {
+    localStorage.setItem("novella.pane.right", rightOpen ? "1" : "0");
+  }, [rightOpen]);
 
   if (!loaded) return null;
 

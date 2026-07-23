@@ -3189,6 +3189,32 @@ body.focus-mode .cm-editor {
   color: var(--fg-primary);
 }
 
+.personalize-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-2) 0;
+  font-size: var(--text-sm);
+}
+.personalize-row select,
+.personalize-row input[type="range"] {
+  max-width: 220px;
+}
+.personalize-row input[type="color"] {
+  width: 44px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+}
+.hint-inline {
+  color: var(--fg-muted);
+  font-weight: 400;
+}
+
 .quick-create-label {
   margin: var(--space-2) 0 var(--space-1);
   font-size: var(--text-xs);

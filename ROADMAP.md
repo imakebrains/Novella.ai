@@ -39,22 +39,13 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
 - [x] **Ctrl+K everywhere** — shipped 2026-07-23.
 - [x] **Table view for the manuscript** — shipped 2026-07-23.
 - [x] **Alt+↑/↓ moves the current paragraph** — shipped 2026-07-23.
-- [ ] **Note templates** — "new character/location/chapter from template",
-      stored as ordinary notes under `Templates/`. Obsidian's Templater and
-      QuickAdd are perennial must-have plugins; presets proved the shape
-      already, this makes it repeatable mid-project.
+- [x] **Note templates** — shipped 2026-07-23: right-click → Save as template (Templates/, `(template)` suffix so links never mis-resolve); + New stamps from it with {{name}}/{{date}}.
 - [ ] **Drag images onto board cards** — drop an image file on a chapter card
       for card art; downscale like project covers; store at
       `.novella/images/<note-id>.jpg` via `storage()` so it travels (IDB on
       web, disk on desktop); hydrate on board render; removable.
-- [ ] **Personalization: accent color + prose font/size** — Settings →
-      Appearance: color input overriding `--accent`/`--accent-soft` (compute
-      a readable `--accent-fg`), prose font choice and editor text size via
-      CSS vars; persisted in localStorage; reset button.
-- [ ] **Quiet first run** — first launch opens ONE pane (the editor with the
-      seed chapter); Story Bible and Inspector present but closed; a 3-line
-      welcome note instead of tutorial screens. Depth on demand, calm by
-      default — the #1 usability complaint about the category.
+- [x] **Personalization: accent color + prose font/size** — shipped 2026-07-23: Settings → Appearance, on top of any theme, per device; reset button.
+- [x] **Quiet first run** — shipped 2026-07-23: first launch opens the editor alone on the seed chapter; Codex/Tools one labeled click away; pane choices remembered.
 - [x] **Rename notes in place** — shipped 2026-07-23.
 - [x] **Word-level diff inside History's changed paragraphs** — shipped 2026-07-23.
 - [ ] **Continuity checks, deterministic tier** — no model: characters
@@ -64,8 +55,7 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
 - [ ] **OS keychain for API keys (desktop)** — Tauri command pair
       (`keyring` crate) storing provider secrets; fall back to in-memory on
       web. Removes the re-enter-each-session cost.
-- [ ] **Export presets per format** — remember last-used export options per
-      project in `.novella/`.
+- [x] **Export presets per format** — shipped 2026-07-23 (.novella/export.json, restored on open).
 - [ ] **Silent auto-update** — generate a Tauri updater keypair, add the
       pubkey + endpoint to `tauri.conf.json`, wire `tauri-plugin-updater`,
       and have CI attach `latest.json`. Needs a decision from the owner
@@ -80,19 +70,13 @@ Everything below is a real observation, not a guess. What held up: bulk load
 55ms, DOCX export 68ms, compile 3ms, search 1ms, task aggregation instant,
 focus mode clean. What didn't:
 
-- [ ] **Board card virtualization** — 64 cards render fine, but every card
-      recomputes word count, tasks and thread dots on each vault change.
-      Above ~150 chapters that's wasteful. Memoize per-card derived values,
-      keyed on the note's body, before it becomes a real stall.
-- [ ] **Stats view needs a scroll affordance** — at 64 chapters the chart
-      scrolls horizontally with no visual hint that there's more to the
-      right. Add an edge fade or a count so it's obvious.
+- [x] **Board card virtualization** — shipped 2026-07-23 (the memoization half): per-note words/tasks/synopsis cached by body identity (cardDerived) across corkboard, stats, table. True windowing deferred until real projects pass ~300 chapters.
+- [x] **Stats view needs a scroll affordance** — shipped 2026-07-23: edge fades driven by a reusable useScrollEdges hook.
 - [ ] **The codex pane doesn't group at scale** — 44 characters is a
       flat wall of names. Add per-type collapse memory and a letter index
       or sub-grouping once a type passes ~20 entries.
 - [x] **No way to delete a note from the UI** — shipped 2026-07-23: right-click → Delete note anywhere; undo toast; trash copy in `.novella/trash/`; board membership cleaned and restored.
-- [ ] **Agents can't be reordered or run as a group** — with five agents
-      installed there's no "run all now". Minor, but asked-for shape.
+- [x] **Agents can't be reordered or run as a group** — shipped 2026-07-23: Run all now (sequential) + hover ↑↓ reorder, order persisted.
 
 ## Research cadence
 
@@ -118,6 +102,19 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-07-23 — Roadmap burn-down, phase 2 (session) + owner feedback pass.
+  OWNER FEEDBACK ("still don't see the +; symbols aren't obvious"):
+  the + is now a labeled "+ New" pill; the codex header speaks words
+  ("+ New", "Import", "Export"); titlebar toggles labeled Codex/Tools/
+  Focus; Rename… added to every note's right-click menu (opens the note
+  with its title selected). BUILT from the list: note templates, export
+  presets, agents run-all + reorder, stats edge fades (useScrollEdges),
+  per-note derived-value cache (cardDerived), personalization (accent/
+  prose font/size on top of any theme, per device, with reset), quiet
+  first run (editor alone; pane choices persisted). SWEPT: every board
+  layout, inspector tab, settings page, and modal open/close with zero
+  fresh console errors. 232 checks green throughout.
 
 - 2026-07-23 — Roadmap burn-down, phase 1 (session; release deferred until
   the list is done, per the owner). BUILT: Alt+↑/↓ paragraph moves

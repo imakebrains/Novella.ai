@@ -16,6 +16,12 @@ import {
   type UpdateCheck,
 } from "../state/updates";
 import { AgentsPanel } from "./AgentsPanel";
+import {
+  loadPersonalization,
+  resetPersonalization,
+  savePersonalization,
+  type Personalization,
+} from "./personalize";
 
 /* Settings.
 
@@ -163,6 +169,13 @@ function ProfileTab() {
 
 function AppearanceTab() {
   const { theme, setTheme } = useTheme();
+  const [personal, setPersonal] = useState<Personalization>(() => loadPersonalization());
+
+  const change = (patch: Partial<Personalization>) => {
+    const next = { ...personal, ...patch };
+    setPersonal(next);
+    savePersonalization(next);
+  };
 
   return (
     <>
@@ -187,6 +200,65 @@ function AppearanceTab() {
           </button>
         ))}
       </div>
+
+      <section className="settings-group">
+        <h3 className="settings-cat">Make it yours</h3>
+        <p className="hint">
+          These sit on top of whichever theme is active, and follow this device
+          rather than the project.
+        </p>
+
+        <label className="personalize-row">
+          <span>Accent color</span>
+          <input
+            type="color"
+            value={personal.accent ?? "#e8a33d"}
+            onChange={(e) => change({ accent: e.target.value })}
+            aria-label="Accent color"
+          />
+        </label>
+
+        <label className="personalize-row">
+          <span>Prose font</span>
+          <select
+            value={personal.proseFont ?? "serif"}
+            onChange={(e) =>
+              change({ proseFont: e.target.value as Personalization["proseFont"] })
+            }
+          >
+            <option value="serif">Book serif (default)</option>
+            <option value="sans">Clean sans-serif</option>
+            <option value="mono">Typewriter mono</option>
+          </select>
+        </label>
+
+        <label className="personalize-row">
+          <span>
+            Prose size <span className="hint-inline">{personal.proseSize ?? 17}px</span>
+          </span>
+          <input
+            type="range"
+            min={14}
+            max={24}
+            step={1}
+            value={personal.proseSize ?? 17}
+            onChange={(e) => change({ proseSize: Number(e.target.value) })}
+            aria-label="Prose text size in pixels"
+          />
+        </label>
+
+        <div className="btn-row">
+          <button
+            className="btn-ghost"
+            onClick={() => {
+              resetPersonalization();
+              setPersonal({});
+            }}
+          >
+            Back to the theme's own look
+          </button>
+        </div>
+      </section>
     </>
   );
 }
