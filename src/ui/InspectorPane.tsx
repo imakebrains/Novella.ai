@@ -45,10 +45,26 @@ export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => 
   useVaultVersion();
   const prefs = useTabPrefs();
   const [plusOpen, setPlusOpen] = useState(false);
-  const dragFrom = useRef<TabId | null>(null);
+  const headRef = useRef<HTMLDivElement>(null);
   const active = store.active();
-  const visible = tabPrefs.visible();
   const tab = prefs.active;
+
+  // Click-away and Escape close the tool menu.
+  useEffect(() => {
+    if (!plusOpen) return;
+    const away = (e: MouseEvent) => {
+      if (!headRef.current?.contains(e.target as Node)) setPlusOpen(false);
+    };
+    const key = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setPlusOpen(false);
+    };
+    window.addEventListener("mousedown", away);
+    window.addEventListener("keydown", key);
+    return () => {
+      window.removeEventListener("mousedown", away);
+      window.removeEventListener("keydown", key);
+    };
+  }, [plusOpen]);
 
   const renderTab = (id: TabId) => {
     if (TAB_DEFS[id].needsNote && !active) return <p className="empty-note">Nothing open.</p>;
@@ -74,89 +90,40 @@ export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => 
     }
   };
 
+  // One dropdown instead of a wrapping tab strip — owner feedback: the
+  // row of tabs read as clutter. The dropdown names where you are and
+  // lists everywhere you could be, with a one-line description each.
   return (
     <aside className="pane pane-right">
-      <div className="pane-head tabs inspector-tabs">
-        {visible.map((id) => (
-          <button
-            key={id}
-            className={`tab ${tab === id ? "on" : ""}`}
-            title={TAB_DEFS[id].title}
-            draggable
-            onDragStart={(e) => {
-              dragFrom.current = id;
-              e.dataTransfer.effectAllowed = "move";
-            }}
-            onDragOver={(e) => {
-              if (dragFrom.current && dragFrom.current !== id) e.preventDefault();
-            }}
-            onDrop={(e) => {
-              e.preventDefault();
-              if (dragFrom.current && dragFrom.current !== id) {
-                tabPrefs.moveBefore(dragFrom.current, id);
-              }
-              dragFrom.current = null;
-            }}
-            onDragEnd={() => {
-              dragFrom.current = null;
-            }}
-            onClick={() => tabPrefs.setActive(id)}
-          >
-            {TAB_DEFS[id].label}
-            {visible.length > 1 && (
-              <span
-                className="tab-close"
-                role="button"
-                aria-label={`Close the ${TAB_DEFS[id].label} tab`}
-                title="Close (bring back with +)"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  tabPrefs.hide(id);
+      <div className="pane-head inspector-head" ref={headRef}>
+        <button
+          className="tool-picker-btn"
+          onClick={() => setPlusOpen((v) => !v)}
+          aria-expanded={plusOpen}
+          title="Switch tool — links, tasks, history, assistant and more"
+        >
+          {TAB_DEFS[tab].label} <span className="picker-caret">▾</span>
+        </button>
+
+        {plusOpen && (
+          <div className="tool-picker-menu" role="menu">
+            {prefs.order.map((id) => (
+              <button
+                key={id}
+                role="menuitem"
+                className={`picker-item ${tab === id ? "on" : ""}`}
+                onClick={() => {
+                  tabPrefs.show(id);
+                  tabPrefs.setActive(id);
+                  setPlusOpen(false);
                 }}
               >
-                ×
-              </span>
-            )}
-          </button>
-        ))}
-
-        {/* Always present — a closed tab must never be a dead end. Lists
-            every tab with its state, so it reads as the manager it is. */}
-        <div className="tab-plus-wrap">
-          <button
-            className="tab tab-plus"
-            onClick={() => setPlusOpen((v) => !v)}
-            title="Show or hide tabs"
-            aria-expanded={plusOpen}
-          >
-            +
-          </button>
-          {plusOpen && (
-            <div className="tab-plus-pop" onMouseLeave={() => setPlusOpen(false)}>
-              <div className="tab-plus-title">Tabs</div>
-              {prefs.order.map((id) => {
-                const shown = !prefs.hidden.includes(id);
-                return (
-                  <button
-                    key={id}
-                    className={shown ? "shown" : ""}
-                    onClick={() => {
-                      if (shown) tabPrefs.hide(id);
-                      else {
-                        tabPrefs.show(id);
-                        setPlusOpen(false);
-                      }
-                    }}
-                  >
-                    <span className="tab-plus-check">{shown ? "✓" : ""}</span>
-                    {TAB_DEFS[id].label}
-                  </button>
-                );
-              })}
-              <div className="tab-plus-hint">Drag tabs to reorder · × hides</div>
-            </div>
-          )}
-        </div>
+                <span className="tool-name">{TAB_DEFS[id].label}</span>
+                <span className="tool-blurb">{TAB_DEFS[id].title}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="pane-scroll">{renderTab(tab)}</div>
@@ -301,12 +268,18 @@ function AssistantTab() {
     .map((l) => l.note)
     .filter((n): n is NonNullable<typeof n> => Boolean(n));
 
-  // A chosen prompt template replaces the default "continue" behaviour.
-  // Both builders return the same shape, so nothing downstream branches.
+  // A chosen style replaces the default "continue" behaviour. Both
+  // builders return the same shape, so nothing downstream branches. The
+  // writer's direction line rides along either way — styles that use
+  // {{guidance}} place it themselves; for the rest it's appended.
   const chosen = promptId ? store.vault.get(promptId) : undefined;
-  const ctx = chosen
-    ? buildFromTemplate(chosen.body, active, referenced)
+  const baseCtx = chosen
+    ? buildFromTemplate(chosen.body, active, referenced, { guidance: instruction })
     : buildSceneContext(active, referenced, { instruction });
+  const ctx =
+    chosen && instruction.trim() && !chosen.body.includes("{{guidance}}")
+      ? { ...baseCtx, prompt: `${baseCtx.prompt}\n\nDirection from the writer: ${instruction.trim()}` }
+      : baseCtx;
 
   const runGenerate = async () => {
     setBusy(true);
@@ -387,7 +360,7 @@ function AssistantTab() {
         </div>
       </Section>
 
-      <Section title="Prompt">
+      <Section title="Writing style">
         <select
           className="select"
           value={promptId}
@@ -396,6 +369,7 @@ function AssistantTab() {
             setOutput("");
           }}
           disabled={busy}
+          aria-label="Writing style"
         >
           <option value="">Continue the scene (default)</option>
           {store.prompts().map((p) => (
@@ -421,20 +395,61 @@ function AssistantTab() {
           </p>
         )}
         <p className="hint">
-          Prompts are ordinary notes in your vault — edit them like any other file.
+          A style is how the assistant writes — try <em>Extensive novel</em>,{" "}
+          <em>Paragraph mode</em> or <em>Email writer</em>. Each one is an ordinary
+          note under Prompts in the left pane, editable like any other file.
         </p>
+        <div className="btn-row">
+          <button
+            className="btn-ghost"
+            disabled={busy}
+            title="Creates an editable style note and opens it — write instructions for how the assistant should sound"
+            onClick={() => {
+              let n = store.prompts().length + 1;
+              while (store.vault.resolveLink(`My style ${n}`)) n++;
+              const note = store.createNote("prompt", `My style ${n}`);
+              store.setBody(
+                note.id,
+                `Continue "{{scene}}" in this style:\n\n(Describe the voice you want here — sentence length, mood, how much detail, what to avoid.)\n\n{{prose}}\n\nDirection from the writer:\n{{guidance}}\n\nWrite only the prose.`,
+              );
+            }}
+          >
+            + New style
+          </button>
+          <label className="btn-ghost upload-style" title="Import a .txt or .md file as a style">
+            Upload style…
+            <input
+              type="file"
+              accept=".txt,.md"
+              hidden
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                void file.text().then((text) => {
+                  const name = file.name.replace(/\.(txt|md)$/i, "").replace(/[-_]/g, " ");
+                  let title = name;
+                  let n = 2;
+                  while (store.vault.resolveLink(title)) title = `${name} ${n++}`;
+                  const note = store.createNote("prompt", title);
+                  store.setBody(note.id, text);
+                  setPromptId(note.id);
+                });
+                e.target.value = "";
+              }}
+            />
+          </label>
+        </div>
       </Section>
 
       <Section title="Generate">
-        {!chosen && (
-          <input
-            className="search inline"
-            value={instruction}
-            onChange={(e) => setInstruction(e.target.value)}
-            placeholder="Continue this scene."
-            disabled={busy}
-          />
-        )}
+        <input
+          className="search inline"
+          value={instruction}
+          onChange={(e) => setInstruction(e.target.value)}
+          placeholder="What should this be about? e.g. “the storm hits mid-conversation”"
+          title="One line of direction for this run — what should happen, what it's about. Works with every style."
+          disabled={busy}
+        />
         <div className="btn-row">
           <button
             className="btn-primary"

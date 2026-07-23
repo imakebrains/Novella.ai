@@ -12,6 +12,12 @@ export interface Personalization {
   proseFont?: "serif" | "sans" | "mono";
   /** Editor prose size in px. Absent = the theme default (17). */
   proseSize?: number;
+  /** Line spacing in the editor. Absent = 1.75. */
+  leading?: number;
+  /** How wide the page of text runs. Absent = "standard". */
+  measure?: "narrow" | "standard" | "wide";
+  /** Rounded is the theme default; sharp squares everything off. */
+  corners?: "rounded" | "sharp";
 }
 
 const KEY = "novella.personalize";
@@ -84,6 +90,29 @@ export function applyPersonalization(p: Personalization): void {
     root.setProperty("--text-prose", `${p.proseSize / 16}rem`);
   } else {
     root.removeProperty("--text-prose");
+  }
+
+  if (typeof p.leading === "number" && p.leading >= 1.3 && p.leading <= 2.4) {
+    root.setProperty("--prose-leading", String(p.leading));
+  } else {
+    root.removeProperty("--prose-leading");
+  }
+
+  const MEASURES = { narrow: "34rem", standard: "42rem", wide: "54rem" } as const;
+  if (p.measure && p.measure !== "standard") {
+    root.setProperty("--editor-measure", MEASURES[p.measure]);
+  } else {
+    root.removeProperty("--editor-measure");
+  }
+
+  if (p.corners === "sharp") {
+    root.setProperty("--radius-sm", "3px");
+    root.setProperty("--radius-md", "4px");
+    root.setProperty("--radius-lg", "6px");
+  } else {
+    root.removeProperty("--radius-sm");
+    root.removeProperty("--radius-md");
+    root.removeProperty("--radius-lg");
   }
 }
 

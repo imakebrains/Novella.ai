@@ -9,6 +9,7 @@ import {
   type AgentTrigger,
 } from "../state/agents";
 import { runAgent } from "../state/agentRunner";
+import { showUndo } from "../state/undo";
 import { store, useVaultVersion } from "../state/vaultStore";
 import { providerAvailable } from "../ai/generate";
 
@@ -416,11 +417,12 @@ function AgentDetail({
 
       <button
         className="btn-ghost danger agent-delete"
+        title="Removes the agent. Its report note stays, and Undo is offered."
         onClick={() => {
-          if (confirm(`Delete the "${agent.name}" agent? Its report note stays.`)) {
-            agentStore.remove(agent.id);
-            onBack();
-          }
+          const snapshot = { ...agent };
+          agentStore.remove(agent.id);
+          onBack();
+          showUndo(`Deleted the “${snapshot.name}” agent`, () => agentStore.restore(snapshot));
         }}
       >
         Delete this agent

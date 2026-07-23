@@ -1,4 +1,4 @@
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { store, useVaultVersion } from "../state/vaultStore";
 import {
   clearHistory,
@@ -110,18 +110,53 @@ export function HistoryPanel() {
         })}
       </ol>
 
-      <button
-        className="btn-ghost danger"
-        disabled={busy}
-        onClick={() => {
-          if (confirm(`Delete all ${revisions.length} saved versions of "${active.title}"? The text in the editor is not affected.`)) {
-            void clearHistory(active.id);
-          }
-        }}
-      >
-        Clear history for this note
-      </button>
+      <ClearHistoryButton
+        busy={busy}
+        count={revisions.length}
+        onClear={() => void clearHistory(active.id)}
+      />
     </div>
+  );
+}
+
+/* Two clicks instead of a confirm() dialog — some webviews suppress
+   dialogs entirely, which made buttons like this look broken. The armed
+   state disarms itself after a few seconds. */
+function ClearHistoryButton({
+  busy,
+  count,
+  onClear,
+}: {
+  busy: boolean;
+  count: number;
+  onClear: () => void;
+}) {
+  const [armed, setArmed] = useState(false);
+
+  useEffect(() => {
+    if (!armed) return;
+    const t = setTimeout(() => setArmed(false), 4000);
+    return () => clearTimeout(t);
+  }, [armed]);
+
+  return (
+    <button
+      className="btn-ghost danger"
+      disabled={busy}
+      title="The text in the editor is not affected — only the saved versions go."
+      onClick={() => {
+        if (!armed) {
+          setArmed(true);
+          return;
+        }
+        setArmed(false);
+        onClear();
+      }}
+    >
+      {armed
+        ? `Really delete all ${count} versions? Click again`
+        : "Clear history for this note"}
+    </button>
   );
 }
 

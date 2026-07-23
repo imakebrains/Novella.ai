@@ -22,14 +22,17 @@ export interface PromptVariables {
   selection: string;
   /** Everything written so far in this scene. */
   prose: string;
+  /** The writer's one-line direction for this run — what it should be about. */
+  guidance: string;
 }
 
 export const VARIABLES: { key: keyof PromptVariables; blurb: string }[] = [
   { key: "scene", blurb: "Title of the current chapter or scene" },
-  { key: "beat", blurb: "The beat being expanded" },
-  { key: "codex", blurb: "Referenced story bible entries" },
+  { key: "beat", blurb: "The plan step being expanded" },
+  { key: "codex", blurb: "Referenced codex entries" },
   { key: "prose", blurb: "The scene's text so far" },
   { key: "selection", blurb: "Currently selected text" },
+  { key: "guidance", blurb: "The writer's direction for this run" },
 ];
 
 /** Replace {{variable}} tokens. Unknown tokens are left visible rather
@@ -65,7 +68,7 @@ export function buildFromTemplate(
   template: string,
   scene: Note,
   referenced: Note[],
-  extra: { beat?: string; selection?: string } = {},
+  extra: { beat?: string; selection?: string; guidance?: string } = {},
 ): BuiltPrompt {
   // Reuse the scene-context builder so the token-economy rule (only
   // referenced codex entries) applies to custom prompts too.
@@ -83,6 +86,7 @@ export function buildFromTemplate(
     codex: codexBlock,
     selection: extra.selection ?? "",
     prose: stripWikiLinks(scene.body).trim(),
+    guidance: extra.guidance?.trim() || "(none — writer's choice)",
   });
 
   return {
@@ -194,6 +198,46 @@ And the prose of "{{scene}}":
 {{prose}}
 
 Write a 120-word back-cover blurb: hook first line, stakes by the middle, and end on the question that makes someone buy it. No spoilers past the midpoint. Give two versions with different first lines.`,
+  },
+  {
+    name: "Extensive novel",
+    description:
+      "Rich long-form fiction — full paragraphs, interiority, sensory detail. The style for drafting real chapters.",
+    template: `Continue "{{scene}}" in rich novelistic prose.
+
+{{prose}}
+
+Direction from the writer (follow it if given):
+{{guidance}}
+
+Write several full paragraphs. Stay inside the point-of-view character's head — thoughts, senses, small physical detail. Match the established voice and tense. Let moments breathe; don't rush to summary. Write only the prose.`,
+  },
+  {
+    name: "Paragraph mode",
+    description:
+      "One tight paragraph and stop. For inching a scene forward without the model running away.",
+    template: `Continue "{{scene}}" by exactly ONE paragraph.
+
+{{prose}}
+
+Direction from the writer (follow it if given):
+{{guidance}}
+
+One paragraph, 3–6 sentences, then stop. Match voice, tense, and point of view. No summary, no scene break. Write only that paragraph.`,
+  },
+  {
+    name: "Email writer",
+    description:
+      "Plain, warm, professional email drafting — for query letters, newsletters, or anything that isn't the book.",
+    template: `Write an email.
+
+What it needs to say and who it's for:
+{{guidance}}
+
+Useful background, if any relates:
+{{codex}}
+
+Subject line first, then the body. Plain and warm, no corporate filler, short paragraphs, a clear ask or close. Under 200 words unless the content truly needs more.`,
   },
 ];
 

@@ -4,6 +4,7 @@ import { store, useVaultVersion } from "../state/vaultStore";
 import { stripWikiLinks } from "../ai/context";
 import { cardDerived } from "./cardDerived";
 import { cardImageOf, removeCardImage, setCardImage, useCardImages } from "../state/cardImages";
+import { showUndo } from "../state/undo";
 import { useActiveProject } from "../state/projects";
 import { boardStore, MANUSCRIPT_BOARD, useBoards } from "../state/boards";
 import { plotStore, threadColor, usePlotThreads } from "../state/plot";
@@ -207,12 +208,16 @@ export function Corkboard({
             <button
               className="btn-ghost"
               onClick={() => {
-                if (confirm(`Delete the "${customBoard.name}" board? The notes on it are untouched.`)) {
-                  boardStore.remove(boardId);
-                  pickBoard(MANUSCRIPT_BOARD);
-                }
+                // No confirm() dialog — some webviews suppress those and the
+                // button reads as dead. Delete now, offer the way back.
+                const snapshot = { ...customBoard, noteIds: [...customBoard.noteIds] };
+                boardStore.remove(boardId);
+                pickBoard(MANUSCRIPT_BOARD);
+                showUndo(`Deleted the “${snapshot.name}” board`, () => {
+                  boardStore.restore(snapshot);
+                });
               }}
-              title="Delete this board (its notes stay)"
+              title="Delete this board — its notes stay, and Undo is offered"
             >
               Delete board
             </button>

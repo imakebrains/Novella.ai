@@ -51,8 +51,8 @@ What happened here that people still won't talk about?
 export const PRESETS: ProjectPreset[] = [
   {
     id: "novel",
-    name: "Novel",
-    blurb: "Three chapters, character & location sheets, a revision checklist.",
+    name: "The Big Book",
+    blurb: "A novel, ready to go — three chapters, character and place sheets, a revision checklist.",
     files: [
       [
         "Manuscript/01-Chapter-One.md",
@@ -80,8 +80,8 @@ export const PRESETS: ProjectPreset[] = [
   },
   {
     id: "series",
-    name: "Series bible",
-    blurb: "One shared codex, room for several books — how a series stays consistent.",
+    name: "A World to Keep",
+    blurb: "For a series — one shared world, room for several books, so book three still matches book one.",
     files: [
       [
         "Book-1/01-Chapter-One.md",
@@ -105,8 +105,8 @@ export const PRESETS: ProjectPreset[] = [
   },
   {
     id: "short",
-    name: "Short story",
-    blurb: "One manuscript file and a scratch note. No ceremony.",
+    name: "Small but Mighty",
+    blurb: "A short story — one manuscript file and a scratch note. No ceremony.",
     files: [
       ["Manuscript/01-The-Story.md", `---\ntype: chapter\nname: The Story\norder: 1\n---\n`],
       [
@@ -117,8 +117,8 @@ export const PRESETS: ProjectPreset[] = [
   },
   {
     id: "blank",
-    name: "Blank",
-    blurb: "An empty folder. You know what you're doing.",
+    name: "Blank Page",
+    blurb: "Just an empty first chapter. You know what you're doing.",
     files: [
       ["Manuscript/01-Chapter-One.md", `---\ntype: chapter\nname: Chapter One\norder: 1\n---\n`],
     ],

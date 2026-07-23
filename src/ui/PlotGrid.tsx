@@ -203,6 +203,7 @@ export function PlotGrid({
 
 function ThreadHead({ thread, count }: { thread: PlotThread; count: number }) {
   const [open, setOpen] = useState(false);
+  const [armedDelete, setArmedDelete] = useState(false);
   const color = threadColor(thread.color);
 
   return (
@@ -246,18 +247,18 @@ function ThreadHead({ thread, count }: { thread: PlotThread; count: number }) {
             </button>
             <button
               className="danger"
+              title="Removes this thread and its plot points on every chapter. The chapters themselves are untouched."
               onClick={() => {
-                if (
-                  confirm(
-                    `Delete the "${thread.name}" thread? Its plot points on every chapter are removed too. The chapters themselves are untouched.`,
-                  )
-                ) {
-                  plotStore.remove(thread.id);
+                if (!armedDelete) {
+                  setArmedDelete(true);
+                  setTimeout(() => setArmedDelete(false), 4000);
+                  return;
                 }
+                plotStore.remove(thread.id);
                 setOpen(false);
               }}
             >
-              Delete thread
+              {armedDelete ? "Really delete? Click again" : "Delete thread"}
             </button>
           </div>
         </div>

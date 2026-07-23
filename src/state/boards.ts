@@ -167,6 +167,16 @@ export const boardStore = {
     emit();
   },
 
+  /** Put a removed board back exactly as it was — the undo half of a
+      delete. Same id, same cards, same order. */
+  restore(board: Board): void {
+    if (cached.some((b) => b.id === board.id)) return;
+    cached = [...cached, board];
+    mutatedSinceLoad = true;
+    void persistSafely();
+    emit();
+  },
+
   /** Add a note to a board. Already present is a quiet no-op — "add again"
       should never create duplicates or feel like an error. */
   addNote(boardId: string, noteId: string): void {

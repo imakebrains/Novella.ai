@@ -250,6 +250,60 @@ function AppearanceTab() {
           />
         </label>
 
+        <label
+          className="personalize-row"
+          title="How much air between lines in the editor. 1.75 is book-like; higher reads airier, lower fits more on screen."
+        >
+          <span>
+            Line spacing{" "}
+            <span className="hint-inline">{(personal.leading ?? 1.75).toFixed(2)}</span>
+          </span>
+          <input
+            type="range"
+            min={1.4}
+            max={2.2}
+            step={0.05}
+            value={personal.leading ?? 1.75}
+            onChange={(e) => change({ leading: Number(e.target.value) })}
+            aria-label="Editor line spacing"
+          />
+        </label>
+
+        <label
+          className="personalize-row"
+          title="How wide the column of text runs before wrapping. Narrow reads like a paperback; wide fills the screen."
+        >
+          <span>Page width</span>
+          <select
+            value={personal.measure ?? "standard"}
+            onChange={(e) =>
+              change({ measure: e.target.value as Personalization["measure"] })
+            }
+            aria-label="Editor page width"
+          >
+            <option value="narrow">Narrow — paperback</option>
+            <option value="standard">Standard (default)</option>
+            <option value="wide">Wide — fill the screen</option>
+          </select>
+        </label>
+
+        <label
+          className="personalize-row"
+          title="Rounded is the themes' soft look; Sharp squares off every corner for a flatter, tool-like feel."
+        >
+          <span>Corners</span>
+          <select
+            value={personal.corners ?? "rounded"}
+            onChange={(e) =>
+              change({ corners: e.target.value as Personalization["corners"] })
+            }
+            aria-label="Corner style"
+          >
+            <option value="rounded">Rounded (default)</option>
+            <option value="sharp">Sharp</option>
+          </select>
+        </label>
+
         <div className="btn-row">
           <button
             className="btn-ghost"

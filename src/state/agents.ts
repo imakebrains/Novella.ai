@@ -310,6 +310,15 @@ export const agentStore = {
     emit();
   },
 
+  /** The undo half of remove — same id, same run history. */
+  restore(agent: Agent): void {
+    if (cached.some((a) => a.id === agent.id)) return;
+    cached = [...cached, agent];
+    mutatedSinceLoad = true;
+    void persistSafely();
+    emit();
+  },
+
   /** Nudge an agent up or down the list. Order is presentation AND run
       order for "run all", so it's worth persisting. */
   move(id: string, dir: -1 | 1): void {

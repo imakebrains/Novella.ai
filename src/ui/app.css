@@ -1922,6 +1922,200 @@ body:has(.resizer.dragging) {
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
+/* "Let's get started" wizard */
+.wizard {
+  width: min(560px, 100%);
+  padding: var(--space-5);
+  gap: var(--space-4);
+}
+.wizard-progress {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: center;
+  margin-bottom: var(--space-2);
+}
+.wizard-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border-strong);
+  transition: background 0.2s;
+}
+.wizard-dot.on {
+  background: var(--accent);
+}
+.wizard-step h2 {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+}
+.wizard-themes .theme-card {
+  padding: var(--space-2);
+}
+.wizard-presets {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+.preset-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-raised);
+  color: var(--fg-primary);
+  text-align: left;
+  cursor: pointer;
+}
+.preset-card.on {
+  border-color: var(--accent);
+}
+.preset-name {
+  font-weight: 600;
+}
+.preset-blurb {
+  color: var(--fg-muted);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+.wizard-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+}
+
+.upload-style {
+  position: relative;
+  cursor: pointer;
+}
+
+/* Tools dropdown — one labeled button instead of a wrapping tab strip. */
+.inspector-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+}
+.tool-picker-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  color: var(--fg-primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+.tool-picker-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: var(--space-3);
+  right: var(--space-3);
+  z-index: 40;
+  padding: var(--space-1);
+  background: var(--bg-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.tool-picker-menu .picker-item {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+.tool-name {
+  font-weight: 600;
+}
+.tool-blurb {
+  color: var(--fg-muted);
+  font-size: var(--text-xs);
+}
+
+/* Board picker dropdown — one labeled button instead of a pill row. */
+.board-picker-drop {
+  position: relative;
+}
+.board-picker-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  color: var(--fg-primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+.picker-caret {
+  color: var(--fg-muted);
+  font-size: var(--text-xs);
+}
+.board-picker-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 40;
+  min-width: 240px;
+  padding: var(--space-1);
+  background: var(--bg-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+}
+.picker-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--fg-primary);
+  font: inherit;
+  font-size: var(--text-sm);
+  text-align: left;
+  cursor: pointer;
+}
+.picker-item:hover {
+  background: var(--bg-hover);
+}
+.picker-item.on {
+  color: var(--accent);
+}
+.picker-item.add {
+  color: var(--fg-secondary);
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  margin-top: var(--space-1);
+}
+.picker-hint {
+  color: var(--fg-muted);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+.board-picker-menu .board-new-name {
+  margin: var(--space-1) var(--space-2) var(--space-2);
+}
+
 /* Dashed empty-card tiles: "make one of these" without a manual. */
 .ghost-card {
   display: flex;
@@ -3447,6 +3641,39 @@ body.focus-mode .cm-editor {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  margin: calc(var(--space-2) * -1) calc(var(--space-2) * -1) var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--accent) 24%, transparent),
+    transparent 65%
+  );
+}
+.music-head:active {
+  cursor: grabbing;
+}
+
+.music-note-badge {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-right: var(--space-1);
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-fg);
+  font-size: var(--text-xs);
+}
+
+.music-dock.mini {
+  width: 240px;
+}
+.music-dock.mini .music-head {
+  margin-bottom: calc(var(--space-2) * -1);
 }
 
 .music-title {

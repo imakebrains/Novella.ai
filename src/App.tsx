@@ -20,6 +20,7 @@ import { BoardStats } from "./ui/BoardStats";
 import type { BoardLayout } from "./ui/BoardLayoutToggle";
 import { RecoveryBanner } from "./ui/RecoveryBanner";
 import { UndoToastHost } from "./ui/UndoToastHost";
+import { FirstRunWizard, firstRunPending } from "./ui/FirstRunWizard";
 import { useAutosave, type SaveState } from "./state/autosave";
 import { probeSetup } from "./setupProbe";
 import { installAgentRunner } from "./state/agentRunner";
@@ -45,15 +46,19 @@ export default function App() {
   const [projectsOpen, setProjectsOpen] = useState(false);
   const [musicOpen, setMusicOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [wizardOpen, setWizardOpen] = useState(false);
   const activeProject = useActiveProject();
   const left = usePaneWidth("left", 268);
   const right = usePaneWidth("right", 340);
   const [mode, setMode] = useState<"write" | "board">("write");
   // Which board layout: loose cards (corkboard) or the plot grid. Remembered
   // so a plotter who lives in the grid isn't dropped back to cards each time.
-  const [boardLayout, setBoardLayout] = useState<BoardLayout>(
-    () => (localStorage.getItem("novella.boardLayout") as BoardLayout) || "cards",
-  );
+  const [boardLayout, setBoardLayout] = useState<BoardLayout>(() => {
+    const saved = localStorage.getItem("novella.boardLayout") as BoardLayout | null;
+    // Web and Stats were cut from the switch (owner, 2026-07-23); a saved
+    // preference for them would strand the board on an unreachable view.
+    return saved && ["cards", "grid", "table"].includes(saved) ? saved : "cards";
+  });
   // Focus mode: nothing but the page. Distraction-free writing is the most
   // consistently praised feature across every competitor, and it's the one
   // that makes a feature-dense app bearable — depth on demand, calm by
@@ -86,6 +91,8 @@ export default function App() {
       // the demo world into memory even when their real project was one
       // click away — an app that forgets your book on restart isn't done.
       const active = projectStore.active();
+      // Anyone who already has projects predates the welcome interview.
+      if (projectStore.all().length > 0) localStorage.setItem("novella.welcomed", "1");
       if (active?.path) {
         const ok = await store.openFolderAt(active.path);
         if (ok) {
@@ -102,9 +109,11 @@ export default function App() {
       if (projectStore.all().length === 0) {
         // Genuinely the first launch: quiet by default. The panes exist
         // one click away ("Codex", "Tools" in the titlebar) — depth on
-        // demand instead of a cockpit on day one.
+        // demand instead of a cockpit on day one. The two-minute
+        // "Let's get started" interview opens over the seed world.
         setLeftOpen(false);
         setRightOpen(false);
+        if (firstRunPending()) setWizardOpen(true);
         if (storage().kind === "web") {
           // Browser first run: the seed world becomes a REAL project in
           // IndexedDB, so everything done to it persists. The browser is a
@@ -457,6 +466,7 @@ export default function App() {
       {exportOpen && <ExportModal onClose={() => setExportOpen(false)} />}
       {importOpen && <ImportModal onClose={() => setImportOpen(false)} />}
       {projectsOpen && <ProjectsPanel onClose={() => setProjectsOpen(false)} />}
+      {wizardOpen && <FirstRunWizard onDone={() => setWizardOpen(false)} />}
     </div>
   );
 }

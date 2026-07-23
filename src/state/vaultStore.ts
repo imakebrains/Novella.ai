@@ -687,7 +687,9 @@ export class VaultStore {
           ? "Codex/Locations"
           : type === "chapter"
             ? "Manuscript"
-            : "Codex/Lore";
+            : type === "prompt"
+              ? "Prompts"
+              : "Codex/Lore";
     const filename = name.trim().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
     const note = parseNote(
       `${folder}/${filename}.md`,

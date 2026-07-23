@@ -124,9 +124,10 @@ const novellaTheme = EditorView.theme({
   },
   ".cm-content": {
     fontFamily: "var(--font-prose)",
-    lineHeight: "1.75",
+    // Both overridable from Settings → Appearance.
+    lineHeight: "var(--prose-leading, 1.75)",
     padding: "var(--space-6) 0 40vh 0",
-    maxWidth: "42rem",
+    maxWidth: "var(--editor-measure, 42rem)",
     margin: "0 auto",
     caretColor: "var(--accent)",
   },

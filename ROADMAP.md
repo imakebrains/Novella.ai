@@ -84,6 +84,22 @@ scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
 
+- 2026-07-23 — Owner feedback round 3 (session). FIXED THE REPORTED BUG:
+  "Delete board does nothing" — confirm() dialogs are suppressed in some
+  webviews, so every confirm() in the app is gone (boards and agents
+  delete instantly with an Undo toast; clear-history and delete-thread
+  are two-click armed buttons). BUILT: writing styles in the Assistant
+  (Extensive novel / Paragraph mode / Email writer seeds, + New style,
+  Upload style, and an always-on "what should this be about" line wired
+  through a new {{guidance}} variable); board picker is a dropdown and
+  Web/Stats left the layout switch; the Tools pane is one dropdown with
+  per-tool descriptions; the music dock is draggable by its header,
+  minimizable to a mini bar, with an accent header; Appearance grew
+  line spacing, page width and corner style; a 4-step "Let's get
+  started" wizard for new users (name → theme → honest local-AI check →
+  first project); presets renamed The Big Book / A World to Keep /
+  Small but Mighty / Blank Page. All verified live; 241 checks green.
+
 - 2026-07-23 — Playtest pass (session; owner asked for a game-tester
   sweep: "make sure everything visible has a purpose"). The critique
   chips (Sticky/Adverbs/Passive/Echoes) now carry live counts, plain-
