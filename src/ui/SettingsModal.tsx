@@ -8,6 +8,7 @@ import { SessionSummary } from "./GoalMeter";
 import { activeProviderSlash, setActiveProvider } from "../ai/generate";
 import { PRESETS, listRemoteModels } from "../plugins/providers/openaiCompatible";
 import { useMusic } from "../state/music";
+import { isTauri } from "../storage";
 import {
   checkForUpdate,
   currentVersion,
@@ -764,11 +765,27 @@ function SettingRow({ pluginId, field }: { pluginId: string; field: SettingField
     <div className="setting">
       <label className="setting-label">
         {field.label}
-        {field.secret && <span className="chip secret">session only</span>}
+        {field.secret && (
+          <span
+            className="chip secret"
+            title={
+              isTauri()
+                ? "Stored in your OS credential manager — never in a file Novella writes"
+                : "The browser has no safe place for keys, so this lasts until the tab closes"
+            }
+          >
+            {isTauri() ? "in OS keychain" : "session only"}
+          </span>
+        )}
       </label>
 
       {field.kind === "select" ? (
-        <select className="select bare" value={value} onChange={(e) => commit(e.target.value)}>
+        <select
+          className="select bare"
+          value={value}
+          onChange={(e) => commit(e.target.value)}
+          aria-label={field.label}
+        >
           <option value="">—</option>
           {(field.options ?? []).map((o) => (
             <option key={o} value={o}>
@@ -781,6 +798,7 @@ function SettingRow({ pluginId, field }: { pluginId: string; field: SettingField
           type="checkbox"
           checked={value === "true"}
           onChange={(e) => commit(String(e.target.checked))}
+          aria-label={field.label}
         />
       ) : (
         <input
@@ -790,6 +808,7 @@ function SettingRow({ pluginId, field }: { pluginId: string; field: SettingField
           placeholder={field.placeholder ?? ""}
           onChange={(e) => commit(e.target.value)}
           autoComplete={field.secret ? "off" : undefined}
+          aria-label={field.label}
         />
       )}
     </div>

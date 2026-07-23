@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { EditorState } from "@codemirror/state";
 import { EditorView, keymap, placeholder, highlightActiveLine } from "@codemirror/view";
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
@@ -20,13 +20,14 @@ import {
   critiqueExtension,
   setCritiqueKinds,
   ALL_KINDS,
+  KIND_EXPLAIN,
   KIND_LABEL,
 } from "./critiqueExtension";
 import { taskCheckboxes } from "./taskCheckboxes";
 import { moveParagraph } from "../core/paragraphs";
 import { boardStore, useBoards } from "../state/boards";
 import { SLASH_TRIGGER, SLASH_INSERT, matchSlashCommands } from "./slashCommands";
-import type { IssueKind } from "../analysis/prose";
+import { analyseProse, type IssueKind } from "../analysis/prose";
 
 /* Autocomplete inside [[ ]]. Sourced from the live vault every
    keystroke, so a character you created a moment ago is offered
@@ -180,6 +181,19 @@ export function EditorPane() {
       effects: setCritiqueKinds.of(kinds.size ? kinds : null),
     });
   }, [kinds]);
+
+  // Counts on the chips, so toggling one with nothing to show doesn't
+  // read as a dead button — "Sticky" with no number means all clear.
+  const activeBody = store.active()?.body ?? "";
+  const critiqueCounts = useMemo<Record<IssueKind, number>>(() => {
+    const r = analyseProse(activeBody);
+    return {
+      sticky: r.stickySentences.length,
+      adverb: r.adverbs.length,
+      passive: r.passive.length,
+      echo: r.echoes.length,
+    };
+  }, [activeBody]);
 
   /* Adopt changes made to the note from outside the editor.
 
@@ -363,24 +377,34 @@ export function EditorPane() {
             aria-label="Note title — edit to rename"
             title="Click to rename. Old links keep working."
           />
-          <div className="editor-path">{active.path}</div>
+          <div className="editor-path" title="Where this note lives in the project folder — plain Markdown, yours to open anywhere">
+            {active.path}
+          </div>
         </div>
         <div className="editor-meta">
-          <div className="critique-toggles" role="group" aria-label="Inline critique">
+          <div
+            className="critique-toggles"
+            role="group"
+            aria-label="Prose critique highlighters"
+            title="Prose critique — each toggle highlights one habit in the text. Hover a chip for what it means; the Critique tab on the right explains findings in full."
+          >
             {ALL_KINDS.map((k) => (
               <button
                 key={k}
                 className={`critique-chip ${k} ${kinds.has(k) ? "on" : ""}`}
                 onClick={() => toggleKind(k)}
-                title={`${kinds.has(k) ? "Hide" : "Show"} ${KIND_LABEL[k].toLowerCase()} in the text`}
+                title={`${KIND_EXPLAIN[k]} Click to ${kinds.has(k) ? "hide" : "highlight"}.`}
                 aria-pressed={kinds.has(k)}
               >
                 {KIND_LABEL[k]}
+                {critiqueCounts[k] > 0 && (
+                  <span className="critique-count">{critiqueCounts[k]}</span>
+                )}
               </button>
             ))}
           </div>
           {store.isDirty(active.id) && <span className="dot-dirty" title="Unsaved changes" />}
-          <span>{words.toLocaleString()} words</span>
+          <span title="Words in this note">{words.toLocaleString()} words</span>
         </div>
       </header>
       {active.type === "chapter" || active.type === "scene" ? <BeatsPanel /> : null}

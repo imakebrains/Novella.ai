@@ -140,3 +140,16 @@ export const KIND_LABEL: Record<IssueKind, string> = {
   passive: "Passive",
   echo: "Echoes",
 };
+
+/* One sentence per chip, because the labels alone are editor jargon.
+   Shown as the toggle tooltip and in the Critique tab's legend. */
+export const KIND_EXPLAIN: Record<IssueKind, string> = {
+  sticky:
+    "Sticky sentences — held together by glue words (of, that, just, very…). They read slow; highlighting shows where prose drags.",
+  adverb:
+    "-ly adverbs (walked slowly, said angrily). Often a weak verb in disguise — 'crept' beats 'walked slowly'.",
+  passive:
+    "Passive voice (the door was opened by her). Fine on purpose, flat by accident — highlights let you decide which is which.",
+  echo:
+    "Echoes — the same word repeated within a few lines without meaning to. Readers hear it before writers do.",
+};

@@ -229,7 +229,14 @@ export default function App() {
             disabled={store.isBusy()}
           >
             {activeProject?.name ?? vaultLabel}
-            {!persistent && <span className="badge-warn">in memory</span>}
+            {!persistent && (
+              <span
+                className="badge-warn"
+                title="No folder or browser storage is holding this project — edits vanish when the app closes. Click to choose a project."
+              >
+                in memory
+              </span>
+            )}
           </button>
           <QuickCreate
             onCreated={() => setMode("write")}
@@ -476,14 +483,27 @@ function SaveStatus({
     ) : null;
   }
 
-  if (state === "saving") return <span className="save-status">saving…</span>;
+  if (state === "saving")
+    return (
+      <span className="save-status" title="Writing your changes now">
+        saving…
+      </span>
+    );
   if (state === "error")
     return (
       <span className="save-status warn" title={store.error() ?? ""}>
         save failed
       </span>
     );
-  if (state === "pending" || dirty > 0) return <span className="save-status">unsaved</span>;
+  if (state === "pending" || dirty > 0)
+    return (
+      <span
+        className="save-status"
+        title="Changes waiting — autosave writes 1.5s after you stop typing, or press Ctrl+S"
+      >
+        unsaved
+      </span>
+    );
   if (state === "saved" && lastSaved)
     return (
       <span className="save-status ok" title={new Date(lastSaved).toLocaleTimeString()}>

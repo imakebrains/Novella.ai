@@ -2091,6 +2091,11 @@ body:has(.resizer.dragging) {
   border-radius: 999px;
   transition: all 140ms var(--ease);
 }
+.critique-count {
+  margin-left: 4px;
+  opacity: 0.75;
+  font-weight: 600;
+}
 .critique-chip:hover {
   color: var(--fg-secondary);
   border-color: var(--border-strong);

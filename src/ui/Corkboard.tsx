@@ -234,8 +234,8 @@ export function Corkboard({
             <>
               <p>Nothing on this board yet.</p>
               <p className="muted">
-                Press <em>+ Add cards</em> above to pin chapters and notes here — or
-                right-click anything in the left pane or the editor.
+                Click the dashed <em>Add cards</em> tile below to pin chapters and
+                notes here — or right-click anything in the left pane or the editor.
               </p>
             </>
           )}

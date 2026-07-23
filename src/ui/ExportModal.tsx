@@ -164,6 +164,7 @@ export function ExportModal({ onClose }: { onClose: () => void }) {
                 type="checkbox"
                 checked={skipEmpty}
                 onChange={(e) => setSkipEmpty(e.target.checked)}
+                aria-label="Skip empty chapters"
               />
               <span className="switch-track" />
             </label>

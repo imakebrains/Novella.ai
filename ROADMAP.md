@@ -84,6 +84,21 @@ scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
 
+- 2026-07-23 — Playtest pass (session; owner asked for a game-tester
+  sweep: "make sure everything visible has a purpose"). The critique
+  chips (Sticky/Adverbs/Passive/Echoes) now carry live counts, plain-
+  language tooltips explaining each habit, and the Critique tab
+  cross-references them; highlight round-trip verified on planted prose
+  ("slowly"/"softly" marked, cleared on toggle). A DOM audit walked all
+  15 surfaces + 7 settings tabs + modals for unlabeled controls — six
+  found (plugin setting fields, export checkbox), all labeled. FOUND
+  STALE: the "session only" chip on secret fields predated the OS
+  keychain — now says "in OS keychain" on desktop, with honest hovers
+  for both builds. Custom-board empty state now points at the dashed
+  tile that exists instead of the old header button. Titlebar save
+  status, "in memory" badge and the editor's file path all explain
+  themselves on hover. 241 checks green.
+
 - 2026-07-23 — Owner feedback round 2 (session). "Beats" is gone from the
   UI: the panel is **Scene plan**, lines are steps ("Write this step",
   "Suggest next steps", card chip "3-step plan"); files and APIs keep the

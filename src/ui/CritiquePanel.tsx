@@ -38,6 +38,11 @@ export function CritiquePanel() {
           <Stat label="Avg length" value={`${report.avgSentenceWords.toFixed(1)}w`} />
           <Stat label="Reading" value={readTime} />
         </div>
+        <p className="hint">
+          The small chips under the chapter title — Sticky, Adverbs, Passive,
+          Echoes — highlight these same findings inside the text as you write.
+          This tab is the full report; the chips are the in-place view.
+        </p>
       </section>
 
       <Section title="Readability">
