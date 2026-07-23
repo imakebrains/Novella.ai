@@ -122,6 +122,58 @@ fn start_ollama() -> Result<(), String> {
         .map_err(|e| format!("Couldn't start Ollama: {e}"))
 }
 
+/* ---------- OS keychain for provider secrets ----------
+
+   API keys were deliberately memory-only until they could live somewhere
+   actually safe. This is that somewhere: Windows Credential Manager /
+   macOS Keychain / the Linux keyutils service, via the audited `keyring`
+   crate. Keys never touch localStorage or any file we write. */
+
+const KEYCHAIN_SERVICE: &str = "com.novella.app";
+
+#[tauri::command]
+fn secret_set(name: String, value: String) -> Result<(), String> {
+    keyring::Entry::new(KEYCHAIN_SERVICE, &name)
+        .and_then(|e| e.set_password(&value))
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn secret_get(name: String) -> Result<Option<String>, String> {
+    match keyring::Entry::new(KEYCHAIN_SERVICE, &name).and_then(|e| e.get_password()) {
+        Ok(v) => Ok(Some(v)),
+        Err(keyring::Error::NoEntry) => Ok(None),
+        Err(e) => Err(e.to_string()),
+    }
+}
+
+#[tauri::command]
+fn secret_delete(name: String) -> Result<(), String> {
+    match keyring::Entry::new(KEYCHAIN_SERVICE, &name).and_then(|e| e.delete_credential()) {
+        Ok(()) => Ok(()),
+        Err(keyring::Error::NoEntry) => Ok(()),
+        Err(e) => Err(e.to_string()),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    /// Round-trips a credential through the real OS store. If this passes
+    /// on a machine, the keychain commands work on that machine — no app
+    /// window required to prove it.
+    #[test]
+    fn keychain_round_trip() {
+        let entry = keyring::Entry::new("com.novella.app.test", "probe").unwrap();
+        entry.set_password("s3cret-probe").unwrap();
+        assert_eq!(entry.get_password().unwrap(), "s3cret-probe");
+        entry.delete_credential().unwrap();
+        assert!(matches!(
+            entry.get_password(),
+            Err(keyring::Error::NoEntry)
+        ));
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -134,7 +186,10 @@ pub fn run() {
             ollama_installed,
             winget_available,
             install_ollama,
-            start_ollama
+            start_ollama,
+            secret_set,
+            secret_get,
+            secret_delete
         ])
         .setup(|app| {
             if cfg!(debug_assertions) {

@@ -57,10 +57,15 @@ iframes. The allowlist is exactly those four origins; no other frame can load,
 and no audio API, credential, or playback token ever passes through the app —
 any login happens inside the platform's own iframe.
 
-**API keys are never written to disk.** `ScopedSettings` in
-`src/plugins/runtime.ts` keeps any field marked `secret` in memory only.
-Non-secret settings go to localStorage; secrets never do. The cost is
-re-entering a key each session — see "Not yet built".
+**API keys never touch localStorage or any file Novella writes.**
+`ScopedSettings` in `src/plugins/runtime.ts` keeps any field marked
+`secret` in memory, and on the desktop build persists it in the **OS
+credential store** (Windows Credential Manager / macOS Keychain / Linux
+keyutils) via three Rust commands over the `keyring` crate — the same
+place your OS keeps Wi-Fi passwords, guarded by your login. The browser
+build has no such safe, so there secrets remain session-only by design.
+The round-trip (set → get → delete → gone) is covered by a Rust test
+against the real credential store.
 
 ## Where your words live (audited 2026-07-23)
 
@@ -94,7 +99,8 @@ differently.
 **Audit findings, this pass:** no `innerHTML`/`dangerouslySetInnerHTML`
 anywhere (model output and imported files render as text, never as markup);
 no `eval`; the secret-field write path verified to divert to memory and
-never touch localStorage; every `fetch` target enumerated and accounted for.
+the OS credential store, never localStorage; every `fetch` target
+enumerated and accounted for.
 One note: `src/core/plugins.ts` contains an unregistered Phase-1 provider
 with an unreachable `fetch` to api.anthropic.com — dead code, no path calls
 it; left in place because that file is the protected Phase-1 engine surface.
@@ -112,8 +118,6 @@ containing `<script>` is prose, not an instruction.
 - **No code signing.** Installers are unsigned, so Windows SmartScreen will
   warn on install and the app will look untrusted. A certificate must be
   purchased before public distribution.
-- **No OS keychain.** Secrets live in memory for the session only. Safe, but
-  inconvenient, and it blocks practical use of paid AI providers.
 - **No auto-update.** Shipping a fix means users manually reinstalling.
 - **No accounts, no sync, no server.** Nothing to log into. Any UI suggesting
   otherwise would be a lie.

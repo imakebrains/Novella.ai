@@ -25,3 +25,6 @@ tauri = { version = "2.11.3", features = [] }
 tauri-plugin-log = "2"
 tauri-plugin-fs = "2"
 tauri-plugin-dialog = "2"
+# OS credential store for provider API keys (Windows Credential Manager /
+# macOS Keychain / Linux keyutils). Platform backends are opt-in features.
+keyring = { version = "3", features = ["windows-native", "apple-native", "linux-native"] }

@@ -46,29 +46,16 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
 - [x] **Rename notes in place** — shipped 2026-07-23.
 - [x] **Word-level diff inside History's changed paragraphs** — shipped 2026-07-23.
 - [x] **Continuity checks, deterministic tier** — shipped 2026-07-23: Continuity inspector tab; provable checks only (early mention via `introduced:`, near-duplicate codex names, dangling links with counts, unordered chapters, unknown POV); click opens the note; 9 unit checks.
-- [ ] **OS keychain for API keys (desktop)** — Tauri command pair
-      (`keyring` crate) storing provider secrets; fall back to in-memory on
-      web. Removes the re-enter-each-session cost.
+- [x] **OS keychain for API keys (desktop)** — shipped 2026-07-23: secret_set/get/delete Tauri commands over the `keyring` crate (Credential Manager / macOS Keychain / Linux keyutils); JS write-through + hydrate-at-register; web stays memory-only; Rust round-trip test passes against the real store; SECURITY.md updated.
 - [x] **Export presets per format** — shipped 2026-07-23 (.novella/export.json, restored on open).
 - [ ] **Silent auto-update** — generate a Tauri updater keypair, add the
       pubkey + endpoint to `tauri.conf.json`, wire `tauri-plugin-updater`,
       and have CI attach `latest.json`. Needs a decision from the owner
       about key custody — ASK, do not generate silently.
-- [ ] **PLAN: sync/accounts backend** — E2E-encrypted vault sync; unlocks
-      Google sign-in and same-book-on-two-machines. Write the plan document
-      first; needs owner decisions on hosting and billing.
-
-### From the 2026-07-23 QA pass (a 64-chapter, 44-entry stress project)
-
-Everything below is a real observation, not a guess. What held up: bulk load
-55ms, DOCX export 68ms, compile 3ms, search 1ms, task aggregation instant,
-focus mode clean. What didn't:
-
+- [x] **PLAN: sync/accounts backend** — plan written 2026-07-23 as PLAN-sync.md (zero-knowledge design, three hosting options, phased; blocked on the three NEEDS OWNER decisions listed there — nothing scheduled until answered).
 - [x] **Board card virtualization** — shipped 2026-07-23 (the memoization half): per-note words/tasks/synopsis cached by body identity (cardDerived) across corkboard, stats, table. True windowing deferred until real projects pass ~300 chapters.
 - [x] **Stats view needs a scroll affordance** — shipped 2026-07-23: edge fades driven by a reusable useScrollEdges hook.
-- [ ] **The codex pane doesn't group at scale** — 44 characters is a
-      flat wall of names. Add per-type collapse memory and a letter index
-      or sub-grouping once a type passes ~20 entries.
+- [x] **The codex pane doesn't group at scale** — shipped 2026-07-23: codex types sort alphabetically with letter headers past 20 entries; manuscript keeps book order (also fixed: it previously showed file-load order); folds persist.
 - [x] **No way to delete a note from the UI** — shipped 2026-07-23: right-click → Delete note anywhere; undo toast; trash copy in `.novella/trash/`; board membership cleaned and restored.
 - [x] **Agents can't be reordered or run as a group** — shipped 2026-07-23: Run all now (sequential) + hover ↑↓ reorder, order persisted.
 
@@ -96,6 +83,22 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-07-23 — Roadmap burn-down, phase 3 (session): the list is now
+  clear except Silent auto-update, which stays open on purpose — it
+  needs the owner's key-custody decision (see its ASK note). BUILT:
+  card art (drop an image on a corkboard card; .novella/images/,
+  lazy-hydrated, removable), the Continuity inspector tab (deterministic
+  tier — early mentions via `introduced:`, near-duplicate names,
+  dangling links with counts, unordered chapters, unknown POV; 9 unit
+  checks), codex letter grouping at scale + persistent folds (and fixed
+  the manuscript group showing file-load order instead of book order),
+  PLAN-sync.md (zero-knowledge sync design, three NEEDS OWNER decisions),
+  and the OS keychain: three Rust commands over `keyring`, JS
+  write-through + hydrate-at-register, web unchanged; the Rust
+  round-trip test passes against the real Windows Credential Manager.
+  SECURITY.md updated to match (secrets: memory + OS credential store,
+  never localStorage). 241 unit checks green.
 
 - 2026-07-23 — Roadmap burn-down, phase 2 (session) + owner feedback pass.
   OWNER FEEDBACK ("still don't see the +; symbols aren't obvious"):

@@ -19,6 +19,31 @@ const GROUPS: { type: string; label: string }[] = [
   { type: "prompt", label: "Prompts" },
 ];
 
+const COLLAPSE_KEY = "novella.codex.collapsed";
+
+function readCollapsed(): Set<string> {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(COLLAPSE_KEY) ?? "[]") as string[]);
+  } catch {
+    return new Set();
+  }
+}
+
+/** Book order for manuscript groups, alphabetical for everything else —
+    a codex is consulted by name, a book is read in order. */
+const orderNum = (n: Note): number =>
+  typeof n.data.order === "number" ? n.data.order : Number.POSITIVE_INFINITY;
+
+function sortForType(type: string, notes: Note[]): Note[] {
+  if (type === "chapter" || type === "scene") {
+    return [...notes].sort((a, b) => orderNum(a) - orderNum(b));
+  }
+  return [...notes].sort((a, b) => a.title.localeCompare(b.title));
+}
+
+/** Past this many entries, a flat list becomes a wall — inject letters. */
+const LETTER_INDEX_AT = 20;
+
 export function CodexPane({
   onImport,
   onExport,
@@ -29,7 +54,7 @@ export function CodexPane({
   useVaultVersion();
   const project = useActiveProject();
   const [query, setQuery] = useState("");
-  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const [collapsed, setCollapsed] = useState<Set<string>>(readCollapsed);
   const [menu, setMenu] = useState<{ id: string; x: number; y: number } | null>(null);
 
   const activeId = store.activeIdOrUndefined();
@@ -45,6 +70,11 @@ export function CodexPane({
       const next = new Set(prev);
       if (next.has(type)) next.delete(type);
       else next.add(type);
+      try {
+        localStorage.setItem(COLLAPSE_KEY, JSON.stringify([...next]));
+      } catch {
+        /* remembering folds is a nicety */
+      }
       return next;
     });
   };
@@ -99,10 +129,18 @@ export function CodexPane({
 
       <div className="pane-scroll">
         {GROUPS.map(({ type, label }) => {
-          const notes = visible(store.vault.byType(type));
+          const notes = sortForType(type, visible(store.vault.byType(type)));
           if (!notes.length) return null;
           const isCollapsed = collapsed.has(type);
+          // A 40-character cast is a wall of names; letters give the eye
+          // somewhere to land. Chapters never get letters — book order.
+          const lettered =
+            !query &&
+            type !== "chapter" &&
+            type !== "scene" &&
+            notes.length > LETTER_INDEX_AT;
 
+          let lastLetter = "";
           return (
             <section key={type} className="group">
               <button className="group-head" onClick={() => toggle(type)}>
@@ -114,22 +152,28 @@ export function CodexPane({
 
               {!isCollapsed && (
                 <ul className="note-list">
-                  {notes.map((note) => (
-                    <li key={note.id}>
-                      <button
-                        className={`note-item ${note.id === activeId ? "active" : ""}`}
-                        onClick={() => store.open(note.id)}
-                        onContextMenu={(e) => {
-                          e.preventDefault();
-                          setMenu({ id: note.id, x: e.clientX, y: e.clientY });
-                        }}
-                        title={note.path}
-                      >
-                        <span className="note-name">{note.title}</span>
-                        {store.isDirty(note.id) && <span className="dot-dirty" />}
-                      </button>
-                    </li>
-                  ))}
+                  {notes.map((note) => {
+                    const letter = (note.title[0] ?? "#").toUpperCase();
+                    const showLetter = lettered && letter !== lastLetter;
+                    lastLetter = letter;
+                    return (
+                      <li key={note.id}>
+                        {showLetter && <div className="letter-row">{letter}</div>}
+                        <button
+                          className={`note-item ${note.id === activeId ? "active" : ""}`}
+                          onClick={() => store.open(note.id)}
+                          onContextMenu={(e) => {
+                            e.preventDefault();
+                            setMenu({ id: note.id, x: e.clientX, y: e.clientY });
+                          }}
+                          title={note.path}
+                        >
+                          <span className="note-name">{note.title}</span>
+                          {store.isDirty(note.id) && <span className="dot-dirty" />}
+                        </button>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </section>

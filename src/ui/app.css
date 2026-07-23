@@ -3221,6 +3221,16 @@ body.focus-mode .cm-editor {
   color: var(--fg-primary);
 }
 
+.letter-row {
+  padding: var(--space-2) var(--space-2) 2px;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--fg-muted);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2px;
+}
+
 .continuity-panel {
   display: flex;
   flex-direction: column;

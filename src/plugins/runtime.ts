@@ -6,6 +6,7 @@ import type {
   SettingField,
 } from "../core/plugins";
 import { store } from "../state/vaultStore";
+import { isTauri } from "../storage";
 
 /* ============================================================
    Plugin host
@@ -35,6 +36,21 @@ export function isStreaming(p: AIProvider): p is StreamingAIProvider {
   return typeof (p as StreamingAIProvider).generateStream === "function";
 }
 
+/* The OS keychain, where the desktop build parks API keys between
+   sessions: Windows Credential Manager / macOS Keychain / Linux
+   keyutils, through three Rust commands. The browser has no such safe,
+   so there secrets stay memory-only, exactly as before. */
+async function keychainWrite(name: string, value: string): Promise<void> {
+  const { invoke } = await import("@tauri-apps/api/core");
+  if (value) await invoke("secret_set", { name, value });
+  else await invoke("secret_delete", { name });
+}
+
+async function keychainRead(name: string): Promise<string | null> {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return ((await invoke("secret_get", { name })) as string | null) ?? null;
+}
+
 /** Per-plugin settings. Secrets never touch localStorage. */
 class ScopedSettings {
   private static secretCache = new Map<string, unknown>();
@@ -49,9 +65,9 @@ class ScopedSettings {
   }
 
   get<T = string>(key: string): T | undefined {
-    // API keys and the like are held in memory for the session only.
-    // Writing them to localStorage would put plaintext credentials on
-    // disk; the OS keychain path is task #12.
+    // API keys and the like live in the in-memory cache; on desktop the
+    // cache is filled from the OS keychain at register time. On the web
+    // they remain session-only — there is nowhere safe to put them.
     if (this.secretKeys.has(key)) {
       return ScopedSettings.secretCache.get(this.key(key)) as T | undefined;
     }
@@ -67,9 +83,30 @@ class ScopedSettings {
   set(key: string, value: unknown): void {
     if (this.secretKeys.has(key)) {
       ScopedSettings.secretCache.set(this.key(key), value);
+      if (isTauri() && (typeof value === "string" || value == null)) {
+        void keychainWrite(this.key(key), (value as string | null) ?? "").catch(() => {
+          /* memory still has it for this session */
+        });
+      }
       return;
     }
     localStorage.setItem(this.key(key), JSON.stringify(value));
+  }
+
+  /** Fill the secret cache from the OS keychain — desktop only, once,
+      at plugin registration. Values already set this session win. */
+  async hydrateSecrets(): Promise<void> {
+    if (!isTauri()) return;
+    for (const key of this.secretKeys) {
+      const full = this.key(key);
+      if (ScopedSettings.secretCache.has(full)) continue;
+      try {
+        const v = await keychainRead(full);
+        if (v) ScopedSettings.secretCache.set(full, v);
+      } catch {
+        /* no keychain on this platform — memory-only, as on web */
+      }
+    }
   }
 }
 
@@ -144,6 +181,9 @@ export class PluginHost {
         .map((f) => f.key),
     );
     const settings = new ScopedSettings(plugin.id, secretKeys);
+    // Desktop: saved keys come back from the OS keychain. Fire-and-forget —
+    // reads are pull-based, so whenever this lands the next get() sees it.
+    void settings.hydrateSecrets();
 
     return {
       vault: store.vault,
