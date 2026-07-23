@@ -118,6 +118,23 @@ export class WebStorage implements VaultStorage {
     await withStore("readwrite", (s) => s.delete(fileKey(root, relPath)));
   }
 
+  async listFiles(root: string): Promise<{ path: string; bytes: Uint8Array }[]> {
+    if (!root) return [];
+    const [keys, values] = await Promise.all([
+      withStore("readonly", (s) => s.getAllKeys(rootRange(root))),
+      withStore("readonly", (s) => s.getAll(rootRange(root))),
+    ]);
+    const enc = new TextEncoder();
+    const out: { path: string; bytes: Uint8Array }[] = [];
+    keys.forEach((key, i) => {
+      const path = String(key).slice(root.length + SEP.length);
+      const entry = values[i] as Entry | undefined;
+      if (entry?.bytes) out.push({ path, bytes: entry.bytes });
+      else if (typeof entry?.text === "string") out.push({ path, bytes: enc.encode(entry.text) });
+    });
+    return out;
+  }
+
   /** True when a virtual root already holds files. Used to avoid
       scaffolding over an existing project that shares a name. */
   async rootExists(root: string): Promise<boolean> {

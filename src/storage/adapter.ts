@@ -27,6 +27,9 @@ export interface VaultStorage {
   readBytes(root: string, relPath: string): Promise<Uint8Array | null>;
   /** Remove a file. Missing files are not an error. */
   remove(root: string, relPath: string): Promise<void>;
+  /** Every file under the root, bytes included — covers .novella configs,
+      covers and history, not just the .md vault. Powers full backups. */
+  listFiles(root: string): Promise<{ path: string; bytes: Uint8Array }[]>;
 }
 
 /** True when running inside the Tauri desktop shell. */

@@ -38,4 +38,12 @@ export class MemoryStorage implements VaultStorage {
     this.files.delete(relPath);
     this.blobs.delete(relPath);
   }
+
+  async listFiles(): Promise<{ path: string; bytes: Uint8Array }[]> {
+    const enc = new TextEncoder();
+    return [
+      ...[...this.files.entries()].map(([path, text]) => ({ path, bytes: enc.encode(text) })),
+      ...[...this.blobs.entries()].map(([path, bytes]) => ({ path, bytes })),
+    ];
+  }
 }

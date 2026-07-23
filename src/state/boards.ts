@@ -39,6 +39,26 @@ let loadedFor: string | null | undefined;
 const listeners = new Set<() => void>();
 let version = 0;
 
+/* The load/persist race guard. Mutating before the current root's file has
+   been read — trivially easy right after a project opens — used to persist
+   the empty post-reset cache over the real file. Every persist now waits
+   for the load; the load merges instead of clobbering in-flight edits. */
+let loadPromise: Promise<void> | null = null;
+let mutatedSinceLoad = false;
+
+function ensureLoaded(): Promise<void> {
+  if (loadedFor === store.vaultRoot() && loadPromise === null) return Promise.resolve();
+  loadPromise ??= load().finally(() => {
+    loadPromise = null;
+  });
+  return loadPromise;
+}
+
+async function persistSafely(): Promise<void> {
+  await ensureLoaded();
+  await persist();
+}
+
 function emit(): void {
   version++;
   for (const l of listeners) l();
@@ -70,7 +90,15 @@ async function load(): Promise<void> {
       /* same */
     }
   }
-  cached = boards;
+  if (mutatedSinceLoad) {
+    // Disk first, then anything touched locally on top — additions and
+    // edits made while the file was still loading survive it arriving.
+    const local = new Map(cached.map((x) => [x.id, x]));
+    cached = [...boards.filter((x) => !local.has(x.id)), ...local.values()];
+  } else {
+    cached = boards;
+  }
+  mutatedSinceLoad = false;
   emit();
 }
 
@@ -119,20 +147,23 @@ export const boardStore = {
   add(name: string): Board {
     const board: Board = { id: newId(), name: name.trim() || "New board", noteIds: [] };
     cached = [...cached, board];
-    void persist();
+    mutatedSinceLoad = true;
+    void persistSafely();
     emit();
     return board;
   },
 
   rename(id: string, name: string): void {
     cached = cached.map((b) => (b.id === id ? { ...b, name } : b));
-    void persist();
+    mutatedSinceLoad = true;
+    void persistSafely();
     emit();
   },
 
   remove(id: string): void {
     cached = cached.filter((b) => b.id !== id);
-    void persist();
+    mutatedSinceLoad = true;
+    void persistSafely();
     emit();
   },
 
@@ -144,7 +175,8 @@ export const boardStore = {
         ? { ...b, noteIds: [...b.noteIds, noteId] }
         : b,
     );
-    void persist();
+    mutatedSinceLoad = true;
+    void persistSafely();
     emit();
   },
 
@@ -152,7 +184,8 @@ export const boardStore = {
     cached = cached.map((b) =>
       b.id === boardId ? { ...b, noteIds: b.noteIds.filter((n) => n !== noteId) } : b,
     );
-    void persist();
+    mutatedSinceLoad = true;
+    void persistSafely();
     emit();
   },
 
@@ -160,7 +193,8 @@ export const boardStore = {
       its order is the book's `order` frontmatter. */
   setOrder(boardId: string, noteIds: string[]): void {
     cached = cached.map((b) => (b.id === boardId ? { ...b, noteIds } : b));
-    void persist();
+    mutatedSinceLoad = true;
+    void persistSafely();
     emit();
   },
 };

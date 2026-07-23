@@ -27,6 +27,7 @@ import { weekOf } from "./src/state/planner";
 import { agentIsDue } from "./src/state/agents";
 import { compareVersions } from "./src/state/updates";
 import { defaultBanner } from "./src/seed/bannerArt";
+import { backupFilename } from "./src/export/backupName";
 import { ARC_PER_LABEL, clipLabel, LABEL_MAX_CHARS, ringPositions, webCanvasSize } from "./src/ui/webLayout";
 import { SLASH_COMMANDS, SLASH_TRIGGER, SLASH_INSERT, matchSlashCommands } from "./src/ui/slashCommands";
 
@@ -789,6 +790,19 @@ lied, and Wren had known that since she was nine.
   check("sprint: formats sub-minute seconds with a leading zero", formatClock(65), "1:05");
   check("sprint: formats a whole minute", formatClock(900), "15:00");
   check("sprint: formats zero", formatClock(0), "0:00");
+}
+
+/* ---------- backup filenames ---------- */
+
+{
+  const at = new Date("2026-07-23T14:05:00");
+  check(
+    "backup: name is slugged and stamped to the minute",
+    backupFilename("The Compass That Lies!", at),
+    "The-Compass-That-Lies-backup-2026-07-23-1405.zip",
+  );
+  check("backup: empty name still yields a filename", backupFilename("", at), "project-backup-2026-07-23-1405.zip");
+  ok("backup: absurd names get truncated", backupFilename("x".repeat(200), at).length < 90);
 }
 
 /* ---------- report ---------- */

@@ -62,6 +62,43 @@ any login happens inside the platform's own iframe.
 Non-secret settings go to localStorage; secrets never do. The cost is
 re-entering a key each session — see "Not yet built".
 
+## Where your words live (audited 2026-07-23)
+
+A full pass over every storage and network path in the app, so the answer to
+"is my work safe?" is specific rather than reassuring:
+
+**On disk (desktop):** the vault folder you chose — plain Markdown plus a
+`.novella/` folder for history, covers, plot threads, agents and boards.
+Unencrypted by design: they are your files, readable by any editor, covered
+by whatever disk encryption your OS provides.
+
+**In the browser build:** the same shape inside IndexedDB, plus draft
+snapshots and preferences in localStorage. Same-origin protected, cleared if
+site data is cleared — which is why the projects screen says so, and why the
+full backup exists.
+
+**What ever leaves the machine:** exactly three things, all user-initiated —
+prompts and referenced codex entries to the AI provider *you* configured
+(local Ollama by default, in which case nothing leaves at all); a version
+check to `api.github.com` when you press "Check for updates"; and the music
+player iframes (Spotify/YouTube/SoundCloud/Apple only, enforced by
+`frame-src`). There is no analytics, no telemetry, no phone-home.
+
+**Layered protection against loss:** autosave (1.5s after typing stops),
+keystroke-level draft snapshots with crash recovery, revision history at
+every decision point (before AI writes, on save, before restores), and a
+one-click **full-project backup** — a plain .zip of everything including
+`.novella/`, restorable by simple extraction. Four layers, because they fail
+differently.
+
+**Audit findings, this pass:** no `innerHTML`/`dangerouslySetInnerHTML`
+anywhere (model output and imported files render as text, never as markup);
+no `eval`; the secret-field write path verified to divert to memory and
+never touch localStorage; every `fetch` target enumerated and accounted for.
+One note: `src/core/plugins.ts` contains an unregistered Phase-1 provider
+with an unreachable `fetch` to api.anthropic.com — dead code, no path calls
+it; left in place because that file is the protected Phase-1 engine surface.
+
 **Unsaved work survives a crash.** Draft snapshots are written to
 localStorage on every keystroke and offered back on next launch. Autosave
 writes to disk 1.5s after typing stops when a vault folder is open.

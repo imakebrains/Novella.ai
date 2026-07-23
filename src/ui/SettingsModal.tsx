@@ -496,6 +496,15 @@ function PluginsTab() {
 
   return (
     <>
+      <p className="hint">
+        Plugins extend what Novella can do; <strong>Connections</strong> (previous tab) is
+        where outside services link in — AI models, music platforms, GitHub updates.
+        Anything that speaks the OpenAI API can already be connected as a custom
+        endpoint. Google accounts, Drive and Dropbox arrive with the sync backend:
+        they need server-side pieces we haven't built yet, and a fake "link" button
+        would only pretend otherwise.
+      </p>
+
       {[...byCategory.entries()].map(([category, list]) => (
         <section key={category} className="settings-group">
           <h3 className="settings-cat">{CATEGORY_LABEL[category] ?? category}</h3>

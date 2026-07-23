@@ -71,6 +71,27 @@ export class TauriStorage implements VaultStorage {
     if (await exists(abs)) await remove(abs);
   }
 
+  async listFiles(root: string): Promise<{ path: string; bytes: Uint8Array }[]> {
+    const { readDir, readFile } = await import("@tauri-apps/plugin-fs");
+    const out: { path: string; bytes: Uint8Array }[] = [];
+
+    // Unlike readAll, dotfolders ARE included — .novella holds history,
+    // covers and configs, which is half the point of a backup. Only .git
+    // stays out: it can dwarf the vault and restores badly from a zip.
+    const walk = async (abs: string, rel: string): Promise<void> => {
+      for (const entry of await readDir(abs)) {
+        if (entry.name === ".git") continue;
+        const childAbs = `${abs}/${entry.name}`;
+        const childRel = rel ? `${rel}/${entry.name}` : entry.name;
+        if (entry.isDirectory) await walk(childAbs, childRel);
+        else out.push({ path: childRel, bytes: await readFile(childAbs) });
+      }
+    };
+
+    await walk(root, "");
+    return out;
+  }
+
   /** Create the parent directory if needed; returns the absolute path. */
   private async ensureDir(root: string, relPath: string): Promise<string> {
     const { mkdir, exists } = await import("@tauri-apps/plugin-fs");

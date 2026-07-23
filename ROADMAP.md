@@ -133,6 +133,17 @@ scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
 
+- 2026-07-23 — Security/editorial pass (session). AUDITED: no injection
+  surfaces, no eval, secrets verified memory-only, every fetch target
+  enumerated; findings written into SECURITY.md as a data-safety section.
+  BUILT: one-click full-project backup (.zip of everything incl. .novella)
+  as a fourth export card, with listFiles() on all three storage backends.
+  FOUND & FIXED a real data-loss bug: the four .novella config stores
+  (boards/plot/agents/music) could persist their empty post-reset cache
+  over the disk file if mutated before the async load settled — this had
+  already eaten two of the owner's boards. All four stores now load-before-
+  persist and merge in-flight edits; regression scenario verified live.
+
 - 2026-07-22 — Relationship web + Stats board layouts (session build).
 - 2026-07-23 — Screenshot-feedback pass: fixed the inspector tab overflow
   that made Music unclickable (pane head now grows), tab manager always

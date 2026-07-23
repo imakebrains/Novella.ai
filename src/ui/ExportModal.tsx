@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { compileManuscript, defaultTitle } from "../export/compile";
+import { backupProject } from "../export/backup";
 import { render, type Format } from "../export/formats";
 import { saveExport } from "../export/save";
 import { bylineOf, useProfile } from "../state/profile";
 import { isTauri } from "../storage";
 
-const FORMATS: { id: Format; label: string; blurb: string }[] = [
+type Choice = Format | "backup";
+
+const FORMATS: { id: Choice; label: string; blurb: string }[] = [
   {
     id: "docx",
     label: "Word (.docx)",
@@ -22,11 +25,17 @@ const FORMATS: { id: Format; label: string; blurb: string }[] = [
     label: "Markdown (.md)",
     blurb: "One plain-text file. Nothing is lost, and every tool can read it.",
   },
+  {
+    id: "backup",
+    label: "Full backup (.zip)",
+    blurb:
+      "The entire project — manuscript, codex, history, covers, boards, agents. Unzip it anywhere and open the folder to restore. Make one before anything that scares you.",
+  },
 ];
 
 export function ExportModal({ onClose }: { onClose: () => void }) {
   const [profile] = useProfile();
-  const [format, setFormat] = useState<Format>("docx");
+  const [format, setFormat] = useState<Choice>("docx");
   const [title, setTitle] = useState(defaultTitle);
   const [author, setAuthor] = useState(() => bylineOf(profile));
   const [skipEmpty, setSkipEmpty] = useState(true);
@@ -52,9 +61,18 @@ export function ExportModal({ onClose }: { onClose: () => void }) {
     setError(null);
     setDone(null);
     try {
-      const result = await render(manuscript, format);
-      const where = await saveExport(result);
-      if (where) setDone(where);
+      if (format === "backup") {
+        const r = await backupProject();
+        if (r.savedTo) {
+          setDone(
+            `${r.savedTo} — ${r.fileCount} files, ${(r.bytes / 1024).toFixed(0)} KB`,
+          );
+        }
+      } else {
+        const result = await render(manuscript, format);
+        const where = await saveExport(result);
+        if (where) setDone(where);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -75,6 +93,8 @@ export function ExportModal({ onClose }: { onClose: () => void }) {
         </header>
 
         <div className="modal-body">
+          {format !== "backup" && (
+          <>
           <div className="setting">
             <label className="setting-label">Title</label>
             <input
@@ -111,6 +131,8 @@ export function ExportModal({ onClose }: { onClose: () => void }) {
               <span className="switch-track" />
             </label>
           </div>
+          </>
+          )}
 
           <h3 className="settings-cat">Format</h3>
           <div className="format-list">
@@ -131,7 +153,9 @@ export function ExportModal({ onClose }: { onClose: () => void }) {
           </div>
 
           <div className="export-summary">
-            {empty ? (
+            {format === "backup" ? (
+              <>Everything in the project, including its history and settings.</>
+            ) : empty ? (
               <span className="warn-text">
                 Nothing to export — no chapters have prose in them yet.
               </span>
@@ -153,8 +177,8 @@ export function ExportModal({ onClose }: { onClose: () => void }) {
           )}
 
           <div className="btn-row">
-            <button className="btn-primary" onClick={() => void run()} disabled={busy || empty}>
-              {busy ? "Exporting…" : `Export ${FORMATS.find((f) => f.id === format)?.label}`}
+            <button className="btn-primary" onClick={() => void run()} disabled={busy || (empty && format !== "backup")}>
+              {busy ? "Working…" : format === "backup" ? "Back up now" : `Export ${FORMATS.find((f) => f.id === format)?.label}`}
             </button>
             <button className="btn-ghost" onClick={onClose}>
               Close

@@ -107,6 +107,26 @@ let loadedFor: string | null | undefined; // undefined = never loaded
 const listeners = new Set<() => void>();
 let version = 0;
 
+/* The load/persist race guard. Mutating before the current root's file has
+   been read — trivially easy right after a project opens — used to persist
+   the empty post-reset cache over the real file. Every persist now waits
+   for the load; the load merges instead of clobbering in-flight edits. */
+let loadPromise: Promise<void> | null = null;
+let mutatedSinceLoad = false;
+
+function ensureLoaded(): Promise<void> {
+  if (loadedFor === store.vaultRoot() && loadPromise === null) return Promise.resolve();
+  loadPromise ??= load().finally(() => {
+    loadPromise = null;
+  });
+  return loadPromise;
+}
+
+async function persistSafely(): Promise<void> {
+  await ensureLoaded();
+  await persist();
+}
+
 function emit(): void {
   version++;
   for (const l of listeners) l();
@@ -126,7 +146,9 @@ async function load(): Promise<void> {
   } else {
     url = localStorage.getItem(lsKey());
   }
-  currentUrl = url;
+  // A playlist chosen while the file was still loading wins over disk.
+  if (!mutatedSinceLoad) currentUrl = url;
+  mutatedSinceLoad = false;
   emit();
 }
 
@@ -173,14 +195,16 @@ export const musicStore = {
   set(url: string): boolean {
     if (!parseMusicUrl(url)) return false;
     currentUrl = url.trim();
-    void persist();
+    mutatedSinceLoad = true;
+    void persistSafely();
     emit();
     return true;
   },
 
   clear(): void {
     currentUrl = null;
-    void persist();
+    mutatedSinceLoad = true;
+    void persistSafely();
     emit();
   },
 };
