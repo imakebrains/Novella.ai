@@ -269,6 +269,38 @@ export function Corkboard({
             }}
           />
         ))}
+
+        {/* The two dashed tiles are the discoverable path — an empty
+            outline where a card would be says "make one" without a
+            manual. The header buttons still exist for muscle memory. */}
+        <button
+          className="ghost-card"
+          onClick={() => {
+            if (onManuscript) {
+              let n = chapters.length + 1;
+              while (store.vault.resolveLink(`Chapter ${n}`)) n++;
+              store.createNote("chapter", `Chapter ${n}`);
+            } else {
+              setAdding(true);
+            }
+          }}
+          title={
+            onManuscript
+              ? "A fresh chapter at the end of the book — rename it any time"
+              : "Pin existing chapters and notes to this board"
+          }
+        >
+          <span className="ghost-card-plus">+</span>
+          <span className="ghost-card-label">{onManuscript ? "New chapter" : "Add cards"}</span>
+        </button>
+
+        <NewBoardTile
+          onCreate={(name) => {
+            const b = boardStore.add(name);
+            pickBoard(b.id);
+            setAdding(true);
+          }}
+        />
       </div>
 
       {cardMenu && (
@@ -299,6 +331,55 @@ export function Corkboard({
         />
       )}
     </main>
+  );
+}
+
+/* The new-board tile: a dashed outline that becomes a name field on
+   click. Creating switches straight to the fresh board and opens the
+   add-cards picker, so "new board" never lands on a dead end. */
+function NewBoardTile({ onCreate }: { onCreate: (name: string) => void }) {
+  const [naming, setNaming] = useState(false);
+  const [name, setName] = useState("");
+
+  if (!naming) {
+    return (
+      <button
+        className="ghost-card"
+        onClick={() => setNaming(true)}
+        title="A separate board of cards — planning, research, anything. The book is untouched."
+      >
+        <span className="ghost-card-plus">+</span>
+        <span className="ghost-card-label">New board</span>
+      </button>
+    );
+  }
+
+  return (
+    <div className="ghost-card naming">
+      <input
+        className="board-new-name"
+        autoFocus
+        value={name}
+        placeholder="Name the board…"
+        onChange={(e) => setName(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && name.trim()) {
+            onCreate(name.trim());
+            setName("");
+            setNaming(false);
+          } else if (e.key === "Escape") {
+            setNaming(false);
+            setName("");
+          }
+        }}
+        onBlur={() => {
+          setNaming(false);
+          setName("");
+        }}
+        aria-label="New board name"
+      />
+      <p className="hint">Enter creates · Esc cancels</p>
+    </div>
   );
 }
 
@@ -551,7 +632,11 @@ function Card({
             +
           </button>
         )}
-        {beats.length > 0 && <span className="chip">{beats.length} beats</span>}
+        {beats.length > 0 && (
+          <span className="chip" title="This chapter's scene plan — open it to see the steps">
+            {beats.length}-step plan
+          </span>
+        )}
         {tasks.total > 0 && (
           <span
             className={`chip task-chip ${tasks.done === tasks.total ? "all-done" : ""}`}

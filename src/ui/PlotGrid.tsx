@@ -413,7 +413,7 @@ function PlotCell({
           className="pg-point-edit"
           data-no-drag
           autoFocus
-          placeholder="A beat for this thread…"
+          placeholder="What this thread does in this chapter…"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onBlur={commit}

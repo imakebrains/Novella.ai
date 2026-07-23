@@ -84,6 +84,17 @@ scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
 
+- 2026-07-23 — Owner feedback round 2 (session). "Beats" is gone from the
+  UI: the panel is **Scene plan**, lines are steps ("Write this step",
+  "Suggest next steps", card chip "3-step plan"); files and APIs keep the
+  `beats` key so nothing breaks. The corkboard grid now ends in two
+  dashed ghost tiles — **+ New chapter** (or **+ Add cards** on a custom
+  board) and **+ New board**, which names itself inline, switches to the
+  fresh board and opens the add-cards picker so it's never a dead end.
+  Settings grew a **Shortcuts** tab: every binding with a plain-language
+  description (Everywhere / While writing / On the board) — a reference,
+  honestly labeled as not-yet-remappable. All verified live; 241 checks.
+
 - 2026-07-23 — Roadmap burn-down, phase 3 (session): the list is now
   clear except Silent auto-update, which stays open on purpose — it
   needs the owner's key-custody decision (see its ASK note). BUILT:

@@ -31,11 +31,12 @@ import {
    There is no account tab. Novella has no server, so a login would be
    theatre — see SECURITY.md. Profile is local metadata for title pages. */
 
-type Tab = "profile" | "appearance" | "connections" | "agents" | "plugins" | "about";
+type Tab = "profile" | "appearance" | "shortcuts" | "connections" | "agents" | "plugins" | "about";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "profile", label: "Profile" },
   { id: "appearance", label: "Appearance" },
+  { id: "shortcuts", label: "Shortcuts" },
   { id: "connections", label: "Connections" },
   { id: "agents", label: "Agents" },
   { id: "plugins", label: "Plugins" },
@@ -80,6 +81,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
           <div className="modal-body">
             {tab === "profile" && <ProfileTab />}
             {tab === "appearance" && <AppearanceTab />}
+            {tab === "shortcuts" && <ShortcutsTab />}
             {tab === "connections" && <ConnectionsTab />}
             {tab === "agents" && <AgentsPanel onOpenNote={onClose} />}
             {tab === "plugins" && <PluginsTab />}
@@ -259,6 +261,71 @@ function AppearanceTab() {
           </button>
         </div>
       </section>
+    </>
+  );
+}
+
+/* ---------------- shortcuts ---------------- */
+
+/* A reference, not a remapper — knowing what exists is the actual gap.
+   Rebinding can come later if anyone asks; a wrong list would be worse
+   than no list, so keep this in step with the real handlers. */
+
+const SHORTCUT_GROUPS: { title: string; rows: [string, string][] }[] = [
+  {
+    title: "Everywhere",
+    rows: [
+      ["Ctrl+K", "Open the command palette — jump to any chapter or note by name, or run a command (switch views, save, export, focus mode…)."],
+      ["Ctrl+S", "Save everything to disk now. Autosave already runs 1.5s after you stop typing; this is for peace of mind."],
+      ["Ctrl+Shift+F", "Focus mode — hides every pane except the page. Esc leaves it."],
+      ["Esc", "Leave focus mode, close whatever dialog or menu is open."],
+    ],
+  },
+  {
+    title: "While writing",
+    rows: [
+      ["Alt+↑ / Alt+↓", "Move the paragraph the cursor is in up or down a slot."],
+      ["/ on an empty line", "The insert menu: task checkbox, scene break, heading, plan step, link, or a brand-new character."],
+      ["[[", "Link to a codex entry — start typing a name and pick from the list. Links power backlinks and the relationship web."],
+      ["Enter / Esc in the title", "Renaming the note: Enter keeps the new name, Esc cancels. Old names keep resolving."],
+    ],
+  },
+  {
+    title: "On the board",
+    rows: [
+      ["Drag a card", "Reorder chapters (on Manuscript this is the real book order)."],
+      ["← / → on a focused card", "Nudge the card one slot without dragging."],
+      ["Right-click a card", "Open, rename, add to boards, save as template, export, delete."],
+      ["Drop an image on a card", "Card art — stored with the project, removable from the card."],
+    ],
+  },
+];
+
+function ShortcutsTab() {
+  return (
+    <>
+      <p className="hint">
+        Everything the keyboard can do. These aren't remappable yet — if a
+        binding fights your muscle memory, say so and remapping moves up the
+        list.
+      </p>
+      {SHORTCUT_GROUPS.map((group) => (
+        <section key={group.title} className="settings-group">
+          <h3 className="settings-cat">{group.title}</h3>
+          <table className="shortcut-table">
+            <tbody>
+              {group.rows.map(([keys, what]) => (
+                <tr key={keys}>
+                  <td className="shortcut-keys">
+                    <kbd>{keys}</kbd>
+                  </td>
+                  <td className="shortcut-what">{what}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      ))}
     </>
   );
 }

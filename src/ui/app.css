@@ -1922,6 +1922,42 @@ body:has(.resizer.dragging) {
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
+/* Dashed empty-card tiles: "make one of these" without a manual. */
+.ghost-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 188px;
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--fg-muted);
+  cursor: pointer;
+  transition: border-color 0.12s var(--ease), color 0.12s var(--ease);
+}
+.ghost-card:hover {
+  border-color: var(--accent);
+  color: var(--fg-primary);
+}
+.ghost-card-plus {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+.ghost-card-label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.ghost-card.naming {
+  cursor: default;
+  padding: var(--space-4);
+}
+.ghost-card.naming .board-new-name {
+  width: 100%;
+  text-align: center;
+}
+
 /* Dropped-on art sits above the card text, like a cover on a jacket. */
 .card-art-wrap {
   position: relative;
@@ -3263,6 +3299,35 @@ body.focus-mode .cm-editor {
   border-color: var(--border-strong);
   color: var(--fg-primary);
   background: var(--bg-hover);
+}
+
+.shortcut-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+.shortcut-table td {
+  padding: var(--space-2) var(--space-3) var(--space-2) 0;
+  border-bottom: 1px solid var(--border);
+  vertical-align: baseline;
+}
+.shortcut-keys {
+  white-space: nowrap;
+  width: 1%;
+}
+.shortcut-keys kbd {
+  display: inline-block;
+  padding: 2px var(--space-2);
+  border: 1px solid var(--border-strong);
+  border-bottom-width: 2px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: var(--fg-primary);
+}
+.shortcut-what {
+  color: var(--fg-secondary);
 }
 
 .personalize-row {

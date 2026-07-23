@@ -66,8 +66,8 @@ export function BeatsPanel() {
         system:
           "You plan scenes for a novelist. Answer with plain lines only — no numbering, no bullets, no commentary.",
         prompt: `Here is the chapter "${active.title}" so far:\n\n${active.body.trim() || "(nothing written yet)"}\n\n${
-          beats.length ? `Beats already planned:\n${beats.join("\n")}\n\n` : ""
-        }Propose the next 3 beats — what should happen next, one short line each. Concrete events, not themes.`,
+          beats.length ? `Steps already planned:\n${beats.join("\n")}\n\n` : ""
+        }Propose the next 3 steps — what should happen next, one short line each. Concrete events, not themes.`,
         maxTokens: 200,
       });
       const proposed = text
@@ -135,7 +135,7 @@ export function BeatsPanel() {
     <section className={`beats ${open ? "open" : ""}`}>
       <button className="beats-head" onClick={() => setOpen((v) => !v)}>
         <span className={`caret ${open ? "" : "closed"}`}>▾</span>
-        <span className="beats-title">Beats</span>
+        <span className="beats-title">Scene plan</span>
         {beats.length > 0 && <span className="count">{beats.length}</span>}
         {!open && beats.length > 0 && (
           <span className="beats-peek">{beats[0]}</span>
@@ -146,10 +146,10 @@ export function BeatsPanel() {
         <div className="beats-body">
           {beats.length === 0 && (
             <p className="hint">
-              Beats are your plan for this chapter — one line per thing that has to happen.
-              Write them yourself, or let <em>Suggest next beats</em> read the prose and
-              propose some. "Write this beat" then turns a single line into prose, held for
-              your review before anything enters the chapter.
+              The plan for this chapter — one line per thing that has to happen. Write
+              the steps yourself, or let <em>Suggest next steps</em> read the prose and
+              propose some. "Write this step" then turns a single line into prose, held
+              for your review before anything enters the chapter.
             </p>
           )}
 
@@ -166,15 +166,15 @@ export function BeatsPanel() {
                   className="beat-action"
                   onClick={() => void expand(i)}
                   disabled={busyIndex !== null || suggesting}
-                  title="Turn this one beat into prose, shown for review first"
+                  title="Turn this one step into prose, shown for review first"
                 >
-                  {busyIndex === i ? "Writing…" : "Write this beat"}
+                  {busyIndex === i ? "Writing…" : "Write this step"}
                 </button>
                 <button
                   className="beat-action ghost"
                   onClick={() => commit(beats.filter((_, j) => j !== i))}
                   disabled={busyIndex !== null}
-                  title="Remove beat"
+                  title="Remove this step"
                 >
                   ✕
                 </button>
@@ -194,7 +194,7 @@ export function BeatsPanel() {
                   addBeat();
                 }
               }}
-              placeholder="What happens next? Add it as a beat…"
+              placeholder="What happens next? Add a step…"
             />
             <button className="beat-action" onClick={addBeat} disabled={!draft.trim()}>
               Add
@@ -203,9 +203,9 @@ export function BeatsPanel() {
               className="beat-action ghost"
               onClick={() => void suggestBeats()}
               disabled={suggesting || busyIndex !== null}
-              title="Read the chapter and propose the next few beats"
+              title="Read the chapter and propose the next few steps"
             >
-              {suggesting ? "Thinking…" : "✦ Suggest next beats"}
+              {suggesting ? "Thinking…" : "✦ Suggest next steps"}
             </button>
           </div>
 

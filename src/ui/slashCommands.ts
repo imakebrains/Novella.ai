@@ -1,14 +1,15 @@
 /* Slash-command menu — Notion's fastest habit, adapted for prose.
 
    Typing "/" as the only thing on a line opens a menu of things to drop
-   in: a task, a scene break, a heading, a beat, a link, a new character.
-   The trigger only fires when "/" starts the line and nothing follows the
-   cursor, so "and/or" mid-sentence or a pasted URL never pops it open.
+   in: a task, a scene break, a heading, a plan step, a link, a new
+   character. The trigger only fires when "/" starts the line and nothing
+   follows the cursor, so "and/or" mid-sentence or a pasted URL never pops
+   it open.
 
    This module is the pure half — the command list and the matching/insert
    logic, with no CodeMirror or store dependency, so it's testable without
    a live editor. EditorPane.tsx wires it to the autocomplete API and to
-   the vault for the commands that need it (beat, link, character). */
+   the vault for the commands that need it (plan step, link, character). */
 
 export interface SlashCommand {
   id: string;
@@ -20,7 +21,7 @@ export const SLASH_COMMANDS: SlashCommand[] = [
   { id: "task", label: "Task", hint: "- [ ] a to-do line" },
   { id: "scene-break", label: "Scene break", hint: "* * *" },
   { id: "heading", label: "Heading", hint: "## a section title" },
-  { id: "beat", label: "Beat", hint: "Jump to the beat plan below" },
+  { id: "beat", label: "Plan step", hint: "Jump to the scene plan below" },
   { id: "link", label: "Link to entry", hint: "[[ — search the codex" },
   { id: "character", label: "New character", hint: "Create a codex entry and link it here" },
 ];
