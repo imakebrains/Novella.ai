@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { compileManuscript, defaultTitle } from "../export/compile";
 import { backupProject } from "../export/backup";
+import { openPrintWindow } from "../export/printPdf";
 import { render, type Format } from "../export/formats";
 import { saveExport } from "../export/save";
 import { bylineOf, useProfile } from "../state/profile";
 import { isTauri, storage } from "../storage";
 import { store } from "../state/vaultStore";
 
-type Choice = Format | "backup";
+type Choice = Format | "pdf" | "backup";
 
 const FORMATS: { id: Choice; label: string; blurb: string }[] = [
   {
@@ -25,6 +26,12 @@ const FORMATS: { id: Choice; label: string; blurb: string }[] = [
     id: "markdown",
     label: "Markdown (.md)",
     blurb: "One plain-text file. Nothing is lost, and every tool can read it.",
+  },
+  {
+    id: "pdf",
+    label: "PDF (print)",
+    blurb:
+      "Opens a print-ready copy — choose “Save as PDF” in the dialog. Proper page breaks, chapter starts, book typography.",
   },
   {
     id: "backup",
@@ -88,7 +95,10 @@ export function ExportModal({ onClose }: { onClose: () => void }) {
     setError(null);
     setDone(null);
     try {
-      if (format === "backup") {
+      if (format === "pdf") {
+        if (openPrintWindow(manuscript)) setDone("Print dialog opened — choose “Save as PDF”.");
+        else setError("The print window was blocked. Allow pop-ups for Novella and try again.");
+      } else if (format === "backup") {
         const r = await backupProject();
         if (r.savedTo) {
           setDone(

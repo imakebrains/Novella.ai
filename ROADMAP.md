@@ -48,6 +48,15 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
 - [x] **Continuity checks, deterministic tier** — shipped 2026-07-23: Continuity inspector tab; provable checks only (early mention via `introduced:`, near-duplicate codex names, dangling links with counts, unordered chapters, unknown POV); click opens the note; 9 unit checks.
 - [x] **OS keychain for API keys (desktop)** — shipped 2026-07-23: secret_set/get/delete Tauri commands over the `keyring` crate (Credential Manager / macOS Keychain / Linux keyutils); JS write-through + hydrate-at-register; web stays memory-only; Rust round-trip test passes against the real store; SECURITY.md updated.
 - [x] **Export presets per format** — shipped 2026-07-23 (.novella/export.json, restored on open).
+- [ ] **Notion-parity pass, ongoing** — owner: "make this look and function
+      exactly like Notion but better." Next concrete gaps: block-style
+      hover handles in the editor, inline databases-as-tables on notes,
+      synced project sidebar collapse, cover images on note headers.
+      One gap per run, verified live.
+- [ ] **NovelCrafter-parity pass, ongoing** — codex entry templates per
+      type (character sheets with fields), chat-with-your-book mode,
+      scene status labels (draft/revised/done) surfaced on cards and
+      table. One per run.
 - [ ] **Silent auto-update** — generate a Tauri updater keypair, add the
       pubkey + endpoint to `tauri.conf.json`, wire `tauri-plugin-updater`,
       and have CI attach `latest.json`. Needs a decision from the owner
@@ -83,6 +92,15 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-07-23 — Owner feedback round 4 (session). The writing-style menu
+  is exactly the promised set — default + Extensive novel + Paragraph
+  mode + Email writer + anything the writer creates (the nine old task
+  prompts no longer seed and are filtered from the menu; existing notes
+  stay in vaults). PDF export added as a print-ready window ("Save as
+  PDF" — engine-quality pagination, no PDF library shipped). The
+  Appearance controls are themed instead of native-white. Standing
+  Notion/NovelCrafter parity items added above for the autopilot.
 
 - 2026-07-23 — Owner feedback round 3 (session). FIXED THE REPORTED BUG:
   "Delete board does nothing" — confirm() dialogs are suppressed in some

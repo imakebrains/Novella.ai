@@ -3537,9 +3537,21 @@ body.focus-mode .cm-editor {
   padding: var(--space-2) 0;
   font-size: var(--text-sm);
 }
-.personalize-row select,
+/* Native form controls read as another app's — restyle to the theme. */
+.personalize-row select {
+  max-width: 220px;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  color: var(--fg-primary);
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
 .personalize-row input[type="range"] {
   max-width: 220px;
+  accent-color: var(--accent);
 }
 .personalize-row input[type="color"] {
   width: 44px;

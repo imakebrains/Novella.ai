@@ -223,6 +223,22 @@ function LinksTab() {
 
 type DaemonState = "checking" | "ready" | "no-models" | "unreachable";
 
+/* The old task-prompts (grammar check, storyboard, blurb…) crowded the
+   style menu — owner feedback. Their notes stay in the vault for anyone
+   who used them; the menu shows only styles: the default, the three
+   samples, and anything the writer creates or uploads. */
+const LEGACY_PROMPTS = new Set([
+  "Expand beat",
+  "Continue scene",
+  "Rewrite selection",
+  "Describe setting",
+  "Dialogue pass",
+  "Storyboard this chapter",
+  "Grammar check",
+  "Familiarity check",
+  "Blurb writer",
+]);
+
 function AssistantTab() {
   usePluginVersion();
   const active = store.active();
@@ -372,7 +388,10 @@ function AssistantTab() {
           aria-label="Writing style"
         >
           <option value="">Continue the scene (default)</option>
-          {store.prompts().map((p) => (
+          {store
+            .prompts()
+            .filter((p) => !LEGACY_PROMPTS.has(p.title))
+            .map((p) => (
             <option key={p.id} value={p.id}>
               {p.title}
             </option>
