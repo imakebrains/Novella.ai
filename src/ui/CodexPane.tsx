@@ -3,6 +3,7 @@ import type { Note } from "../core/vault";
 import { store, useVaultVersion } from "../state/vaultStore";
 import { useActiveProject } from "../state/projects";
 import { NoteMenu } from "./NoteMenu";
+import { openQuickCreate } from "./QuickCreate";
 
 /* Order matters — manuscript sits above the world bible, because
    that's what a writer reaches for most. */
@@ -58,11 +59,26 @@ export function CodexPane({
           {project?.name ?? "Project"}
         </span>
         <span className="count">{store.vault.all().length}</span>
-        <button className="icon-btn" onClick={onImport} title="Import a manuscript">
-          ⤒
+        <button
+          className="pane-word-btn"
+          onClick={() => openQuickCreate()}
+          title="New chapter, character, location or note — or from a template"
+        >
+          + New
         </button>
-        <button className="icon-btn" onClick={onExport} title="Export the manuscript">
-          ⤓
+        <button
+          className="pane-word-btn"
+          onClick={onImport}
+          title="Import a manuscript (.docx, .md, .txt) into this project"
+        >
+          Import
+        </button>
+        <button
+          className="pane-word-btn"
+          onClick={onExport}
+          title="Export the manuscript, or back up the whole project"
+        >
+          Export
         </button>
       </div>
 

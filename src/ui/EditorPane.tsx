@@ -14,7 +14,7 @@ import {
   type CompletionResult,
 } from "@codemirror/autocomplete";
 import { store, useVaultVersion } from "../state/vaultStore";
-import { registerEditorInsert, focusBeatDraft } from "./editorBridge";
+import { registerEditorInsert, registerTitleFocus, focusBeatDraft } from "./editorBridge";
 import { BeatsPanel } from "./BeatsPanel";
 import {
   critiqueExtension,
@@ -161,6 +161,17 @@ export function EditorPane() {
   const [kinds, setKinds] = useState<Set<IssueKind>>(new Set());
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
   const [titleDraft, setTitleDraft] = useState<string | null>(null);
+  const titleInput = useRef<HTMLInputElement>(null);
+
+  // "Rename" on any right-click menu lands here: the title input is the
+  // rename surface, so the menu just walks the cursor to it.
+  useEffect(() => {
+    registerTitleFocus(() => {
+      titleInput.current?.focus();
+      titleInput.current?.select();
+    });
+    return () => registerTitleFocus(null);
+  }, []);
   const kindsRef = useRef(kinds);
   kindsRef.current = kinds;
 
@@ -330,6 +341,7 @@ export function EditorPane() {
       <header className="editor-head">
         <div className="editor-title-wrap">
           <input
+            ref={titleInput}
             className="editor-title editor-title-input"
             value={titleDraft ?? active.title}
             onChange={(e) => setTitleDraft(e.target.value)}

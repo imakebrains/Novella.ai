@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { store } from "../state/vaultStore";
 import { boardStore, useBoards } from "../state/boards";
 import { deleteNoteWithUndo } from "../state/deleteNote";
+import { focusEditorTitle } from "./editorBridge";
 import { stripWikiLinks } from "../ai/context";
 import { saveExport } from "../export/save";
 
@@ -92,6 +93,21 @@ export function NoteMenu({
         Open
       </button>
 
+      <button
+        role="menuitem"
+        className="editor-menu-item"
+        title="Opens the note with its title selected — type the new name. Old [[links]] keep working."
+        onClick={() => {
+          store.open(noteId);
+          onOpenNote?.();
+          onClose();
+          // Give the editor a beat to mount when coming from a board.
+          setTimeout(() => focusEditorTitle(), 90);
+        }}
+      >
+        Rename…
+      </button>
+
       {!isManuscript && (
         <button
           role="menuitem"
@@ -109,6 +125,20 @@ export function NoteMenu({
       <button role="menuitem" className="editor-menu-item" onClick={exportMarkdown}>
         Export as Markdown…
       </button>
+
+      {!note.path.startsWith("Templates/") && (
+        <button
+          role="menuitem"
+          className="editor-menu-item"
+          title="Copies this note into Templates/ so the + button can stamp out more like it. {{name}} and {{date}} in the body are filled in on use."
+          onClick={() => {
+            store.saveAsTemplate(noteId);
+            onClose();
+          }}
+        >
+          Save as template
+        </button>
+      )}
 
       <div className="editor-menu-label">Add to board</div>
       {boards.map((b) => {

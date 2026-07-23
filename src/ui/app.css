@@ -122,6 +122,33 @@
   color: var(--accent);
 }
 
+/* Icon buttons whose glyph alone doesn't explain them get a word. */
+.icon-btn.labeled {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: auto;
+  padding: 0 var(--space-2);
+  font-size: var(--text-xs);
+}
+
+/* Small text actions in a pane header — words, not runes. */
+.pane-word-btn {
+  border: none;
+  background: transparent;
+  color: var(--fg-muted);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.pane-word-btn:hover {
+  color: var(--fg-primary);
+  background: var(--bg-hover);
+}
+
 .workspace {
   display: grid;
   flex: 1 1 auto;
@@ -3071,19 +3098,23 @@ body.focus-mode .cm-editor {
 }
 
 .quick-create-btn {
-  width: 26px;
   height: 26px;
-  border-radius: 50%;
+  padding: 0 var(--space-3) 0 var(--space-2);
+  border-radius: 999px;
   border: 1px solid var(--border-strong);
   background: var(--bg-raised);
   color: var(--fg-secondary);
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
   line-height: 1;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: var(--space-1);
   transition: background 0.12s var(--ease), color 0.12s var(--ease), transform 0.12s var(--ease);
+}
+.quick-create-word {
+  font-weight: 600;
 }
 
 .quick-create-btn:hover,
@@ -3156,6 +3187,11 @@ body.focus-mode .cm-editor {
   border-color: var(--accent);
   background: var(--accent-soft);
   color: var(--fg-primary);
+}
+
+.quick-create-label {
+  margin: var(--space-2) 0 var(--space-1);
+  font-size: var(--text-xs);
 }
 
 .quick-create-actions {
@@ -4150,6 +4186,53 @@ body.focus-mode .cm-editor {
   background: var(--success);
 }
 
+.agent-state-dot.busy {
+  background: var(--accent);
+  animation: agent-pulse 1s ease-in-out infinite;
+}
+@keyframes agent-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.agent-list-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.agent-order {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+.agent-row:hover .agent-order,
+.agent-order:focus-within {
+  opacity: 1;
+}
+.agent-nudge {
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm);
+  color: var(--fg-muted);
+  font-size: var(--text-xs);
+  line-height: 1.2;
+  cursor: pointer;
+  user-select: none;
+}
+.agent-nudge:hover {
+  color: var(--fg-primary);
+  background: var(--bg-hover);
+}
+.agent-nudge[aria-disabled="true"] {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
 .agent-state-dot.err {
   background: var(--danger);
 }
@@ -4627,6 +4710,35 @@ body.focus-mode .cm-editor {
   align-items: stretch;
   gap: var(--space-2);
   min-height: 300px;
+}
+
+/* Edge fades: the chart is wider than the screen past ~15 chapters, and
+   without a hint the cut-off column reads as the last one. */
+.stats-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.stats-wrap > .stats-scroll {
+  flex: 1;
+}
+.scroll-fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 56px;
+  pointer-events: none;
+  z-index: 2;
+}
+.scroll-fade.right {
+  right: 0;
+  background: linear-gradient(to left, var(--bg-app), transparent);
+}
+.scroll-fade.left {
+  left: 0;
+  background: linear-gradient(to right, var(--bg-app), transparent);
 }
 
 .stats-col {

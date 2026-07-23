@@ -1,5 +1,6 @@
 import { store } from "./state/vaultStore";
 import { boardStore } from "./state/boards";
+import { agentStore } from "./state/agents";
 import { deleteNoteWithUndo } from "./state/deleteNote";
 import { pluginHost } from "./plugins/runtime";
 import { probeSetup } from "./setupProbe";
@@ -95,6 +96,7 @@ export function installDevtools(): void {
     /** Escape hatches for poking at internals during development. */
     store,
     boards: boardStore,
+    agents: agentStore,
     deleteNoteWithUndo,
     pluginHost,
     profile: profileStore,

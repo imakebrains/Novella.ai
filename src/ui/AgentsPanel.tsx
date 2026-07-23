@@ -54,6 +54,7 @@ export function AgentsPanel({ onOpenNote }: { onOpenNote: () => void }) {
   const agents = useAgents();
   const [view, setView] = useState<View>({ kind: "list" });
   const [runningId, setRunningId] = useState<string | null>(null);
+  const [runningAll, setRunningAll] = useState(false);
 
   const runNow = async (agent: Agent) => {
     setRunningId(agent.id);
@@ -61,6 +62,22 @@ export function AgentsPanel({ onOpenNote }: { onOpenNote: () => void }) {
       await runAgent(agent);
     } finally {
       setRunningId(null);
+    }
+  };
+
+  // Sequential on purpose: five agents in parallel is five simultaneous
+  // model calls against the same provider, and their reports would race
+  // for the same notes.
+  const runAll = async () => {
+    setRunningAll(true);
+    try {
+      for (const agent of agentStore.all().filter((a) => a.enabled)) {
+        setRunningId(agent.id);
+        await runAgent(agent);
+      }
+    } finally {
+      setRunningId(null);
+      setRunningAll(false);
     }
   };
 
@@ -125,21 +142,60 @@ export function AgentsPanel({ onOpenNote }: { onOpenNote: () => void }) {
 
       {agents.length > 0 && (
         <section className="settings-group">
-          <h3 className="settings-cat">Your agents</h3>
+          <div className="agent-list-head">
+            <h3 className="settings-cat">Your agents</h3>
+            {agents.some((a) => a.enabled) && (
+              <button
+                className="btn-ghost"
+                disabled={runningAll || runningId !== null || !providerAvailable()}
+                onClick={() => void runAll()}
+                title="Run every enabled agent once, top to bottom"
+              >
+                {runningAll ? "Running…" : "Run all now"}
+              </button>
+            )}
+          </div>
           <div className="agent-list">
-            {agents.map((agent) => (
+            {agents.map((agent, i) => (
               <button key={agent.id} className={`agent-row ${agent.enabled ? "" : "off"}`} onClick={() => setView({ kind: "agent", id: agent.id })}>
                 <div className="agent-main">
                   <span className="agent-name">{agent.name}</span>
                   <span className="agent-desc">{agent.description || agent.instructions.slice(0, 90)}</span>
                   <span className="agent-last">
-                    {describeTrigger(agent.trigger)} ·{" "}
-                    {agent.lastRunAt === null
-                      ? "never run"
-                      : `${agent.lastStatus === "error" ? "failed" : "ran"} ${new Date(agent.lastRunAt).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}`}
+                    {runningId === agent.id
+                      ? "running now…"
+                      : `${describeTrigger(agent.trigger)} · ${
+                          agent.lastRunAt === null
+                            ? "never run"
+                            : `${agent.lastStatus === "error" ? "failed" : "ran"} ${new Date(agent.lastRunAt).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}`
+                        }`}
                   </span>
                 </div>
-                <span className={`agent-state-dot ${agent.enabled ? (agent.lastStatus === "error" ? "err" : "on") : ""}`} />
+                <span className="agent-order" onClick={(e) => e.stopPropagation()}>
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    className="agent-nudge"
+                    aria-disabled={i === 0}
+                    title="Move up"
+                    onClick={() => agentStore.move(agent.id, -1)}
+                    onKeyDown={(e) => e.key === "Enter" && agentStore.move(agent.id, -1)}
+                  >
+                    ↑
+                  </span>
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    className="agent-nudge"
+                    aria-disabled={i === agents.length - 1}
+                    title="Move down"
+                    onClick={() => agentStore.move(agent.id, 1)}
+                    onKeyDown={(e) => e.key === "Enter" && agentStore.move(agent.id, 1)}
+                  >
+                    ↓
+                  </span>
+                </span>
+                <span className={`agent-state-dot ${runningId === agent.id ? "busy" : agent.enabled ? (agent.lastStatus === "error" ? "err" : "on") : ""}`} />
               </button>
             ))}
           </div>

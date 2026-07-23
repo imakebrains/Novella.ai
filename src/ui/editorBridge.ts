@@ -34,6 +34,21 @@ export function focusBeatDraft(): boolean {
   return true;
 }
 
+/* And once more for renaming: "Rename" on a note's right-click menu
+   opens the note and puts the cursor in the editable title — the title
+   input IS the rename surface, this just walks you to it. */
+let titleFocusFn: (() => void) | null = null;
+
+export function registerTitleFocus(fn: (() => void) | null): void {
+  titleFocusFn = fn;
+}
+
+export function focusEditorTitle(): boolean {
+  if (!titleFocusFn) return false;
+  titleFocusFn();
+  return true;
+}
+
 export function editorReady(): boolean {
   return insertFn !== null;
 }

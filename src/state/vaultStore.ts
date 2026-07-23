@@ -622,6 +622,63 @@ export class VaultStore {
   }
 
   /** Create a note that was referenced but never written. */
+  /* ---------- templates ----------
+
+     A template is an ordinary note living under Templates/ — visible in
+     the codex, editable like anything else, and it travels with the
+     project folder. `templateFor` in its frontmatter remembers what kind
+     of note it stamps out. */
+
+  templates(): Note[] {
+    return this.index
+      .all()
+      .filter((n) => n.path.startsWith("Templates/"))
+      .sort((a, b) => a.title.localeCompare(b.title));
+  }
+
+  /** Copy a note into Templates/. The copy's title gets a "(template)"
+      suffix so it never hijacks [[links]] meant for the original. */
+  saveAsTemplate(id: string): Note | null {
+    const source = this.index.get(id);
+    if (!source) return null;
+    const title = `${source.title} (template)`;
+    const existing = this.index.resolveLink(title);
+    if (existing) return existing;
+    const filename = title.replace(/[^\w\s-]/g, "").trim().replace(/\s+/g, "-");
+    const tpl: Note = {
+      id: `tpl-${source.id}`,
+      path: `Templates/${filename}.md`,
+      type: "note",
+      title,
+      aliases: [],
+      tags: [],
+      data: { templateFor: source.type },
+      body: source.body,
+    };
+    this.index.add(tpl);
+    this.dirty.add(tpl.id);
+    this.emit();
+    return tpl;
+  }
+
+  /** Stamp out a new note from a template and open it. {{name}} and
+      {{date}} in the template body are filled in. */
+  createFromTemplate(templateId: string, name: string): Note | null {
+    const tpl = this.index.get(templateId);
+    if (!tpl) return null;
+    const type = typeof tpl.data.templateFor === "string" ? tpl.data.templateFor : "note";
+    const note = this.createNote(type, name);
+    const today = new Date().toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+    note.body = tpl.body.replaceAll("{{name}}", name).replaceAll("{{date}}", today);
+    this.dirty.add(note.id);
+    this.emit();
+    return note;
+  }
+
   createFromDanglingLink(name: string, type: string): Note {
     const folder =
       type === "character"

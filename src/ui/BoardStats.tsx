@@ -1,6 +1,7 @@
+import { useRef } from "react";
 import { store, useVaultVersion } from "../state/vaultStore";
-import { countWords } from "../analysis/prose";
-import { taskProgress } from "../core/tasks";
+import { cardDerived } from "./cardDerived";
+import { useScrollEdges } from "./useScrollEdges";
 import { threadColor, usePlotThreads } from "../state/plot";
 import { useActiveProject } from "../state/projects";
 import { BoardLayoutToggle, BoardPicker, type BoardLayout } from "./BoardLayoutToggle";
@@ -31,11 +32,13 @@ export function BoardStats({
   const project = useActiveProject();
   const threads = usePlotThreads();
   const chapters = store.orderedChapters();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const edges = useScrollEdges(scrollRef, chapters.length);
 
   const rows = chapters.map((c) => ({
     note: c,
-    words: countWords(c.body),
-    tasks: taskProgress(c.body),
+    words: cardDerived(c).words,
+    tasks: cardDerived(c).tasks,
     threads: threads.filter((t) => store.plotPointsOf(c, t.id).length > 0),
   }));
   const maxWords = Math.max(1, ...rows.map((r) => r.words));
@@ -69,7 +72,10 @@ export function BoardStats({
           <p>No chapters yet — nothing to measure.</p>
         </div>
       ) : (
-        <div className="stats-scroll">
+        <div className="stats-wrap">
+          {edges.left && <div className="scroll-fade left" aria-hidden />}
+          {edges.right && <div className="scroll-fade right" aria-hidden />}
+        <div className="stats-scroll" ref={scrollRef}>
           <div className="stats-chart" role="img" aria-label="Words per chapter">
             {rows.map((row, i) => {
               const h = Math.max(3, Math.round((row.words / maxWords) * 100));
@@ -145,6 +151,7 @@ export function BoardStats({
               </p>
             </section>
           )}
+        </div>
         </div>
       )}
     </main>

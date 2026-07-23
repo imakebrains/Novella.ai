@@ -1,6 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { store } from "../state/vaultStore";
 
+/* Other surfaces (the codex pane's own + button) can pop this open
+   without owning the component. */
+let opener: (() => void) | null = null;
+export function openQuickCreate(): boolean {
+  if (!opener) return false;
+  opener();
+  return true;
+}
+
 /* The + button — Notion's fastest habit, adapted.
 
    One press, name the thing, pick what it is, and you're writing in it.
@@ -26,9 +35,17 @@ export function QuickCreate({
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [kind, setKind] = useState("chapter");
+  const [tplId, setTplId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const wrap = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    opener = () => setOpen(true);
+    return () => {
+      opener = null;
+    };
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -48,12 +65,19 @@ export function QuickCreate({
   }, [open]);
 
   const create = () => {
-    const title = name.trim() || defaultName(kind);
+    const tpl = tplId ? store.vault.get(tplId) : undefined;
+    const effectiveKind = tpl
+      ? typeof tpl.data.templateFor === "string"
+        ? tpl.data.templateFor
+        : "note"
+      : kind;
+    const title = name.trim() || defaultName(effectiveKind);
     if (store.vault.resolveLink(title)) {
       setError(`"${title}" already exists — pick another name.`);
       return;
     }
-    store.createNote(kind, title);
+    if (tpl) store.createFromTemplate(tpl.id, title);
+    else store.createNote(kind, title);
     setName("");
     setError(null);
     setOpen(false);
@@ -71,10 +95,10 @@ export function QuickCreate({
       <button
         className={`quick-create-btn ${open ? "on" : ""}`}
         onClick={() => setOpen((v) => !v)}
-        title="Create something new"
+        title="Create a chapter, character, location or note — or start from a template"
         aria-expanded={open}
       >
-        +
+        + <span className="quick-create-word">New</span>
       </button>
 
       {open && (
@@ -98,16 +122,44 @@ export function QuickCreate({
             {KINDS.map((k) => (
               <button
                 key={k.type}
-                className={`quick-kind ${kind === k.type ? "on" : ""}`}
+                className={`quick-kind ${kind === k.type && !tplId ? "on" : ""}`}
                 role="radio"
-                aria-checked={kind === k.type}
+                aria-checked={kind === k.type && !tplId}
                 title={k.hint}
-                onClick={() => setKind(k.type)}
+                onClick={() => {
+                  setKind(k.type);
+                  setTplId(null);
+                }}
               >
                 <span className="type-dot" data-type={k.type} /> {k.label}
               </button>
             ))}
           </div>
+
+          {store.templates().length > 0 && (
+            <>
+              <p className="hint quick-create-label">…or from a template</p>
+              <div className="quick-create-kinds" role="radiogroup" aria-label="From a template">
+                {store.templates().map((t) => {
+                  const forType =
+                    typeof t.data.templateFor === "string" ? t.data.templateFor : "note";
+                  return (
+                    <button
+                      key={t.id}
+                      className={`quick-kind ${tplId === t.id ? "on" : ""}`}
+                      role="radio"
+                      aria-checked={tplId === t.id}
+                      title={`New ${forType} with this template's contents. Save any note as a template from its right-click menu.`}
+                      onClick={() => setTplId(tplId === t.id ? null : t.id)}
+                    >
+                      <span className="type-dot" data-type={forType} />{" "}
+                      {t.title.replace(/ \(template\)$/, "")}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
 
           {error && <p className="hint quick-create-error">{error}</p>}
 

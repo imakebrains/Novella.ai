@@ -309,6 +309,21 @@ export const agentStore = {
     void persistSafely();
     emit();
   },
+
+  /** Nudge an agent up or down the list. Order is presentation AND run
+      order for "run all", so it's worth persisting. */
+  move(id: string, dir: -1 | 1): void {
+    const at = cached.findIndex((a) => a.id === id);
+    const to = at + dir;
+    if (at === -1 || to < 0 || to >= cached.length) return;
+    const next = [...cached];
+    const [agent] = next.splice(at, 1);
+    next.splice(to, 0, agent!);
+    cached = next;
+    mutatedSinceLoad = true;
+    void persistSafely();
+    emit();
+  },
 };
 
 /* Standing orders belong to a book; a different book has different ones. */

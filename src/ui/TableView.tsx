@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { store, useVaultVersion } from "../state/vaultStore";
-import { countWords } from "../analysis/prose";
-import { taskProgress } from "../core/tasks";
+import { cardDerived } from "./cardDerived";
 import { useActiveProject } from "../state/projects";
 import { BoardLayoutToggle, BoardPicker, type BoardLayout } from "./BoardLayoutToggle";
 import { MANUSCRIPT_BOARD } from "../state/boards";
@@ -42,12 +41,12 @@ export function TableView({
   const chapters = store.orderedChapters();
   const rows = useMemo(() => {
     const base = chapters.map((c, i) => {
-      const tasks = taskProgress(c.body);
+      const { words, tasks } = cardDerived(c);
       return {
         id: c.id,
         order: i + 1,
         title: c.title,
-        words: countWords(c.body),
+        words,
         tasksDone: tasks.done,
         tasksTotal: tasks.total,
         tags: c.tags,

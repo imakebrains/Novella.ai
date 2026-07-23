@@ -2,8 +2,7 @@ import { useRef, useState } from "react";
 import type { Note } from "../core/vault";
 import { store, useVaultVersion } from "../state/vaultStore";
 import { stripWikiLinks } from "../ai/context";
-import { countWords } from "../analysis/prose";
-import { taskProgress } from "../core/tasks";
+import { cardDerived } from "./cardDerived";
 import { useActiveProject } from "../state/projects";
 import { boardStore, MANUSCRIPT_BOARD, useBoards } from "../state/boards";
 import { plotStore, threadColor, usePlotThreads } from "../state/plot";
@@ -191,7 +190,7 @@ export function Corkboard({
           </h1>
           <span className="board-meta">
             {chapters.length} {chapters.length === 1 ? "card" : "cards"} ·{" "}
-            {chapters.reduce((sum, c) => sum + countWords(c.body), 0).toLocaleString()} words ·
+            {chapters.reduce((sum, c) => sum + cardDerived(c).words, 0).toLocaleString()} words ·
             drag to reorder
             {!onManuscript && " · this board's order only — the book is untouched"}
           </span>
@@ -400,14 +399,13 @@ function Card({
 }) {
   const [addingTag, setAddingTag] = useState(false);
   const [tagDraft, setTagDraft] = useState("");
-  const words = countWords(note.body);
+  const derived = cardDerived(note);
+  const words = derived.words;
+  const tasks = derived.tasks;
   const pov = typeof note.data.pov === "string" ? stripWikiLinks(note.data.pov).trim() : null;
   const synopsis =
-    typeof note.data.synopsis === "string"
-      ? note.data.synopsis
-      : stripWikiLinks(note.body).replace(/\s+/g, " ").trim();
+    typeof note.data.synopsis === "string" ? note.data.synopsis : derived.stripped;
   const beats = store.beatsOf(note);
-  const tasks = taskProgress(note.body);
   // Which plot threads run through this chapter — shown as colour dots so
   // the cards carry the grid's information without the grid.
   const threadDots = plotStore

@@ -4,7 +4,8 @@ import { backupProject } from "../export/backup";
 import { render, type Format } from "../export/formats";
 import { saveExport } from "../export/save";
 import { bylineOf, useProfile } from "../state/profile";
-import { isTauri } from "../storage";
+import { isTauri, storage } from "../storage";
+import { store } from "../state/vaultStore";
 
 type Choice = Format | "backup";
 
@@ -51,6 +52,32 @@ export function ExportModal({ onClose }: { onClose: () => void }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
+  // Last-used options come back on reopen — retyping the byline for the
+  // fourth export of the same book is pure friction. Per project, in
+  // .novella/, so it travels with the folder like everything else.
+  useEffect(() => {
+    const root = store.vaultRoot();
+    if (!root) return;
+    storage()
+      .readBytes(root, ".novella/export.json")
+      .then((bytes) => {
+        if (!bytes) return;
+        const saved = JSON.parse(new TextDecoder().decode(bytes)) as Partial<{
+          format: Choice;
+          title: string;
+          author: string;
+          skipEmpty: boolean;
+        }>;
+        if (saved.format && FORMATS.some((f) => f.id === saved.format)) setFormat(saved.format);
+        if (typeof saved.title === "string" && saved.title) setTitle(saved.title);
+        if (typeof saved.author === "string") setAuthor(saved.author);
+        if (typeof saved.skipEmpty === "boolean") setSkipEmpty(saved.skipEmpty);
+      })
+      .catch(() => {
+        /* corrupt or missing presets aren't worth an error */
+      });
+  }, []);
+
   const manuscript = useMemo(
     () => compileManuscript({ title, author, skipEmpty }),
     [title, author, skipEmpty],
@@ -72,6 +99,16 @@ export function ExportModal({ onClose }: { onClose: () => void }) {
         const result = await render(manuscript, format);
         const where = await saveExport(result);
         if (where) setDone(where);
+      }
+      const root = store.vaultRoot();
+      if (root) {
+        void storage()
+          .writeBytes(
+            root,
+            ".novella/export.json",
+            new TextEncoder().encode(JSON.stringify({ format, title, author, skipEmpty })),
+          )
+          .catch(() => {});
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));

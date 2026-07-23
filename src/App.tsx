@@ -256,26 +256,28 @@ export default function App() {
             </button>
           )}
           <button
-            className={`icon-btn ${leftOpen ? "on" : ""}`}
+            className={`icon-btn labeled ${leftOpen ? "on" : ""}`}
             onClick={() => setLeftOpen((v) => !v)}
-            title="Toggle codex pane"
+            title="Show or hide the left pane — your chapters, characters and notes"
+            aria-pressed={leftOpen}
           >
-            ▤
+            ▤ <span>Codex</span>
           </button>
           <button
-            className={`icon-btn ${rightOpen ? "on" : ""}`}
+            className={`icon-btn labeled ${rightOpen ? "on" : ""}`}
             onClick={() => setRightOpen((v) => !v)}
-            title="Toggle Inspector"
+            title="Show or hide the right pane — links, tasks, history, assistant"
+            aria-pressed={rightOpen}
           >
-            ▥
+            ▥ <span>Tools</span>
           </button>
           <button
-            className={`icon-btn ${focus ? "on" : ""}`}
+            className={`icon-btn labeled ${focus ? "on" : ""}`}
             onClick={() => setFocus((v) => !v)}
-            title="Focus mode — just the page (Ctrl+Shift+F)"
+            title="Focus mode — just the page, nothing else (Ctrl+Shift+F). Esc leaves."
             aria-pressed={focus}
           >
-            ◎
+            ◎ <span>Focus</span>
           </button>
           <button
             className="icon-btn theme-cycle"
