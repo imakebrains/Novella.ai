@@ -324,3 +324,89 @@ offline mode, weak mobile, notes buried five layers deep, and export/lock-in
 pain. Every one of these is a Novella strength by construction (local files,
 measured-fast at 118 notes, flat structure, plain Markdown). These become
 standing guardrails in ROADMAP.md, not one-off features.
+
+---
+
+# Round 7 — sweep of NovelCrafter, Sudowrite, Dabble, Scrivener, Campfire,
+type.ai, Obsidian-for-writers, Notion novel templates
+
+A no-code research pass, autopilot run 2026-07-24. "Next up" had thinned to
+2 buildable items, which is exactly the signal to research instead of build.
+
+## Confirmed strengths — nothing to build, just say it louder
+
+Checked our own export code (`src/export/formats.ts`) against Sudowrite's
+stated gap before writing this: **Sudowrite ships no PDF, EPUB, or DOCX
+export** — reviewers call it out by name, "requiring writers to stitch
+together separate tools for everything else." Novella already exports
+Markdown, DOCX, and EPUB (`formats.ts`) plus a print-quality PDF (round 4)
+plus one-click full-project backup. This is a real, checkable advantage and
+the export modal / first-run copy doesn't currently say so. Cheap win, low
+priority.
+
+Scrivener reviews in 2026 still center on the same two complaints as every
+prior round: a fragile Dropbox/iCloud cross-device sync ("close it on one
+device before opening it on another" — a workflow that "shouldn't require
+conscious attention in 2026") and a compile system that broke EPUB export
+for months without a fix. Reinforces that PLAN-sync.md is the single highest-
+leverage blocked item on the roadmap, not a nice-to-have — nothing new to
+add here, it's already flagged NEEDS OWNER.
+
+## New gaps worth building
+
+**1. Inline comments / margin notes on manuscript text — genuinely missing.**
+Dabble's Premium tier and Notion's comment threads both lean on this, and
+it's the default way a writer incorporates beta-reader or critique-partner
+feedback. We searched the codebase (`comment`/`annotation` matches) and
+found nothing that attaches a note to a text range — only the unrelated
+"comment" fields inside agent prompts and imported-docx comment stripping.
+Right now a Novella user round-trips through Google Docs for this. Attach a
+note to a selection without touching prose, show it in a margin gutter,
+resolve/reply. Directly collapses one more reason to leave the app.
+
+**2. Location map / pinboard — Campfire's headline feature, and reviewers
+rate Campfire 4/5 specifically for it.** Interactive maps + custom languages
++ timeline management, all linked back into the manuscript, is what fantasy/
+sci-fi authors cite as Campfire's edge over general tools. We already have
+Relationship web (people-to-people); a lighter version — pin codex
+locations onto an uploaded map image — is the worldbuilding-genre equivalent
+and reuses the card-image upload path already shipped for board cards.
+
+**3. Grammar/spelling, flagged not committed.** Dabble Premium
+(ProWritingAid) and type.ai both lean on live grammar checking; our Critique
+tab covers *style* habits (adverbs, passive voice, echoes) but not spelling/
+grammar mechanics. Before building anything: check whether CodeMirror's
+`contenteditable` surface already gets the browser's/webview's native
+spellcheck for free — if so this may be a documentation gap, not a code
+gap. Genuinely offline grammar checking (not style linting) is a much bigger
+build (bundled dictionary, MB cost) that cuts against the lightweight-
+installer promise, so this needs a scoping pass before it's a committed item.
+
+## Competitive landscape notes (no action)
+
+Obsidian-for-writers is a real alternative some serious writers already use
+for free via plugins (Longform for scene ordering + export stitching, Novel
+Word Count, StoryLine for full book-planning-in-a-vault). It's not a
+product, it's a plugin stack a writer has to assemble and maintain — the
+zero-setup, works-on-first-launch positioning still holds against it and is
+worth keeping in first-run copy.
+
+Notion novel templates (Scriborg, World Building Bible, Modern Writer) are
+converging on the same shape we're already building toward in the
+Notion-parity item: interconnected databases (character/location/timeline)
+with multiple views of the same data. Nothing new to add beyond what's
+already tracked there.
+
+### Round 7 sources
+
+- [Novelcrafter Review — Frustrating to Set Up (April 2026)](https://ilampadmanabhan.medium.com/novelcrafter-review-powerful-for-fiction-writers-frustrating-to-set-up-april-2026-64d391c629a2)
+- [Sudowrite Review — DreamGen](https://dreamgen.com/blog/articles/sudowrite-review)
+- [Sudowrite Review — no PDF/EPUB/DOCX export noted](https://aiunpacker.com/blog/sudowrite-review-the-ai-writing-tool-fiction-authors-actually-use)
+- [Dabble Writer Review 2026 — tier breakdown](https://knowara.com/ai-tools/writing/dabble-writer-review/)
+- [Scrivener 2026 Review — sync and compile complaints](https://elephas.app/blog/scrivener-review)
+- [Best Scrivener Alternatives 2026 — Storyflow](https://storyflow.so/blog/best-scrivener-alternatives-2026)
+- [Campfire Writing Review — 4-star, maps/languages/timelines](https://aitoolscoop.com/tool/campfire-writing/)
+- [Type.ai Review — dedicated writing tool first, AI second](https://ilampadmanabhan.medium.com/type-ai-review-719f59c68dbb)
+- [Obsidian plugins tagged #writing](https://www.obsidianstats.com/tags/writing)
+- [Longform plugin thread — Obsidian Forum](https://forum.obsidian.md/t/plugin-storyline-obsidian-plugin-for-writers/111494)
+- [28 Best Notion Templates for Writers in 2026 — Gridfiti](https://gridfiti.com/notion-templates-for-writers/)

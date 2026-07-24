@@ -48,6 +48,13 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
 - [x] **Continuity checks, deterministic tier** — shipped 2026-07-23: Continuity inspector tab; provable checks only (early mention via `introduced:`, near-duplicate codex names, dangling links with counts, unordered chapters, unknown POV); click opens the note; 9 unit checks.
 - [x] **OS keychain for API keys (desktop)** — shipped 2026-07-23: secret_set/get/delete Tauri commands over the `keyring` crate (Credential Manager / macOS Keychain / Linux keyutils); JS write-through + hydrate-at-register; web stays memory-only; Rust round-trip test passes against the real store; SECURITY.md updated.
 - [x] **Export presets per format** — shipped 2026-07-23 (.novella/export.json, restored on open).
+- [ ] **Inline comments / margin notes on manuscript text** — research
+      round 7 (2026-07-24): Dabble Premium and every beta-reader workflow
+      lean on comment markup; we have none, so feedback currently
+      round-trips through Google Docs. Attach a note to a text range
+      without touching prose, show it in a margin gutter, resolve/reply.
+      Collapses one more reason to leave the app — high priority against
+      the thesis.
 - [ ] **Notion-parity pass, ongoing** — owner: "make this look and function
       exactly like Notion but better." Next concrete gaps: block-style
       hover handles in the editor, inline databases-as-tables on notes,
@@ -57,6 +64,25 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       type (character sheets with fields), chat-with-your-book mode,
       scene status labels (draft/revised/done) surfaced on cards and
       table. One per run.
+- [ ] **Location map / pinboard for codex locations** — research round 7:
+      Campfire's headline feature (maps + timelines linked to the
+      manuscript) is what fantasy/sci-fi reviewers rate it 4/5 for. Pin
+      codex location entries onto an uploaded map image; reuses the
+      card-image upload path already shipped for board cards. Worldbuilding
+      counterpart to the existing Relationship web.
+- [ ] **Say the export advantage louder** — research round 7: Sudowrite
+      reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
+      Novella already ships all three plus one-click backup
+      (`src/export/formats.ts`) and the export modal / first-run copy
+      doesn't say so. Cheap copy win, low priority.
+- [ ] **Scope offline grammar/spelling checking** — research round 7,
+      flagged not committed: Dabble Premium (ProWritingAid) and type.ai
+      both lean on live grammar checking; our Critique tab covers style
+      habits (adverbs/passive/echoes) but not spelling/grammar mechanics.
+      First check whether the editor surface already gets the webview's
+      native spellcheck for free before building anything — a bundled
+      offline grammar engine is a real size/scope tradeoff against the
+      lightweight-installer promise.
 - [ ] **Silent auto-update** — generate a Tauri updater keypair, add the
       pubkey + endpoint to `tauri.conf.json`, wire `tauri-plugin-updater`,
       and have CI attach `latest.json`. Needs a decision from the owner
@@ -92,6 +118,18 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-07-24 — Research round 7 (autopilot; no code — "Next up" had thinned
+  to 2 buildable items, the documented trigger for a research run). Swept
+  NovelCrafter, Sudowrite, Dabble, Scrivener, Campfire, type.ai,
+  Obsidian-for-writers and Notion novel templates. Confirmed a real
+  strength worth surfacing in copy: Sudowrite reviews dock it for shipping
+  no PDF/EPUB/DOCX export, and we already ship all three plus backup.
+  Added three new build items (inline comments/margin notes — highest
+  priority, closes a real gap; location map/pinboard, Campfire's headline
+  feature; export-advantage copy) plus one flagged-not-committed item
+  (offline grammar/spelling — needs a scoping pass before it's real work).
+  Full notes in RESEARCH.md Round 7.
 
 - 2026-07-23 — Owner feedback round 4 (session). The writing-style menu
   is exactly the promised set — default + Extensive novel + Paragraph
