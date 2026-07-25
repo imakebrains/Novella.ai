@@ -397,6 +397,132 @@ Notion-parity item: interconnected databases (character/location/timeline)
 with multiple views of the same data. Nothing new to add beyond what's
 already tracked there.
 
+---
+
+# Round 8 — sweep of NovelCrafter, Sudowrite, Dabble, Scrivener, Campfire,
+type.ai, Obsidian-for-writers, Notion novel templates
+
+Autopilot run 2026-07-25, one day after round 7. Deliberately searched for
+angles round 7 hadn't already covered — new feature detail, subscription
+economics, and one significant industry event — rather than re-confirming
+the same reviews.
+
+## New build item: NovelCrafter's Matrix view
+
+NovelCrafter's planning surface ships three views — Grid (cards), Matrix,
+and Outline. The Matrix is described repeatedly as the most powerful of the
+three: a spreadsheet where rows are scenes/chapters and columns are
+metadata (POV, subplot, summary, and more), with **single-click POV
+reassignment** — select a new POV character from a dropdown on the cell
+itself, no need to open the scene.
+
+Checked our own code before writing this up: we already have every piece
+of underlying data. `pov` lives in chapter frontmatter (used by the
+Continuity inspector's "unknown POV" check), and `plot.json` already
+tracks subplot threads as columns in PlotGrid.tsx (the Dabble Plot Grid
+work from round 2). But grepping every place `pov` renders
+(`Corkboard.tsx:494-599`, `PlotGrid.tsx:295-321`) shows it is *display-only*
+in both — a text label next to a character-type dot, never an editable
+field. Nothing today lets a writer reassign a scene's POV, or a batch of
+scenes' POV, without opening each note and editing frontmatter by hand.
+
+This is a genuine, checkable gap, not a guess, and it's cheap relative to
+the payoff: the data model doesn't need to change, only a new
+spreadsheet-shaped view (or an edit affordance added to the existing Table
+board layout) that makes `pov` and subplot-thread membership inline-editable
+across many scenes at once. Filed as an addition to the ongoing
+NovelCrafter-parity item rather than a new line, since it's the same kind
+of gap-closing work.
+
+## Landscape notes (confirm the thesis, no new build item)
+
+**Subscription stacking is now a named complaint, not just an inference.**
+Multiple 2026 "best writing software" roundups now call out the *combination*
+of tools directly: "Scrivener + NovelCrafter + ProWritingAid adds up very
+fast," and note that "most productive fiction authors use 2-3 tools
+together... there is no universal best book writing app." This is the
+clearest third-party confirmation yet of Novella's founding thesis (writers
+run 3-4 apps because no one app does the whole job) — worth quoting in
+future marketing copy rather than building anything new from it.
+
+**NaNoWriMo's nonprofit shut down in 2025** (reported through mid-2026):
+after a six-year decline in participation, compounded by board resignations
+over the org's pro-AI-writing stance and complaints about forum moderation
+safety for teen writers, the organization closed and its website went
+offline — writers reported losing data with no warning. This matters for
+Novella's audience, not its code: a large population of sprint-and-goal-
+driven novelists (NaNoWriMo's whole culture was daily word counts and
+community accountability) lost their home in the same period Novella
+shipped Writing sprints, streaks, and daily goals. No action item — the
+features already exist — but it's a relevant fact for whoever writes
+outward-facing copy or picks launch communities (r/NaNoWriMo refugees,
+Discord successor communities).
+
+**Campfire prices per module**, not as one subscription: 18 separate
+modules (Manuscript, Characters, Maps, Timelines, Languages, etc.), each
+billed monthly/annually/lifetime on its own. Reviews frame this as
+flexible ("pay only for what you use"), but it's also the nickel-and-dime
+pattern Novella's flat local-install pricing stands against — reinforces
+the existing pricing thesis in Round 1 rather than adding to it.
+
+**Sudowrite's Muse model** is a genuine step up per 2026 reviews — "the
+first one that's actually felt useful for drafting fiction" — but the tool
+is still scored 3/5 overall because of what it doesn't do: no PDF/EPUB/DOCX
+export (confirms round 7's finding), no book-cover designer, no audiobook
+creation, no non-fiction templates. Book-cover generation and audiobook
+narration both require bundling image/TTS models we don't ship and are
+outside the writing-and-task-managing thesis as scoped today — noted for
+awareness, not filed as a build item; would need its own scoping
+discussion if ever pursued.
+
+**Scrivener** has no Scrivener 4 yet — as of 2026 the company is still
+maintaining Scrivener 3.5 (a macOS 26 Tahoe compatibility update shipped),
+with forum mentions of an unrelated "new writing app" in beta that may
+eventually backport features. Nothing new to act on.
+
+**Obsidian-for-writers setups** converge on a specific four-plugin
+recommendation across multiple guides: Longform (manuscript structure +
+compile), Kanban (plotting board), Templater (character-sheet templates),
+Word Count (status-bar tracking) — "install these four and ignore
+everything else for a month." Reinforces round 7's finding that Obsidian
+is a plugin stack a writer has to assemble and maintain, not a product;
+still worth keeping "works on first launch, nothing to install" in
+first-run copy.
+
+**Notion's performance cliff is now a specific number**: reviews cite
+"performance drops noticeably with databases over 5,000 records." Useful
+as a concrete target if the standing FAST guardrail (round 6) ever needs a
+stress-test number to benchmark against — no action needed now, since true
+board virtualization is already deferred in ROADMAP.md until real projects
+pass ~300 chapters, well short of where Notion's data suggests trouble
+starts.
+
+### Round 8 sources
+
+- [Novelcrafter Review — jenova.ai (April 2026)](https://www.jenova.ai/en/resources/novelcrafter)
+- [Novelcrafter Review — DreamGen](https://dreamgen.com/blog/articles/novelcrafter-review)
+- [Novelcrafter — Planning with the Matrix](https://www.novelcrafter.com/help/docs/plan/planning-with-the-matrix)
+- [Novelcrafter — Plan Views](https://www.novelcrafter.com/help/docs/plan/plan-views)
+- [Sudowrite Review 2026 — CyberNews](https://cybernews.com/ai-tools/sudowrite-review/)
+- [Sudowrite Review 2026 — Built&Written](https://www.builtwritten.com/blog/sudowrite-ai-2026)
+- [Dabble Writer Review — Kindlepreneur](https://kindlepreneur.com/dabble-writer/)
+- [Dabble Writer, Inc. — Trustpilot reviews](https://ca.trustpilot.com/review/dabblewriter.com)
+- [Scrivener 4 — Everything You Want to Know So Far — WPS](https://www.wps.com/blog/scrivener-4-everything-you-want-to-know-so-far/)
+- [Scrivener 4? — Literature & Latte Forums](https://forum.literatureandlatte.com/t/scrivener-4/138792)
+- [Campfire Writing Review 2026 — aitoolscoop](https://aitoolscoop.com/tool/campfire-writing/)
+- [Campfire's Writing Apps pricing](https://www.campfirewriting.com/apps)
+- [Notion review 2026 — eesel AI](https://www.eesel.ai/blog/notion-review)
+- [I would never try writing a novel in Obsidian without these 5 plugins — XDA](https://www.xda-developers.com/would-never-try-writing-novel-in-obsidian-without-these-plugins/)
+- [Obsidian for Fiction Writers: Setup, Plugins, and Workflow — Loreteller](https://loreteller.com/learn/obsidian-fiction-writers-guide/)
+- [Best Writing Apps for Authors (2026) — NowNovel](https://nownovel.com/best-writing-apps/)
+- [Best Writing Tools for Fiction Authors (2026) — Laterpress](https://www.laterpress.com/craft-of-writing/best-ai-writing-tools-for-fiction/)
+- [NaNoWriMo Nonprofit Shutters — Publishers Weekly](https://www.publishersweekly.com/pw/by-topic/industry-news/publisher-news/article/97466-nanowrimo-nonprofit-shutters.html)
+- [NaNoWriMo Is Closing Down After Two Decades — Self-Publishing Advice](https://selfpublishingadvice.org/nanowrimo-is-closing-down/)
+- [NaNoWriMo is shutting down — Literary Hub](https://lithub.com/nanowrimo-is-shutting-down/)
+- [NaNoWriMo Alternatives 2026: The Best Tools and Communities After the Shutdown — CipherWrite](https://cipherwrite.com/blog/nanowrimo-alternatives-2026)
+
+---
+
 ### Round 7 sources
 
 - [Novelcrafter Review — Frustrating to Set Up (April 2026)](https://ilampadmanabhan.medium.com/novelcrafter-review-powerful-for-fiction-writers-frustrating-to-set-up-april-2026-64d391c629a2)

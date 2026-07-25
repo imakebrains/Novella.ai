@@ -63,7 +63,14 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
 - [ ] **NovelCrafter-parity pass, ongoing** — codex entry templates per
       type (character sheets with fields), chat-with-your-book mode,
       scene status labels (draft/revised/done) surfaced on cards and
-      table. One per run.
+      table. One per run. Research round 8 (2026-07-25): NovelCrafter's
+      most-praised planning surface is its Matrix view — a spreadsheet of
+      chapters × columns (POV, subplot, summary) with single-click POV
+      reassignment. We already have every underlying field (`pov`
+      frontmatter, `plot.json` subplot threads in PlotGrid) but display
+      them read-only on cards, not as an editable spreadsheet. Verified
+      by grep: POV appears in Corkboard.tsx and PlotGrid.tsx as a
+      read-only label, never an editable field.
 - [ ] **Location map / pinboard for codex locations** — research round 7:
       Campfire's headline feature (maps + timelines linked to the
       manuscript) is what fantasy/sci-fi reviewers rate it 4/5 for. Pin
@@ -75,6 +82,13 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       Novella already ships all three plus one-click backup
       (`src/export/formats.ts`) and the export modal / first-run copy
       doesn't say so. Cheap copy win, low priority.
+- [ ] **Say the performance/battery advantage louder** — research round 8:
+      2026 Dabble reviews call it out by name as a CPU hog that "ran a
+      user's laptop battery down really quickly," a direct cost of being a
+      browser-tab app. Novella is a native Tauri process with a local
+      vault, not a browser tab — first-run/marketing copy doesn't currently
+      make this contrast. Cheap copy win, low priority, pairs with the
+      export-advantage item above.
 - [ ] **Scope offline grammar/spelling checking** — research round 7,
       flagged not committed: Dabble Premium (ProWritingAid) and type.ai
       both lean on live grammar checking; our Critique tab covers style
@@ -118,6 +132,26 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-07-25 — Research round 8 (autopilot; no code). Swept fresh 2026
+  reviews for NovelCrafter, Sudowrite, Dabble, Scrivener, Campfire,
+  type.ai, Obsidian-for-writers, and Notion writing templates, one day
+  after round 7 — deliberately looked for angles round 7 hadn't covered
+  rather than re-confirming the same ground. Found and added: NovelCrafter's
+  Matrix planning view (spreadsheet of chapters × POV/subplot/summary,
+  single-click POV reassignment) as a concrete NovelCrafter-parity gap —
+  verified live in the codebase first that our POV field is read-only
+  everywhere it appears; a performance/battery copy item (2026 Dabble
+  reviews call it a CPU/battery hog as a browser-tab app, which Novella
+  structurally isn't). Landscape notes (no action): subscription-stacking
+  complaints (Scrivener + NovelCrafter + ProWritingAid) directly confirm
+  the thesis; NaNoWriMo's 2025 nonprofit shutdown (AI-stance controversy +
+  falling participation) leaves a community of sprint/goal writers looking
+  for a home; Campfire prices per-module (a la carte add-ons) which is the
+  opposite of Novella's flat local install; Sudowrite's new Muse model is
+  reviewed as "the first that's actually felt useful for drafting" but the
+  tool still ships no PDF/EPUB/DOCX/cover/audiobook and rates 3/5 for it.
+  Full notes and sources in RESEARCH.md Round 8.
 
 - 2026-07-24 — Research round 7 (autopilot; no code — "Next up" had thinned
   to 2 buildable items, the documented trigger for a research run). Swept
