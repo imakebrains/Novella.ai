@@ -77,6 +77,21 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       codex location entries onto an uploaded map image; reuses the
       card-image upload path already shipped for board cards. Worldbuilding
       counterpart to the existing Relationship web.
+- [ ] **Say the no-training/privacy advantage louder** — research round 9
+      (2026-07-26): a 2026 Authorlytica survey puts numbers on author
+      anxiety about AI training for the first time — 96% want consent
+      required before their work trains a model, and 52% say they'll
+      refuse a tool outright over training-data concerns. NovelCrafter's
+      BYOK model only pushes that question to the API provider's terms;
+      Sudowrite's manuscript-training policy isn't clearly public. A local
+      Ollama model never transmits the manuscript anywhere, so the
+      question doesn't apply to Novella at all — but first-run copy
+      (`FirstRunWizard.tsx`) says "private" and "nothing leaves the
+      machine" without ever saying the word a worried author is actually
+      searching for: training. Cheap, truthful copy add to the AI-setup
+      step and SECURITY.md; placed above the export/performance copy items
+      below because the evidence behind it is a stated reason authors
+      *refuse* a tool, not just a comparison point.
 - [ ] **Say the export advantage louder** — research round 7: Sudowrite
       reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
       Novella already ships all three plus one-click backup
@@ -132,6 +147,30 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-07-26 — Research round 9 (autopilot; no code). Went wider than
+  tool-by-tool feature lists this round: author sentiment and industry
+  privacy surveys. Found and added the strongest copy item yet: a 2026
+  Authorlytica survey measures what earlier rounds only had anecdotally —
+  96% of authors want consent before their work trains an AI, 52% say
+  they'll refuse a tool outright over training-data concerns. Checked
+  NovelCrafter (BYOK just pushes the question to the provider's terms) and
+  Sudowrite (training policy not clearly public) before writing this up —
+  neither can say what Novella can by construction: a local model never
+  transmits the manuscript, so the question doesn't apply. Checked our own
+  first-run copy first too: it already says "private" and "nothing leaves
+  the machine" but never the specific word — "training" — an anxious
+  author is searching for. Filed above the export/performance copy items
+  since this one is a stated reason authors walk away, not just a
+  comparison point. Landscape notes (no action): Sudowrite's AI-generated
+  manuscript review is itself reported unreliable ("missed major plot
+  points"), which retroactively validates Novella's deterministic-only
+  Continuity inspector design; NovelCrafter's BYOK friction is confirmed
+  for a fourth straight round (no need to re-check next time unless the
+  product changes); Dabble's rating has drifted to 2.5/5 over the same
+  export gap already tracked; new entrants (Scribeist, ShyEditor, Novel
+  Factory, NovelistAI) noted for awareness with no concrete gap found yet.
+  Full notes and sources in RESEARCH.md Round 9.
 
 - 2026-07-25 — Research round 8 (autopilot; no code). Swept fresh 2026
   reviews for NovelCrafter, Sudowrite, Dabble, Scrivener, Campfire,

@@ -523,6 +523,117 @@ starts.
 
 ---
 
+---
+
+# Round 9 — sweep of NovelCrafter, Sudowrite, Dabble, Scrivener, Campfire,
+type.ai, Obsidian-for-writers, Notion novel templates
+
+Autopilot run 2026-07-26. Rounds 7 and 8 had exhausted the feature-comparison
+angle for now, so this pass deliberately went wider — author sentiment and
+industry surveys, not just tool-by-tool feature lists — looking for what
+round 8 hadn't already covered.
+
+## New finding: the AI-training-consent anxiety is now measured, and it's a Novella advantage nobody is saying out loud
+
+A 2026 Authorlytica survey, cited across several fresh privacy-focused
+writing-tool roundups, puts numbers on something previous rounds only had
+anecdotally: **96% of authors believe their consent should be required
+before their work is used to train an AI model, and 52% say they will
+refuse to use a specific AI tool outright over training-data concerns.**
+Separately, cloud tools are drawing a harder look this year — writers are
+described as moving off Google Docs specifically over "anxiety about how
+cloud data and AI training intersect." A new sub-genre of buying guide has
+appeared as a direct result: "Best AI Book Writing Tools for Authors Who
+Care About Privacy," which grades tools on whether they train on
+manuscripts and how buried the opt-out is (one piece flags Google's own
+settings as "five layers deep" to turn off).
+
+Checked what NovelCrafter and Sudowrite actually offer here before writing
+this up: NovelCrafter's BYOK model means the *provider's* API terms govern
+training (enterprise API tiers typically don't train by default, but that's
+a promise from Anthropic/OpenAI, not from NovelCrafter, and a writer has to
+know to check it). Sudowrite's own training/privacy stance wasn't clearly
+documented in what's public — the review sites could only speak to general
+data collection (contact info, usage, diagnostics), not manuscript-specific
+training policy.
+
+**Where Novella stands:** this question doesn't have an asterisk for us —
+it doesn't apply. A local Ollama model never transmits the manuscript
+anywhere, so there is no training pipeline to opt out of, no provider terms
+to trust, no policy page to go read. Checked our own first-run copy
+(`FirstRunWizard.tsx`) before filing this: it already says "free, private,
+nothing leaves the machine" at the AI-setup step and "no accounts and no
+server" at the pen-name step — true and in the right direction, but neither
+line says the word a worried author is actually searching for: *training*.
+Given 52% of authors say they'll walk away from a tool over exactly this,
+naming it explicitly (in first-run copy and SECURITY.md) is a cheap,
+truthful, high-leverage line to add. Filed in "Next up" above the two
+existing copy items (export, performance) since the evidence behind it is a
+stated reason authors *refuse* a tool, not just a comparison point.
+
+## Landscape notes (confirm existing findings, no new build item)
+
+**Sudowrite's AI-generated manuscript review is itself unreliable** — 2026
+reviews report it "missed major plot points" and gave feedback that
+signaled the story wasn't read carefully. This is a useful data point
+against a *probabilistic* review feature in general, not just Sudowrite's
+implementation, and it retroactively validates the design choice already
+made for Novella's Continuity inspector: deterministic checks only (early
+mentions, duplicate names, dangling links, unordered chapters, unknown
+POV), each one provable and click-through-able, rather than an LLM
+summarizing the whole manuscript and occasionally missing a plot point with
+total confidence. No action — noting it because it's evidence the existing
+design choice was right, not a guess.
+
+**NovelCrafter's BYOK friction is still the single most-repeated complaint**
+in every fresh 2026 review pulled this round — this is the fourth research
+round in a row to find the same thing restated. No new action; round 1's
+finding stands and doesn't need re-confirming again next time unless
+NovelCrafter actually changes the model.
+
+**Dabble's aggregate rating has drifted down to 2.5/5** in 2026 roundups,
+with the specific knock being that writers "outgrow it" for lack of
+advanced export/formatting and end up needing a second tool for production
+— the same gap already identified against Sudowrite and already a Novella
+strength (`src/export/formats.ts` ships Markdown/DOCX/EPUB/PDF/backup).
+Reinforces the existing "say the export advantage louder" item rather than
+adding a new one.
+
+**New entrants surfaced this round** (Scribeist, ShyEditor, Novel Factory,
+NovelistAI) are worth naming for awareness but none surfaced a concrete
+feature gap from the search snippets available — Scribeist's headline pitch
+("AI that doesn't need to be briefed from scratch every session") is
+exactly round 1 finding #4, which Novella already satisfies structurally
+(an open chapter is always context, nothing to attach). No action; worth a
+closer look in a future round if any of them gain visible traction.
+
+**Obsidian-for-writers has converged on a specific four-plugin stack**
+(Longform, Kanban, Templater, Word Count) repeated across multiple 2026
+guides as "install these four and ignore everything else" — reinforces
+round 8's finding almost verbatim; still a plugin stack to assemble and
+maintain, not a product. No new action.
+
+## Sources
+
+- [Best AI Book Writing Tools for Authors Who Care About Privacy — Storyloft](https://storyloft.app/best-ai-book-writing-tools-for-authors-who-care-about-privacy/)
+- [What Makes an AI Writing Tool Safe for Authors? — Storyloft](https://storyloft.app/what-makes-an-ai-writing-tool-safe-for-authors-privacy-training-and-manuscript-control-explained/)
+- [Are AI Writing Tools Stealing Your Work? A 2026 Privacy Audit — CipherWrite](https://cipherwrite.com/blog/are-ai-writing-tools-stealing-your-work-2026)
+- [Best Local AI Tools for Writers (2026) — LocalAlternative](https://www.localalternative.io/for/writers)
+- [How Authors Are Fighting Back Against AI Training — ISBNDB Blog](https://isbndb.com/blog/ai-training-data-poisoning/)
+- [Sudowrite vs Novelcrafter — TechDictionary](https://techdictionary.io/sudowrite-vs-novelcrafter/)
+- [Sudowrite Review: I Tested It on a 40,000-Word Manuscript (April 2026)](https://ilampadmanabhan.medium.com/sudowrite-review-i-tested-it-on-a-40-000-word-manuscript-heres-my-honest-verdict-april-2026-951b674dccea)
+- [Novelcrafter Review — jenova.ai (April 2026)](https://www.jenova.ai/en/resources/novelcrafter)
+- [Dabble Review: What Authors Should Know in 2026 — Reedsy](https://reedsy.com/studio/resources/dabble-writing-review/)
+- [Dabble Writer Review 2026 — Knowara](https://knowara.com/ai-tools/writing/dabble-writer-review/)
+- [19 Best Novel Writing Software Compared (2026) — Noveling Guide](https://noveling.dev/guide/en/blog/novel-writing-software-comparison-2026/)
+- [Best AI for Writing Fiction 2026 — mylifenote.ai](https://blog.mylifenote.ai/the-11-best-ai-tools-for-writing-fiction-in-2026/)
+- [The Best AI Writing System for 2026 — SidekickWriter](https://www.sidekickwriter.com/blog/ai-writing-system-comparison-2026)
+- [I would never try writing a novel in Obsidian without these 5 plugins — XDA](https://www.xda-developers.com/would-never-try-writing-novel-in-obsidian-without-these-plugins/)
+- [The 28 Best Notion Templates for Writers in 2026 — Gridfiti](https://gridfiti.com/notion-templates-for-writers/)
+- [The 12 Best Notion Alternatives for Writers and Storytellers (2026) — Storyflow](https://storyflow.so/blog/best-notion-alternatives-writers-2026)
+
+---
+
 ### Round 7 sources
 
 - [Novelcrafter Review — Frustrating to Set Up (April 2026)](https://ilampadmanabhan.medium.com/novelcrafter-review-powerful-for-fiction-writers-frustrating-to-set-up-april-2026-64d391c629a2)
