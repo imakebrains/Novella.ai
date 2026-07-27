@@ -77,6 +77,21 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       codex location entries onto an uploaded map image; reuses the
       card-image upload path already shipped for board cards. Worldbuilding
       counterpart to the existing Relationship web.
+- [ ] **Timeline view for story chronology** — research round 10
+      (2026-07-27): Campfire's Timeline module plots events, scenes and
+      character appearances on one or more horizontal timelines, explicitly
+      pitched at dual-timeline and multi-POV books where story-internal
+      order and manuscript order diverge; its Arcs module links the same
+      events to per-character development arcs. Verified we have nothing
+      like it — grepped the codebase and the only "timeline" hits are an
+      agent example prompt and unrelated seed text, no feature. This is
+      the chronology counterpart to the location-map item above (both
+      Campfire headline features, both unbuilt) and doubles as a stronger
+      Continuity inspector: today's "unordered chapters" check only knows
+      manuscript order, not in-world date order for flashback-heavy or
+      multi-POV books. Lower priority than the map since it's a bigger
+      surface (needs an in-world date field on scenes), but the same
+      genre-fiction audience wants both.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent
@@ -104,6 +119,29 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       vault, not a browser tab — first-run/marketing copy doesn't currently
       make this contrast. Cheap copy win, low priority, pairs with the
       export-advantage item above.
+- [ ] **Say the no-credit-limits advantage louder** — research round 10
+      (2026-07-27): 2026 Sudowrite reviews' top complaint is no longer
+      price alone ($29–59/month) but that credits "run out faster than
+      expected," especially on the Muse model — a writer can hit a wall
+      mid-scene. NovelCrafter's BYOK sidesteps Sudowrite's specific meter
+      but still bills per-token through the provider. A local Ollama model
+      has no credit system at all — generate as much as the machine can
+      compute, forever, for free. Distinct pain point from the existing
+      no-API-key/no-training copy items (this one is about mid-project
+      throttling anxiety, not setup cost or privacy) and just as cheap to
+      say. Low priority, groups with the other copy items above.
+- [ ] **Fix the Claude Fable 5 blurb in the optional Anthropic provider** —
+      research round 10 (2026-07-27): July 2026 coverage confirms Fable 5
+      is Anthropic's purpose-built creative-writing model, topping
+      benchmarks specifically for prose voice, subtext and character work
+      — exactly what a writer picking a model in a writing app cares
+      about. Checked `src/ai/models.ts`: our own catalog blurb reads "Most
+      capable, most expensive. For the hardest work," which undersells it
+      as a generic flagship rather than the creative specialist it
+      actually is. One-line, no-risk copy fix (this is the optional
+      cloud-AI path, not the local-first default, so it doesn't touch the
+      thesis — just don't undersell a real model advantage to writers who
+      do opt in).
 - [ ] **Scope offline grammar/spelling checking** — research round 7,
       flagged not committed: Dabble Premium (ProWritingAid) and type.ai
       both lean on live grammar checking; our Critique tab covers style
@@ -147,6 +185,37 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-07-27 — Research round 10 (autopilot; no code). Swept NovelCrafter,
+  Sudowrite, Scrivener, Dabble, Campfire, type.ai, Obsidian-for-writers and
+  Notion novel templates again, one day after round 9, looking for angles
+  the last three rounds hadn't covered rather than re-confirming known
+  ground. Found and added three items: a Timeline view for story
+  chronology (Campfire's Timeline + Arcs modules plot events and character
+  development across one or more timelines for dual-timeline/multi-POV
+  books — verified by grep that we have nothing like it, only an agent
+  example prompt and unrelated seed text mention the word "timeline"); a
+  fourth copy item, no-credit-limits (2026 Sudowrite reviews' loudest new
+  complaint is credits running out mid-scene on the Muse model, not price
+  — a local Ollama model has no meter at all, a distinct pain point from
+  the existing no-API-key/no-training copy items); and a one-line
+  self-inflicted bug: checked our own optional Anthropic provider
+  (`src/ai/models.ts`) against July 2026 coverage of Claude Fable 5 as
+  Anthropic's dedicated creative-writing model, and found our catalog
+  blurb undersells it as a generic "most expensive" flagship instead of
+  naming the prose/subtext/character strength that's the actual reason a
+  writer would pick it. Landscape notes (no action): NovelCrafter's Chat-
+  with-your-book and Codex templates are real and confirm the existing
+  NovelCrafter-parity item rather than adding a new one; BetaReader.io and
+  BetaBooks are dedicated paid products for exactly the inline-comment gap
+  already top of "Next up," which is strong outside evidence the existing
+  priority is right, not a reason to add a duplicate item; Scrivener's
+  Dropbox-sync complaints are unchanged for a second round (reinforces
+  PLAN-sync.md, nothing new to add); Dabble confirmed at 2.5/5 for a
+  second round; Campfire's per-module pricing confirmed for a second
+  round; a 2025 Author Guild survey puts AI adoption among published
+  fiction writers at 45%, mostly for brainstorming — context, not a gap.
+  Full notes and sources in RESEARCH.md Round 10.
 
 - 2026-07-26 — Research round 9 (autopilot; no code). Went wider than
   tool-by-tool feature lists this round: author sentiment and industry

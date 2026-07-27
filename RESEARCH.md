@@ -646,4 +646,140 @@ maintain, not a product. No new action.
 - [Type.ai Review — dedicated writing tool first, AI second](https://ilampadmanabhan.medium.com/type-ai-review-719f59c68dbb)
 - [Obsidian plugins tagged #writing](https://www.obsidianstats.com/tags/writing)
 - [Longform plugin thread — Obsidian Forum](https://forum.obsidian.md/t/plugin-storyline-obsidian-plugin-for-writers/111494)
+
+---
+
+# Round 10 — sweep of NovelCrafter, Sudowrite, Scrivener, Dabble, Campfire,
+type.ai, Obsidian-for-writers, Notion novel templates
+
+Autopilot run 2026-07-27, one day after round 9. Deliberately hunted for
+angles the last three rounds hadn't already covered — a new visual feature,
+a new complaint category, and a check of our own optional cloud-AI code
+against fresh model news — rather than re-running the same searches.
+
+## New finding: Campfire's Timeline + Arcs modules are a real, unbuilt gap
+
+Campfire's Timeline module plots events, scenes, and character appearances
+along one or more horizontal timelines, explicitly aimed at books with dual
+timelines or multiple POV threads whose story-internal order diverges from
+manuscript order — a writer can hold "what happened when" separate from
+"what chapter it's in." Its Arcs module links the same events to individual
+character-development arcs so a writer can see a character's arc plotted
+against the timeline, not just against chapter order. Both are singled out
+in 2026 reviews as reasons genre (esp. fantasy/sci-fi, multi-POV) writers
+pick Campfire.
+
+Checked before writing this up: grepped the codebase for "timeline" and
+found nothing — the only two hits are an example prompt for the built-in
+Continuity sentinel agent ("timelines that don't add up") and an unrelated
+line of seed placeholder text ("Check every compass mention against the map
+timeline"). No feature exists. This pairs with the still-unbuilt
+location-map item (round 7) as the second Campfire headline feature we
+lack, and it's also a stronger version of what the Continuity inspector
+already half-does: its "unordered chapters" check only knows manuscript
+order, so a flashback chapter or a second POV thread that's supposed to run
+concurrently with chapter 3 reads as "out of order" when it isn't. A
+lightweight in-world date field on scenes plus a horizontal-timeline view
+would fix both the feature gap and that false-positive class in Continuity.
+Filed below the location map (bigger surface — needs a new scene field, not
+just reusing the existing image-upload path) but for the same audience.
+
+## New finding: Sudowrite's loudest complaint has shifted from price to credits running out
+
+Earlier rounds tracked NovelCrafter's BYOK cost surprise ($24–44/month once
+API usage is added) and Sudowrite's flat $29–59/month price. This round's
+reviews surface a sharper, more specific pain: credits "run out faster than
+expected," named explicitly against the new Muse model, which writers now
+have to budget and ration mid-manuscript rather than just pay for once a
+month. That's a different anxiety than price — it's the fear of hitting a
+wall mid-scene, not knowing in advance how far a subscription will
+stretch. A local Ollama model has no credit system to run dry: generation
+is bounded only by what the writer's own machine can compute, at any hour,
+forever. Filed as a fourth, distinct copy item alongside the existing
+no-API-key, no-training, export, and performance items — cheap to say,
+and evidenced by a complaint pattern none of the earlier rounds had yet.
+
+## New finding: we're underselling our own optional Claude Fable 5 model
+
+Not a competitor gap — a self-check prompted by 2026 coverage of Claude
+Fable 5 as Anthropic's purpose-built creative-writing model, reported to
+top benchmarks specifically for prose voice, subtext, and character work
+(as distinct from general coding/reasoning benchmarks). Novella already
+ships an optional Anthropic provider (`src/plugins/providers/anthropic.ts`)
+for writers who opt into cloud AI, and its model catalog
+(`src/ai/models.ts`) already lists Fable 5 — but the blurb reads "Most
+capable, most expensive. For the hardest work," which describes it as a
+generic expensive flagship and never mentions the one thing that actually
+matters to a writer choosing a model in a writing app: it's the model
+built for prose, not just the priciest one. One-line fix, filed as a cheap
+copy item. This sits entirely inside the optional cloud-AI path — it
+doesn't touch the local-first default or the thesis, it just stops
+underselling a real advantage to writers who do opt in.
+
+## Landscape notes (confirm existing findings, no new build item)
+
+**NovelCrafter's Chat-with-your-book and Codex templates are real and
+already tracked.** Fresh reviews describe Chat as reviewers' "#1 way to
+brainstorm and worldbuild," pulling in scenes/chapters/Codex entries as
+context to ask about plot holes and consistency. This confirms rather than
+adds to the existing NovelCrafter-parity item in "Next up" (chat-with-your-
+book mode is already named there as a concrete gap) — no new bullet
+needed, just evidence the priority is right.
+
+**BetaReader.io and BetaBooks are dedicated paid products for exactly the
+gap already at the top of "Next up."** Both exist solely to collect and
+manage inline/chapter feedback from beta readers — sort by reader, chapter,
+or keyword; turn comments into a revision to-do list. That an entire market
+category exists around a feature Novella doesn't have yet is strong
+external validation that "inline comments / margin notes" deserves its
+current top-of-list priority. Not a reason to add a duplicate item, and a
+reminder that if/when it's built, "resolve" and "turn into a to-do" (not
+just "reply") are the parts reviewers say beta-reader workflows actually
+need.
+
+**Scrivener's sync complaints are unchanged for a second straight round** —
+still Dropbox/iCloud, still "close it on one device before opening another"
+to avoid conflict files, still no real-time collaboration. Reinforces
+PLAN-sync.md's priority; nothing new to add until the product changes.
+
+**Dabble confirmed at 2.5/5 for a second round**, same root cause (writers
+"outgrow it" for lack of advanced export, need a second tool for
+production) — already tracked against our export advantage.
+
+**Campfire's per-module pricing confirmed for a second round** ($2/month
+for just the manuscript editor up to $12/month for every module) — still
+the inverse of Novella's flat local install, nothing new to add.
+
+**Author Guild survey: 45% of published fiction writers now use AI tools**
+in some part of their process, mostly for brainstorming (2025 survey, cited
+in July 2026 roundups). Context on how normalized AI-assisted writing has
+become — not a feature gap, no action.
+
+**Type.ai and Obsidian's four-plugin stack (Longform, Kanban, Templater,
+Word Count) are unchanged from prior rounds** — no new angle surfaced this
+pass.
+
+## Sources
+
+- [Novelcrafter: Full Review, Pricing & Better Alternatives (April 2026) — jenova.ai](https://www.jenova.ai/en/resources/novelcrafter)
+- [Novelcrafter Review (2026): Writing Plans, Codex & BYOK AI — Toolworthy](https://www.toolworthy.ai/tool/novelcrafter)
+- [Sudowrite Review 2026 — Nerdynav](https://nerdynav.com/sudowrite-review/)
+- [Muse by Sudowrite: Reviews, Features, Pricing — AIPure](https://aipure.ai/products/muse-by-sudowrite)
+- [Sudowrite Review: Tested the $22/month AI across 70,000 words — UC Strategies](https://ucstrategies.com/news/sudowrite-review-i-tested-the-22-month-ai-against-chatgpt-across-70000-words/)
+- [Scrivener Review 2026 — All About AI](https://www.allaboutai.com/ai-reviews/scrivener/)
+- [Scrivener Review (2026) — Elephas](https://elephas.app/blog/scrivener-review)
+- [Dabble Writer Review: Features, Pros & Cons for 2026 — Automateed](https://www.automateed.com/dabble-writer)
+- [Dabble Review: What Authors Should Know in 2026 — Reedsy](https://reedsy.com/studio/resources/dabble-writing-review/)
+- [Campfire Writing Review: The 17 Modules Explained — selfpublishing.com](https://selfpublishing.com/campfire-writing-review/)
+- [Timeline Module Tutorial — Campfire](https://campfirewriting.com/learn/timeline-tutorial)
+- [Multi-Purpose Timeline Maker for Authors — Campfire](https://campfirewriting.com/timeline-maker)
+- [Type.ai Review: My Top Pick After Testing Three AI Writing Tools (April 2026)](https://ilampadmanabhan.medium.com/type-ai-review-719f59c68dbb)
+- [Essential Obsidian Plugins for Writers — practicalpkm.com](https://practicalpkm.com/essential-obsidian-plugins-for-writers/)
+- [Obsidian for Fiction Writers: Setup, Plugins, and Workflow — Loreteller](https://loreteller.com/learn/obsidian-fiction-writers-guide/)
+- [The 28 Best Notion Templates for Writers in 2026 — Gridfiti](https://gridfiti.com/notion-templates-for-writers/)
+- [BetaReader.io - Features & Pricing (July 2026)](https://www.saasworthy.com/product/betareader-io)
+- [BetaBooks: Reader management software for authors](https://www.betabooks.co/)
+- [Beta Reader Feedback: Turning Notes Into a Revision Plan](https://www.webproworld.com/creative-writing/beta-reader-feedback-turning-notes-into-a-revision-plan-1/)
+- [Best AI for Creative Writing July 2026: Claude Fable 5, GPT-5.5 and Top 10 — buildmvpfast.com](https://www.buildmvpfast.com/articles/best-llms-2026-guide/creative-writing-ai)
+- [Are Fictionbots Triumphing Over Writers? — Mind Matters](https://mindmatters.ai/2026/07/are-fictionbots-triumphing-over-writers/)
 - [28 Best Notion Templates for Writers in 2026 — Gridfiti](https://gridfiti.com/notion-templates-for-writers/)
