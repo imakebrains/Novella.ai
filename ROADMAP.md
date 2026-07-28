@@ -70,7 +70,36 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       frontmatter, `plot.json` subplot threads in PlotGrid) but display
       them read-only on cards, not as an editable spreadsheet. Verified
       by grep: POV appears in Corkboard.tsx and PlotGrid.tsx as a
-      read-only label, never an editable field.
+      read-only label, never an editable field. Research round 11
+      (2026-07-28): NovelCrafter's March 21, 2026 Codex update added two
+      small, concrete gaps, verified against our own code — entries can
+      now belong to more than one custom category (ours carries a single
+      `type` field, checked in `CodexPane.tsx`/`QuickCreate.tsx`), and an
+      entry can be marked case-sensitive to stop false-positive text
+      matches (e.g. character "Will" vs. the word "will") — our Continuity
+      inspector's near-duplicate-name check has no such option.
+- [ ] **Voice-matching from the writer's own prose, not just style templates**
+      — research round 11 (2026-07-28): checked our own Upload style flow
+      (`InspectorPane.tsx`) — it imports a .txt/.md file as the literal body
+      of a new prompt note, so the writer still has to hand-author a
+      template describing the voice they want. A new direct competitor,
+      Novel Mage, ships "Writer's Voice": upload samples of the writer's
+      own past prose and future generations are matched to it, no
+      template-writing required. Distinct from the existing style-menu
+      system (round 3) — today's styles are hand-authored, never learned
+      from the writer's own words. This is core to the "writes with you"
+      half of the thesis, not a worldbuilding nice-to-have, so it ranks
+      above the location map/timeline items below.
+- [ ] **Per-request reasoning toggle for local models** — research round 11
+      (2026-07-28): NovelCrafter's Jan 9, 2026 "AI Thinking" release lets a
+      writer prefer/avoid reasoning tokens per request, across Scene Beats
+      and Chats. Matters more for us than for NovelCrafter's cloud models:
+      local reasoning models (the DeepSeek-R1 family via Ollama) emit a
+      visible "thinking" preamble before the prose itself — slow and
+      distracting for a plain continue-the-paragraph request, useful when
+      working out a plot problem in Chat. Grepped `src/ai` for
+      "reasoning"/"thinking" — no matches; every request is treated
+      identically regardless of model or task.
 - [ ] **Location map / pinboard for codex locations** — research round 7:
       Campfire's headline feature (maps + timelines linked to the
       manuscript) is what fantasy/sci-fi reviewers rate it 4/5 for. Pin
@@ -92,6 +121,18 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       multi-POV books. Lower priority than the map since it's a bigger
       surface (needs an in-world date field on scenes), but the same
       genre-fiction audience wants both.
+- [ ] **Say the four-app bundle louder, not just "local AI, no subscription"**
+      — research round 11 (2026-07-28): three new products (LocalProse,
+      Novel Mage, Noveling) now market themselves in nearly the same words
+      Novella does — local AI, zero cloud, no subscription. That half of
+      the differentiation is no longer unique to us. Checked all three:
+      none fold in task management or a sprint/focus timer — the "one app
+      instead of four" half of the thesis is untouched competitive ground.
+      First-run and marketing copy should lead with the bundle (writing +
+      worldbuilding + tasks + sprints, one local app) rather than the
+      local-AI half alone, since that half now has three named competitors
+      saying the same sentence. Placed above the copy items below because
+      it defends the thesis itself, not just a supporting fact for it.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent
@@ -185,6 +226,38 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-07-28 — Research round 11 (autopilot; no code). Widened the usual
+  named-competitor sweep (NovelCrafter, Sudowrite, Dabble, Scrivener,
+  Campfire, type.ai, Obsidian, Notion) with a direct search on our own
+  positioning phrase — "local-first, no-subscription AI novel writing" —
+  and found three products now using nearly the same language: LocalProse
+  (local model + phone-to-desktop LAN sync with zero cloud, even a
+  Dropbox-style folder), Novel Mage (Codex, story planner, and a
+  prose-sample voice-matching feature we don't have), and Noveling
+  (free editor forever, prepaid AI credits instead of a subscription).
+  None of the three fold in task management or a sprint timer, so filed
+  the strongest item this round as a copy priority: lead marketing with
+  the four-app bundle, since "local AI, no subscription" alone is no
+  longer unique to us. Also added two buildable AI-quality gaps found by
+  checking our own code against the news: Novel Mage's voice-matching
+  (we only support hand-authored style templates, verified in
+  `InspectorPane.tsx`) and NovelCrafter's Jan 2026 reasoning-toggle
+  release (we treat every model identically, verified by grepping
+  `src/ai` for "reasoning"/"thinking" — no matches). Folded two smaller,
+  concrete findings into the existing NovelCrafter-parity item rather
+  than adding new bullets: March 2026 Codex updates for multi-category
+  entries and case-sensitive name tracking, both verified absent from
+  our own codex code. Landscape notes (no action): Sudowrite's prose-
+  accuracy complaints continue for a second round, reinforcing the
+  Continuity inspector's deterministic-only design; Scrivener's Windows
+  version remains years behind its Mac version (real Tauri
+  cross-platform advantage, but narrow enough to note rather than add
+  as a fifth copy item); Dabble reviewers still flag no image support,
+  confirming a Novella advantage already shipped; Campfire reviews
+  report the app getting glitchy as character data accumulates, second-
+  hand evidence for the standing "stay FAST" guardrail. Full notes and
+  sources in RESEARCH.md Round 11.
 
 - 2026-07-27 — Research round 10 (autopilot; no code). Swept NovelCrafter,
   Sudowrite, Scrivener, Dabble, Campfire, type.ai, Obsidian-for-writers and

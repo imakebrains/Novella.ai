@@ -783,3 +783,152 @@ pass.
 - [Best AI for Creative Writing July 2026: Claude Fable 5, GPT-5.5 and Top 10 — buildmvpfast.com](https://www.buildmvpfast.com/articles/best-llms-2026-guide/creative-writing-ai)
 - [Are Fictionbots Triumphing Over Writers? — Mind Matters](https://mindmatters.ai/2026/07/are-fictionbots-triumphing-over-writers/)
 - [28 Best Notion Templates for Writers in 2026 — Gridfiti](https://gridfiti.com/notion-templates-for-writers/)
+
+# Round 11 — sweep of NovelCrafter, Sudowrite, Dabble, Scrivener, Campfire,
+type.ai, Obsidian-for-writers, Notion novel templates, and a new
+"local-first AI novel writing" category search
+
+Autopilot run 2026-07-28, one day after round 10. Widened the last search of
+the round beyond the usual named competitors to "local-first / no-subscription
+novel writing software" specifically, since that phrase is Novella's own
+positioning — worth checking whether anyone else has started using it too.
+They have.
+
+## Biggest finding: local-first, no-subscription AI novel writing is no longer just us
+
+Three products now exist that describe themselves in almost the same words
+Novella's thesis uses — "local AI," "zero cloud," "no subscription":
+
+- **LocalProse** (Windows/macOS/Linux/Android/iOS) — local-model generation,
+  an Idea Box of note post-its linked to chapters, Character/Location/Item
+  profiles, a one-time lifetime license, and **LAN Continuity**: a phone app
+  syncs to the desktop app directly over the writer's own WiFi, with no
+  cloud server in the path at all (not even a Dropbox-style folder — a direct
+  device-to-device protocol).
+- **Novel Mage** (Windows/macOS) — free 7-day trial, Codex, story planner,
+  character interviews, and "Writer's Voice": upload samples of the writer's
+  own past prose and the model matches its output to that voice. Supports
+  local Ollama/LM Studio or BYOK cloud, same dual-path choice Novella offers.
+- **Noveling** (Windows/macOS/Linux) — free editor forever, AI gated behind
+  prepaid credits (not a subscription) so there's no recurring bill and no
+  training-data question tied to a subscription account; project templates
+  for Novel/Non-fiction/Screenplay.
+
+None of the three claim task management, a sprint timer, or a word-count/goal
+system — they are novel-writing-plus-local-AI tools, not the four-app bundle
+Novella's thesis targets. That distinction now matters more than it did a
+round ago: "local AI, no subscription" by itself is measurably no longer a
+differentiator unique to Novella — three funded/shipping competitors say the
+same sentence on their landing pages. The thing that's still true only of
+Novella, checked against all three: none of them fold in task management or
+a sprint/focus timer, so the "one app instead of four" bet is now carrying
+more of the differentiation weight than the "local, no subscription" half
+was previously assumed to carry alone. Filed as a copy item below — lead
+with the bundle, not just the local-AI half, now that the local-AI half is
+common ground.
+
+Also worth a note for whoever next revisits `PLAN-sync.md`: LocalProse's LAN
+Continuity is a genuinely different fourth option from the three already
+listed there (A: our own server, B: Supabase, C: user's own cloud-drive
+folder) — direct phone-to-desktop sync over local WiFi, no account, no
+cloud storage of any kind, not even a Dropbox folder. Worth weighing next to
+option C when that plan is picked back up; not added to the plan file itself
+this round since this is a research-only pass.
+
+## New finding: "Writer's Voice"-style prose matching is a real gap in our own Assistant
+
+Checked our own code before writing this up, since Novel Mage's marketing
+claim ("matches your own voice") is exactly the kind of thing worth
+verifying rather than assuming. `InspectorPane.tsx`'s "Upload style…"
+control imports a `.txt`/`.md` file as the literal body of a new prompt note
+— it expects the writer to have already written a *prompt template*
+(with `{{prose}}`/`{{guidance}}` placeholders) describing the voice they
+want. There's nothing that takes actual prose the writer already wrote —
+three chapters of their own manuscript, say — and derives a style from it
+the way Novel Mage's Writer's Voice does. Grepped for "style sample" and
+"Writer's Voice" equivalents; nothing. This is a distinct, buildable gap
+from the existing style-menu system (round 3), not a duplicate of it —
+today's styles are hand-authored templates, never learned from the
+writer's own words.
+
+## New finding: NovelCrafter shipped a reasoning/thinking toggle we have no equivalent of
+
+NovelCrafter's January 9, 2026 changelog entry opened "AI Thinking" support
+to everyone: a per-request preference to have the model "prefer" or "avoid"
+reasoning/thinking tokens, exposed across Scene Beats and Chats. This
+matters more for a local-first tool than it does for NovelCrafter's
+cloud-API model list, because several popular local Ollama models (the
+DeepSeek-R1 family in particular) emit a visible "thinking" preamble before
+the actual prose — slow and occasionally distracting when a writer just
+wants a paragraph continued, useful when they're using Chat to work out a
+plot problem. Grepped `src/ai` for "reasoning"/"thinking"; no matches — we
+pass every request through identically regardless of model or task.
+Genuine AI-UX gap, not copy.
+
+## NovelCrafter's March 21, 2026 Codex update: two concrete, checkable gaps
+
+Rolled out to everyone: entries can now belong to more than one custom
+category at once, and an entry can be marked case-sensitive to cut down
+false-positive text-matching (e.g. a character named "Will" no longer
+matches every incidental use of the word "will"). Checked our own codex
+(`CodexPane.tsx`, `QuickCreate.tsx`): entries carry a single `type` field,
+and the Continuity inspector's near-duplicate-name check has no
+case-sensitivity option. Both are small, concrete additions to the existing
+"NovelCrafter-parity pass, ongoing" item rather than new bullets of their
+own.
+
+## Landscape notes (confirm existing findings or add context, no new build item)
+
+**Sudowrite's most-cited technical complaint is still prose-quality errors**
+("character placement inconsistencies," "faulty metaphors") even as its
+Muse model is otherwise well reviewed — a second round of evidence (after
+round 9's finding that Sudowrite's own AI manuscript review "missed major
+plot points") that generative accuracy claims from cloud tools don't hold up
+under scrutiny, which is exactly why Novella's Continuity inspector stays
+deterministic-only rather than adding an AI-guess tier. No action, reinforces
+an existing design decision.
+
+**Scrivener's Windows version remains years behind its Mac version** — Mac is
+at 3.5.0, Windows is still on the 1.x line, a gap reviewers call out
+directly in 2026 writeups. Novella ships one Tauri codebase to
+Windows/macOS/Linux with no platform gap by construction — a real
+differentiator, but a narrow one (mostly matters to Windows-using Scrivener
+switchers), so noted here rather than added as a fifth "say it louder" copy
+item; revisit if a future round finds sharper evidence this is a common
+switching reason.
+
+**Dabble reviewers still flag no image support in content** — "one user
+mentioned the absence of the ability to incorporate images into content" —
+while Novella has shipped drag-image-onto-board-cards since 2026-07-23.
+Confirms an existing shipped advantage; not a new item.
+
+**Campfire reviews (Reedsy updated June 2, Kindlepreneur updated July 16)
+report the app getting "glitchy" — blinking custom tags, scrolling issues —
+specifically as characters accumulate more fields.** Second-hand evidence
+for the standing "stay FAST as projects grow" guardrail already in the
+thesis section; not a new item, a reason not to relax that guardrail.
+
+**Type.ai, Obsidian's plugin stack, and Notion templates are unchanged from
+prior rounds** — no new angle surfaced this pass beyond what rounds 7–10
+already recorded.
+
+## Round 11 sources
+
+- [Changelog | novelcrafter](https://feedback.novelcrafter.com/changelog)
+- [January 9, 2026 - AI Thinking support | novelcrafter Changelog](https://feedback.novelcrafter.com/changelog/january-9-2026-ai-thinking-support)
+- [Novelcrafter Review: Powerful for Fiction Writers, Frustrating to Set Up (April 2026)](https://ilampadmanabhan.medium.com/novelcrafter-review-powerful-for-fiction-writers-frustrating-to-set-up-april-2026-64d391c629a2)
+- [Sudowrite Review 2026: Pricing, Features, Pros & Cons — Inkfluence AI](https://www.inkfluenceai.com/blog/sudowrite-review-pricing-2026)
+- [Sudowrite Review 2026 A Deep Dive — Cybernews](https://cybernews.com/ai-tools/sudowrite-review/)
+- [Sudowrite Reviews - SmartCustomer (2026)](https://www.smartcustomer.com/reviews/sudowrite.com)
+- [Scrivener Review 2026: Is it Cost Effective? — All About AI](https://www.allaboutai.com/ai-reviews/scrivener/)
+- [Scrivener 2026 Detailed Review — Elephas](https://elephas.app/blog/scrivener-review)
+- [Campfire Write Review — Reedsy (updated June 2026)](https://reedsy.com/blog/guide/book-writing-software/campfire-write-review/)
+- [Campfire Write Review — Kindlepreneur (updated July 2026)](https://kindlepreneur.com/campfire-write-review/)
+- [Dabble Writer Review: Features, Pros & Cons for 2026 — Automateed](https://www.automateed.com/dabble-writer)
+- [Dabble Review: What Authors Should Know in 2026 — Reedsy](https://reedsy.com/studio/resources/dabble-writing-review/)
+- [LocalProse - Novel writing software with local AI](https://www.localprose.com/en/)
+- [LocalProse Alternatives: Top 12 Novel Authoring Tools — AlternativeTo](https://alternativeto.net/software/localprose/)
+- [Novel Mage – Offline AI Novel Writing Software | No Subscription, No Cloud](https://novelmage.com/)
+- [Best AI Writing Software for Novelists in 2026 — Novel Mage blog](https://novelmage.com/blog/best-ai-writing-software-for-novelists-in-2026-i-tried-all-the-major-tools-so-you-dont-have-to)
+- [Best Free Novel Writing Software with AI in 2026 — Noveling Guide](https://noveling.dev/guide/en/blog/free-novel-writing-software-ai)
+- [19 Best Novel Writing Software Compared (2026 Edition) — Noveling Guide](https://noveling.dev/guide/en/blog/novel-writing-software-comparison-2026/)
