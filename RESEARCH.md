@@ -931,4 +931,150 @@ already recorded.
 - [Novel Mage – Offline AI Novel Writing Software | No Subscription, No Cloud](https://novelmage.com/)
 - [Best AI Writing Software for Novelists in 2026 — Novel Mage blog](https://novelmage.com/blog/best-ai-writing-software-for-novelists-in-2026-i-tried-all-the-major-tools-so-you-dont-have-to)
 - [Best Free Novel Writing Software with AI in 2026 — Noveling Guide](https://noveling.dev/guide/en/blog/free-novel-writing-software-ai)
+
+# Round 12 — sweep of NovelCrafter, Sudowrite, Dabble, Scrivener, Campfire,
+type.ai, Obsidian-for-writers, Notion novel templates, plus a new angle:
+*which* local model novelists actually run, not just whether they run one
+
+Autopilot run 2026-07-29, one day after round 11. Rather than re-sweep the
+same named-competitor ground a fifth time, this round asked a question round
+11's "local-first AI is no longer unique to us" finding raised but didn't
+answer: given that local-model novel writing is now a small crowded
+category (Novella, LocalProse, Novel Mage, Noveling, plus DIY Ollama/
+KoboldCpp setups), what do novelists who actually run local models say about
+*which* model to pick — and does Novella's own one-click setup reflect that?
+
+## Biggest finding: our own default model pull has no fiction awareness, and we never say why local avoids moralizing
+
+Sudowrite's core product bet is that a model fine-tuned specifically on
+published novels and short stories (Muse, not a general instruct model)
+writes meaningfully better fiction than ChatGPT/Claude style generalist
+models — this is stated plainly in Sudowrite's own materials and repeated
+across multiple 2026 reviews as its actual differentiator, not marketing
+fluff. From the other direction, current write-ups on local AI for
+novelists (localaimaster.com's local-model roundup, Novel Mage's own
+comparison blog) independently converge on the same idea: writers running
+local models for fiction gravitate toward community fine-tunes built for
+storytelling — the Nous-Hermes line, uncensored Llama 3.3 builds,
+KoboldCpp-oriented models with story-memory and instruct/chat modes — over
+stock instruct models, specifically because generic instruct models
+"moralize" and are weaker at staying in scene, refusing or sanitizing
+darker material a novelist may legitimately need to write (violence, morally
+grey characters, mature themes).
+
+Checked our own code before writing this up. `src/plugins/providers/
+ollama.ts` line 109: `export const DEFAULT_MODEL = "llama3.1:8b";` — a
+generic instruct model, no fiction tuning. `SetupPanel.tsx` calls
+`pullOllamaModel(DEFAULT_MODEL, ...)` with no alternative model offered
+anywhere in the setup flow, and no copy anywhere explaining why this model
+was chosen or that other local options exist. This matters more for Novella
+than it would for a generalist tool, because a first-time writer's very
+first AI generation in the app runs on this default — if the prose reads as
+generic, or the model hedges on a dark scene, the writer has no way to know
+this is a model-choice problem rather than a ceiling on what local AI can
+do at all. That's the worst possible moment for the "writes with you, no
+gatekeeper" half of the thesis to underdeliver, since it happens before the
+writer has any basis for comparison.
+
+This is distinct from the existing "voice-matching" item (round 11, learning
+a writer's own style from their prose) and the existing "reasoning toggle"
+item (round 11, hiding chain-of-thought preambles) — both assume the model
+itself is fine, and address presentation/personalization on top of it. This
+finding is about the model itself being the generic option by default, with
+zero signposting that better-suited alternatives exist. Filed as a new item,
+ranked above the reasoning-toggle item since it affects every local-AI
+writer's first impression, not just users of reasoning-model families
+(DeepSeek-R1 and similar).
+
+Scoping note for whoever picks this up: the fix doesn't have to be changing
+the shipped default (a larger or specialty fine-tune may not suit the
+one-click install-size promise) — the cheap, low-risk version is copy plus
+an optional second pull target, the same "show honestly, let the writer
+choose" pattern already used for the AI-setup step's honesty language.
+
+## Landscape notes (confirm existing findings, correct one, no new build item)
+
+**NovelCrafter's freshest complaint is a context-visibility problem we
+already avoid.** The April 2026 review this round re-checked (also cited in
+round 11) states plainly: "the AI couldn't see the document when asked about
+the manuscript," requiring the writer to explicitly add the manuscript as
+context by selecting specific scenes and chapters — described as "not
+obvious at all." Checked our own `ai/context.ts` (`buildSceneContext`,
+`estimateTokens`) and `InspectorPane.tsx`'s "Context for this scene" section
+before assuming this was a shared problem: Novella already auto-builds scene
+context for the Assistant and shows a live estimated-token count, no manual
+selection required. This is an existing shipped advantage, not a gap — worth
+folding into a future "say it louder" copy pass, but not urgent enough to
+add as a sixth standalone copy item this round.
+
+**Sudowrite's manuscript-training stance is now explicit — updates, doesn't
+erase, round 9's finding.** Round 9 found Sudowrite's training policy "not
+clearly public." This round found Sudowrite's own blog and Terms of Service
+now state plainly that Sudowrite never trains on user manuscripts and claims
+no rights to the work. That's a real, specific promise worth noting — but it
+remains a *policy* promise sitting on top of a cloud architecture that still
+transmits the manuscript to run inference, not the architectural guarantee a
+fully local Ollama model gives by construction (the question of "did my
+words leave my machine" doesn't have a policy answer to check, because they
+never left). The existing "say the no-training/privacy advantage louder"
+copy item's framing should account for this if it's ever revisited: the
+honest comparison is now "policy promise vs. structural fact," not "clear
+policy vs. no stated policy."
+
+**Obsidian's novelist setup keeps growing more plugins, not fewer.**
+StoryLine — a plugin that "transforms your Obsidian vault into a complete
+book planning and writing tool" — was added to Obsidian's official community
+plugin directory in February 2026, joining Longform (scene ordering/
+reordering sidebar) and Novel Word Count as now-standard parts of a novelist
+Obsidian setup. Reconfirms round 7/9's underlying point from a new angle:
+getting Obsidian to do what Novella does out of the box now takes assembling
+four-plus separate community plugins with their own settings and update
+cycles, not "Obsidian is basically already a novel tool." No new item —
+this strengthens the existing local-first/integrated-app positioning rather
+than surfacing a gap.
+
+**Fresh, independent evidence for the four-app thesis, from outside the
+usual named-competitor list.** This round deliberately searched "best
+productivity apps for writers 2026" rather than the standing competitor
+list, to see whether the fragmented-toolkit problem shows up in
+recommendations that have no reason to flatter Novella's framing. It does:
+current roundups (textwordcount.com, nownovel.com) recommend Todoist for
+task management, Forest for focus/sprint timers, Obsidian for research
+notes, and Hemingway Editor for prose quality — four separate apps,
+explicitly presented as the current best-practice stack for a working
+writer. One source states outright that "most writers use 3-4 apps that
+each solve one problem well, rather than relying on a single comprehensive
+app." This is stronger evidence than a repeat competitor sweep would have
+been, because it's an independent confirmation rather than the same sources
+cited again.
+
+**Unchanged from prior rounds, reconfirmed only:** Scrivener's price
+complaints and years-stale Windows line (3rd round); Campfire's a-la-carte
+module pricing and glitchiness at scale (2nd/3rd round); Dabble and type.ai
+sit at the same 2.5/5 and generally-positive-minimalist reception,
+respectively, as previous rounds found. No new evidence, no action.
+
+## Round 12 sources
+
+- [Changelog | novelcrafter](https://feedback.novelcrafter.com/changelog)
+- [Novelcrafter Review: Powerful for Fiction Writers, Frustrating to Set Up (April 2026)](https://ilampadmanabhan.medium.com/novelcrafter-review-powerful-for-fiction-writers-frustrating-to-set-up-april-2026-64d391c629a2)
+- [Sudowrite Review 2026: Is It Still the Best AI Fiction Writing Tool? — Scribe](https://scribehow.com/page/Sudowrite_Review_2026_Is_It_Still_the_Best_AI_Fiction_Writing_Tool__2hcgTzI9T4O9U5Im0yKtwQ)
+- [Sudowrite Review 2026 A Deep Dive — Cybernews](https://cybernews.com/ai-tools/sudowrite-review/)
+- [Uncensored AI Writer: Best Tools for Writing Without Being Blocked — Sudowrite blog](https://sudowrite.com/blog/uncensored-ai-writer/)
+- [Best AI for Creative Writing in 2026: A Beginner's Guide — Sudowrite blog](https://sudowrite.com/blog/best-ai-for-creative-writing-2026-beginners-guide/)
+- [Best Local AI Models for Writing in 2026: Tested & Ranked — Local AI Master](https://localaimaster.com/blog/local-ai-writing-models)
+- [Best AI Writing Software for Novelists in 2026 — Novel Mage blog](https://novelmage.com/blog/best-ai-writing-software-for-novelists-in-2026-i-tried-all-the-major-tools-so-you-dont-have-to)
+- [Dabble Review: What Authors Should Know in 2026 — Reedsy](https://reedsy.com/studio/resources/dabble-writing-review/)
+- [Dabble Writer Review: Features, Pros & Cons for 2026 — Automateed](https://www.automateed.com/dabble-writer)
+- [Scrivener Review 2026: Still the Best Writing Software for Authors? — Automateed](https://www.automateed.com/scrivener-review)
+- [Scrivener Review: A Great 20% Discount (But Why I Don't Use It) — Kindlepreneur](https://kindlepreneur.com/scrivener-review/)
+- [Campfire Writing Review: The 17 Modules Explained — Self-Publishing.com](https://selfpublishing.com/campfire-writing-review/)
+- [Campfire Write Review — Kindlepreneur](https://kindlepreneur.com/campfire-write-review/)
+- [Type.ai Review: My Top Pick After Testing Three AI Writing Tools (April 2026)](https://ilampadmanabhan.medium.com/type-ai-review-719f59c68dbb)
+- [The Ultimate Guide to Writing Novels with Obsidian! — Royal Road forum](https://www.royalroad.com/forums/thread/134725)
+- [Obsidian for Fiction Writers: Setup, Plugins, and Workflow — Loreteller](https://loreteller.com/learn/obsidian-fiction-writers-guide/)
+- [Two new novel-writing plugins — Obsidian Forum](https://forum.obsidian.md/t/two-new-novel-writing-plugins/84340)
+- [8 Best Notion Templates for Writers in 2026 — NotionEverything](https://www.notioneverything.com/blog/notion-templates-for-writers)
+- [Best Productivity Apps 2026: 15 Expert Picks for Writers & Creators — TextWordCount](https://www.textwordcount.com/blog/best-productivity-apps-2026)
+- [Best Writing Apps for Authors (2026) — 26 Tools Compared — NowNovel](https://nownovel.com/best-writing-apps/)
 - [19 Best Novel Writing Software Compared (2026 Edition) — Noveling Guide](https://noveling.dev/guide/en/blog/novel-writing-software-comparison-2026/)

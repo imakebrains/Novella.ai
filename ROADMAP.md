@@ -90,6 +90,29 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       from the writer's own words. This is core to the "writes with you"
       half of the thesis, not a worldbuilding nice-to-have, so it ranks
       above the location map/timeline items below.
+- [ ] **Recommend a fiction-capable local model instead of silently defaulting
+      to a generic one** — research round 12 (2026-07-29): checked our own
+      one-click setup — `DEFAULT_MODEL = "llama3.1:8b"` in
+      `src/plugins/providers/ollama.ts` is pulled by `SetupPanel.tsx` with no
+      alternative offered and no explanation shown anywhere in the flow.
+      Sudowrite's entire product differentiator is Muse, a model fine-tuned
+      specifically on published fiction rather than general web text, and
+      several independent 2026 write-ups on local AI for novelists converge
+      on the same point from the other direction: writers who go local
+      deliberately seek out community fiction fine-tunes or uncensored
+      variants (the Nous-Hermes line, uncensored Llama 3.3 builds) over stock
+      instruct models, specifically because generic instruct models moralize,
+      refuse, or sanitize dark scenes a novelist may need to write. A
+      first-time Novella writer's very first generation runs on the generic
+      default with no way to know a better-suited local option exists or
+      that a disappointing result is fixable — the worst possible moment for
+      the "writes with you, no gatekeeper" half of the thesis to
+      underdeliver. Ranks above the reasoning-toggle item below because it
+      affects every local-AI writer's first impression, not just Chat/Scene
+      Beats users on reasoning-model families. At minimum: surface model
+      choice with a one-line note on why (fiction-tuned alternatives exist;
+      local models don't apply cloud-style content policies), even if the
+      shipped one-click default stays conservative for install-size reasons.
 - [ ] **Per-request reasoning toggle for local models** — research round 11
       (2026-07-28): NovelCrafter's Jan 9, 2026 "AI Thinking" release lets a
       writer prefer/avoid reasoning tokens per request, across Scene Beats
@@ -226,6 +249,42 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-07-29 — Research round 12 (autopilot; no code). Swept NovelCrafter,
+  Sudowrite, Dabble, Scrivener, Campfire, type.ai, Obsidian-for-writers and
+  Notion writing templates again, plus a fresh angle: how novelists actually
+  choose *which* local model to run, not just whether to run one locally at
+  all. Found and added the strongest item this round: checked our own
+  one-click Ollama setup (`src/plugins/providers/ollama.ts`,
+  `SetupPanel.tsx`) and confirmed it silently pulls a generic instruct model
+  (`llama3.1:8b`) with no alternative offered and no explanation — while
+  Sudowrite's whole differentiator is a model fine-tuned specifically on
+  published fiction, and multiple independent 2026 sources on local AI for
+  novelists confirm writers who go local deliberately seek out fiction
+  fine-tunes or uncensored community variants over stock instruct models
+  because generic models moralize or sanitize dark scenes. Ranked above the
+  existing reasoning-toggle item since it affects every local-AI writer's
+  very first generation, not just reasoning-model users. Landscape notes (no
+  action): NovelCrafter's freshest complaint (April 2026 review) is that its
+  AI "couldn't see the manuscript" without the writer manually selecting
+  context — checked our own `ai/context.ts`/`InspectorPane.tsx` and confirmed
+  Novella already auto-builds scene context with a visible token estimate,
+  an existing advantage worth saying louder eventually but not a new item;
+  Sudowrite's blog/ToS now explicitly states it never trains on user
+  manuscripts, which updates (softens, doesn't erase) round 9's "not clearly
+  public" finding — a policy promise, not the architectural guarantee a
+  fully local model gives by construction; Obsidian's novelist setup now
+  needs a further plugin (StoryLine, added to the official directory
+  February 2026) on top of Longform and Novel Word Count, reconfirming that
+  assembling Obsidian into a novel tool takes 4-5 separate plugins where
+  Novella ships it native; independent "best productivity apps for writers"
+  roundups (not the usual named competitors) still recommend the fragmented
+  toolkit by default — Todoist for tasks, Forest for focus timers, Obsidian
+  for notes, Hemingway for editing — fresh independent evidence for the
+  core thesis rather than a repeat of prior findings; Scrivener's price
+  complaints and stale Windows version, Campfire's a-la-carte pricing, and
+  Dabble/type.ai's 2.5-4/5 range are all reconfirmed with no new angle.
+  Full notes and sources in RESEARCH.md Round 12.
 
 - 2026-07-28 — Research round 11 (autopilot; no code). Widened the usual
   named-competitor sweep (NovelCrafter, Sudowrite, Dabble, Scrivener,
