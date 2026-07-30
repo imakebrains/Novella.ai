@@ -1078,3 +1078,115 @@ respectively, as previous rounds found. No new evidence, no action.
 - [Best Productivity Apps 2026: 15 Expert Picks for Writers & Creators — TextWordCount](https://www.textwordcount.com/blog/best-productivity-apps-2026)
 - [Best Writing Apps for Authors (2026) — 26 Tools Compared — NowNovel](https://nownovel.com/best-writing-apps/)
 - [19 Best Novel Writing Software Compared (2026 Edition) — Noveling Guide](https://noveling.dev/guide/en/blog/novel-writing-software-comparison-2026/)
+
+## Round 13 (2026-07-30)
+
+Swept the usual named competitors again — NovelCrafter, Sudowrite, Dabble,
+Scrivener, Campfire, type.ai, Obsidian, Notion — looking specifically for
+angles rounds 7–12 hadn't already covered, plus a fresh look at new local-AI
+entrants.
+
+**Sudowrite's biggest 2026 story has quietly shifted from "prose quality" to
+"reliability."** Earlier rounds tracked prose-accuracy complaints and the
+training-policy question; this round found a different, sharper problem.
+Sudowrite had an app-wide outage April 22–23, 2026 that cost some users
+unsaved work (status page incident report). Separately, a changelog entry
+admits to (and fixes) an Android bug where Story Bible entry fields could be
+unexpectedly cleared — a real data-loss bug, not a hypothetical one, and
+strikingly similar in shape to the empty-cache-over-disk bug Novella itself
+found and fixed in its own config stores back on 2026-07-23. As recently as
+July 24, 2026, Trustpilot and community reports call the app "clunky and
+full of bugs" on both web and native clients; Sudowrite replied publicly
+that it is "shipping fixes steadily." Checked our own `FirstRunWizard.tsx`
+before writing this up: the only reliability-adjacent line in first-run copy
+is "free, private, nothing leaves the machine" — true, but it never names
+outages or lost work, the specific fear this competitor's incidents would
+speak to. Because a cloud service can go down and a local vault structurally
+cannot, this is a real, ownable advantage Novella already has (autosave +
+crash recovery, both shipped) and isn't saying. Filed as the strongest new
+item this round, ranked above the training-privacy copy item because these
+are reported incidents, not survey sentiment.
+
+**A concrete named model closes some of round 12's open question.** Round
+12 flagged that Novella's one-click Ollama setup pulls a generic instruct
+model with no fiction-tuned alternative offered. This round found a
+specific candidate worth naming when that item gets built: a Local AI
+Master write-up on local setups for novelists ranks Qwen 2.5 32B above Llama
+3.1 70B on fiction-specific metrics — more literary-text training data,
+better long-range character-voice consistency, and line-edit suggestions
+described as reading like "an actual editor" wrote them. Folded into the
+existing item rather than filed as new, since it's evidence for the same
+gap, not a new one.
+
+**type.ai's whole-manuscript context reinforces, rather than adds to, the
+existing chat-with-your-book gap.** type.ai markets a 200k-token context
+window specifically so the model "sees" the entire manuscript rather than
+whatever the writer manually selects. Checked our own `src/ai/context.ts`
+before treating this as a gap: `buildSceneContext` deliberately sends only
+the codex entries a scene actually references, the tail of the current
+scene (6,000 chars), and other chapters as bare titles — a documented
+token-economy choice, not an oversight, and the right one for a local
+8B-class model's context window and generation speed. But it confirms the
+existing NovelCrafter-parity item's "chat-with-your-book mode" gap is real
+and will need its own retrieval design (not just a bigger prompt) whenever
+it's picked up, rather than being a solved problem. No new item; appended
+as a note to the existing one.
+
+**NovelCrafter's pricing has changed enough that round 7's sticker-shock
+framing needs an update, not a repeat.** Round 7 through 9 cited
+NovelCrafter's advertised price as misleading once BYOK API costs are
+added ($14/month tier landing at $24–44/month all-in). This round found
+NovelCrafter now lists a $4/month Scribe tier and an $8/month Hobbyist tier
+that includes BYOK AI access — materially cheaper headline pricing than
+what earlier rounds captured. The underlying point survives (BYOK still
+meters through the provider, so the real cost still isn't the sticker
+price), but future rounds citing NovelCrafter pricing should use the
+current $4/$8 tiers, not the older $14 figure, or the citation becomes
+stale and inaccurate rather than just outdated.
+
+**Sudowrite's Muse model was quietly upgraded at no extra cost.** Separate
+from the reliability story above: Sudowrite replaced its original Muse
+model with an improved version in 2026 — scenes stretch further, prose
+reads denser, voice holds more consistently across full manuscripts, same
+price and credit cost. Worth tracking as a reminder that Sudowrite's AI
+quality keeps improving even as its app stability slips; the two aren't the
+same axis and shouldn't be conflated in future copy.
+
+**Unchanged from prior rounds, reconfirmed only, no new angle:** Scrivener
+sits at 4.2/5 despite the same standing complaints (Windows version still
+years behind Mac, Dropbox-only sync, steep learning curve, price-increase
+resentment) — third-plus round with the same findings. Dabble confirmed
+again at 2.5/5, explicitly described as something serious plotters/
+researchers "outgrow." Campfire now lists 18 modules (up from 17 last
+round) with entry pricing "as low as $0.50/month" for an a-la-carte
+structure that's still the opposite of Novella's flat local install.
+Obsidian's novelist setup still requires assembling multiple community
+plugins (Longform, Novel Word Count, StoryLine, Keep the Rhythm) with no
+single-plugin alternative emerging. Notion's writer-template ecosystem
+keeps growing (Scriborg, Storybook, World Building Bible, several official
+marketplace templates) but nothing in it changes the flat/fast/easy-to-
+leave critique from round 6.
+
+## Round 13 sources
+
+- [Sudowrite Review 2026: Tested w/ 3 Stories — Nerdynav](https://nerdynav.com/sudowrite-review/)
+- [Sudowrite Muse – Sudowrite Documentation](https://docs.sudowrite.com/using-sudowrite/1ow1qkGqof9rtcyGnrWUBS/sudowrite-muse/4k9bFDMSyic6mFPkYFHrkZ)
+- [Sudowrite Muse 1.5: What's New, What's Better, What's Gone — AIMojo](https://aimojo.io/sudowrite-muse-1-5/)
+- [App-wide errors — Sudowrite status page](https://status.sudowrite.com/incident/877582)
+- [Changelog — Sudowrite](https://feedback.sudowrite.com/changelog)
+- [Improvements & Fixes — Sudowrite changelog](https://feedback.sudowrite.com/changelog/improvements-and-fixes)
+- [sudowrite.com Reviews — Trustpilot](https://www.trustpilot.com/review/www.sudowrite.com)
+- [Novelcrafter Review (2026): Writing Plans, Codex & BYOK AI — Toolworthy](https://www.toolworthy.ai/tool/novelcrafter)
+- [Novelcrafter Review 2026: Pricing, Use Cases, Pros & Cons — BestAITables](https://bestaitables.com/novelcrafter-review/)
+- [Scrivener Review 2026: Still the Best Writing Software for Authors? — Automateed](https://www.automateed.com/scrivener-review)
+- [Scrivener Review: A Great 20% Discount (But Why I Don't Use It) — Kindlepreneur](https://kindlepreneur.com/scrivener-review/)
+- [Dabble Writer Review: Features, Pros & Cons for 2026 — Automateed](https://www.automateed.com/dabble-writer)
+- [Dabble Review: What Authors Should Know in 2026 — Reedsy](https://reedsy.com/studio/resources/dabble-writing-review/)
+- [Campfire Worldbuilding Software Review: Complete Tutorial for 2026 — Automateed](https://www.automateed.com/campfire-write/)
+- [Campfire Writing Review: The 17 Modules Explained — Self-Publishing.com](https://selfpublishing.com/campfire-writing-review/)
+- [Type.ai Review: My Top Pick After Testing Three AI Writing Tools (April 2026)](https://ilampadmanabhan.medium.com/type-ai-review-719f59c68dbb)
+- [Local AI for Writers: Private Novel-Writing Assistant Setup (2026) — Local AI Master](https://localaimaster.com/blog/local-ai-writers)
+- [Best AI Writing Software for Novelists in 2026 — Novel Mage blog](https://novelmage.com/blog/best-ai-writing-software-for-novelists-in-2026-i-tried-all-the-major-tools-so-you-dont-have-to)
+- [Two new novel-writing plugins — Obsidian Forum](https://forum.obsidian.md/t/two-new-novel-writing-plugins/84340)
+- [I would never try writing a novel in Obsidian without these 5 plugins — XDA](https://www.xda-developers.com/would-never-try-writing-novel-in-obsidian-without-these-plugins/)
+- [The 28 Best Notion Templates for Writers in 2026 — Gridfiti](https://gridfiti.com/notion-templates-for-writers/)

@@ -77,7 +77,18 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       `type` field, checked in `CodexPane.tsx`/`QuickCreate.tsx`), and an
       entry can be marked case-sensitive to stop false-positive text
       matches (e.g. character "Will" vs. the word "will") — our Continuity
-      inspector's near-duplicate-name check has no such option.
+      inspector's near-duplicate-name check has no such option. Research
+      round 13 (2026-07-30) reinforces the chat-with-your-book half of
+      this item: type.ai markets a 200k-token context window specifically
+      so the model "sees" the entire manuscript, not just what's manually
+      selected. Checked our own `src/ai/context.ts` — by design it sends
+      only the referenced codex entries, the tail of the current scene
+      (6,000 chars), and other chapters as titles only, never full bodies
+      (the token-economy rule from the file's own header comment). Right
+      call for a local 8B-class model's context window and speed, but it
+      means a true whole-manuscript Q&A mode needs its own retrieval
+      design, not just a bigger prompt — scope that when this item is
+      picked up.
 - [ ] **Voice-matching from the writer's own prose, not just style templates**
       — research round 11 (2026-07-28): checked our own Upload style flow
       (`InspectorPane.tsx`) — it imports a .txt/.md file as the literal body
@@ -113,6 +124,13 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       choice with a one-line note on why (fiction-tuned alternatives exist;
       local models don't apply cloud-style content policies), even if the
       shipped one-click default stays conservative for install-size reasons.
+      Research round 13 (2026-07-30) adds a concrete candidate for that
+      alternative list: a Local AI Master write-up on local setups for
+      novelists names Qwen 2.5 32B as beating Llama 3.1 70B on fiction-
+      specific metrics — more literary training data, better character-
+      voice consistency, editor-quality line-edit suggestions — worth
+      weighing alongside the community fine-tunes already named above
+      once this gets built.
 - [ ] **Per-request reasoning toggle for local models** — research round 11
       (2026-07-28): NovelCrafter's Jan 9, 2026 "AI Thinking" release lets a
       writer prefer/avoid reasoning tokens per request, across Scene Beats
@@ -156,6 +174,22 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       local-AI half alone, since that half now has three named competitors
       saying the same sentence. Placed above the copy items below because
       it defends the thesis itself, not just a supporting fact for it.
+- [ ] **Say the no-outage / can't-lose-your-work advantage louder** —
+      research round 13 (2026-07-30): Sudowrite had an app-wide outage
+      April 22–23, 2026 that cost some users unsaved work, and shipped a
+      since-fixed Android bug that could unexpectedly clear Story Bible
+      entry fields; Trustpilot and community complaints call the app
+      "clunky and full of bugs" as recently as July 24, with Sudowrite
+      itself replying it's "shipping fixes steadily." A cloud-service
+      outage structurally cannot happen to Novella — the vault is plain
+      files on the writer's own disk, already backed by autosave
+      (`src/state/autosave.ts`) and crash recovery (`RecoveryBanner.tsx`)
+      — but checked `FirstRunWizard.tsx` and confirmed its only reliability-
+      adjacent line is "free, private, nothing leaves the machine," never
+      naming outages or lost work at all. More visceral than the training-
+      privacy survey below (real reported data loss, not sentiment), so
+      ranked above it; still below the four-app-bundle item since it's a
+      copy-only win, not a thesis-defining gap.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent
@@ -249,6 +283,36 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-07-30 — Research round 13 (autopilot; no code). Swept the usual
+  named competitors again looking for angles rounds 7-12 hadn't covered.
+  Found and added the strongest item this round: Sudowrite's biggest 2026
+  story has quietly shifted from prose quality to reliability — an
+  app-wide outage April 22-23 cost some users unsaved work, a since-fixed
+  Android bug could unexpectedly clear Story Bible fields, and Trustpilot/
+  community complaints call the app "clunky and full of bugs" as recently
+  as July 24, with Sudowrite replying it's "shipping fixes steadily."
+  Checked our own `FirstRunWizard.tsx` first: it says "private, nothing
+  leaves the machine" but never names outages or lost work, the specific
+  fear these incidents speak to, even though a cloud outage structurally
+  can't happen to a local vault already backed by autosave and crash
+  recovery. Ranked above the training-privacy copy item since these are
+  reported incidents, not survey sentiment. Folded two more findings into
+  existing items rather than adding new bullets: a Local AI Master piece
+  naming Qwen 2.5 32B as beating Llama 3.1 70B on fiction metrics (feeds
+  the round-12 local-model-recommendation item), and type.ai's 200k-token
+  whole-manuscript context, which reinforces rather than adds to the
+  existing chat-with-your-book gap in the NovelCrafter-parity item after
+  confirming our own `context.ts` token-economy design is deliberate, not
+  an oversight. Landscape notes (no action): NovelCrafter's pricing has
+  dropped to $4/$8 tiers, materially cheaper than the $14+ figure earlier
+  rounds cited — the BYOK-meters-through-the-provider point survives but
+  future rounds should cite current pricing; Sudowrite's Muse model was
+  quietly upgraded at no extra cost, a reminder that its AI quality and
+  its app stability are separate axes; Scrivener (4.2/5), Dabble (2.5/5),
+  Campfire (18 modules, still a-la-carte), Obsidian (still a multi-plugin
+  assembly) and Notion (growing template ecosystem) all reconfirmed with
+  no new angle. Full notes and sources in RESEARCH.md Round 13.
 
 - 2026-07-29 — Research round 12 (autopilot; no code). Swept NovelCrafter,
   Sudowrite, Dabble, Scrivener, Campfire, type.ai, Obsidian-for-writers and
