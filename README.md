@@ -36,7 +36,7 @@ Your vault is a folder of Markdown files with a small structured header (frontma
 **Phase 2 — the app — is running.**
 
 - `src/state/vaultStore.ts` — a reactive shell over the Vault engine. Adds change notification, the active note, and persistence. The engine itself is untouched.
-- `src/storage/` — storage adapters. Tauri (real folders on disk) on desktop, memory in a plain browser. Same interface, so the UI never branches.
+- `src/storage/` — storage adapters. Tauri (real folders on disk) on desktop, IndexedDB in a browser, memory as the last-resort fallback. Same interface, so the UI never branches.
 - `src/ui/` — the three panes: **Codex** (typed, searchable, with an "Unwritten" section that creates missing notes in one click), **manuscript editor** (CodeMirror 6 with `[[link]]` autocomplete over titles *and* aliases), and **Inspector** (backlinks with mention counts, outgoing references, frontmatter).
 - Light and dark themes, both first-class. Ctrl+S saves every dirty note.
 
@@ -50,7 +50,10 @@ npm run test:engine  # the Phase 1 vault smoke test
 npm run typecheck
 ```
 
-The web build keeps everything in memory and says so in a banner. The desktop build reads and writes a real folder.
+The desktop build reads and writes a real folder you pick. The web build keeps
+projects in IndexedDB, so they survive a reload. Only the last-resort fallback —
+a browser that refuses storage outright, e.g. private mode — is memory-only, and
+it says so in a banner.
 
 ### Filesystem permissions
 
@@ -115,4 +118,10 @@ Opens that folder instead of the seed world and runs a disk round-trip check —
 - Scene-beat drafting, prompt library, outline/corkboard, version history
 - The ecosystem plugins (LanguageTool, plagiarism, Gutenberg import, voice notes, exporters)
 
-See `Novella-Blueprint.md` for the full architecture and NovelCrafter feature-parity map.
+See [ROADMAP.md](ROADMAP.md) for the live backlog and the log of what shipped
+when, and [RESEARCH.md](RESEARCH.md) for the competitor research that drives it.
+
+## License
+
+[Apache-2.0](LICENSE) — free to use, modify, fork, build plugins for, and sell.
+The name and branding are not covered; see [NOTICE](NOTICE).

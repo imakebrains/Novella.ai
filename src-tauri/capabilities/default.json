@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Filesystem access is granted at runtime for the one folder the user picks, so no path scope is listed here.",
+  "description": "Filesystem access is granted at runtime for the one folder the user picks, so no path scope is listed here. These entries widen WHICH fs commands the webview may call; WHERE it may call them is still gated by allow_vault in lib.rs. Every call in src/storage/tauriStorage.ts needs a grant here — a missing one fails ONLY in a Tauri build, never in the browser, which is how read-file and remove shipped broken in v0.1.0.",
   "windows": ["main"],
   "permissions": [
     "core:default",
@@ -13,6 +13,10 @@
     "fs:allow-write-file",
     "fs:allow-read-dir",
     "fs:allow-mkdir",
-    "fs:allow-exists"
+    "fs:allow-exists",
+    "fs:allow-read-file",
+    "fs:allow-remove",
+    "fs:allow-rename",
+    "fs:allow-stat"
   ]
 }

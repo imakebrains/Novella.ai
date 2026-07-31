@@ -4,9 +4,19 @@
   "version": "0.1.0",
   "type": "module",
   "description": "A local-first writing environment. Your book lives as plain Markdown on your disk.",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/imakebrains/Novella.ai",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imakebrains/Novella.ai.git"
+  },
+  "bugs": {
+    "url": "https://github.com/imakebrains/Novella.ai/issues"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "build:web": "tsc --noEmit && vite build --mode web",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test:engine": "tsx test.ts",

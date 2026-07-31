@@ -83,4 +83,54 @@ export async function runVaultSelfTest(path: string): Promise<void> {
       ? "PASS round-trip — prose written, frontmatter preserved"
       : "FAIL round-trip",
   );
+
+  await checkCapabilities(path, log);
+}
+
+/* The capability check.
+
+   Every fs call the app makes has to be granted in
+   src-tauri/capabilities/default.json, and a missing grant fails ONLY in a
+   Tauri build — the browser's WebStorage never goes near Tauri, so browser
+   verification cannot see it. That gap shipped: readBytes/listFiles call
+   readFile and remove() calls remove, neither of which was granted, which
+   silently broke cover art, card images, the backup zip and note deletion
+   in the packaged app while every browser check stayed green.
+
+   So this walks the binary and delete paths deliberately, and cleans up
+   after itself. If a permission is ever dropped again, this says so in the
+   terminal instead of a writer discovering it. */
+async function checkCapabilities(path: string, log: (line: string) => void): Promise<void> {
+  const backing = storage();
+  const probe = ".novella/selftest-probe.bin";
+  const bytes = new Uint8Array([0x4e, 0x6f, 0x76, 0x65, 0x6c, 0x6c, 0x61]); // "Novella"
+
+  try {
+    // writeBytes → readBytes exercises writeFile + readFile. readFile is the
+    // one that was missing, and it also powers listFiles (the backup zip).
+    await backing.writeBytes(path, probe, bytes);
+    const back = await backing.readBytes(path, probe);
+    const same = !!back && back.length === bytes.length && back.every((b, i) => b === bytes[i]);
+    log(same ? "PASS readBytes — binary round-trip (fs:allow-read-file)" : "FAIL readBytes");
+
+    const files = await backing.listFiles(path);
+    log(
+      files.length > 0
+        ? `PASS listFiles — ${files.length} files readable (backup zip path)`
+        : "FAIL listFiles — read nothing",
+    );
+
+    // remove was the other missing grant: note deletion and card-image removal.
+    await backing.remove(path, probe);
+    const gone = (await backing.readBytes(path, probe)) === null;
+    log(gone ? "PASS remove — probe deleted (fs:allow-remove)" : "FAIL remove — probe survived");
+  } catch (err) {
+    // An ACL denial lands here, and its message names the missing permission.
+    log(`FAIL capabilities — ${err instanceof Error ? err.message : String(err)}`);
+    try {
+      await backing.remove(path, probe);
+    } catch {
+      /* nothing to clean up if the write itself was denied */
+    }
+  }
 }
