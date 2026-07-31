@@ -34,8 +34,20 @@ A) BUILD (default): implement the TOPMOST unchecked item in "Next up",
    command bare. Never rewrite src/core/vault.ts. Then tick the item,
    append a dated log line, commit with the Co-Authored-By line, push.
 
-B) RESEARCH (roughly every third run, or when "Next up" has fewer than
-   4 items): no code. Search for fresh reviews, feature announcements
+   **If you have no browser** (the usual cloud case), do NOT fall back to
+   research — that has already produced eight research rounds in a row and
+   grown the backlog from 7 items to 18 while shipping no code. Instead:
+   pick the topmost item, extract its logic into a pure module, unit-test
+   that module properly in `test-units.ts`, wire the UI, and write in the
+   log line exactly which parts you verified and which still need a human
+   to look at the screen. Shipping tested logic with honestly-flagged UI
+   beats shipping nothing. Prefer items with a testable core when the
+   topmost one is pure chrome, and say in the log why you skipped down.
+
+B) RESEARCH (**at most one run in three, and never twice in a row** —
+   the backlog is a means, not an output; if "Next up" has 4+ items and
+   the last run was research, BUILD instead): no code. Search for fresh
+   reviews, feature announcements
    and complaints about NovelCrafter, Sudowrite, Dabble, Scrivener,
    Campfire, type.ai, Obsidian-for-writers and Notion writing
    templates. Add the best findings to "Next up" (one line each + why
