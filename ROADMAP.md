@@ -174,6 +174,31 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       local-AI half alone, since that half now has three named competitors
       saying the same sentence. Placed above the copy items below because
       it defends the thesis itself, not just a supporting fact for it.
+      Research round 14 (2026-07-31) adds three more entrants making the
+      same pitch: Novel Mage now ships a $99 one-time lifetime license
+      (fully local, BYOK or Ollama, manuscript never touches a server) —
+      closer to Novella's own no-subscription positioning than round 11
+      first found it; Storyloft launched May 2026 as a manuscript-aware AI
+      co-writer marketed specifically on a no-training privacy pledge; and
+      Scribeist relaunched in 2026 pitching "write without switching tools"
+      across Novel/Blog/General workspaces. None of the three fold in task
+      management or a sprint timer — the fourth-app gap stays open — but
+      the crowd making the local-AI/no-subscription/unify-everything pitch
+      keeps growing, reinforcing rather than changing the round-11 priority.
+- [ ] **Speak directly to the sprint/goal-tracking audience NaNoWriMo left
+      homeless** — research round 14 (2026-07-31): with no central org
+      since NaNoWriMo's 2025 shutdown, this July's "Camp NaNoWriMo" saw
+      writers stitching together separate trackers (Pacemaker, Trackbear,
+      4theWords) plus a volunteer-run "NaNoWriMo 2.0" revival site and
+      Discord servers (Writers Hangout) just for word-count accountability
+      — no single tool has won this niche. We already ship the exact
+      feature this audience wants: the sprint timer and daily-goal/streak
+      system (shipped 2026-07-23). The gap is entirely in naming — nothing
+      in first-run copy or marketing calls out NaNoWriMo, Camp NaNoWriMo, or
+      sprint-and-goal writers as an audience Novella already serves. Cheap,
+      no-code opportunity, filed right next to the four-app-bundle item
+      above since it's a sharper, named version of the same "the fourth app
+      is real and unclaimed" pitch, not a general comparison point.
 - [ ] **Say the no-outage / can't-lose-your-work advantage louder** —
       research round 13 (2026-07-30): Sudowrite had an app-wide outage
       April 22–23, 2026 that cost some users unsaved work, and shipped a
@@ -189,7 +214,20 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       naming outages or lost work at all. More visceral than the training-
       privacy survey below (real reported data loss, not sentiment), so
       ranked above it; still below the four-app-bundle item since it's a
-      copy-only win, not a thesis-defining gap.
+      copy-only win, not a thesis-defining gap. Research round 14
+      (2026-07-31) adds two more data points beyond Sudowrite's outage: a
+      fresh Dabble Trustpilot review reports a large portion of a user's
+      book deleted with no support response for over a day (no phone
+      support); and Campfire's Update 40 changelog period saw app-store
+      reviews describe the editor resetting mid-sentence and the cursor
+      jumping unpredictably while syncing online. Three unrelated cloud
+      writing tools, three different flavors of the same structural risk —
+      a local vault removes the failure mode entirely, not just this
+      quarter's instance of it. Caveat worth carrying forward: Sudowrite's
+      own July 28 changelog response plus a same-month "faster loading"
+      update show they're actively triaging reliability, so this window
+      isn't unlimited — say it while the evidence is fresh, not as a
+      permanent advantage.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent
@@ -204,7 +242,18 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       searching for: training. Cheap, truthful copy add to the AI-setup
       step and SECURITY.md; placed above the export/performance copy items
       below because the evidence behind it is a stated reason authors
-      *refuse* a tool, not just a comparison point.
+      *refuse* a tool, not just a comparison point. Research round 14
+      (2026-07-31) adds a sharper, dated hook than the survey stat: the
+      Bartz v. Anthropic author-copyright settlement received final court
+      approval July 20, 2026 ($1.5B, only ~350 authors opting out of
+      roughly a million works), and the same week major publishers
+      (Hachette, Cengage, Elsevier, Scott Turow, S.C.R.I.B.E.) filed a fresh
+      suit against Google over book-training data. Real money and named
+      lawsuits, not survey sentiment — a local Ollama model sidesteps the
+      question by construction, since a manuscript that never leaves the
+      machine can never become a training-data lawsuit's evidence. Lead
+      copy with this instead of the 2026 Authorlytica numbers alone; it's
+      the more recognizable, more current hook.
 - [ ] **Say the export advantage louder** — research round 7: Sudowrite
       reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
       Novella already ships all three plus one-click backup
@@ -227,7 +276,16 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       compute, forever, for free. Distinct pain point from the existing
       no-API-key/no-training copy items (this one is about mid-project
       throttling anxiety, not setup cost or privacy) and just as cheap to
-      say. Low priority, groups with the other copy items above.
+      say. Low priority, groups with the other copy items above. Research
+      round 14 (2026-07-31) adds a sharper edge: fresh Sudowrite complaints
+      report being charged after repeatedly trying to pause a subscription
+      (one review: "We updated your subscription for you!" after a cancel
+      attempt), and Sudowrite's own feedback board carries an open,
+      acknowledged item about billing/membership-status mismatches costing
+      users days of paid access. Distinct from the credit-throttling pain
+      this item already tracks — this is subscription-mechanics friction
+      itself, the thing that structurally can't happen to a one-time-install
+      local app with no billing relationship at all.
 - [ ] **Fix the Claude Fable 5 blurb in the optional Anthropic provider** —
       research round 10 (2026-07-27): July 2026 coverage confirms Fable 5
       is Anthropic's purpose-built creative-writing model, topping
@@ -283,6 +341,45 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-07-31 — Research round 14 (autopilot; no code). Rather than re-sweep
+  the usual named competitors a sixth-plus time, dispatched three parallel
+  research passes and looked specifically for angles rounds 7-13 hadn't
+  covered. Found and added the strongest new item this round: NaNoWriMo's
+  sprint/goal-tracking niche remains unclaimed since its 2025 shutdown —
+  this July's "Camp NaNoWriMo" saw writers stitching together Pacemaker,
+  Trackbear, 4theWords, a volunteer "NaNoWriMo 2.0" revival site, and
+  Discord servers just for word-count accountability. We already ship the
+  exact feature this audience wants (sprint timer + daily-goal/streak,
+  shipped 2026-07-23) but never name the audience in copy — a cheap,
+  no-code opportunity ranked with the four-app-bundle item. Folded four
+  more findings into existing items rather than duplicating: Novel Mage's
+  new $99 lifetime-license local build, Storyloft (manuscript-aware AI +
+  no-training pledge, launched May 2026), and a relaunched Scribeist
+  ("write without switching tools") all feed the four-app-bundle item as
+  three more entrants making a similar pitch, none folding in task
+  management or sprints; a fresh Dabble Trustpilot data-loss report and a
+  Campfire Update 40-era editor-reset/cursor-jump complaint feed the
+  no-outage item alongside Sudowrite's, with a carried-forward caveat that
+  Sudowrite is actively triaging reliability so the window isn't
+  unlimited; the Bartz v. Anthropic $1.5B author-copyright settlement's
+  July 20 final court approval, plus a fresh publisher suit against Google
+  over book-training data, feed the no-training/privacy item with a far
+  more current, dollar-figure hook than the standing 2026 Authorlytica
+  survey stat; and fresh Sudowrite subscription-billing/pause complaints
+  feed the no-credit-limits item as a distinct subscription-mechanics pain
+  point. Landscape notes (no action): Scrivener reconfirmed at zero AI
+  features with concrete current version numbers (Mac 3.5.0 vs. Windows
+  3.1.6) and Literature & Latte's long-teased next-gen app still has no
+  public release or AI angle as of mid-2026; Sudowrite shipped new model
+  access (GPT-5.6 suite, Claude Sonnet 4.6) and faster load times,
+  confirming its AI-quality and app-stability stories are separate axes
+  moving independently; a "Dabble acquired by Headout" claim surfaced in
+  search summaries was checked and is false (Headout is an unrelated
+  travel-booking company) — disregarded rather than repeated; nothing new
+  surfaced for type.ai, Obsidian-for-writers, or Notion templates beyond
+  what prior rounds already found. Full notes and sources in RESEARCH.md
+  Round 14.
 
 - 2026-07-30 — Research round 13 (autopilot; no code). Swept the usual
   named competitors again looking for angles rounds 7-12 hadn't covered.

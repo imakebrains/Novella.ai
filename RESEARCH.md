@@ -1190,3 +1190,177 @@ leave critique from round 6.
 - [Two new novel-writing plugins — Obsidian Forum](https://forum.obsidian.md/t/two-new-novel-writing-plugins/84340)
 - [I would never try writing a novel in Obsidian without these 5 plugins — XDA](https://www.xda-developers.com/would-never-try-writing-novel-in-obsidian-without-these-plugins/)
 - [The 28 Best Notion Templates for Writers in 2026 — Gridfiti](https://gridfiti.com/notion-templates-for-writers/)
+
+# Round 14 (2026-07-31)
+
+Rather than run a sixth-plus identical sweep of the standing named-competitor
+list, this round split into three parallel passes — NovelCrafter + Sudowrite,
+Dabble + Scrivener + Campfire, and type.ai + Obsidian + Notion (with a fourth
+angle folded into that last pass: new local-first entrants, the AI-training
+legal landscape, and the post-NaNoWriMo sprint/goal-tracking niche) — each
+briefed on everything rounds 1-13 already found, and told to report only what
+was genuinely new.
+
+## Biggest new finding: the NaNoWriMo-orphaned sprint/goal-tracking audience is still homeless
+
+With no central org running NaNoWriMo since its 2025 nonprofit shutdown
+(first noted in round 8), this July's "Camp NaNoWriMo" made the resulting gap
+concrete: writers are stitching together separate trackers — Pacemaker,
+Trackbear, 4theWords — plus a volunteer-run "NaNoWriMo 2.0" revival site and
+Discord servers (Writers Hangout) just to get word-count accountability, the
+single simplest feature in this whole category. No one tool has consolidated
+this niche.
+
+Checked our own state before writing this up: Novella already ships exactly
+what this audience is assembling piecemeal — the sprint timer
+(`src/ui/SprintTimer.tsx`, `src/state/sprints.ts`) and the daily-goal/streak
+system, both shipped 2026-07-23. Nothing in `FirstRunWizard.tsx` or any
+marketing copy names NaNoWriMo, Camp NaNoWriMo, or sprint-and-goal writers as
+an audience the app already serves. This is a zero-build, pure-copy
+opportunity to court a specific, currently-searching, currently-homeless
+audience rather than a general comparison point — filed as a new item
+alongside the four-app-bundle copy item, since it's a sharper, named version
+of the same "the fourth app is real and unclaimed" pitch.
+
+## A sharper hook for the training/privacy item: real money, not a survey
+
+Round 9 found a 2026 Authorlytica survey (96% of authors want training
+consent, 52% would refuse a tool outright) — real sentiment, but abstract.
+This round found something authors would actually recognize by name: the
+Bartz v. Anthropic author-copyright class action settlement received final
+court approval on July 20, 2026 — $1.5 billion, with the presiding judge
+(Araceli Martinez-Olguin) overruling 53 objections. Only roughly 350 authors
+opted out of a settlement covering close to a million works, though a
+smaller holdout group is pursuing further suits ("the opt-outs strike back,"
+per Writer Beware, July 17). The same week, a separate group of major
+publishers and authors (Hachette, Cengage, Elsevier, Scott Turow, S.C.R.I.B.E.)
+filed a fresh suit against Google over book-training data (TechCrunch, July
+14).
+
+This doesn't change the underlying point the existing item already makes —
+a local Ollama model sidesteps the question by construction, since a
+manuscript that never leaves the machine can never become evidence in a
+training-data lawsuit — but it gives the copy a current, dollar-figure,
+named-court-case hook instead of a survey statistic. Folded into the
+existing item rather than filed separately; future copy should lead with
+this instead of (or alongside) the Authorlytica numbers.
+
+## Two more reliability incidents, and one billing complaint, feeding existing items
+
+**No-outage item:** beyond Sudowrite's already-tracked April 2026 outage, this
+round found a fresh Dabble Trustpilot review reporting a large portion of a
+user's book deleted, with no support response for over a day (Dabble has no
+phone support). Separately, app-store reviews from the Campfire Update 40
+period describe the editor resetting before a user can finish typing a
+sentence while online, with the cursor jumping unpredictably during
+scrolling — a sharper, more specific version of the "glitchy at scale"
+reputation tracked since round 11. Three different cloud writing tools, three
+different flavors of the same structural risk: sync/server round-trips as a
+single point of failure. A local vault removes the failure mode entirely, not
+just patches this quarter's instance of it.
+
+Worth carrying forward honestly: Sudowrite's own July 28 changelog response
+to bug complaints, plus a same-month "faster loading" update alongside new
+model access (GPT-5.6 suite, Claude Sonnet 4.6), show the company is actively
+triaging reliability rather than ignoring it. The advantage is real today;
+it isn't guaranteed to stay this wide.
+
+**No-credit-limits item:** fresh complaints describe Sudowrite users being
+charged after repeatedly trying to pause a subscription (one review quotes
+the app's own message: "We updated your subscription for you!" after a
+cancellation attempt), and Sudowrite's feedback board carries an open,
+acknowledged item about billing/membership-status mismatches costing users
+days of paid access they tried to avoid. This is a different pain point from
+the credit-throttling-mid-scene complaint the item already tracks — it's
+subscription mechanics itself, the kind of friction that cannot exist for an
+app with no billing relationship at all.
+
+## The "one app instead of four" and "local, no training" pitches keep getting more crowded
+
+Three more products are now making pitches adjacent to Novella's own,
+beyond the LocalProse/Novel Mage/Noveling trio round 11 already found:
+
+- **Novel Mage now ships a $99 one-time lifetime license** — fully local
+  (BYOK or Ollama; the manuscript never touches a server), Codex and
+  character tools, a 7-day full-feature trial, Windows and Mac. This is
+  closer to Novella's own pricing shape (one-time cost, not a subscription)
+  than round 11 first captured it.
+- **Storyloft** launched May 4, 2026 ($19/month, web-based): "Eddy," a
+  manuscript-aware AI that reads the whole draft before responding (the
+  same "reads your document automatically" praise type.ai earns), paired
+  with an explicit no-training privacy pledge as its stated selling point.
+  It's a cloud subscription competitor fighting on the exact privacy ground
+  a local model owns by construction — worth watching as the closest thing
+  yet to "type.ai, but privacy-branded specifically for novelists."
+- **Scribeist** relaunched in early 2026 ("Write without switching tools,"
+  Product Hunt), bundling Novel/Blog/General workspaces with context-aware
+  AI at $8-18/month.
+
+None of the three fold in task management or a sprint/focus timer — the
+fourth-app half of the thesis remains untouched competitive ground, same as
+round 11 found — but the crowd making the local-AI/no-subscription/unify-
+everything pitch keeps growing. Folded into the existing four-app-bundle
+item rather than filed as a new one.
+
+## Landscape notes (confirm existing findings or explicitly correct one, no new build item)
+
+**Scrivener remains at zero AI features, confirmed with current version
+numbers.** Multiple 2026 review sites independently reconfirm Scrivener ships
+no AI assistance and sends no text to any server. As of this round, Mac sits
+at Scrivener 3.5.0 (added macOS 26 Tahoe support) while Windows sits at
+3.1.6 — a concrete, dated version of the known Mac/Windows lag rather than
+just a general reputation. Literature & Latte's long-teased "lighter, next-
+gen" spinoff app (in beta since 2023-2024) still has no public release, name,
+pricing, or announced AI angle as of forum activity in mid/late June 2026.
+Reinforces rather than changes the standing read: the entire legacy-desktop-
+writing-tool category is leaving both AI-assist and local-first execution on
+the table at the same time — exactly Novella's wedge — with no sign that's
+about to change.
+
+**Sudowrite's AI-quality and app-stability stories keep moving on separate
+axes.** New model access (OpenAI's GPT-5.6 suite — Sol, Terra, Luna — plus
+Claude Sonnet 4.6) shipped alongside faster editor load times, especially on
+slower devices. Confirms round 13's point: Sudowrite keeps riding "best model
+access" as its differentiator while reliability complaints (above) continue
+in parallel. Two separate axes, worth tracking separately in future copy
+rather than conflating.
+
+**A "Dabble was acquired by Headout" claim is false — checked and
+disregarded.** Some AI-generated search summaries asserted this; Headout is
+an unrelated travel/tours-booking company, and this appears to be a search-
+engine name collision, not a real acquisition. Not repeating it without
+independent confirmation from Dabble's own channels.
+
+**Nothing new surfaced for type.ai, Obsidian-for-writers, or Notion writing
+templates this round** beyond what rounds 1-13 already found (type.ai's
+minimalism, Obsidian's 4-5-plugin novelist stack, Notion's growing but
+still-buried-and-hard-to-leave template ecosystem).
+
+## Round 14 sources
+
+- [Sudowrite Changelog](https://feedback.sudowrite.com/changelog)
+- [Faster Loading, GPT-5.6 Models & More Improvements — Sudowrite changelog](https://feedback.sudowrite.com/changelog/faster-loading-gpt-56-models-and-more-improvements)
+- [Sudowrite reviews — SmartCustomer](https://www.smartcustomer.com/reviews/sudowrite.com)
+- [Adjust Billing and Membership Correlation — Sudowrite feedback board](https://feedback.sudowrite.com/p/adjust-billing-and-membership-correlation)
+- [Sudowrite status/incidents](https://status.sudowrite.com/incidents)
+- [Novel Mage — Offline AI Novel Writing Software](https://novelmage.com/)
+- [NovelCrafter offline-mode FAQ](https://www.novelcrafter.com/help/faq/general/can-i-use-nc-in-ofline-mode)
+- [NovelCrafter export help doc](https://docs.novelcrafter.com/en/articles/9319221-how-do-i-export-my-novel)
+- [New Lit & Lat writing app — Literature & Latte forum](https://forum.literatureandlatte.com/t/new-lit-lat-writing-app/136936)
+- [Something new — Literature & Latte blog](https://www.literatureandlatte.com/blog/something-new)
+- [Scrivener Review — All About AI](https://www.allaboutai.com/ai-reviews/scrivener/)
+- [Scrivener Review 2026 — Automateed](https://www.automateed.com/scrivener-review)
+- [Is Scrivener Discontinued? The Shocking Truth for 2026 Writers](https://techradar.info/is-scrivener-discontinued-the-shocking-truth-for-2026-writers/)
+- [Update 40: Returning to Our Roots — Campfire](https://campfirewriting.com/learn/update40)
+- [Campfire: Write Your Book reviews — JustUseApp](https://justuseapp.com/en/app/1626123915/campfire-write-your-book/reviews)
+- [Dabble reviews — Trustpilot (CA)](https://ca.trustpilot.com/review/dabblewriter.com)
+- [Storyloft: what makes an AI writing tool safe for authors](https://storyloft.app/what-makes-an-ai-writing-tool-safe-for-authors-privacy-training-and-manuscript-control-explained/)
+- [Storyloft launch press release — Marketers Media](https://news.marketersmedia.com/storyloft-launches-eddy-an-ai-co-writer-designed-to-help-authors-edit-manuscripts-and-improve-their-craft/89192872)
+- [Scribeist V2 — ChatGate](https://chatgate.ai/post/scribeist-v2)
+- [Scribeist on Product Hunt](https://www.producthunt.com/products/scribeist)
+- [Bartz v. Anthropic granted final approval by the court — TAA](https://blog.taaonline.net/2026/07/bartz-v-anthropic-granted-final-approval-by-the-court/)
+- [Anthropic settlement update: the opt-outs strike back — Writer Beware](https://writerbeware.blog/2026/07/17/anthropic-settlement-update-the-opt-outs-strike-back/)
+- [Google faces another AI training lawsuit from major publishers — TechCrunch](https://techcrunch.com/2026/07/14/google-faces-another-ai-training-lawsuit-from-major-publishers/)
+- [NPR: Anthropic/Bartz settlement pros and cons](https://www.npr.org/2026/07/27/nx-s1-5904606/anthropic-vs-bartz-ai-copyright-lawsuit-pros-cons)
+- [Camp NaNoWriMo 2026 tools/tracker roundup — CipherWrite](https://cipherwrite.com/blog/camp-nanowrimo-2026-tools-tracker)
+- [Obsidian StoryLine plugin](https://www.storyline.pixero.com/)
