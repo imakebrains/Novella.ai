@@ -1364,3 +1364,267 @@ still-buried-and-hard-to-leave template ecosystem).
 - [NPR: Anthropic/Bartz settlement pros and cons](https://www.npr.org/2026/07/27/nx-s1-5904606/anthropic-vs-bartz-ai-copyright-lawsuit-pros-cons)
 - [Camp NaNoWriMo 2026 tools/tracker roundup — CipherWrite](https://cipherwrite.com/blog/camp-nanowrimo-2026-tools-tracker)
 - [Obsidian StoryLine plugin](https://www.storyline.pixero.com/)
+
+# Round 15 (2026-08-01)
+
+A note on how this round came to run: AUTOPILOT.md was edited 2026-07-31,
+right after round 14, to cap the build-loop's own research fallback at "at
+most one run in three, never twice in a row" — eight straight research-only
+runs had grown the backlog from 7 items to 18 with no code shipped. This
+round fired from a separate, dedicated research schedule rather than the
+build loop choosing research on its own, so that cap didn't directly gate
+it — but it's flagged in the ROADMAP.md log line for the owner to confirm
+the schedule's frequency still matches intent now that the cap exists.
+Findings below turned out substantial either way.
+
+Split into four parallel passes: NovelCrafter + Sudowrite; Dabble +
+Scrivener + Campfire; type.ai + Obsidian + Notion (plus a scan for new
+local-first entrants); and a broader industry/legal-sentiment sweep. Each
+was briefed on everything rounds 1-14 already found and told to report only
+genuinely new material, with primary sources prioritized over AI-generated
+summary sites.
+
+## Biggest new finding: a named, paying competitor has zero generative AI
+
+Multiple independent 2026 reviews (Reedsy, WriteABookAI's Dabble-vs-Scrivener
+comparison, Knowara) now state plainly what earlier rounds only implied
+through feature-gap comparisons: Dabble ships no generative AI writing
+assistance at all. Its $29/mo Premium tier (or $699 lifetime) bundles a
+ProWritingAid-powered grammar/style checker — editing help, not drafting
+help — plus a novelty text-to-speech "Read to Me" feature. That's the whole
+AI story for a tool charging real subscription or lifetime money for "the
+whole job."
+
+This is the sharpest, most quotable proof point found in fifteen rounds for
+the "writes with you" half of the thesis, because it needs no caveat about
+competitors catching up or matching the feature later — Dabble isn't even
+trying. Filed as a new copy item, ranked with the other marketing-copy
+findings but placed high in that cluster since it's a single fact rather
+than a comparison that could shift under a competitor's next release.
+
+## The four-app-bundle thesis gets its sharpest direct hit yet — and a sharper stat
+
+Scribeist V2 (relaunched, Product Hunt) now ships a dedicated **Novel
+workspace** — character tracking, timeline visualization, worldbuilding
+docs — alongside a General notes workspace, with context-aware AI that
+behaves differently per workspace, marketed explicitly as "write without
+switching tools." Round 14 had already logged Scribeist's relaunch as one of
+three entrants using similar language to Novella's own positioning; this
+round found the specifics, and they land closer to the actual "one app
+instead of four" pitch than anything found so far — worldbuilding and
+organization tooling under one roof, not just an editor with AI bolted on.
+The clean counter-argument survives intact: Scribeist's AI routes through
+OpenRouter/BYOK, metered and cloud-dependent, not local and free — Novella's
+"one app instead of four, and it's yours forever, no meter" pitch still
+has ground Scribeist doesn't occupy.
+
+Separately, a fresh "best productivity apps for writers 2026" roundup
+(independent of any named competitor) now recommends a **five**-tool stack —
+a word-count tracker, Todoist, Forest, Obsidian, and Hemingway — rather than
+the four the thesis names. If anything the fragmentation problem is getting
+worse, not better, which is a fresher, sharper stat to lead marketing copy
+with than "3-4 apps." Both findings folded into the existing four-app-bundle
+item.
+
+## NovelCrafter and Sudowrite converge on chat-with-your-book — the differentiator has to move
+
+Sudowrite shipped "Chat" and "Feedback" as major features on May 12, 2026
+("Your Personal Writing Partner Has Arrived" changelog post), giving Chat
+full context of characters, outline, and story world, plus — new — the
+ability to edit existing documents and create new ones, not just discuss
+them. Feedback (manuscript-level critique) was opened free to all
+subscribers through a launch promo. Combined with NovelCrafter's existing
+Codex-grounded chat and type.ai's 200k-token whole-manuscript context (round
+13), all three major AI-writing competitors now offer some form of
+chat-with-your-book. Once Novella builds its own version of this (tracked
+in the NovelCrafter-parity item), the feature's mere existence won't be a
+competitive edge — every serious competitor will have it. The differentiator
+that survives is local, private, and free of per-token cost; future copy and
+design work on this item should lead with that, not with parity.
+
+Also corrected while checking Sudowrite's changelog: Sudowrite's reliability
+complaints are not a stale July 24 data point closed by the "shipping fixes
+steadily" reply already logged in round 13 — a Google Play developer
+response dated on or about July 28, 2026 responds to the same class of
+bugginess complaint with near-identical language, meaning it was still
+unresolved days before this round ran, not a one-off that got fixed.
+
+## A pricing correction: NovelCrafter is a 4-tier ladder, not "$4/$8"
+
+Round 13 logged NovelCrafter's pricing as having "dropped to $4/$8 tiers."
+That's the bottom of the ladder, not the whole thing — current tiers across
+multiple aggregators are Scribe $4/mo, Hobbyist $8/mo, Artisan $14/mo, and
+Specialist $20/mo (annual billing saves roughly two months). Worth keeping
+straight for any future "cheaper than NovelCrafter" comparison copy so it
+doesn't accidentally understate NovelCrafter's power-user tier pricing.
+
+## Reliability watch continues: Campfire and Dabble both add a data point
+
+Campfire's mid-sentence editor-reset/cursor-jump bug — first logged in round
+14 from the Update 40 changelog era — is still being reported in the app's
+current mobile release (v1.3.2, updated July 3, 2026): "can't type a single
+sentence before it resets while online," "jumps to the top every time." This
+is now a multi-cycle unresolved defect, not a one-off tied to one update.
+Separately, Dabble's own Facebook page acknowledged a "more widespread
+issue" that backlogged support tickets, on top of the already-logged
+Trustpilot report of a large portion of a user's book being deleted with no
+support response for over a day. Both folded into the existing no-outage
+item, which now carries three named cloud tools with three separate,
+still-open reliability windows.
+
+## The legal/regulatory ground under "no-training" shifted: training itself is being called fair use
+
+The Bartz v. Anthropic settlement's final approval (July 20) carries a
+specific piece of legal reasoning worth separating from the settlement
+dollar figure already logged in round 14: the court's theory was that
+training an AI on copyrighted books is fair use — the actionable wrong was
+Anthropic's use of pirated/torrented source copies, not the training itself.
+A parallel ruling in the Meta/Kadrey litigation lands the same way: the
+court dismissed the authors' core "training equals infringement" theory
+against Meta while letting the illegally-sourced-copies claim proceed.
+Two separate cases, the same emerging legal consensus.
+
+This matters for how Novella frames its no-training advantage going
+forward. "We were trained legally" is no longer a strong claim to make on
+anyone's behalf, including ours — courts are saying training itself is
+fair use regardless of how careful the sourcing was. The durable version of
+this pitch was never about legality; it's about consent and architecture: a
+local Ollama model doesn't transmit a manuscript anywhere, so it cannot
+train on it, cannot be sued over doing so, and cannot need a court's fair-use
+ruling to defend it. That claim survives a legal system that keeps ruling
+training itself is fine.
+
+Adding to the news cycle keeping this topic current: a fresh Google/Gemini
+suit (Hachette, Cengage, Elsevier, Scott Turow, S.C.R.I.B.E., filed
+~July 14, already logged in round 14) alleges Gemini was trained on
+pirated/torrented books with copyright management info stripped to conceal
+it — not yet decided, a filing only. And the EU AI Act's Article 53
+training-data-transparency duty becomes enforceable August 2, 2026: the AI
+Office can now audit general-purpose AI models and fine providers up to
+€15M or 3% of global turnover for failing to publish what they trained on.
+A concrete, dated regulatory hook for EU-facing copy — Novella has nothing
+to disclose under this rule, because nothing leaves the device to train
+anything in the first place.
+
+## NaNoWriMo-successor niche: still fragmenting, not consolidating
+
+Beyond the Pacemaker/Trackbear/4theWords/NaNoWriMo-2.0/Writers-Hangout
+fragmentation logged in round 14, this round found still more events
+competing for the same orphaned audience: World Anvil's "NovelEmber,"
+ProWritingAid's "Novel November," Reedsy's Novel Sprint, and a Discord-based
+"Order of the Written Word" running three parallel November challenges.
+More than a year after NaNoWriMo's shutdown, no single successor has
+consolidated the sprint/goal-tracking community — reinforcing rather than
+changing round 14's read that this is a cheap, no-code naming opportunity
+Novella hasn't taken yet.
+
+## Sudowrite leans into "uncensored fiction" — a genuine structural advantage, and a values call
+
+Sudowrite is now actively marketing an "uncensored fiction" positioning
+through a cluster of new blog posts (dark romance, erotica, dark fantasy,
+explicitly contrasted against Claude/ChatGPT refusals), built around Muse.
+But user reports describe inconsistent enforcement even within Sudowrite's
+own product: certain scenes routed through Claude-based pipelines inside
+the app still reintroduce refusals or toned-down output, "depending on mood
+and phrasing." A fully local model with zero vendor-side content policy is
+a structural advantage over that inconsistency — not just "a less
+restrictive model," but the complete absence of a moderation layer to be
+inconsistent in the first place. Worth stating plainly once the local-model-
+recommendation item ships, but which content a shipped default should
+actually permit is a deliberate values decision for the owner to make, not
+something to default into silently by picking an "uncensored" community
+fine-tune without discussion.
+
+## Landscape notes (confirm existing findings, correct one, or note with no action)
+
+**Scrivener's Mac/Windows gap widened rather than narrowed.** Mac shipped
+3.5.1 and 3.5.2 in 2026 (chasing Apple's own macOS 26.1/26.2 bugs — a
+Liquid Glass icon rework, a scroller-over-footer rendering glitch), while
+Windows remains frozen at 3.1.6. Literature & Latte's long-teased next-gen
+app is confirmed still in closed beta as of forum activity around July 2026
+(nearly three years after its October 2023 tease), now known to be built for
+simultaneous Mac/iOS/Windows release — unlike Scrivener 3 — but explicitly
+stripping out the corkboard, scriptwriting mode, custom metadata, and
+multi-column outline, with still no AI feature, pricing, or release date
+announced. Reinforces the standing read (legacy desktop tools leaving both
+AI-assist and local-first execution on the table) but the beta is worth
+watching since it could surface with little warning.
+
+**Both NovelCrafter and Sudowrite have a nearly-empty review-platform
+footprint.** NovelCrafter has no G2 or Capterra reviews and only one
+(negative) Trustpilot review; Sudowrite's G2 profile shows only two reviews
+and looks stale despite a "2026 Best Software Awards" listing. This is a
+go-to-market opening, not a product gap — if Novella invests early in
+G2/Trustpilot/Capterra presence, it could win "best AI writing tool"
+review-platform visibility essentially uncontested. No code follows from
+this, so it isn't filed as a Next-up item, but it's worth the owner's
+attention outside the autopilot loop.
+
+**Several frequently-cited author-survey statistics could not be traced to
+a primary source this round and were deliberately not repeated as fact.**
+Specific figures like "78% of authors use AI, up from 33% in 2024," "61%
+deeply concerned about training," and "89% always review AI output"
+appeared only in SEO/content-marketing blog posts (mylifenote.ai,
+authorlytica.com, cipherwrite.com, storyloft.app) with no traceable primary
+survey behind them — read as likely inflated or blended by AI-generated
+content, not verified data. A recirculating "90% of writers want
+compensation, 65% support collective licensing" Authors Guild figure could
+not be freshly confirmed either (authorsguild.org blocked automated
+fetches) and closely matches an older, 2023-era survey being reshared —
+flagged as probably stale rather than new signal.
+
+**Ruled out as false or miscategorized, not repeated:** a claim that
+"Campfire Blaze launched in 2026 as a successor to Campfire Pro" is
+mistaken — Campfire Blaze actually dates to an August 2019 Kickstarter and
+was folded into the single unified Campfire product years ago, misdated by
+an AI-generated summary site. Several "Dabble Trustpilot 2026" search
+results turned out to be for an unrelated Australian/UK sports-betting app
+also called "Dabble" (dabble.com.au, dabble.co.uk) and were discarded; a
+separate unrelated company, "dabble.ai," is a different AI writing-assistant
+product entirely and should not be conflated with Dabble Writer in future
+comparison copy. Claims of a Sudowrite "Story Engine 3.0," a pay-as-you-go
+Developer API, and a "Canvas 2.0" spatial-plotting feature came from a
+single low-authority SEO aggregator and were not corroborated anywhere
+else — treated as unverified marketing copy, not fact.
+
+**Nothing materially new surfaced for type.ai this round** — pricing and
+positioning ($12/mo entry tier, GPT-5 + Claude 4.5 Sonnet access, 4.5/5
+rating) are stable, with no fresh negative reviews or regressions found
+across G2, Slashdot, or Medium in 2026. Differentiation against type.ai
+still has to rest on cost and local-privacy rather than waiting for a crack
+in its manuscript-context quality.
+
+## Round 15 sources
+
+- [Dabble vs Scrivener: Book Writing Software Compared 2026 — WriteABookAI](https://writeabookai.com/blog/dabble-vs-scrivener-book-writing-software-2026)
+- [Dabble Writer Review — Knowara](https://knowara.com/ai-tools/writing/dabble-writer-review/)
+- [Scrivener 3.5.2 for macOS Now Available — Literature & Latte forum](https://forum.literatureandlatte.com/t/scrivener-3-5-2-for-macos-now-available/152621)
+- [Scrivener 3.5.1 — TidBITS Watchlist](https://tidbits.com/watchlist/scrivener-3-5-1/)
+- [L&L New Product? — Literature & Latte forum](https://forum.literatureandlatte.com/t/l-l-new-product/152462)
+- [Something new — Literature & Latte blog](https://www.literatureandlatte.com/blog/something-new)
+- [Scribeist: Write without switching tools — Product Hunt](https://www.producthunt.com/products/scribeist)
+- [Scribeist V2 Review — FunBlocks](https://www.funblocks.net/aitools/reviews/scribeist-v2)
+- [Scribeist V2 — ChatGate](https://chatgate.ai/post/scribeist-v2)
+- [Scribeist plans/billing](https://scribeist.com/help/billing/general/plans/)
+- [Novelcrafter — Jenova AI resources](https://www.jenova.ai/en/resources/novelcrafter)
+- [Novelcrafter Review 2026 — Toolworthy](https://www.toolworthy.ai/tool/novelcrafter)
+- [Novelcrafter Review: Powerful for Fiction Writers, Frustrating to Set Up (April 2026)](https://ilampadmanabhan.medium.com/novelcrafter-review-powerful-for-fiction-writers-frustrating-to-set-up-april-2026-64d391c629a2)
+- [Your Personal Writing Partner Has Arrived — Sudowrite changelog](https://feedback.sudowrite.com/changelog/your-personal-writing-partner-has-arrived)
+- [Sudowrite — uncensored AI writer blog post](https://sudowrite.com/blog/uncensored-ai-writer)
+- [AI for Erotic Fiction: Why Sudowrite's Muse Model Changes Everything](https://sudowrite.com/blog/ai-for-erotic-fiction-why-sudowrites-muse-model-changes-everything)
+- [Sudowrite vs Claude — eesel.ai](https://eesel.ai/blog/sudowrite-vs-claude)
+- [Type.ai Review (April 2026) — Medium](https://ilampadmanabhan.medium.com/type-ai-review-my-top-pick-after-testing-three-ai-writing-tools-april-2026-719f59c68dbb)
+- [Type.ai — AIChief](https://aichief.com/ai-text-tools/typeai/)
+- [Type.ai pricing](https://type.ai/pricing)
+- [LocalProse](https://www.localprose.com/en/)
+- [Best productivity apps 2026 — TextWordCount blog](https://www.textwordcount.com/blog/best-productivity-apps-2026)
+- [Google faces another AI training lawsuit from major publishers — TechCrunch](https://techcrunch.com/2026/07/14/google-faces-another-ai-training-lawsuit-from-major-publishers/)
+- [Authors, publishers sue Google over alleged AI copyright infringement — Al Jazeera](https://www.aljazeera.com/economy/2026/7/15/authors-publishers-sue-google-over-alleged-ai-copyright-infringement)
+- [Publishers file lawsuit against Google for AI training — Jane Friedman](https://janefriedman.com/publishers-file-lawsuit-against-google-for-ai-training/)
+- [Court grants final approval of Anthropic copyright settlement — Authors Guild](https://authorsguild.org/news/court-grants-final-approval-anthropic-copyright-settlement/)
+- [AI vs. Authors update: court approves historic Anthropic settlement while Meta... — National Law Review](https://natlawreview.com/article/ai-vs-authors-update-court-approves-historic-anthropic-settlement-while-meta)
+- [AI in Litigation Series: an update on AI copyright cases in 2026 — Norton Rose Fulbright](https://www.nortonrosefulbright.com/en/knowledge/publications/ce8eaa5f/ai-in-litigation-series-an-update-on-ai-copyright-cases-in-2026)
+- [The EU AI Act: when does it become enforceable now? — Data Protection Report](https://www.dataprotectionreport.com/2026/07/the-eu-ai-act-when-does-it-become-enforceable-now/)
+- [OpenAI's EU AI Act statement skips training-data copyright gap, activates Sunday — Tech Times](https://www.techtimes.com/articles/322519/20260731/openais-eu-ai-act-statement-skips-training-data-copyright-gap-activates-sunday.htm)
+- [NaNoWriMo alternatives 2026 — CipherWrite](https://cipherwrite.com/blog/nanowrimo-alternatives-2026)
+- [NaNoWriMo alternatives — Authors Breeze](https://authorsbreeze.com/blogs/nanowrimo-alternatives/)
