@@ -1627,4 +1627,194 @@ in its manuscript-context quality.
 - [The EU AI Act: when does it become enforceable now? — Data Protection Report](https://www.dataprotectionreport.com/2026/07/the-eu-ai-act-when-does-it-become-enforceable-now/)
 - [OpenAI's EU AI Act statement skips training-data copyright gap, activates Sunday — Tech Times](https://www.techtimes.com/articles/322519/20260731/openais-eu-ai-act-statement-skips-training-data-copyright-gap-activates-sunday.htm)
 - [NaNoWriMo alternatives 2026 — CipherWrite](https://cipherwrite.com/blog/nanowrimo-alternatives-2026)
+
+# Round 16 (2026-08-02)
+
+Only one day had passed since round 15, so this round was run as a
+deliberate stress test of the "report only what's genuinely new" discipline
+rather than an expectation of a big haul. Four parallel passes covered the
+usual split (NovelCrafter + Sudowrite; Dabble + Scrivener + Campfire;
+type.ai + Obsidian + Notion plus a new-entrant scan; broader industry/legal
+sentiment), each handed a full brief of everything rounds 1-15 already
+found so nothing already logged would resurface as "new." Three of the four
+passes came back mostly or entirely empty after real effort, which is
+reported honestly below rather than padded — but the fourth surfaced a
+genuine crack in a competitor's flagship claim, and two others sharpened
+existing items in ways worth carrying forward.
+
+## Two more local-first entrants, plus a nuance that complicates "runs locally" as a unique claim
+
+Novelist (novelist-app.com) is a Windows desktop novel-writing app, $49
+one-time with a 14-day trial, working fully offline via Ollama or BYOK
+across ten providers. Its feature set — reorderable chapters, a
+drag-and-connect character-relationship map, a plot timeline, a corkboard,
+a worldbuilding codex, word-count targets and streak tracking — is a close
+mirror of Novella's own surface area, and site metadata suggests it's been
+live since around May 2026 rather than a brand-new launch, so it's "new to
+our tracking" rather than newly shipped. Separately, a new Obsidian plugin,
+Noveler (community-listed roughly three weeks before this check), bundles
+StoryLine's scene routing with manuscript export and Antidote grammar-
+checker integration — pushing the plugin count required for a workable
+Obsidian novel setup to at least four (Longform, Novel Word Count,
+StoryLine, Noveler).
+
+Both were checked specifically for task management and a sprint/focus
+timer, since that's the one piece of the thesis no competitor has claimed.
+Novelist has word-count streaks (gamification) but no task manager and no
+timer. Noveler and the StoryLine ecosystem it extends have neither. A
+direct search across Product Hunt, Hacker News Show HN, and writing-
+community subreddits for *any* product pairing task-tracking with a
+focus/sprint timer alongside writing and worldbuilding turned up nothing.
+The fourth-app gap is now checked against six-plus dedicated competitors
+(NovelCrafter, Sudowrite, Dabble, Scrivener, Campfire, type.ai) and at
+least six local-first/indie entrants (LocalProse, Novel Mage, Noveling,
+Storyloft, Scribeist, Novelist) across sixteen rounds, and remains
+completely unclaimed.
+
+The nuance is less comfortable: NovelCrafter's own help docs, dated
+February 8, 2026, confirm it already supports pointing the app at a
+locally-running Ollama or LM Studio instance instead of paid API calls
+(novelcrafter.com/help/docs/ai-connections/ollama). This isn't new — the
+docs predate this whole research project — but it hadn't been checked or
+logged in fifteen prior rounds, and it matters: "Novella runs AI locally
+with no per-token cost" is not, on its own, a claim NovelCrafter can't also
+make for a slice of its usage. What NovelCrafter still can't offer, even
+with Ollama plugged in, is the packaging: it's still a cloud-hosted,
+browser-only app that needs the well-documented ~1-hour BYOK setup for any
+model *besides* the one a writer manually configures through Ollama, the
+manuscript itself still lives on NovelCrafter's own servers regardless of
+which model answers a prompt, and there's still no offline mode and no
+desktop process. Future "local AI" copy should lead with the whole
+package — zero-config local AI *and* a local-only manuscript *and* no
+cloud dependency at all *and* task/sprint tools bundled in the same
+app — rather than the bare fact that a local model can be attached, since
+that fact alone just stopped being exclusively ours to claim.
+
+## A concrete crack in Sudowrite's "reads your whole manuscript" claim
+
+A Trustpilot review of Sudowrite states plainly that its manuscript-review
+output "missed major plot points," and separately calls the claim that
+Sudowrite "reads all messages" — i.e., has full context of the manuscript —
+a "flagrant lie" based on direct experience. The same reviewer describes
+being locked out of their account with no 24/7 support and no response
+after complaining, both via chat and again on attempting to cancel;
+Sudowrite reached out to try to resolve it on June 23, 2026. This is the
+first specific, named complaint found across sixteen rounds that
+Sudowrite's "Feedback" manuscript-critique feature (shipped May 12, 2026,
+marketed with "full context of characters, outline, and story world") does
+not deliver on that promise in practice.
+
+The same pass found Sudowrite shipped a third model family in roughly two
+weeks — Kimi K3 (Moonshot AI), added July 29, 2026 to Write/Draft/Plugins
+and pitched as #2 on the EQ-Bench creative-writing leaderboard behind only
+Claude Opus 5, notable for adapting sentence rhythm rather than just word
+choice to a requested register. The same release fixed a real bug: Undo
+(Ctrl/Cmd+Z) after a Chat-based edit had been rolling the entire document
+back to before that edit, not just undoing the edit itself — a document-
+corruption-adjacent bug in exactly the feature Sudowrite is racing
+competitors to build out. Taken together with the GPT-5.6 suite and Claude
+Sonnet 4.6 access already logged in round 15, Sudowrite added three model
+families in about two weeks while also patching a bug that could silently
+roll back a writer's work — evidence it's competing on model breadth
+faster than it's stabilizing the underlying feature.
+
+This sharpens rather than replaces the existing NovelCrafter-parity item's
+framing: once Novella builds its own chat-with-your-book mode, the
+differentiator was already identified (round 15) as local/private/free
+rather than the feature's mere existence. This round adds a second,
+concrete argument to lead with alongside that one — a local Codex-grounded
+implementation has no cloud context window to silently truncate a
+manuscript against, and no server-side Undo state that can roll back past
+an edit a writer already accepted.
+
+## A legal nuance on Article 53, live as of today
+
+The EU AI Act's Article 53 general-purpose-AI transparency duty took
+enforcement effect today, August 2, 2026, confirmed via the European
+Commission's own press release — investigation powers and fines (up to
+€15M or 3% of global turnover) are now live, retroactive to violations
+since August 2025. Checked specifically for two things beyond the bare
+fact already logged in round 14: any writing-tool-specific reaction to the
+date landing, and whether local/on-device deployment gets any distinct
+treatment under the statute. Found no writing-tool-specific reaction. On
+the second question, the answer is more useful than "no distinct
+treatment" — it's that the obligation was never aimed at apps like
+Novella in the first place. Article 53's transparency duty is a *provider*
+obligation: it falls on whoever publishes and releases the general-purpose
+model (Meta for Llama, Mistral, Alibaba for Qwen, etc.), not on downstream
+software that deploys someone else's already-published model locally.
+Article 53(2) separately exempts models released under a free/open license
+with public weights and no monetization outright, which covers most of the
+model families Novella's Ollama integration would point at anyway. So the
+existing "nothing leaves the device, so there's nothing to disclose" claim
+already logged is true, but it turns out to be the *second* reason Article
+53 has nothing to bite on here — the first is that Novella was never the
+regulated party to begin with, being a downstream deployer rather than a
+GPAI provider. Worth having ready if a legally-minded reviewer or reporter
+asks how Novella complies with the Act; not sharp or dramatic enough to
+lead marketing copy with on its own.
+
+## Landscape notes (no action)
+
+**Nothing new for Dabble, Scrivener, or Campfire this round**, despite a
+real search effort (~20 queries across Trustpilot, App Store/Google Play,
+G2, justuseapp.com, X, Reddit, and the vendors' own official pages).
+Scrivener's Mac version is still 3.5.2, Windows still 3.1.6, and every
+"new writing app" beta thread findable by search predates the already-
+logged "still in closed beta as of ~July 2026" status — literatureandlatte.com
+and its forum blocked direct fetches this round, so this is search-snippet-
+sourced only, flagged as a limitation for a future round to close with
+different access. Campfire's most recent numbered changelog is still
+Update 41 (Jan 27, 2026), well before the already-logged v1.3.2 mobile
+release; the false "Campfire Blaze successor" claim is still circulating on
+at least one SEO site (automateed.com) but wasn't repeated as fact.
+Dabble's rating and pricing are unchanged; a Facebook-support-page mention
+of an "SDK Misconfigured" desktop error and a persistent web banner bug
+could not be dated distinctly from the already-logged "widespread issue"
+report, so it's noted but not counted as new.
+
+**Nothing new on the Google/Gemini publisher lawsuit or on fresh author-
+sentiment survey data.** The Gemini suit (Hachette, Cengage, Elsevier,
+Scott Turow, S.C.R.I.B.E.) has no answer, motion, or hearing date yet. The
+same unverifiable "78% of authors use AI," "61% deeply concerned," "89%
+always review AI output" stats are still recirculating on the same
+content-marketing sites (cipherwrite.com, storyloft.app, mylifenote.ai,
+authorlytica.com) with no traceable primary source — round 15's skepticism
+holds. One correction worth carrying forward: the Authors Guild's actual
+November 2025 survey (~2,400 authors; "96% want consent," "90% believe
+authors should be compensated") looks like it may be the real primary
+source behind the "96% consent" figure this project has been citing under
+an "Authorlytica" attribution since round 9 — the AG survey predates this
+research window so it isn't logged as a new finding, but the attribution
+should probably be corrected to Authors Guild the next time that stat is
+cited in copy.
+
+**A NovelCrafter changelog entry ("Draft 11": Codex filter by type and
+custom category simultaneously, plus a new `novel.title`/`novel.*` custom-
+prompt variable) was found but its date could not be confirmed** —
+feedback.novelcrafter.com blocked direct fetches this round and the
+changelog URL slug carries no year. Noted for a future round to verify
+directly rather than relied on now. type.ai and Notion writing templates:
+no material change found in either — type.ai's pricing snapshot found this
+round is dated July 3, 2026 and matches what's already logged; Notion
+template listicles surfaced only pre-existing products.
+
+## Round 16 sources
+
+- [Novelist — local-first novel-writing app](https://www.novelist-app.com/)
+- [Novelist — AlternativeTo listing](https://alternativeto.net/software/novelist-app/about/)
+- [Noveler — A StoryLine Expansion — Obsidian community plugin](https://community.obsidian.md/plugins/noveler-a-storyline-expansion)
+- [StoryLine — Obsidian plugin for writers — Obsidian forum](https://forum.obsidian.md/t/plugin-storyline-obsidian-plugin-for-writers/111494)
+- [NovelCrafter — connecting to Ollama](https://www.novelcrafter.com/help/docs/ai-connections/ollama)
+- [Sudowrite Trustpilot reviews](https://www.trustpilot.com/review/www.sudowrite.com)
+- [Kimi K3, safer Undo, Chat reliability and more fixes — Sudowrite changelog](https://feedback.sudowrite.com/changelog/kimi-k3-safer-undo-chat-reliability-and-more-fixes)
+- [NovelCrafter changelog — "Draft 11"](https://feedback.novelcrafter.com/changelog/draft-11)
+- [Google faces another AI training lawsuit from major publishers — TechCrunch](https://techcrunch.com/2026/07/14/google-faces-another-ai-training-lawsuit-from-major-publishers/)
+- [U.S. publishers sue Google alleging massive copyright infringement behind Gemini — Publishing Perspectives](https://publishingperspectives.com/2026/07/u-s-publishers-sue-google-alleging-massive-copyright-infringement-behind-its-gemini-ai-service/)
+- [Google faces class action over books used to train Gemini — Search Engine Journal](https://www.searchenginejournal.com/google-faces-class-action-over-books-used-to-train-gemini/582708/)
+- [AG AI Survey Reveals Authors Overwhelmingly Want Consent and Compensation — Authors Guild](https://authorsguild.org/news/ag-ai-survey-reveals-authors-overwhelmingly-want-consent-and-compensation-for-use-of-their-works/)
+- [European Commission press release — EU AI Act GPAI obligations](https://ec.europa.eu/commission/presscorner/detail/en/ip_26_1714)
+- [EU AI Act — Article 53 text](https://artificialintelligenceact.eu/article/53/)
+- [How the EU AI Act treats open-source GPAI models — Hugging Face](https://huggingface.co/blog/yjernite/eu-act-os-guideai)
+- [Campfire Update 41 changelog](https://campfirewriting.com/learn/update41)
 - [NaNoWriMo alternatives — Authors Breeze](https://authorsbreeze.com/blogs/nanowrimo-alternatives/)

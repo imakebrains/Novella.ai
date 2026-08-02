@@ -97,6 +97,20 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       differentiator that survives is local/private/no-per-token-cost, not
       "an AI that knows your book," so lead any future copy or design for
       this half of the item with that framing rather than parity alone.
+      Research round 16 (2026-08-02) finds a concrete crack in that
+      convergence: a Sudowrite Trustpilot review states its manuscript-
+      review output "missed major plot points" and calls the claim that
+      Sudowrite "reads all messages" a "flagrant lie," compounded by being
+      locked out of the account with no timely support response. Sudowrite
+      also shipped a third model family in two weeks (Kimi K3, added
+      July 29, pitched #2 on the EQ-Bench creative-writing leaderboard)
+      alongside a fix for a real Undo bug where Ctrl/Cmd+Z after a
+      Chat-based edit had been rolling the whole document back past that
+      edit — evidence Sudowrite is model-shopping faster than it's
+      stabilizing the feature. Together these sharpen, rather than soften,
+      the case that a local Codex-grounded chat-with-your-book mode (once
+      built) should lead on "no cloud context window to silently truncate
+      or corrupt," not just "free and local."
 - [ ] **Voice-matching from the writer's own prose, not just style templates**
       — research round 11 (2026-07-28): checked our own Upload style flow
       (`InspectorPane.tsx`) — it imports a .txt/.md file as the literal body
@@ -216,7 +230,29 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       recommends a *five*-tool stack this round (word tracker + Todoist +
       Forest + Obsidian + Hemingway), not the four the thesis names — sharper
       evidence the fragmentation problem is worsening, not resolving, and a
-      fresher stat to lead marketing copy with than "3-4 apps."
+      fresher stat to lead marketing copy with than "3-4 apps." Research
+      round 16 (2026-08-02) adds two more entrants and one important nuance:
+      Novelist (novelist-app.com), a $49 one-time Windows app running fully
+      offline via Ollama or BYOK, and Noveler, a new Obsidian plugin
+      (community-listed ~July 2026) bundling StoryLine's scene routing with
+      manuscript export and grammar-checker integration — pushing the
+      Obsidian novel-setup plugin count to at least four (Longform, Novel
+      Word Count, StoryLine, Noveler). Searched directly for any competitor,
+      old or new, pairing task-tracking with a focus/sprint timer alongside
+      writing and worldbuilding and found none — the fourth-app gap stays
+      fully open, including in Novelist's own feature list (word-count
+      streaks only, no task manager, no timer). The nuance: NovelCrafter's
+      own docs (dated Feb 2026) confirm it already supports pointing at a
+      local Ollama/LM Studio instance instead of paid API calls, so "runs a
+      local model" alone is no longer even a Novella-vs-NovelCrafter
+      distinction — only Novella's packaging is. NovelCrafter is still
+      cloud-hosted/browser-only, still needs the ~1hr BYOK setup for its
+      non-Ollama features, still keeps the manuscript on its own servers,
+      still ships no offline mode. Future copy should lead with the
+      packaging (zero-config local AI + local-only manuscript + no cloud
+      dependency at all + task/sprint tools bundled in), not the bare fact
+      of local inference, since that fact alone just stopped being unique
+      even against the cloud incumbent.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -328,7 +364,18 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       enforceable August 2, 2026 (fines up to €15M/3% of global turnover
       for GPAI providers who don't publish what they trained on) — a
       concrete, dated regulatory hook for EU-facing copy: Novella has
-      nothing to disclose, because nothing leaves the device.
+      nothing to disclose, because nothing leaves the device. Research
+      round 16 (2026-08-02), the day Article 53 actually went live, adds a
+      second independent reason: the statute's transparency duty falls on
+      GPAI *providers* — whoever publishes the base model — not on
+      downstream deployers of it, and Article 53(2) exempts models released
+      under a free/open license with public weights and no monetization
+      outright. Novella runs a third-party open local model via Ollama, so
+      even setting "nothing leaves the device" aside, the disclosure
+      obligation was never Novella's to begin with. Worth having in the
+      back pocket if a legally-minded reviewer or reporter asks how Novella
+      complies with the Act, rather than something to lead marketing copy
+      with.
 - [ ] **Say the export advantage louder** — research round 7: Sudowrite
       reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
       Novella already ships all three plus one-click backup
@@ -416,6 +463,47 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-08-02 — Research round 16 (autopilot; no code). Dispatched four
+  parallel research passes (NovelCrafter/Sudowrite; Dabble/Scrivener/
+  Campfire; type.ai/Obsidian/Notion plus new-entrant scan; broader
+  industry/legal sentiment), each briefed on rounds 1-15's findings and
+  told to report only genuinely new material. Given only one day had
+  passed since round 15, most passes came back with "nothing new found"
+  after real search effort (Dabble/Scrivener/Campfire: ~20 searches, no
+  new material; Google/Gemini suit, EU Article 53 reaction, fresh author
+  surveys: none found, same unverifiable stats recirculating) — reported
+  plainly rather than padded. What did surface, folded into three
+  existing items rather than added as new bullets: two more local-first
+  entrants (Novelist, a $49 one-time Windows app running fully offline
+  via Ollama; Noveler, a new Obsidian plugin) confirm the four-app-bundle
+  item's fourth-app gap is still unclaimed, plus a nuance worth sharpening
+  future copy on — NovelCrafter's own docs confirm it already supports a
+  local Ollama backend, so "runs locally" alone stopped being a unique
+  Novella claim and the differentiator has to be the packaging (zero-config
+  local AI + local-only manuscript + no cloud dependency + task/sprint
+  tools bundled in); a Sudowrite Trustpilot review disputing its
+  manuscript-review output ("missed major plot points," called the
+  full-manuscript-context claim a "flagrant lie") plus a real Undo bug
+  (Ctrl/Cmd+Z after a Chat edit rolling back past that edit, fixed July 29
+  alongside a third model family added in two weeks) feed the
+  NovelCrafter-parity item's chat-with-your-book thread, sharpening it
+  toward "no cloud context window to silently truncate or corrupt" as the
+  durable local-AI argument; and a plain-text reading of EU AI Act
+  Article 53, live as of today, adds a second independent reason
+  (obligations fall on GPAI providers publishing a base model, not
+  downstream deployers running an open one locally) to the no-training
+  item, useful if a reviewer asks about compliance rather than something
+  to lead marketing with. Landscape notes (no action, full detail in
+  RESEARCH.md Round 16): a Sudowrite Trustpilot exchange traces the
+  already-logged "flagrant lie" complaint to a real support timeline; the
+  Authors Guild's actual November 2025 survey (~2,400 authors) looks like
+  the real primary source behind the "96% want consent" figure previously
+  logged under an "Authorlytica" attribution — flagged as a correction,
+  not a new finding since it predates the tracked window; a NovelCrafter
+  changelog entry ("Draft 11," Codex filter + custom prompt variable) was
+  found but its year could not be confirmed since the changelog site
+  blocked direct fetches, so it's noted but not relied on.
 
 - 2026-08-01 — Research round 15 (autopilot; no code). Note on cadence: this
   run fired from a schedule dedicated to research, separately from
