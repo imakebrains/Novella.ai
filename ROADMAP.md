@@ -252,7 +252,25 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       packaging (zero-config local AI + local-only manuscript + no cloud
       dependency at all + task/sprint tools bundled in), not the bare fact
       of local inference, since that fact alone just stopped being unique
-      even against the cloud incumbent.
+      even against the cloud incumbent. Research round 17 (2026-08-03), one
+      day after round 16, came back mostly dry on this item by design (a
+      dedicated pass re-checked LocalProse and Novel Mage specifically for
+      a task/goal-tracking or focus-timer feature and found none — the
+      fourth-app gap is now confirmed absent across every named local-AI
+      competitor, not just assumed) but surfaced one new design nuance
+      worth carrying forward, not building yet: Novel Mage lets a writer
+      switch models *per task within one project* — a fast local model for
+      drafting, a cloud model like Claude for nuanced rewrites — rather
+      than picking one model for the whole project. Novella already
+      supports multiple providers (local Ollama, optional cloud) but not
+      this kind of per-task hot-swap; worth studying whether it's a real
+      writer need or a way to blur the local-first line before adopting it.
+      Also found two more local-first entrants worth naming but not
+      ranking on: Mergen Ink (local-first storage, but BYOK cloud AI, not
+      a true local LLM — closer to Scribeist's architecture than
+      Novella's) and Epilogue (local-first, offline, plain-Markdown,
+      explicitly zero AI) — neither combines local AI with the four-app
+      bundle, reinforcing rather than narrowing the gap this item tracks.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -375,7 +393,15 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       obligation was never Novella's to begin with. Worth having in the
       back pocket if a legally-minded reviewer or reporter asks how Novella
       complies with the Act, rather than something to lead marketing copy
-      with.
+      with. Research round 17 (2026-08-03) found the same Google/Gemini
+      publisher suit round 14 already logged, but with a sharper, more
+      quotable detail from the complaint itself: it alleges Gemini can
+      generate "a 100-page murder mystery set in a quiet seaside town"
+      that substitutes for an original copyrighted mystery it trained on,
+      in 20 minutes for 39 cents — a concrete, fiction-specific illustration
+      of the training-risk argument to use verbatim in copy instead of the
+      abstract "trained on scraped books" framing. Same lawsuit, not a new
+      one — cite as an example, don't imply a second suit exists.
 - [ ] **Say the export advantage louder** — research round 7: Sudowrite
       reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
       Novella already ships all three plus one-click backup
@@ -463,6 +489,49 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-08-03 — Research round 17 (autopilot; no code). Dispatched four
+  parallel research passes again (NovelCrafter/Sudowrite;
+  Dabble/Scrivener/Campfire; type.ai/Obsidian/Notion plus new-entrant
+  scan; broader industry/legal sentiment), each briefed on rounds 1-16's
+  findings. Third dedicated-schedule round in three days on top of an
+  already-16-round backlog, so the yield was thin and mostly reported
+  honestly as "nothing new" rather than padded: NovelCrafter and Sudowrite
+  passes found no material dated in the prior ~10 days at all; Dabble,
+  Scrivener and Campfire the same. What did surface, folded into two
+  existing items rather than added as new bullets: the four-app-bundle
+  item gained a dedicated recheck confirming neither LocalProse nor Novel
+  Mage has added task/goal-tracking or a focus timer (the fourth-app gap
+  stays fully unclaimed, now checked rather than assumed), plus a design
+  nuance worth studying later — Novel Mage lets a writer switch between a
+  local and a cloud model per task within one project rather than per
+  project — and two more local-first entrants noted without ranking
+  (Mergen Ink: local storage but BYOK cloud AI, not a true local LLM;
+  Epilogue: local-first and offline but ships zero AI at all, reinforcing
+  rather than narrowing the gap). The no-training item gained a sharper,
+  quotable illustration from the same Google/Gemini suit round 14 already
+  logged (not a new suit): the complaint alleges Gemini can generate a
+  full "100-page murder mystery" that substitutes for a copyrighted
+  original it trained on, in 20 minutes for 39 cents. Landscape notes (no
+  action): a widely-recirculated "78% of authors now use AI, up from 33%"
+  stat attributed to "Authors Guild 2026" could not be traced to any
+  primary Authors Guild report and is flagged in RESEARCH.md as unverified
+  — do not cite it in copy. Full notes and sources in RESEARCH.md Round 17.
+
+  **Flag for the owner, escalated from round 15:** round 15's log entry
+  already noted this run fires from a schedule dedicated to research,
+  separate from the build loop's own cadence cap in AUTOPILOT.md ("at
+  most one run in three, never twice in a row," added 2026-07-31 after
+  eight straight research-only runs). That flag went unaddressed and this
+  is now the *third* consecutive research-only round from this same
+  schedule (rounds 15, 16, 17 — Aug 1, 2, 3), against a "Next up" list
+  that already had 14+ open items before this round and gained no new
+  checklist items from it. The research well for the usual named
+  competitors is measurably running dry on a daily cadence — three of four
+  passes this round found nothing dated in their whole search window.
+  Recommend the owner either widen this schedule's interval (e.g. weekly)
+  or point it at BUILD/QA some of the time, matching AUTOPILOT.md's own
+  cap, rather than let it keep firing research-only every day.
 
 - 2026-08-02 — Research round 16 (autopilot; no code). Dispatched four
   parallel research passes (NovelCrafter/Sudowrite; Dabble/Scrivener/

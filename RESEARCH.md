@@ -1818,3 +1818,153 @@ template listicles surfaced only pre-existing products.
 - [How the EU AI Act treats open-source GPAI models — Hugging Face](https://huggingface.co/blog/yjernite/eu-act-os-guideai)
 - [Campfire Update 41 changelog](https://campfirewriting.com/learn/update41)
 - [NaNoWriMo alternatives — Authors Breeze](https://authorsbreeze.com/blogs/nanowrimo-alternatives/)
+
+# Round 17 (2026-08-03)
+
+A note on how this round came to run, escalated from round 15's note: on
+2026-07-31, right after round 14, AUTOPILOT.md was edited to cap the build
+loop's own research fallback at "at most one run in three, never twice in a
+row" — eight straight research-only runs had grown the backlog from 7 items
+to 18 with no code shipped. Round 15 (2026-08-01) already flagged that this
+round fires from a schedule dedicated to research, separate from the build
+loop's own cadence choice, so that cap doesn't directly gate it, and asked
+the owner to confirm the schedule still fits now that the cap exists. That
+flag went unaddressed through round 16 (2026-08-02) and now round 17
+(2026-08-03) — three consecutive research-only rounds from this dedicated
+schedule, one per day, against a backlog that already had 14+ open items
+and gained zero new checklist entries this round. Re-flagged more visibly
+in ROADMAP.md's log line this time, since the quiet version didn't reach
+the owner.
+
+Split into the same four parallel passes as recent rounds: NovelCrafter +
+Sudowrite; Dabble + Scrivener + Campfire; type.ai + Obsidian + Notion (plus
+a scan for new local-first entrants); and a broader industry/legal-
+sentiment sweep. Each was briefed on everything rounds 1-16 already found
+and told to report only genuinely new material dated in roughly the last
+10 days to 3 weeks, and to say plainly if nothing qualified rather than pad
+with re-summaries.
+
+## The research well for named competitors is running dry on a daily cadence
+
+Three of four passes came back substantially empty after real search
+effort, and said so honestly rather than padding:
+
+- **NovelCrafter and Sudowrite:** no material dated within ~10 days of
+  round 16 found anywhere — not on either company's own changelog/status
+  page (both largely blocked direct fetches; indexed search snippets used
+  instead), not on Trustpilot, not on Reddit. The only Sudowrite item
+  surfaced (Claude Opus 4.8 + Ballad 1.1 model, a "Free Excellent Friday"
+  promo) is from June 5, 2026 — roughly eight weeks old, already stale
+  before this project ever logged it, not new.
+- **Dabble, Scrivener, and Campfire:** same result. Scrivener's version
+  history was checked in detail (3.5, 3.5.1, 3.5.2) and all releases
+  predate round 16. A Campfire mobile-app "last updated" date conflict
+  between search snippets (July 3 vs. July 29, 2026 for v1.3.2) looks like
+  Play Store re-indexing noise, not a real release — could not confirm a
+  version bump via direct fetch (403).
+- **type.ai, Obsidian, Notion specifically:** no movement found beyond
+  what rounds 1-16 already logged.
+
+This is worth noting plainly for whoever tunes this schedule: a daily
+cadence is now outpacing how often these specific companies actually ship
+or get reviewed. A weekly or biweekly interval would very likely catch the
+same signal with far less wasted search effort per round.
+
+## What did surface: reinforcement and one new design nuance, not a new gap
+
+**Local-first competitors still don't touch the fourth app, now checked
+directly rather than assumed.** A dedicated search asked specifically
+whether LocalProse or Novel Mage — the two most-direct local-AI-drafting
+competitors already logged — have added anything resembling task/goal
+tracking or a focus/sprint timer since they were first found. Neither has.
+LocalProse's own site (updated June 25, 2026) lists a "Focus mode" but
+that's the extent of it — no task manager, no goal streaks. This converts
+the fourth-app-gap claim from "true as of when we last checked" to "true as
+of a dedicated recheck this round," which is worth more in a competitive
+claim than the earlier phrasing implied.
+
+**Novel Mage's per-task model-switching is a genuinely new nuance, not
+previously logged.** Earlier rounds noted Novel Mage runs local models via
+Ollama/LM Studio. This round found more: a writer can switch models *per
+task within one project* — a fast local model for drafting, a cloud model
+like Claude for nuanced rewrites — rather than committing to one model for
+the whole project. Novella already supports multiple providers (local
+Ollama by default, optional cloud providers like Anthropic), but not this
+specific per-task hot-swap pattern. Worth studying as a possible UX
+direction before building it — it's a middle path between "pure local" and
+"pure cloud" that blurs the local-first line somewhat, which is exactly the
+kind of design decision that should be made deliberately rather than
+absorbed by imitation. Filed as a note, not a build item.
+
+**Two more local-first entrants, neither closing the gap:**
+
+- **Mergen Ink** (free beta, macOS/Windows) — local-first file storage
+  with on-device encrypted API keys, but its AI runs through BYOK cloud
+  providers (Claude/Gemini/GPT-4), not a true local LLM. Architecturally
+  closer to Scribeist (local shell, cloud brain) than to Novella (local
+  shell, local brain by default). Source: [mergen.ink](https://mergen.ink/)
+- **Epilogue** (Product Hunt, ~late June 2026) — local-first, offline,
+  plain-Markdown novel/script/poetry app, no subscription, but explicitly
+  ships **no AI at all**. The newest local-first entrant found yet, and it
+  still doesn't combine local-first + AI + the four-app bundle in one
+  place — if anything this reinforces the thesis rather than threatens it.
+  Source: [Epilogue on Product Hunt](https://www.producthunt.com/products/epilogue-book-writing-app)
+
+**A sharper, quotable illustration for the no-training item — same
+lawsuit already logged, not a new one.** Round 14 already logged the
+Hachette/Cengage/Elsevier/Scott Turow suit against Google over Gemini's
+book-training data (filed the week of July 13-15, 2026). This round found
+a specific detail from the complaint itself worth quoting directly in
+future copy instead of the abstract "trained on scraped books" framing: it
+alleges Gemini can generate "a 100-page murder mystery set in a quiet
+seaside town... that substitutes for an original copyrighted murder
+mystery on which Gemini trained" in 20 minutes for 39 cents. Concrete,
+fiction-specific, and cheap to verify against the complaint text if it's
+ever quoted publicly. Sources:
+[TechCrunch](https://techcrunch.com/2026/07/14/google-faces-another-ai-training-lawsuit-from-major-publishers/),
+[Al Jazeera](https://www.aljazeera.com/economy/2026/7/15/authors-publishers-sue-google-over-alleged-ai-copyright-infringement)
+
+## Landscape notes (no action)
+
+**An unverified "78% of authors now use AI, up 33% from 2024, 61% deeply
+concerned about training" stat is circulating under an "Authors Guild 2026"
+attribution and should not be cited.** It could not be traced to any
+primary Authors Guild report or press release this round — the Guild's own
+published figures (its actual November 2025 survey, already identified in
+round 16 as the likely real source behind this project's long-standing "96%
+want consent" citation) use different numbers and different wording. This
+looks like the same class of content-mill stat-recirculation round 15 and
+16 already flagged for other figures. Do not cite the 78%/33%/61% numbers
+in any Novella copy without tracing them to a primary source first.
+
+**The Bartz v. Anthropic settlement's payout structure was found with more
+precision than previously logged** (~$3,000 per work across roughly
+500,000 works) but this is the same settlement already logged in rounds 14
+and 15 under a slightly different framing (~$1.5B total, ~350 authors
+opting out of roughly a million works) — both figures describe the same
+settlement from different angles (per-work payout vs. total pool size,
+opted-in vs. total-eligible-work counts) rather than a contradiction. Not
+logged as a correction; the existing item's numbers stand, this is just a
+confirmation from a second angle.
+
+**Nothing new surfaced for NovelCrafter, Sudowrite, Dabble, Scrivener,
+Campfire, type.ai, Obsidian-for-writers, or Notion writing templates**
+beyond what rounds 1-16 already found, despite real search effort across
+each company's own changelog/status pages (where reachable), Trustpilot,
+Google Play, and Reddit.
+
+## Round 17 sources
+
+- [feedback.sudowrite.com/changelog/opus-48-new-plugin-editor-free-excellent-friday-and-more](https://feedback.sudowrite.com/changelog/opus-48-new-plugin-editor-free-excellent-friday-and-more)
+- [Sudowrite status page](https://status.sudowrite.com/)
+- [NovelCrafter blog](https://www.novelcrafter.com/blog)
+- [Mergen Ink](https://mergen.ink/)
+- [Epilogue — Product Hunt](https://www.producthunt.com/products/epilogue-book-writing-app)
+- [LocalProse](https://www.localprose.com/en/)
+- [Novel Mage — local models](https://novelmage.com/resources/local-models)
+- [Novel Mage](https://novelmage.com/)
+- [Google faces another AI training lawsuit from major publishers — TechCrunch](https://techcrunch.com/2026/07/14/google-faces-another-ai-training-lawsuit-from-major-publishers/)
+- [Authors, publishers sue Google over alleged AI copyright infringement — Al Jazeera](https://www.aljazeera.com/economy/2026/7/15/authors-publishers-sue-google-over-alleged-ai-copyright-infringement)
+- [Court grants final approval of Anthropic copyright settlement — Authors Guild](https://authorsguild.org/news/court-grants-final-approval-anthropic-copyright-settlement/)
+- [Anthropic's landmark $1.5B copyright settlement is approved — TechCrunch](https://techcrunch.com/2026/07/20/anthropics-landmark-1-5b-copyright-settlement-is-approved/)
+- [Commission starts enforcing AI Act rules and new transparency requirements — European Commission](https://digital-strategy.ec.europa.eu/en/news/commission-starts-enforcing-ai-act-rules-and-new-transparency-requirements-2-august)
