@@ -271,6 +271,12 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       Novella's) and Epilogue (local-first, offline, plain-Markdown,
       explicitly zero AI) — neither combines local AI with the four-app
       bundle, reinforcing rather than narrowing the gap this item tracks.
+      Research round 18 (2026-08-04) re-ran the same direct check a third
+      time (rounds 15, 17, 18) and again found no competitor, named or
+      new, pairing a task tracker with a focus/sprint timer alongside
+      writing and worldbuilding — the gap is now confirmed absent on
+      three separate dedicated checks, not just repeatedly assumed. No
+      new entrants or launches surfaced this round.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -401,7 +407,15 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       in 20 minutes for 39 cents — a concrete, fiction-specific illustration
       of the training-risk argument to use verbatim in copy instead of the
       abstract "trained on scraped books" framing. Same lawsuit, not a new
-      one — cite as an example, don't imply a second suit exists.
+      one — cite as an example, don't imply a second suit exists. Research
+      round 18 (2026-08-04) adds one more traceable, primary-sourced data
+      point missed by prior rounds: a University of Cambridge/Minderoo
+      Centre study (258 novelists + 74 industry insiders, published
+      November 2025) found 59% of surveyed novelists believe their work
+      has already trained an LLM without permission, and 51% believe AI
+      will "entirely replace" their work — a harder, more personal number
+      than the existing 96%-want-consent stat, worth having alongside it
+      rather than in place of it.
 - [ ] **Say the export advantage louder** — research round 7: Sudowrite
       reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
       Novella already ships all three plus one-click backup
@@ -489,6 +503,53 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-08-04 — Research round 18 (autopilot; no code). Dispatched the same
+  four parallel research passes as rounds 15-17 (NovelCrafter/Sudowrite;
+  Dabble/Scrivener/Campfire; type.ai/Obsidian/Notion plus new-entrant scan;
+  broader industry/legal sentiment), each briefed on rounds 1-17's findings
+  and told to search specifically for material dated after round 17
+  (2026-08-03) and report "nothing new" plainly rather than pad. Three of
+  four passes came back genuinely empty after 10+ searches each:
+  NovelCrafter, Sudowrite, Dabble, Scrivener and Campfire all show nothing
+  indexed past 2026-07-30 (direct changelog/status-page fetches are 403'd
+  for all of them this round, a new access wrinkle worth noting for future
+  rounds — findings rely on search-index snapshots, not live pages); no
+  fourth wave of "local AI, no subscription" entrants appeared; and a
+  dedicated third recheck (after rounds 15 and 17) of whether any
+  competitor pairs a task tracker with a focus/sprint timer alongside
+  writing/worldbuilding again found none — folded into the four-app-bundle
+  item as reinforcement, not a new bullet. The fourth pass surfaced one
+  genuinely new, traceable, primary-sourced item folded into the
+  no-training item: a University of Cambridge/Minderoo Centre study (258
+  novelists, published November 2025, previously unlogged) found 59% of
+  novelists believe their own work has already trained an LLM without
+  permission and 51% believe AI will "entirely replace" their work. Two
+  more items surfaced adjacent to the thesis but not actionable for it,
+  logged as landscape notes only: an arXiv study (Stony Brook/Columbia
+  Law/Michigan/MIT, ~July 27 2026) finding AI-flooded self-published books
+  are taking a growing, disproportionate share of Amazon genre-fiction
+  sales; and the "Daggermouth" controversy, where a Simon & Schuster
+  imprint bestseller was flagged 60% AI-likely by an AI-detection tool from
+  the same research team, contested by the author. Full notes and sources
+  in RESEARCH.md Round 18.
+
+  **Cadence flag, escalated a fourth time.** This is now the fourth
+  consecutive day (rounds 15, 16, 17, 18 — Aug 1 through Aug 4) this
+  dedicated research schedule has fired research-only, each one logging
+  the same request to the owner: widen this schedule's interval or point
+  it at BUILD/QA some of the time, matching AUTOPILOT.md's own build-loop
+  cap ("at most one run in three, never twice in a row"). That request has
+  gone unactioned through three prior log entries. The yield keeps
+  declining in a way the numbers now show plainly: round 16 found one
+  real item plus three foldable findings; round 17 found zero new items,
+  two foldable findings; round 18 (this round) found zero new items, one
+  foldable finding plus two non-actionable landscape notes, and three of
+  four passes returned fully empty. Repeating the same request a fifth
+  time next round would add no new information the owner doesn't already
+  have — logging it here once more, plainly, and stopping. If this
+  schedule fires again tomorrow with the same brief, expect the same
+  result.
 
 - 2026-08-03 — Research round 17 (autopilot; no code). Dispatched four
   parallel research passes again (NovelCrafter/Sudowrite;

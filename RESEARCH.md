@@ -1968,3 +1968,126 @@ Google Play, and Reddit.
 - [Court grants final approval of Anthropic copyright settlement — Authors Guild](https://authorsguild.org/news/court-grants-final-approval-anthropic-copyright-settlement/)
 - [Anthropic's landmark $1.5B copyright settlement is approved — TechCrunch](https://techcrunch.com/2026/07/20/anthropics-landmark-1-5b-copyright-settlement-is-approved/)
 - [Commission starts enforcing AI Act rules and new transparency requirements — European Commission](https://digital-strategy.ec.europa.eu/en/news/commission-starts-enforcing-ai-act-rules-and-new-transparency-requirements-2-august)
+
+# Round 18 (2026-08-04)
+
+One day after round 17, and the fourth consecutive day this dedicated
+research schedule has fired research-only (rounds 15, 16, 17, 18 — Aug 1
+through Aug 4). Round 17 already re-flagged this in ROADMAP.md's log line
+after rounds 15 and 16's quieter notes went unaddressed; that flag is
+repeated once more in this round's log line and then intentionally not
+repeated a fifth time — see ROADMAP.md's Round 18 entry for the full
+argument and the numbers behind it.
+
+Split into the same four parallel passes as rounds 15-17: NovelCrafter +
+Sudowrite; Dabble + Scrivener + Campfire; type.ai + Obsidian + Notion (plus
+a new-entrant scan); and a broader industry/legal-sentiment sweep. Each was
+briefed on rounds 1-17's findings and told to search specifically for
+material dated after 2026-07-30 and report "nothing new" plainly rather
+than pad with re-summaries.
+
+## Three of four passes: confirmed empty, with a new access wrinkle
+
+NovelCrafter, Sudowrite, Dabble, Scrivener, and Campfire all returned
+nothing genuinely new dated after 2026-07-30 across 30+ combined search
+queries. New this round: direct fetches of feedback.novelcrafter.com,
+feedback.sudowrite.com, status.sudowrite.com, Trustpilot, and the
+Literature & Latte forum all returned HTTP 403 — every finding this round
+relies on search-engine indexed snapshots of those pages rather than a
+live read, which can lag the real page by days to weeks. Worth flagging
+for whoever tunes future rounds: if this 403 pattern persists, findings
+from these sources should be treated as lower-confidence than in rounds
+where direct fetch worked.
+
+The type.ai/Obsidian/Notion/new-entrant pass was equally dry: no product
+update for type.ai, no new novelist-specific Obsidian plugin, no Notion
+template-marketplace activity, and — checked directly for a third time,
+after rounds 15 and 17 — no competitor of any kind, named or brand-new,
+pairs a task tracker with a focus/sprint timer alongside writing and
+worldbuilding. Two tools surfaced that are not on the tracked list but
+are not new either: Novel Forge AI (mediachance.com), a rebrand of
+"CQuill Writer" dating to early 2025, and novelistAI (novelistai.com),
+cloud-based (GPT-5.6/Grok-4.5) rather than local, with no confirmed launch
+date in the window. Neither qualifies as a fourth wave of local-AI
+entrants.
+
+## What did surface: one item worth folding in, two worth naming only
+
+**A Cambridge/Minderoo Centre novelist survey, previously unlogged, adds a
+sharper personal-impact stat to the no-training item.** Dr. Clementine
+Collett's study for Cambridge's Minderoo Centre for Technology and
+Democracy surveyed 258 published UK novelists plus 74 industry insiders
+(commissioning editors, literary agents), published November 2025 — dated
+well before this project's research window but not previously found or
+logged in rounds 1-17. Headline numbers: 59% of novelists say they know
+their own work has trained an LLM without permission or payment; 51%
+believe AI is likely to *entirely replace* their work as fiction writers;
+39% say their income has already been hit by generative AI, and 85%
+expect future income to fall because of it; two-thirds of respondents rank
+romance authors as "extremely threatened," followed by thriller (61%) and
+crime (60%) writers. This is a harder, more personal number than the
+existing "96% want consent" stat (which itself traces to the Authors
+Guild's ~Nov 2025 survey, per round 16) — folded into the no-training item
+in ROADMAP.md as an addition, not a replacement. Sources:
+[University of Cambridge](https://www.cam.ac.uk/stories/generative-ai-novelists),
+[EurekAlert!](https://www.eurekalert.org/news-releases/1105954),
+[TechXplore](https://techxplore.com/news/2025-11-novelists-ai.html)
+
+**Two more items are directly thesis-adjacent but not actionable for
+Novella's own roadmap — logged here for awareness, not folded into any
+build or copy item:**
+
+- **An arXiv study on AI-flooded self-published books** (Chakrabarty, Liu,
+  Ginsburg, Dhillon — Stony Brook / Columbia Law / Michigan / MIT,
+  submitted July 22 2026, revised July 26) analyzed 14,419 self-published
+  Amazon genre-fiction ebooks (2023-2026) matched against sales through
+  June 2026. Books with substantial detected AI text (>25%) are a growing
+  share of both catalog and sales, increasingly taking the scarce top-rank
+  positions once held by books with no detected AI text; across the study
+  period the number of books with observed sales grew 19.2x while revenue
+  grew only 8.9x — the market is diluting faster than it's growing. This
+  is about the self-publishing marketplace, not a writing tool, so it
+  doesn't point at a Novella feature gap — noted for context on how the
+  broader AI-fiction conversation is trending, in case it's useful
+  background for future copy about AI-assisted vs. AI-generated work.
+  Source: [arXiv:2607.20349](https://arxiv.org/abs/2607.20349)
+- **The "Daggermouth" AI-detection controversy.** A Stony Brook team (same
+  researchers as above) scanned 14,000+ Kindle ebooks with the Pangram
+  AI-detection tool and flagged *Daggermouth*, a BookTok-viral Simon &
+  Schuster (Scarlett Press/Tor Bramble) bestseller by H.M. Wolfe, at 60%
+  AI-likelihood — the highest score of any popular title in the dataset,
+  and higher than an outside University of Maryland reviewer called
+  "almost statistically impossible" for fully human writing, though that
+  same reviewer noted AI-assisted-with-heavy-editing is a real gray zone
+  for detection tools. The study isn't peer-reviewed; Wolfe's lawyer and
+  Simon & Schuster both deny AI use and stand behind the book; Tor Bramble
+  publicly backed the author. No Novella angle (Novella isn't a detection
+  or publishing-compliance tool) — logged for awareness only. Sources:
+  [Book Riot](https://bookriot.com/study-claims-viral-bestseller-daggermouth-is-ai-generated/),
+  [Tech Times](https://www.techtimes.com/articles/321780/20260728/daggermouth-hardcover-drops-today-booktok-hit-flagged-ai-researchers.htm),
+  [The Bookseller](https://www.thebookseller.com/news/tor-bramble-backs-h-m-wolfe-after-ai-detection-claims-over-daggermouth)
+
+## Landscape notes (no action)
+
+**Nothing new found for AI-copyright litigation, EU AI Act enforcement
+actions, or NaNoWriMo-successor tools beyond what rounds 1-17 already
+logged**, despite 14+ dedicated searches. A six-author suit against
+Anthropic/OpenAI/Google/Meta/xAI/Perplexity (Carreyrou et al., opted out
+of the Bartz settlement, seeking $150k/work) was found but dates to
+December 23, 2025 — predates this project's entire research window and
+isn't newly relevant, noted only in case a future round needs the
+reference. A recurring "39% worried about training data, 52% would refuse
+certain AI tools" stat cluster appears in secondary blog roundups
+(CipherWrite and similar) with no traceable primary source — likely a
+mangled restatement of the Authors Guild 96% figure — not cited anywhere
+in this project's copy.
+
+## Round 18 sources
+
+- [Half of UK novelists believe AI is likely to replace their work entirely — University of Cambridge](https://www.cam.ac.uk/stories/generative-ai-novelists)
+- [Half of novelists believe AI is likely to replace their work entirely, research finds — EurekAlert!](https://www.eurekalert.org/news-releases/1105954)
+- [Half of novelists believe AI is likely to replace their work entirely, research finds — TechXplore](https://techxplore.com/news/2025-11-novelists-ai.html)
+- [Generative AI floods and dilutes the market for books — arXiv:2607.20349](https://arxiv.org/abs/2607.20349)
+- [Study Claims Viral Bestseller DAGGERMOUTH is AI-Generated — Book Riot](https://bookriot.com/study-claims-viral-bestseller-daggermouth-is-ai-generated/)
+- [Daggermouth Hardcover Drops Today: BookTok Hit Flagged as AI by Researchers — Tech Times](https://www.techtimes.com/articles/321780/20260728/daggermouth-hardcover-drops-today-booktok-hit-flagged-ai-researchers.htm)
+- [Tor Bramble backs HM Wolfe after AI-detection claims over Daggermouth — The Bookseller](https://www.thebookseller.com/news/tor-bramble-backs-h-m-wolfe-after-ai-detection-claims-over-daggermouth)
