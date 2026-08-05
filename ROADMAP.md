@@ -277,6 +277,17 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       writing and worldbuilding — the gap is now confirmed absent on
       three separate dedicated checks, not just repeatedly assumed. No
       new entrants or launches surfaced this round.
+      Research round 19 (2026-08-05) re-ran the same check a fourth time
+      (rounds 15, 17, 18, 19) and again found no competitor pairing a task
+      tracker with a focus/sprint timer alongside writing and
+      worldbuilding. One new entrant is the closest architectural analog
+      found yet: PlotForge Desktop (plotforge.app, $69 one-time rising to
+      $79, local AI via Ollama/LM Studio, SQLite local storage), which
+      bundles 11 tools including 60+-field worldbuilding and a Consistency
+      Checker plus a "Sessions" tool of unconfirmed purpose — reads as
+      session/word-count logging, not a focus timer, and no dedicated task
+      tracker was found. Worth a name-check if it adds a timer later; not
+      a gap-closer today.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -347,6 +358,16 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       already-logged large-book-deletion report — suggesting Dabble's
       support-response gap is structural, not a single incident. Three
       cloud tools, three separate reliability windows, none closed yet.
+      Research round 19 (2026-08-05) adds a fresh, distinct Sudowrite
+      incident on top of the April outage: app-wide errors and login
+      failures Aug 1–3, 2026 (status.sudowrite.com/incident/877582), plus
+      a Google Play review thread (posted Aug 1, Sudowrite reply Aug 3)
+      reporting laggy/unstable chat, response freezing, and file-deletion
+      bugs after a prior update, with Sudowrite promising a fix that week.
+      Two separate Sudowrite outages in under four months, not one
+      isolated incident — the "actively triaging" caveat carried since
+      round 14 is wearing thinner with each fresh report, not holding
+      steady.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent
@@ -503,6 +524,43 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-08-05 — Research round 19 (autopilot; no code). Dispatched the same
+  four parallel research passes as rounds 15-18 (NovelCrafter/Sudowrite;
+  Dabble/Scrivener/Campfire; type.ai/Obsidian/Notion plus new-entrant scan;
+  broader industry/legal sentiment), each briefed on rounds 1-18's findings
+  and told to search specifically for material dated after round 18
+  (2026-08-04). Two of four passes came back genuinely empty after 9-15
+  searches each: Dabble/Scrivener/Campfire (all three primary sites and
+  Trustpilot still 403 direct fetches; "Campfire" and "Dabble" searches
+  keep colliding with unrelated companies of the same name) and
+  NovelCrafter specifically (no changelog or review activity since
+  July 30). The other two passes found real material, folded into existing
+  items rather than added as new bullets: Sudowrite had a second, distinct
+  outage — app-wide errors and login failures Aug 1-3, 2026, plus a Google
+  Play thread reporting chat instability and file-deletion bugs with
+  Sudowrite promising a fix — feeding the no-outage item as evidence the
+  "actively triaging" caveat is wearing thin rather than holding; and a
+  fourth dedicated recheck (rounds 15, 17, 18, 19) again found no
+  competitor pairing a task tracker with a focus/sprint timer alongside
+  writing and worldbuilding, though PlotForge Desktop (local Ollama/LM
+  Studio AI, worldbuilding, consistency checker) is now the closest
+  architectural analog found — still no task tracker or confirmed timer,
+  folded into the four-app-bundle item as reinforcement. Two findings
+  outside the five tracked categories were logged as landscape notes only,
+  not folded into any build/copy item, because neither points at a
+  specific Novella action: OpenAI's July 31 2026 EU AI Act compliance
+  statement reportedly omits the training-data-transparency chapter right
+  as enforcement activated Aug 2, the first concrete example of a named
+  major provider with a visible Article 53 gap; and a $2.4M two-book deal
+  (Jerry Falade, via Macmillan/Minotaur) was pulled in late July/early
+  August after readers flagged AI-typical prose, reported as a
+  copyright-chain-of-title concern. The latter was deliberately not turned
+  into a "proof of human authorship" copy item — Novella's own AI writes
+  prose directly into the document, so a provenance-history claim would
+  overstate what the app can actually attest to; flagging the nuance here
+  so a future round doesn't reach for it without the same caveat. Full
+  notes and sources in RESEARCH.md Round 19.
 
 - 2026-08-04 — Research round 18 (autopilot; no code). Dispatched the same
   four parallel research passes as rounds 15-17 (NovelCrafter/Sudowrite;

@@ -2091,3 +2091,128 @@ in this project's copy.
 - [Study Claims Viral Bestseller DAGGERMOUTH is AI-Generated — Book Riot](https://bookriot.com/study-claims-viral-bestseller-daggermouth-is-ai-generated/)
 - [Daggermouth Hardcover Drops Today: BookTok Hit Flagged as AI by Researchers — Tech Times](https://www.techtimes.com/articles/321780/20260728/daggermouth-hardcover-drops-today-booktok-hit-flagged-ai-researchers.htm)
 - [Tor Bramble backs HM Wolfe after AI-detection claims over Daggermouth — The Bookseller](https://www.thebookseller.com/news/tor-bramble-backs-h-m-wolfe-after-ai-detection-claims-over-daggermouth)
+
+# Round 19 (2026-08-05)
+
+Fifth consecutive day this dedicated research schedule has fired
+research-only (rounds 15-19, Aug 1 through Aug 5). Round 18 already logged
+the cadence flag a fourth time and explicitly said it would stop repeating
+it — that decision stands; this round doesn't re-raise it, per round 18's
+own note that doing so a fifth time would add no new information.
+
+Split into the same four parallel passes as rounds 15-18: NovelCrafter +
+Sudowrite; Dabble + Scrivener + Campfire; type.ai + Obsidian + Notion (plus
+a new-entrant scan); and a broader industry/legal-sentiment sweep. Each was
+briefed on rounds 1-18's findings and told to search specifically for
+material dated after 2026-08-04.
+
+## Two of four passes: confirmed empty
+
+Dabble, Scrivener and Campfire came back dry after 9 searches and 4
+direct-fetch attempts (dabblewriter.com/blog, literatureandlatte.com
+release notes, campfirewriting.com/blog, and Trustpilot all 403'd). Search
+itself was noisier than usual this round: "Campfire" collides with an
+unrelated AI-native ERP fintech startup that just raised a Series B, and
+"Dabble" collides with an unrelated UK/AU sports-betting company — both
+polluted result pages without surfacing anything from the actual writing
+tools. Confirmed-stale, no change: Scrivener still 3.5.2 (Mac) / 3.1.6
+(Windows); Campfire mobile still v1.3.2 (~July 8 2026), cursor-jump bug
+still unfixed as far as public reports show.
+
+NovelCrafter came back dry too: no changelog, pricing, or review activity
+found dated after July 30, 2026 (its own blog's latest post is still
+June 11). The feedback/changelog subdomain is still 403ing to direct
+fetch, consistent with rounds 17-18.
+
+## What did surface: one real item, one architectural near-miss, two landscape-only
+
+**A second, distinct Sudowrite outage.** Status page incident 877582
+records app-wide errors and login failures Aug 1-3, 2026 — separate from
+the already-logged April 22-23 outage, not a re-report of it. A Google
+Play review thread (posted Aug 1, Sudowrite's official reply Aug 3)
+independently reports laggy/unstable chat, AI response freezing, and
+file-deletion bugs following a prior app update; Sudowrite's reply
+promised a "fresh update" that week and asked the reviewer to confirm
+afterward. Folded into the no-outage item in ROADMAP.md: two separate
+outage incidents in under four months is a pattern, not a one-off, and
+meaningfully wears down the "actively triaging reliability" caveat this
+project has carried since round 14 as a reason not to over-claim.
+(Lower-confidence aside, not folded in: aggregator/SEO sites describe a
+"Story Engine 3.0" and "Canvas 2.0" as 2026 Sudowrite flagship features,
+but these version numbers appear only in third-party content-farm
+material, never in Sudowrite's own materials, which stayed 403'd to
+direct fetch this round — treat as unconfirmed, possibly inflated, not
+cited in ROADMAP.md.)
+
+**PlotForge Desktop — the closest architectural analog to Novella found
+yet, still doesn't close the fourth-app gap.** plotforge.app: $69 one-time
+(rising to $79), local AI via Ollama/LM Studio, SQLite local storage, 11
+bundled tools including 60+-field worldbuilding, an Idea Board, Outline,
+Characters, Timeline, and a Consistency Checker. Closer to Novella's own
+local-AI-plus-worldbuilding shape than any prior entrant (LocalProse,
+Novel Mage, Noveling, Storyloft, Scribeist, Novelist, Mergen Ink,
+Epilogue). It has a "Sessions" tool of unconfirmed purpose — reads from
+available description as session/word-count logging rather than a focus
+or sprint timer — and no dedicated task tracker was found anywhere in its
+feature list. The direct check for a task-tracker-plus-sprint-timer
+competitor (run a fourth time now, after rounds 15, 17, 18) again came
+back negative. Folded into the four-app-bundle item as reinforcement, with
+PlotForge named as the one to watch if it adds a timer later.
+
+Two more items surfaced outside the five tracked categories, logged here
+for awareness only — neither was folded into a ROADMAP.md build or copy
+item, because neither points at a specific Novella action:
+
+- **OpenAI's EU AI Act compliance gap.** A July 31, 2026 report says
+  OpenAI's own Article 53 compliance statement omits the copyright/
+  training-data-transparency chapter of the GPAI Code of Practice — no
+  public training-data summary, no documented text-and-data-mining
+  opt-out policy — filed right before the EU AI Office's enforcement
+  powers activated August 2. This is the first concrete example this
+  project has found of a named major provider with a visible Article 53
+  gap, rather than the purely hypothetical enforcement discussed in
+  rounds 15-16. Relevant background if Novella's own Article 53-exemption
+  reasoning (round 16) ever needs restating to a reporter, but doesn't
+  change what Novella should say today. Source:
+  [Tech Times](https://www.techtimes.com/articles/322519/20260731/openais-eu-ai-act-statement-skips-training-data-copyright-gap-activates-sunday.htm)
+- **A $2.4M two-book deal pulled over AI-prose suspicion.** Minotaur/
+  Macmillan withdrew from a 14-way-auction deal for debut author Jerry
+  Falade's thriller "Call Me, I'll Hide the Body" in late July/early
+  August 2026, after readers flagged AI-typical prose (negative
+  parallelism, off-kilter metaphors); reporting frames the real driver as
+  a copyright chain-of-title concern — publishers can't cleanly register
+  copyright if AI-generated passages are mixed into a manuscript. A fresh,
+  concrete case distinct from the already-logged "Daggermouth" story, and
+  the first to hit a front-list trade deal rather than a self-published or
+  already-published title. Deliberately NOT turned into a "Novella's edit
+  history proves human authorship" marketing angle: Novella's AI writes
+  prose directly into the document at the writer's request, so a
+  provenance-history claim would overstate what the app can actually
+  attest to about any given passage's origin — an honest positioning
+  problem, not a gap to paper over. Noted here so a future round doesn't
+  reach for this hook without the same caveat. Sources:
+  [Publishers Lunch](https://lunch.publishersmarketplace.com/2026/07/seven-figure-book-deal-cancelled-over-ai-suspicions-raises-questions-about-ai-guardrails/),
+  [Boing Boing](https://boingboing.net/2026/07/31/unpublished-novels-2-4m-deal-pulled-over-ai-concerns.html),
+  [Futurism via Yahoo](https://www.yahoo.com/entertainment/articles/major-publisher-cans-2-4-205939362.html)
+
+## Landscape notes (no action)
+
+Nothing new found for type.ai, Obsidian-for-writers plugins (Longform
+still v2.1.0 from March 2025; Novel Word Count's latest release, v4.6.4,
+predates this round's window at July 5), or Notion novel/writing
+templates. NaNoWriMo-successor landscape unchanged — same fragmented list
+(Pacemaker, Trackbear, Reedsy Novel Sprint, etc.) plus one minor,
+insignificant new entrant ("Authorlytica," not chased further). EU AI Act
+enforcement mechanics reconfirmed (Aug 2 2026 start, up to €15M/3% global
+turnover in fines) but no fine has actually been issued against anyone
+yet. A claim of "hundreds of authors returning book advances" surfaced in
+one AI-generated summary blurb with no traceable primary source —
+excluded, not cited.
+
+## Round 19 sources
+
+- [Sudowrite status incident 877582 — app-wide errors, Aug 1-3 2026](https://status.sudowrite.com/incident/877582)
+- [OpenAI's EU AI Act statement skips training-data copyright gap as enforcement activates — Tech Times](https://www.techtimes.com/articles/322519/20260731/openais-eu-ai-act-statement-skips-training-data-copyright-gap-activates-sunday.htm)
+- [Seven-figure book deal cancelled over AI suspicions raises questions about AI guardrails — Publishers Lunch](https://lunch.publishersmarketplace.com/2026/07/seven-figure-book-deal-cancelled-over-ai-suspicions-raises-questions-about-ai-guardrails/)
+- [Unpublished novel's $2.4M deal pulled over AI concerns — Boing Boing](https://boingboing.net/2026/07/31/unpublished-novels-2-4m-deal-pulled-over-ai-concerns.html)
+- [Major publisher cans $2.4 million book deal — Futurism via Yahoo Entertainment](https://www.yahoo.com/entertainment/articles/major-publisher-cans-2-4-205939362.html)
