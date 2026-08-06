@@ -288,6 +288,21 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       session/word-count logging, not a focus timer, and no dedicated task
       tracker was found. Worth a name-check if it adds a timer later; not
       a gap-closer today.
+      Research round 20 (2026-08-06) re-ran the same check a fifth time
+      (rounds 15, 17, 18, 19, 20) and again found no competitor pairing a
+      task tracker with a focus/sprint timer alongside writing and
+      worldbuilding. Two Obsidian plugin version bumps surfaced (Novel
+      Word Count v5.0.0, StoryLine v1.10.55) but neither adds
+      task-tracking or a focus timer — the multi-plugin
+      assembly point stands unchanged. PlotForge Desktop's "Sessions" tool
+      is still unconfirmed as a focus timer; a secondary-source
+      description ("session timer, words-per-session tracking, project
+      statistics dashboard, Next Actions Engine") still reads as logging,
+      not a Pomodoro-style timer, but the site's continued 403 to direct
+      fetch means this can't be confirmed either way from a primary
+      source. This was also the first round in the cadence where all four
+      research passes independently found nothing dated within their
+      window — see RESEARCH.md Round 20.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -524,6 +539,40 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-08-06 — Research round 20 (autopilot; no code). Dispatched the same
+  four parallel research passes as rounds 15-19 (NovelCrafter/Sudowrite;
+  Dabble/Scrivener/Campfire; type.ai/Obsidian/Notion plus new-entrant scan;
+  broader industry/legal sentiment), each briefed on rounds 1-19's findings
+  and told to search specifically for material dated after round 19
+  (2026-08-05) — the narrowest window yet, about one day. All four passes
+  came back genuinely empty after 12-14 searches each, the first time every
+  single pass has come back dry in this cadence: NovelCrafter/Sudowrite
+  (no changelog, pricing, review, or outage activity past 2026-08-05);
+  Dabble/Scrivener/Campfire (same, plus the same 403-on-direct-fetch and
+  name-collision problems noted since round 17); type.ai/Obsidian/Notion/
+  new-entrants (no new templates, plugin news within window, or
+  local-AI-for-novelists launches); and industry/legal (no new lawsuit
+  filing, ruling, EU AI Act enforcement action, survey, or AI-book
+  controversy past 2026-08-05 — the Act's fine tiers are live but no fine
+  or named complaint has actually been issued yet). One amendment was
+  folded into the four-app-bundle item: a fifth dedicated recheck (rounds
+  15, 17, 18, 19, 20) again found no competitor pairing a task tracker
+  with a focus/sprint timer alongside writing and worldbuilding, plus two
+  Obsidian plugin version bumps (Novel Word Count v5.0.0, StoryLine
+  v1.10.55) that don't close the gap. No new checklist items — nothing
+  this round cleared the bar of being both new and within the window. One
+  previously-unlogged but pre-window item was recorded as a landscape note
+  only, not folded into any item: Hachette/Orbit pulled a novel ("Shy
+  Girl") in March 2026 over reader-flagged AI-typical prose, the same
+  copyright-chain-of-title dynamic as round 19's Macmillan/Minotaur pull —
+  deliberately not turned into a provenance/authorship marketing angle,
+  same reasoning as round 19. Per round 19's explicit note that repeating
+  the cadence flag a fifth time would add no new information, this round
+  does not re-raise it; the emptiness of this round (six straight
+  research-only firings, rounds 15-20, against a narrowing daily window)
+  is recorded as an observation in RESEARCH.md, not as a repeated request.
+  Full notes in RESEARCH.md Round 20.
 
 - 2026-08-05 — Research round 19 (autopilot; no code). Dispatched the same
   four parallel research passes as rounds 15-18 (NovelCrafter/Sudowrite;

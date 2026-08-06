@@ -2216,3 +2216,84 @@ excluded, not cited.
 - [Seven-figure book deal cancelled over AI suspicions raises questions about AI guardrails — Publishers Lunch](https://lunch.publishersmarketplace.com/2026/07/seven-figure-book-deal-cancelled-over-ai-suspicions-raises-questions-about-ai-guardrails/)
 - [Unpublished novel's $2.4M deal pulled over AI concerns — Boing Boing](https://boingboing.net/2026/07/31/unpublished-novels-2-4m-deal-pulled-over-ai-concerns.html)
 - [Major publisher cans $2.4 million book deal — Futurism via Yahoo Entertainment](https://www.yahoo.com/entertainment/articles/major-publisher-cans-2-4-205939362.html)
+
+# Round 20 (2026-08-06)
+
+Sixth consecutive day this dedicated research schedule has fired
+research-only (rounds 15-20, Aug 1 through Aug 6). Per round 19's explicit
+note ("repeating the same request a fifth time next round would add no new
+information the owner doesn't already have — logging it here once more,
+plainly, and stopping"), this round does not re-raise the cadence flag.
+
+Split into the same four parallel passes as rounds 15-19: NovelCrafter +
+Sudowrite; Dabble + Scrivener + Campfire; type.ai + Obsidian + Notion (plus
+a new-entrant scan); and a broader industry/legal-sentiment sweep. Each was
+briefed on rounds 1-19's findings and told to search specifically for
+material dated after 2026-08-05, the narrowest window yet (roughly one day).
+
+## All four passes: confirmed empty
+
+This is the first round in the cadence where all four passes independently
+came back with nothing dated after the prior round's cutoff, after real
+search effort in each (12, 12, 12, and 14 searches respectively, plus
+several direct-fetch attempts that continued to 403 across
+status.sudowrite.com, feedback.novelcrafter.com, dabblewriter.com,
+literatureandlatte.com forums, campfirewriting.com, and plotforge.app —
+consistent with the access pattern noted since round 17).
+
+**NovelCrafter/Sudowrite**: no changelog, pricing, review, or outage
+activity found past 2026-08-05. NovelCrafter's blog is still dated June 11;
+its changelog's latest confirmed entry remains March 21. Sudowrite's known
+Aug 1-3 outage thread and Kimi K3 addition were re-surfaced, not new.
+
+**Dabble/Scrivener/Campfire**: no changelog, pricing, or outage activity
+found past 2026-08-05. Dabble and Campfire app versions unchanged from
+round 19 (Campfire 1.3.2, updated July 29). A Campfire "State of the
+Campfire: 2026" roadmap page was found but 403'd before its publish date
+could be confirmed, so it was not logged as new.
+
+**type.ai/Obsidian/Notion/new-entrants**: no news dated past 2026-08-05.
+Two Obsidian plugin version bumps surfaced but both predate the window —
+Novel Word Count v5.0.0 (Aug 3, added a save-counts-to-disk toggle) and
+StoryLine v1.10.55 (Aug 2) — neither adds task-tracking or a focus timer.
+The task-tracker-plus-sprint-timer check was run a fifth time (after
+rounds 15, 17, 18, 19) and again found nothing. PlotForge Desktop's
+"Sessions" tool remains unconfirmed as a focus timer: a secondary-source
+description ("session timer, words-per-session tracking, project
+statistics dashboard, Next Actions Engine") still reads as logging rather
+than a Pomodoro-style timer, but the site's continued 403 means this
+can't be confirmed from a primary source either way.
+
+**Industry/legal**: no new lawsuit filing, ruling, EU AI Act enforcement
+action, survey, or AI-book controversy dated past 2026-08-05. The EU AI
+Act's Article 53 fine tiers are live but multiple sources confirm no
+public fine or named complaint has actually been issued yet. One
+previously-unlogged but pre-window item surfaced: Hachette/Orbit pulled a
+novel called "Shy Girl" in March 2026 over reader-flagged AI-typical prose
+— the same copyright-chain-of-title dynamic as round 19's Macmillan/
+Minotaur pull, just an earlier, previously-untracked instance of it. Not
+folded into any ROADMAP.md item for the same reason round 19 gave for the
+Macmillan case: Novella's own AI writes prose directly into the document
+at the writer's request, so a "provenance proves human authorship" angle
+would overstate what the app can attest to about any given passage.
+Landscape note only.
+
+## What changed in ROADMAP.md
+
+One amendment, to the four-app-bundle item: the fifth "still no
+task-tracker-plus-timer competitor" confirmation and the two Obsidian
+plugin version bumps (neither closing the gap). No new checklist items —
+nothing this round cleared the bar of being both new and dated within the
+window. This is the emptiest round of the cadence to date; six straight
+research-only firings (rounds 15-20) against the same narrowing daily
+window is very likely why, not a change in search quality — noted as
+observation, not as the cadence flag round 19 said not to repeat.
+
+## Round 20 sources
+
+No new primary sources this round — every item found either predates the
+2026-08-05 research window (Novel Word Count v5.0.0, Aug 3; StoryLine
+v1.10.55, Aug 2; the Hachette/Orbit "Shy Girl" pull, March 2026) or
+re-confirms a source already cited in an earlier round's list (Sudowrite
+incident 877582, round 19; the Macmillan/Minotaur coverage stream, round
+19). See those rounds' source lists rather than duplicating links here.
