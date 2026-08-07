@@ -2297,3 +2297,197 @@ v1.10.55, Aug 2; the Hachette/Orbit "Shy Girl" pull, March 2026) or
 re-confirms a source already cited in an earlier round's list (Sudowrite
 incident 877582, round 19; the Macmillan/Minotaur coverage stream, round
 19). See those rounds' source lists rather than duplicating links here.
+
+# Round 21 (2026-08-07)
+
+Seventh consecutive day this dedicated research schedule has fired
+research-only (rounds 15-21, Aug 1 through Aug 7), and the second straight
+round where every pass came back essentially dry for new competitor
+material. Same four parallel passes as rounds 15-20: NovelCrafter +
+Sudowrite; Dabble + Scrivener + Campfire; type.ai + Obsidian + Notion (plus
+a new-entrant and task-tracker-plus-timer recheck); and the broader
+industry/legal sweep. Each was briefed on rounds 1-20's findings and told
+to search specifically for material dated after 2026-08-05/06, and, if that
+window was dry, to widen slightly rather than pad with restated facts.
+Roughly 12-13 searches per pass.
+
+## NovelCrafter / Sudowrite
+
+No NovelCrafter changelog, pricing, or review activity found past
+2026-08-05 — its blog is still dated June 11, its changelog's latest
+confirmed entry is still March 21, and its status page shows no incidents
+in the last 14 days.
+
+One genuinely new Sudowrite item, dated just inside the window: a
+changelog entry titled **"Cheaper GPT-5.6 Models, Plus a Batch of Chat
+Fixes"** (Aug 3, 2026, https://feedback.sudowrite.com/changelog/cheaper-gpt-56-models-plus-a-batch-of-chat-fixes).
+It cuts GPT-5.6 Luna's credit cost by 70%, Terra's by 10%, and GPT-5.5's by
+~12% — Sudowrite passing through OpenAI's own July 30, 2026 price cuts on
+those tiers rather than an unprompted generosity move. Also ships three
+chat fixes: the "working" indicator now shows in Chat Only mode (previously
+only visible in Allow Edits mode); asking about one specific item in Chat
+no longer triggers a full Feedback sweep across every review type (this had
+been silently burning extra credits); and Resend now properly retries a
+stalled response instead of erroring. This implies an earlier, separate
+changelog entry added GPT-5.6 (Sol/Terra/Luna) support in the first place —
+likely mid-to-late July 2026, exact date unconfirmed and not previously
+logged — worth a targeted check next time the research well isn't already
+this dry. Folded into the no-credit-limits item: Sudowrite's own bug fix
+(a single Chat question silently burning credits across every review type)
+is a concrete instance of the exact throttling anxiety that item already
+tracks, from Sudowrite's own mouth rather than a user complaint.
+
+Everything else this pass surfaced — billing/subscription-pause
+complaints, "not fit for purpose" Trustpilot reviews, NovelCrafter's fixed
+4-tier pricing, the January AI Thinking toggle, March Codex updates —
+matches facts already logged in rounds 1-20 and is not new.
+
+Access note (unchanged from round 18 on): feedback.novelcrafter.com and
+status.sudowrite.com are still blocked to direct fetch by the network
+egress proxy; changelog/status contents came from search-result snippets
+only, so a live fetch might surface entries search indexing hasn't picked
+up yet.
+
+## Dabble / Scrivener / Campfire
+
+No changelog, pricing, AI-feature, or outage activity found past
+2026-08-05/06 for any of the three — the second straight dry round for
+this pass specifically.
+
+One item surfaced with content but no confirmable date: the **"State of
+the Campfire: 2026"** roadmap page (campfirewriting.com/learn/state-of-the-campfire-2026,
+still 403 to direct fetch, content came from a search snippet) lists 2026
+priorities as faster performance, fewer bugs, "major Encyclopedia & panel
+upgrades," better mobile writing, cleaner navigation, and new
+gamification features — streaks, achievements, and challenges. No AI
+features mentioned anywhere on the page. It also recaps 2025: the Campfire
+community wrote 210M+ words and published 1,000+ books that year. Because
+no publish date is visible in the snippet, this can't be confirmed as new
+material from this window, but the content itself hadn't been captured by
+any prior round, so it's logged here and folded into the four-app-bundle
+item as a landscape note: Campfire is investing in streaks/achievements
+(overlapping Novella's own daily-goal/streak system) and explicitly not
+in AI or task/time tools, which is more reinforcement, not a narrowing,
+of the fourth-app gap.
+
+Confirmed but minor: Scrivener's Mac build (still v3.5.2, no 3.5.3) picked
+up macOS 26 "Tahoe" compatibility fixes — a Liquid Glass app icon, a
+trackpad-scroll-lag fix, and a workaround for an Apple list-formatting
+bug — but no date past early October 2025 could be confirmed for this
+release, so it's not being treated as new-this-window. Windows remains
+frozen at 3.1.6. Literature & Latte's long-teased next-gen app remains in
+undisclosed beta; one forum thread ("Scrivenix Beta Update — Scrivener on
+Linux") is an unofficial third-party project, not L&L's own next-gen app —
+flagged so a future round doesn't mistake the two.
+
+Search-collision note, worth carrying forward: "Campfire" increasingly
+collides with Campfire (campfire.ai), an unrelated AI-native finance/
+accounting platform that raised a $65M Series B and ships "Ember Agents"
+for AP/AR automation; "Dabble" collides with Dabble Sports Pty Ltd, an
+Australian sports-betting app (dabble.com.au). Both collisions are getting
+worse as general search indices grow, not better — future rounds should
+qualify queries with "writing" or "novelist" explicitly.
+
+The sub-agent running this pass recommended, unprompted, either dropping
+cadence to every 2-3 days for this specific trio or widening scope (e.g.,
+checking Squibler as an adjacent competitor) given two consecutive dry
+rounds. Recorded here as input for the owner, not acted on unilaterally.
+
+## type.ai / Obsidian / Notion / new-entrant scan
+
+**Task-tracker + focus-timer check, run a sixth time (after rounds 15, 17,
+18, 19, 20): still no.** Nothing found pairs a task/to-do tracker with a
+sprint/focus timer alongside writing and worldbuilding tools in one app.
+Closest analogues remain generic productivity apps with zero writing
+features (TickTick, Focus To-Do) and ScribeCount's AuthorFLOW, a Pomodoro
+timer that logs word counts but has no task list or worldbuilding.
+Novelist-specific sprint/streak tools (Final Draft, Novlr, WriteMate, My
+Write Club) offer timers alone, no task manager.
+
+**PlotForge Desktop's "Sessions" tool, partially clarified.** Direct fetch
+to plotforge.app is now blocked at the network-egress level in this
+environment (not just a 403), but a Capterra listing surfaced PlotForge's
+full 11-tool list for the first time: Idea Board, Outline, Characters,
+Worldbuilding, Draft Editor, AI Chat, Story Compass, Consistency Checker,
+Timeline, Sessions, and Export. "Sessions" is listed distinctly from
+"Timeline" (which is the plot/story timeline), which leans the reading
+toward Sessions being a writing-session/word-count time log rather than a
+Pomodoro-style focus timer — but no source (Capterra, PeerPush,
+AlternativeTo) explicitly describes it as either a task list or a focus
+timer, so this stays an inference, not a confirmation.
+
+No new local-AI-for-novelists competitor found. One curiosity, checked and
+ruled out: **novelist.saber-ai.org**, a Tauri-powered, open-source,
+CJK-native, 12MB Markdown writing app on GitHub — a different product from
+the already-tracked "Novelist" ($49 one-time Windows app), and no AI
+features surfaced in any description found. Not worth tracking unless
+evidence of AI features emerges.
+
+type.ai: no update or news since Aug 5, same feature set (structured
+outlining, 130k-word docs, multi-model access). Notion templates: no
+genuinely new templates since Aug 5, same catalog as prior rounds (Novel &
+Fanfic Writer Hub, Book Builder AI, World Building Bible); one listing
+notes a Pomodoro timer bundled into a template, but that's a Notion widget
+inside a template, not a competing product with the feature natively.
+
+## Broader industry / legal sentiment
+
+No new lawsuit filing, ruling, EU AI Act enforcement action or fine, fresh
+survey, or AI-book-deal controversy dated after 2026-08-05 turned up after
+10 searches across lawsuit trackers, EU Act enforcement news, book-deal
+scandal follow-ups, Authors Guild, novelist surveys, AI-detector
+controversies, and NaNoWriMo-successor events. Everything surfaced
+predates the window and is already logged or is old enough not to need
+logging:
+
+- Carreyrou et al. v. Anthropic/OpenAI/Google/Meta/xAI/Perplexity (opt-outs
+  from the Bartz settlement seeking $150K/title) — filed December 2025.
+- AAP/Elsevier/Cengage/Hachette/Macmillan/McGraw Hill/Turow class action
+  against Meta & Zuckerberg over Llama training — filed May 5, 2026.
+- The Granta/Commonwealth Foundation Short Story Prize AI-authorship
+  controversy ("The Serpent in the Grove," flagged 100% AI by Pangram,
+  Granta severed ties by July 1) — surfaced mid-May through June 2026.
+- EU AI Act Article 53 enforcement is confirmed live (up to €15M/3% global
+  turnover) but still zero fines or named complaints actually issued as of
+  the most recent reporting found.
+- The Minotaur "Call Me, I'll Hide the Body" AI-suspicion deal collapse —
+  already logged; reconfirmed with more detail this round (agents Marc
+  Gerald/Ashley Coleman at Europa Content; Pangram scored the manuscript
+  99% AI; the author denies AI use).
+- Authors Guild's Human Authored certification and AI best-practices
+  update — dated March-May 2026, old.
+
+Structural note, not news: NaNoWriMo itself shut down permanently in
+March/April 2025 (funding collapse, previously logged). Its de facto
+successor remains Reedsy's Novel Sprint (November, $5,000 prize + agent
+intros) and a "30k in 30 Days" StoryForge challenge — no autumn-2026
+registration announcement has posted yet.
+
+## What changed in ROADMAP.md
+
+No new checklist items — nothing this round cleared the bar of being both
+new and dated within the window. Three small findings were folded into
+existing items rather than added as bullets: Sudowrite's Aug 3 credit-cost
+cut and Chat credit-burn bug fix (no-credit-limits item); the sixth
+negative task-tracker-plus-timer recheck plus the first full PlotForge
+Sessions feature-list clarification and the Campfire 2026 roadmap page
+(four-app-bundle item, both folded together). Two dead ends were logged
+above so future rounds don't re-chase them (Scrivener's undated Tahoe
+compatibility fixes; the worsening Campfire/Dabble name collisions).
+
+Per round 19's explicit note that repeating the cadence-frequency flag a
+fifth time would add no new information, this round does not raise it as
+a new escalation. It is nonetheless worth recording plainly, once, that
+two independent sub-agents this round — the Dabble/Scrivener/Campfire pass
+and the broader industry/legal pass — each recommended on their own,
+unprompted, either widening scope or reducing frequency given two
+straight dry rounds. That is now four separate signals pointing the same
+direction (three prior owner-facing log entries plus these two
+independent sub-agent observations), recorded here rather than repeated
+as another direct request.
+
+## Round 21 sources
+
+- [Sudowrite changelog — Cheaper GPT-5.6 Models, Plus a Batch of Chat Fixes (Aug 3, 2026)](https://feedback.sudowrite.com/changelog/cheaper-gpt-56-models-plus-a-batch-of-chat-fixes)
+- [Campfire — "State of the Campfire: 2026" roadmap page](https://campfirewriting.com/learn/state-of-the-campfire-2026)
+- PlotForge Desktop feature list via Capterra listing (URL not directly retrievable; site egress-blocked)

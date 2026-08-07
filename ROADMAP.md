@@ -303,6 +303,27 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       source. This was also the first round in the cadence where all four
       research passes independently found nothing dated within their
       window — see RESEARCH.md Round 20.
+      Research round 21 (2026-08-07) re-ran the same check a sixth time
+      and again found no competitor pairing a task tracker with a
+      focus/sprint timer alongside writing and worldbuilding — only
+      generic productivity apps (TickTick, Focus To-Do) with no
+      writing features, and ScribeCount's AuthorFLOW (a Pomodoro timer
+      that logs word counts, no task list or worldbuilding). A Capterra
+      listing gives PlotForge Desktop's full 11-tool list for the first
+      time (Idea Board, Outline, Characters, Worldbuilding, Draft Editor,
+      AI Chat, Story Compass, Consistency Checker, Timeline, Sessions,
+      Export) and lists "Sessions" separately from "Timeline," which
+      leans the unconfirmed "Sessions" tool further toward a writing-
+      session/word-count log than a focus timer, though still not a
+      primary-source confirmation either way. Campfire's own "State of
+      the Campfire: 2026" roadmap page (undated, first indexed this
+      round) lists 2026 priorities as performance, bug fixes,
+      Encyclopedia/panel upgrades, mobile writing, and new gamification
+      (streaks, achievements, challenges) — notably no AI features and no
+      task tracker or timer either, plus a claim of 210M+ community words
+      and 1,000+ published books in 2025 worth having as a scale
+      reference. Second straight fully dry round for new competitors or
+      launches.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -483,7 +504,19 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       users days of paid access. Distinct from the credit-throttling pain
       this item already tracks — this is subscription-mechanics friction
       itself, the thing that structurally can't happen to a one-time-install
-      local app with no billing relationship at all.
+      local app with no billing relationship at all. Research round 21
+      (2026-08-07) finds a small but on-point data point: Sudowrite's own
+      Aug 3, 2026 changelog ("Cheaper GPT-5.6 Models, Plus a Batch of Chat
+      Fixes") cuts GPT-5.6 Luna's credit cost by 70% and Terra's by 10% —
+      Sudowrite passing through an OpenAI price cut rather than a Sudowrite
+      generosity move, but it's still Sudowrite tacitly conceding credit
+      cost is a live pain point worth patching. The same entry fixes a bug
+      where asking about one item in Chat could trigger a full Feedback
+      sweep and silently burn extra credits — read as reinforcement, not a
+      new item: even Sudowrite's own bug list shows credits draining in
+      ways users don't expect, the exact anxiety a metered system
+      structurally cannot fully engineer away and a local model has none
+      of.
 - [ ] **Fix the Claude Fable 5 blurb in the optional Anthropic provider** —
       research round 10 (2026-07-27): July 2026 coverage confirms Fable 5
       is Anthropic's purpose-built creative-writing model, topping
@@ -539,6 +572,44 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-08-07 — Research round 21 (autopilot; no code). Seventh consecutive
+  research-only firing (rounds 15-21, Aug 1-7) and second straight fully
+  dry one for new competitors — same four parallel passes as rounds 15-20
+  (NovelCrafter/Sudowrite; Dabble/Scrivener/Campfire; type.ai/Obsidian/
+  Notion plus new-entrant scan; broader industry/legal sentiment), each
+  briefed on rounds 1-20's findings and searching specifically for
+  material dated after round 20's 2026-08-05/06 cutoff (12-13 searches
+  each). No new checklist items — nothing cleared the bar of being both
+  new and within the window. Three small findings folded into existing
+  items rather than added as bullets: Sudowrite's Aug 3 changelog cutting
+  GPT-5.6 credit costs (a pass-through of an OpenAI price cut, plus a bug
+  fix for Chat silently burning extra credits on a Feedback sweep) feeds
+  the no-credit-limits item as a minor reinforcement; a sixth dedicated
+  recheck (rounds 15, 17, 18, 19, 20, 21) again found no competitor
+  pairing a task tracker with a focus/sprint timer alongside writing and
+  worldbuilding, plus a first-time full 11-tool feature list for PlotForge
+  Desktop (via Capterra) that leans its unconfirmed "Sessions" tool
+  further toward a session/word-count log than a focus timer without
+  fully confirming it either way; and Campfire's own "State of the
+  Campfire: 2026" roadmap page (undated, first indexed this round) lists
+  2026 priorities as performance, bug fixes, Encyclopedia/panel upgrades,
+  mobile writing and new gamification (streaks/achievements/challenges) —
+  no AI, no task tracker, no timer — folded into the four-app-bundle item
+  alongside the PlotForge refinement. Two minor, non-actionable dead ends
+  worth naming so future rounds don't re-chase them: Scrivener's Mac build
+  (still 3.5.2) picked up macOS 26 Tahoe compatibility fixes (icon,
+  trackpad-scroll lag, a list-formatting workaround) with no confirmed
+  date past early Oct 2025, and "Campfire"/"Dabble" search collisions with
+  two unrelated companies of the same name (an AI finance platform and an
+  Australian sports-betting app) are getting worse, not better, as search
+  indices grow. Per round 19's note that repeating the cadence-frequency
+  flag adds no new information, this round does not re-raise it, but
+  records the same observation round 20 did: this schedule is now firing
+  research-only for a seventh straight day against a well that two
+  independent sub-agents this round (Dabble/Scrivener/Campfire and the
+  broader sweep) both, unprompted, suggested widening on their own. Full
+  notes in RESEARCH.md Round 21.
 
 - 2026-08-06 — Research round 20 (autopilot; no code). Dispatched the same
   four parallel research passes as rounds 15-19 (NovelCrafter/Sudowrite;
