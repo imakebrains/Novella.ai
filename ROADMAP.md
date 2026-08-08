@@ -573,6 +573,37 @@ scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
 
+- 2026-08-08 — Research round 22 (autopilot; no code). Eighth consecutive
+  research-only day (rounds 15-22, Aug 1-8) and the first fully dry round
+  on record — all four parallel passes (NovelCrafter/Sudowrite;
+  Dabble/Scrivener/Campfire; type.ai/Obsidian/Notion plus new-entrant scan;
+  broader industry/legal sentiment), each briefed on rounds 1-21 and
+  searching specifically for material dated after round 21's 2026-08-07
+  cutoff, came back genuinely empty (10-16 searches each) rather than
+  merely thin. No new checklist items and nothing folded into existing
+  ones. One unconfirmed lead worth a follow-up check next round: an
+  Obsidian community plugin, WebNovel Assistant, whose own listing
+  describes word-count/goal tracking, focus-time tracking, worldbuilding
+  tools and a timed task tracker with sprints in one place — on paper the
+  closest match yet to the task-tracker-plus-focus-timer combination this
+  cadence has checked for eight rounds running (15/17/18/19/20/21/22, all
+  negative), but its actual last-update date couldn't be confirmed this
+  round (obsidianstats.com egress-blocked) and it has no local-AI
+  component, so it stays unconfirmed rather than closing the gap. A
+  second, deliberately non-actionable note: a Aug 4, 2026 Guardian
+  interview (three days outside this round's window) has an author
+  alleging a pattern of racial bias in how AI-authorship suspicion gets
+  applied to Black authors' book deals — recorded in RESEARCH.md for
+  awareness only, explicitly not to be used as a marketing angle, since
+  it's a claim about how other authors' accusations get adjudicated, not
+  a product-comparison data point about Novella. Also newly noted: direct
+  fetches to Scrivener/Dabble/Campfire's and NovelCrafter/Sudowrite's own
+  sites are now blocked at the network-egress level in this environment,
+  not just 403'd as in prior rounds — a further, cadence-independent
+  degradation in primary-source access worth flagging for whoever tunes
+  this schedule next, alongside the now-fully-dry result itself. Full
+  notes in RESEARCH.md Round 22.
+
 - 2026-08-07 — Research round 21 (autopilot; no code). Seventh consecutive
   research-only firing (rounds 15-21, Aug 1-7) and second straight fully
   dry one for new competitors — same four parallel passes as rounds 15-20

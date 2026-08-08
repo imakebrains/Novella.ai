@@ -2491,3 +2491,120 @@ as another direct request.
 - [Sudowrite changelog — Cheaper GPT-5.6 Models, Plus a Batch of Chat Fixes (Aug 3, 2026)](https://feedback.sudowrite.com/changelog/cheaper-gpt-56-models-plus-a-batch-of-chat-fixes)
 - [Campfire — "State of the Campfire: 2026" roadmap page](https://campfirewriting.com/learn/state-of-the-campfire-2026)
 - PlotForge Desktop feature list via Capterra listing (URL not directly retrievable; site egress-blocked)
+
+# Round 22 (2026-08-08)
+
+Eighth consecutive day this dedicated research schedule has fired
+research-only (rounds 15-22, Aug 1 through Aug 8), and the first fully dry
+round on record — all four passes independently found nothing dated after
+round 21's 2026-08-07 cutoff, not just thin material. Same four parallel
+passes as rounds 15-21: NovelCrafter + Sudowrite; Dabble + Scrivener +
+Campfire; type.ai + Obsidian + Notion (plus new-entrant and
+task-tracker-plus-timer recheck); and the broader industry/legal sweep.
+Each was briefed on rounds 1-21's findings and told to search specifically
+for material dated after 2026-08-07. 10-16 searches per pass.
+
+## NovelCrafter / Sudowrite
+
+Nothing new. Sudowrite's Aug 3 "Cheaper GPT-5.6 Models" changelog entry
+(already logged in round 21) remains the latest; its status page shows no
+incident since the Aug 1-3 one already logged. NovelCrafter's changelog
+still tops out at March 2026 for confirmed entries; its status page shows
+only older/undated resolved incidents (routing blip, OpenRouter connection
+issues, ARM migration, account access), none traceable to August 2026. No
+lawsuit, funding, acquisition, or personnel news for either company.
+Direct WebFetch to feedback.sudowrite.com, feedback.novelcrafter.com,
+status.sudowrite.com and status.novelcrafter.com was blocked by the
+environment's egress proxy this round (not a 403 from the site itself);
+WebSearch's indexed summaries substituted.
+
+## Dabble / Scrivener / Campfire
+
+Nothing new. Direct fetches to literatureandlatte.com, dabblewriter.com and
+campfirewriting.com are now blocked at the network-egress level in this
+environment (EGRESS_BLOCKED), a step beyond the 403s logged since round 18
+— worth noting as a further access wrinkle for future rounds, not a content
+finding. Scrivener 3.5.2's Tahoe-compatibility fixes (already logged) are
+still the newest version; no 3.5.3/3.5.4 exists per forum search; the
+next-gen app is still "nearing beta completion" with no new date. A
+"Campfire Update 41" changelog surfaced but is dated January 2026, already
+superseded by the v1.3.2 (July 3, 2026) entry logged in round 15. The
+"Campfire" name-collision problem (round 17+) has now spread beyond the
+finance-platform and betting-app collisions to 2026 US/Washington wildfire
+news dominating search results for the term.
+
+## type.ai / Obsidian / Notion / new-entrant scan
+
+Nothing confirmed new. The task-tracker-plus-focus-timer recheck (now run
+an eighth time across rounds 15/17/18/19/20/21/22) surfaced one lead worth
+flagging rather than folding in: an Obsidian community plugin called
+**WebNovel Assistant** (listed on community.obsidian.md), whose own
+description combines a writing dashboard with word-count/goal tracking,
+focus-time tracking, worldbuilding tools (character profiles, timelines,
+foreshadowing), and a timed task tracker with time-boxed sprints — on
+paper the closest match to the four-app combination found in eight rounds
+of checking. It could not be dated or confirmed as new this round
+(obsidianstats.com, which would show its last-update date, was
+egress-blocked; no search snippet carried a date), and it's a plugin
+bolted onto Obsidian rather than a standalone app, with no local-AI
+component mentioned anywhere in its description. Filed here as an
+unconfirmed lead: round 23, if it fires on the same brief, should try to
+find its GitHub repo directly and check the actual last-release date
+before this gets treated as a real answer to the recurring check.
+
+## Broader industry / legal sentiment
+
+Nothing dated after 2026-08-07. Two items came close but land one to four
+days short of the cutoff, so are logged here for awareness only, not as
+findings:
+
+- **Daggermouth AI-authorship dispute** (previously unlogged): H.M. Wolfe's
+  novel *Daggermouth* (Simon & Schuster/Scarlett Press) was flagged ~60%
+  AI-likely by the detector Pangram; the author denies AI use. Coverage
+  clusters July 28-31, 2026 (TechTimes, The Bookseller, AI Weekly) — all
+  before the window.
+- **A racial-bias framing across three pulled deals**, via a Guardian
+  interview dated **Aug 4, 2026** (one day short of round 21's Aug 7 close,
+  three days short of round 22's Aug 8 firing): Jerry Falade (author of the
+  already-logged "Call Me, I'll Hide the Body" collapse) states publicly
+  that three Black authors — himself, Mia Ballard ("Shy Girl"), and H.M.
+  Wolfe (Daggermouth) — all had deals cancelled or disrupted this year
+  following AI-authorship suspicion, and frames this as a pattern of racial
+  bias in how AI-detection accusations get applied. Widely reprinted
+  (TheGrio, Vanguard, Breitbart, The Root). This is a live, unfolding, and
+  sensitive story — a claim about bias in accusation patterns, not a
+  product-comparison data point — and is recorded here for awareness only.
+  It should not be turned into marketing copy of any kind without the
+  owner's explicit judgment; Novella's own "no-training/privacy" and
+  "no-outage" items are architecture claims about Novella's own product,
+  not commentary on how other authors' AI-authorship accusations get
+  adjudicated, and the two should stay separate.
+- EU AI Act Article 53: still zero named fines or complaints; only
+  "compliance dialogue" activity reported (CNBC, Aug 3).
+
+## What changed in ROADMAP.md
+
+No new checklist items — nothing this round cleared the bar of being both
+new and dated within the window, and for the first time in this cadence
+every one of the four passes came back genuinely empty rather than merely
+thin. Nothing was folded into existing items either; the WebNovel Assistant
+lead and the Falade/Guardian story are recorded above as unconfirmed/
+pre-window rather than acted on. Per round 19's note that repeating the
+cadence-frequency flag adds no new information on its own, this round
+doesn't re-raise it as a request, but the fact pattern behind it has moved:
+this is now the first *fully* dry round (all four passes, not two of four),
+on the eighth consecutive research-only day, with a new environmental
+wrinkle (egress-level blocks, not just 403s, on Scrivener/Dabble/Campfire's
+and NovelCrafter/Sudowrite's own sites) that will keep degrading source
+access regardless of cadence. Recorded once, plainly, as an update to the
+standing observation rather than a fresh ask.
+
+## Round 22 sources
+
+- [Sudowrite status page](https://status.sudowrite.com/)
+- [Sudowrite changelog](https://feedback.sudowrite.com/changelog) (indexed summary; direct fetch egress-blocked)
+- [NovelCrafter changelog](https://feedback.novelcrafter.com/changelog) (indexed summary; direct fetch egress-blocked)
+- [NovelCrafter status page](https://status.novelcrafter.com/) (indexed summary; direct fetch egress-blocked)
+- [Sudowrite Trustpilot](https://www.trustpilot.com/review/www.sudowrite.com)
+- WebNovel Assistant — Obsidian community plugin listing (community.obsidian.md; GitHub repo/date not located this round)
+- The Guardian, Jerry Falade interview (Aug 4, 2026) — reprinted via TheGrio/Vanguard/Breitbart/The Root (original Guardian URL not directly retrieved)
