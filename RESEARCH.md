@@ -2608,3 +2608,141 @@ standing observation rather than a fresh ask.
 - [Sudowrite Trustpilot](https://www.trustpilot.com/review/www.sudowrite.com)
 - WebNovel Assistant — Obsidian community plugin listing (community.obsidian.md; GitHub repo/date not located this round)
 - The Guardian, Jerry Falade interview (Aug 4, 2026) — reprinted via TheGrio/Vanguard/Breitbart/The Root (original Guardian URL not directly retrieved)
+
+# Round 23 (2026-08-09)
+
+Ninth consecutive day this dedicated research schedule has fired
+research-only (rounds 15-23, Aug 1 through Aug 9). Same four parallel
+research passes as recent rounds (NovelCrafter/Sudowrite; Dabble/
+Scrivener/Campfire; type.ai/Obsidian/Notion plus new-entrant scan and a
+targeted WebNovel Assistant follow-up; broader industry/legal sentiment),
+each briefed on rounds 1-22's findings and told to search specifically for
+material dated after round 22's 2026-08-08 cutoff — a one-day window.
+
+## NovelCrafter / Sudowrite
+
+Nothing new. 10 searches ("Sudowrite August 2026," "NovelCrafter changelog
+August 2026," "Sudowrite outage status," "NovelCrafter review 2026,"
+"Sudowrite Trustpilot review," Reddit site-search for both products, exact
+"August 8"/"August 9 2026" date queries for both, "Sudowrite price
+increase 2026") returned nothing dated after Aug 8. Direct fetches to
+feedback.sudowrite.com and feedback.novelcrafter.com remain
+egress-blocked, as they have been since round 22; WebSearch's indexed
+summaries substituted. Two items surfaced worth a future round's
+attention but NOT logged as confirmed this round because no snippet
+attached a specific post-Aug-8 date: a "Sudowrite Story Engine 3.0"
+mention and a Sudowrite "Developer API" with Python/Node SDKs, both
+appearing only in review-aggregator summaries (cybernews, bloggingwizard,
+aitoolsdevpro) that read as re-summarizing pre-existing 2026 features
+rather than reporting new launches. Round 24 should date-check these
+specifically before treating either as new.
+
+## Dabble / Scrivener / Campfire
+
+Nothing new after 16 searches across new features, pricing, outages,
+reviews, changelogs, and funding/acquisition angles for all three.
+Scrivener still shows no next-gen beta date and no version past
+macOS 3.5.0/Windows 3.1.6 in indexed results; Campfire still shows no
+build past v1.3.2 (July 29, 2026 per this round's indexing — a
+date correction from round 15's "July 3" reading, worth reconciling
+against the primary changelog once egress access returns); Dabble's most
+recent confirmed milestone remains the July 13, 2026 "Dabble 3.0" launch
+(beta-reader sharing, mobile/PWA support). The "Dabble"/"Campfire"
+name-collision problem (an unrelated Australian betting app and an
+unrelated fintech company, respectively) continues to pollute search
+results, as logged since round 17. Genuinely quiet 24 hours rather than a
+coverage gap, per the sub-agent's own assessment — but worth re-running
+the same terms in round 24 in case today's items index late.
+
+## type.ai / Obsidian / Notion / new-entrant scan
+
+The round's one substantive finding: round 22's unconfirmed "WebNovel
+Assistant" lead is now **confirmed**. Its GitHub repo is
+[github.com/HatanoChihiro/obsidian-webnovel-assistant](https://github.com/HatanoChihiro/obsidian-webnovel-assistant)
+— created 2026-04-15, last commit **2026-08-09** (the day of this check,
+so actively maintained, not abandoned), latest release v3.2.0, 144 stars,
+9 forks, 0 open issues, MIT-licensed, bilingual (Chinese/English) UI.
+Confirmed feature set: word count with 3 counting modes and
+multi-direction goal tracking; a focus timer with a 365-day heatmap,
+bar/line trend view, and automatic slack/distraction detection; a task
+tracker for periodic writing goals; a story timeline; a foreshadowing
+manager (mark → track → resolve); a chapter corkboard; a lore system with
+auto-highlight and relation graphs; sticky notes; advanced search; an OBS
+streaming overlay; and mobile floating widgets. That is a focus timer, a
+task tracker, worldbuilding, and word-count tracking — all four of the
+pillars this cadence has checked for across nine rounds — genuinely
+present in one actively-maintained, real product for the first time.
+
+The decisive gap: checking both the GitHub README and repo page directly
+found **zero** mentions of AI, LLM, Ollama, OpenAI, or any
+writing-generation feature anywhere. It is a pure organizational/
+productivity shell around those four functions, not a writing partner —
+and it's an Obsidian plugin inheriting Obsidian's general-notes paradigm,
+not a purpose-built novel-drafting app. This means the standing
+recheck's prior framing ("no competitor pairs a task tracker with a focus
+timer alongside writing and worldbuilding") is no longer accurate as
+stated and needed correcting in ROADMAP.md — see the four-app-bundle item.
+The thesis itself is untouched: the claim that survives is "nobody bundles
+the four apps *and* writes with you, locally, for free," which stays
+fully unclaimed.
+
+Secondary new-entrant search (7 queries) found nothing new post-2026-08-08.
+Two items surfaced but predate the window or don't match the profile: The
+Novelist (github.com/panossakalakis/the-novelist), a free/no-AI Obsidian
+vault template, v2.0 released March 9, 2026 — not a plugin, no AI, predates
+window; Laterpress (laterpress.com), a cloud/BYOK writing tool with a
+10-category worldbuilding wiki that has existed since 2022, not local, no
+confirmed timer or task tracker.
+
+## Broader industry / legal sentiment
+
+Nothing dated after 2026-08-08 across 17 searches (lawsuits, EU AI Act
+enforcement, author surveys, pulled book deals, funding/acquisition news,
+Authors Guild/Society of Authors statements). One reconciliation note: a
+Publishers Lunch/Boing Boing/Futurism/Moneywise/Plagiarism Today report
+describes a ~$2.5M Macmillan/Minotaur two-book deal (a 14-way auction debut
+thriller about a Nigerian chemistry-PhD cleaner in Houston pulled into a
+cartel body-disposal job) withdrawn by agent Marc Gerald on July 29, 2026,
+citing inability to "authenticate how the manuscript... evolved" after a
+Publishers Lunch AI-detector run scored it 97% AI-likely. This reads as
+plausibly the *same* incident as the already-logged Jerry Falade/
+Macmillan/Minotaur "Call Me, I'll Hide the Body" pull (same imprint, same
+~$2.4-2.5M range, same late-July/early-August window) with fuller
+reporting detail, rather than a second distinct deal — but it wasn't
+confirmed either way this round, and it falls before the Aug-8 cutoff
+regardless, so it isn't logged as a new finding. Round 24 should reconcile
+whether "Falade" and "the Nigerian chemistry-PhD cleaner in Houston
+thriller" name the same book before either version gets cited in copy —
+citing them as two separate incidents would overstate the pattern if
+they're one.
+
+Two previously-logged items (UK Society of Authors "Human Authored"
+declaration scheme launched by Tracy Chevalier at London Book Fair; a new
+UK publisher alliance "SPUR" on AI licensing standards) surfaced again
+this round but with no date confirming they're post-Aug-8 — left out per
+the same rule.
+
+## What changed in ROADMAP.md
+
+One correction folded into the existing four-app-bundle item (see above):
+the WebNovel Assistant confirmation, which changes that item's standing
+claim from "no competitor combines the four pillars" to "one now does, but
+with zero AI — the AI-plus-bundle combination stays unclaimed." No
+wholly new checklist items; the Sudowrite Story Engine 3.0/Developer API
+mentions and the Falade/Nigerian-thriller reconciliation are recorded
+above as follow-ups for round 24, not acted on this round since neither
+cleared the new-and-dated bar.
+
+This is the ninth straight research-only day (rounds 15-23) but not a
+repeat of round 22's fully-dry result — two of four passes came back
+empty, one (industry/legal) came back thin-but-old, and one (the
+Obsidian/new-entrant pass) produced a genuine, actionable confirmation.
+Per round 19's note that repeating the cadence-frequency request adds
+nothing new on its own, this entry does not re-raise it.
+
+## Round 23 sources
+
+- [WebNovel Assistant GitHub repo](https://github.com/HatanoChihiro/obsidian-webnovel-assistant)
+- [The Novelist (Obsidian vault template) GitHub repo](https://github.com/panossakalakis/the-novelist)
+- [Laterpress](https://laterpress.com/)
+- Publishers Lunch / Boing Boing / Futurism coverage of the withdrawn Macmillan/Minotaur deal (July 29, 2026; exact Publishers Lunch URL is subscription-gated, not directly retrieved)

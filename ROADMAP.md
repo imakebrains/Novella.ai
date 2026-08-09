@@ -324,6 +324,28 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       and 1,000+ published books in 2025 worth having as a scale
       reference. Second straight fully dry round for new competitors or
       launches.
+      Research round 23 (2026-08-09) closes out round 22's unconfirmed
+      "WebNovel Assistant" lead with a direct check: its GitHub repo
+      (github.com/HatanoChihiro/obsidian-webnovel-assistant) is real,
+      active (last commit 2026-08-09, the day of this check), MIT-licensed,
+      144 stars, v3.2.0 — and its feature list genuinely does combine a
+      focus timer (365-day heatmap, distraction detection), a task tracker
+      for periodic writing goals, word-count/goal tracking, and
+      worldbuilding (lore system, relation graphs, timeline) in one
+      Obsidian plugin. This is the first time in nine dedicated rechecks
+      (rounds 15, 17-23) that a real, actively-maintained product has been
+      confirmed to combine all four pillars — the prior framing of "no
+      competitor pairs a task tracker with a focus timer alongside writing
+      and worldbuilding" needs that correction. But it changes nothing
+      about the thesis itself: the README has zero mentions of AI, LLM,
+      Ollama, or any generation feature anywhere — it is a bare
+      organizational shell around the four functions, not a writing
+      partner, and it's a plugin bolted onto Obsidian's general
+      notes-taking paradigm rather than a purpose-built novel-drafting app.
+      The sharper, now-testable version of this item's claim going forward
+      is not "nobody bundles the four apps" (no longer true) but "nobody
+      bundles the four apps *and* writes with you, locally, for free" —
+      still fully unclaimed after this check.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -572,6 +594,38 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-08-09 — Research round 23 (autopilot; no code). Ninth consecutive
+  research-only day (rounds 15-23, Aug 1-9). Dispatched the same four
+  parallel passes as recent rounds (NovelCrafter/Sudowrite; Dabble/
+  Scrivener/Campfire; type.ai/Obsidian/new-entrant scan; broader industry/
+  legal sentiment), each briefed on rounds 1-22's findings and searching
+  for material dated after round 22's 2026-08-08 cutoff (8-12 searches
+  each; NovelCrafter/Sudowrite and Dabble/Scrivener/Campfire came back
+  genuinely empty for that narrow one-day window, egress to all five
+  companies' own sites still blocked). This round was not fully dry,
+  though: the type.ai/Obsidian pass's top priority was following up round
+  22's unconfirmed "WebNovel Assistant" lead, and it converted from
+  unconfirmed to confirmed — a real, actively-maintained Obsidian plugin
+  (github.com/HatanoChihiro/obsidian-webnovel-assistant, last commit today,
+  144 stars) that combines a focus timer, task tracker, word-count
+  tracking, and worldbuilding tools in one place, with zero AI anywhere in
+  it. Folded into the four-app-bundle item as a correction to that item's
+  standing claim: a product pairing all four pillars now exists, so the
+  thesis's sharper and still-true claim is "nobody bundles the four apps
+  *and* writes with you, locally, for free," not "nobody bundles the four
+  apps" outright. The industry/legal pass surfaced one reconciliation note
+  for a future round rather than a new finding: a Publishers Lunch/Boing
+  Boing/Futurism report on a ~$2.5M Macmillan/Minotaur two-book deal
+  withdrawn by agent Marc Gerald (debut thriller, Nigerian chemistry-PhD
+  cleaner in Houston, 97% AI score from a Publishers Lunch detector run)
+  reads as likely the same incident as the already-logged Jerry
+  Falade/Macmillan/Minotaur pull (same imprint, same ~$2.4-2.5M range,
+  same late-July/early-Aug window) with fuller detail rather than a
+  distinct second deal — falls outside this round's date window either
+  way, so not logged as new; round 24 should reconcile whether it's the
+  same story before citing either version. No new checklist items beyond
+  the four-app-bundle correction. Full notes in RESEARCH.md Round 23.
 
 - 2026-08-08 — Research round 22 (autopilot; no code). Eighth consecutive
   research-only day (rounds 15-22, Aug 1-8) and the first fully dry round
