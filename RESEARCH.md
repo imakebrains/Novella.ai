@@ -2746,3 +2746,167 @@ nothing new on its own, this entry does not re-raise it.
 - [The Novelist (Obsidian vault template) GitHub repo](https://github.com/panossakalakis/the-novelist)
 - [Laterpress](https://laterpress.com/)
 - Publishers Lunch / Boing Boing / Futurism coverage of the withdrawn Macmillan/Minotaur deal (July 29, 2026; exact Publishers Lunch URL is subscription-gated, not directly retrieved)
+
+# Round 24 (2026-08-10)
+
+Tenth consecutive day this dedicated research schedule has fired
+research-only (rounds 15-24, Aug 1 through Aug 10). Same four parallel
+research passes as recent rounds (NovelCrafter/Sudowrite; Dabble/
+Scrivener/Campfire; type.ai/Obsidian/Notion plus new-entrant scan;
+broader industry/legal sentiment), each briefed on rounds 1-23's findings
+and told to search specifically for material dated after round 23's
+2026-08-09 cutoff — a one-day window. This is the driest round since
+round 22: three of four passes came back genuinely empty, and the fourth
+resolved an old ambiguity rather than finding new competitive material.
+
+## NovelCrafter / Sudowrite
+
+Nothing dated 2026-08-09 or later for either product. NovelCrafter's most
+recent verifiable changelog activity remains the March 21, 2026 Codex
+update already on record; a negative Trustpilot review ("Ettore
+Triggiani") surfaced with no confirmable date, likely pre-existing. For
+Sudowrite: the Aug 1-3 incident (#877582) remains the most recent status
+event, Ballad 1.1 (June 2) and the Gemini 3.1 Pro/Claude Opus 4.6
+additions (February) are both stale, and a G2 reviewer explicitly noted
+"it's been two months since a new review." One item flagged but not
+confirmed: a "Smart Spelling & Grammar Check" line on Sudowrite's own
+changelog has no attached date and wasn't on record from any prior
+round — possibly missed earlier, possibly very recent. Round 25 should
+date-check it directly if egress access to feedback.sudowrite.com
+recovers. **Round 23's two flagged items — "Sudowrite Story Engine 3.0"
+and a Sudowrite "Developer API" with Python/Node SDKs — were not
+re-checked this round** (this round's brief didn't carry the flag
+forward); still outstanding for round 25, not dropped.
+
+Access note: status.sudowrite.com, feedback.sudowrite.com,
+feedback.novelcrafter.com, trustpilot.com, releasebot.io, and tickerr.ai
+were all egress-blocked this round, forcing reliance on search-engine
+snippets rather than direct fetches for every finding above.
+
+## Dabble / Scrivener / Campfire
+
+Completely dry — the second fully-empty result for this pass (after round
+22). 13+ searches across outages, pricing, reviews, Reddit, and the
+Literature & Latte forums found nothing dated 2026-08-09 or later for any
+of the three. Dabble's Trustpilot rating checked again at 2.30/5,
+consistent with prior tracking; its G2 rating (4.3/5, only 20 reviews) is
+a pre-existing low-sample discrepancy, not new. Campfire's pricing page
+still shows the a-la-carte module system (~$12-12.50/mo or $375 lifetime
+for the full suite). Scrivener's next-gen app remains in beta with no
+release-date news; one forum aside describes it as combining "the best
+bits of Ulysses and the UI of Bear" but isn't a new dated data point.
+
+## type.ai / Obsidian / Notion / new-entrant scan
+
+One dated but minor item: **WebNovel Assistant shipped v3.8.0 on
+2026-08-09** (an independent typography system, enhanced chapter-merging,
+"lore board card view tabs" for managing multiple setting files) — a
+UI/organization update only, no AI feature added. Release cadence for
+the run-up (v3.7.0 Aug 2, v3.6.3 Jul 29, v3.6.x Jul 24-27) shows steady
+weekly shipping with no AI roadmap signal in any of it. The standing
+finding from round 23 is unchanged: it's still the only product combining
+all four non-AI pillars, still ships zero AI.
+
+The four-pillar check (local/private AI generation + task tracking +
+focus timer + worldbuilding, all in one app) was explicitly re-run from
+several angles and is **still confirmed empty** — the eleventh negative
+check across rounds 15/17/18/19/20/21/22/23/24. NovelCrafter remains the
+closest AI-side contender (true local Ollama/LM Studio AI + Codex
+worldbuilding, no task tracker or timer); WebNovel Assistant remains the
+closest structure-side contender (all four non-AI pillars, zero AI).
+
+PlotForge Desktop's "Sessions" tool stays unconfirmed — plotforge.app is
+now **hard-blocked** at the network egress-proxy level rather than just
+403'ing as in round 23, and the same hard block now also covers type.ai,
+storyforge.com, mediachance.com, forum.obsidian.md, community.obsidian.md,
+obsidianstats.com, capterra.com, and peerpush.net — a materially worse
+access state than any prior round. Only GitHub-hosted pages were directly
+fetchable this round. Recommend dropping further attempts on the Sessions
+question unless access to plotforge.app is restored.
+
+Noise flagged but not logged as new entrants (no confirmable date in
+window): several similarly-named "StoryForge"/"NovelForge" projects (an
+open-source GitHub StoryForge, a Puter-hosted StoryForge, a Lovable-hosted
+prototype, MediaChance's long-running NovelForge/CQuill Writer with local
+LLM linking since ~early 2025) and BookNova (a new but fully cloud-based
+multi-model NovelCrafter competitor). Worth a re-check later if any pivot
+to local AI, not actionable now.
+
+## Broader industry / legal sentiment
+
+**Falade / Nigerian-thriller reconciliation, resolved: same incident, not
+two.** Jerry (Adedayo) Falade is a Nigerian Ph.D. candidate at Southern
+Methodist University in Dallas; his novel *Call Me, I'll Hide the Body* is
+narrated by a fictional 26-year-old Nigerian chemistry Ph.D. student in
+Houston who cleans murder scenes for a cartel — the "Dallas" (real
+author) and "Houston" (fictional narrator) detail is what made prior
+rounds read this as two separate stories. The 14-way-auction, ~$2.4-2.5M,
+Macmillan/Minotaur two-book deal (UK rights to HarperCollins, a ~$2M film
+deal reportedly in progress) was withdrawn by co-agents Marc Gerald and
+Ashley Coleman on July 29, 2026, after a Pangram 4 AI-detector run scored
+the manuscript 97% AI-likely and the agents said they could no longer
+authenticate how the manuscript evolved. Falade denies using AI on the
+prose (says he used it only for research), has retained an attorney, and
+alleges racial bias — citing three Black authors with 2026 deals
+cancelled or disrupted over AI suspicion — and has publicly demonstrated
+the detector scoring pre-genAI (2012/2017) published passages at
+98-99% AI-likely. Sources: Publishers Lunch (2026-07-31), Boing Boing
+(2026-07-31), Futurism, Deadline (2026-07-29), Vanguard News, Publishers
+Weekly, TheGrio (2026-08-04), Plagiarism Today (2026-08-05). This closes
+out the open reconciliation question from round 23's log; the incident
+was already deliberately kept out of Novella's own copy per round 19's
+reasoning (a provenance/authorship claim would overstate what Novella's
+own AI-writes-into-the-document design can attest to) and that reasoning
+still applies with the reconciliation resolved.
+
+No genuinely new items dated 2026-08-09 or later across all five standing
+theme areas (training-consent anxiety, AI-detection false positives,
+training-data lawsuits/regulation, cloud-writing outages, NaNoWriMo-
+successor landscape) — confirmed empty after the reconciliation search
+plus further targeted queries.
+
+One adjacent item, likely already logged: the "Daggermouth" AI-detection
+controversy (H.M. Wolfe's Simon & Schuster/Scarlett Press deal, flagged
+60% AI-likely by Pangram, author denies via attorney) resurfaced in this
+round's search — this matches round 18's already-logged Daggermouth
+finding, not a new incident. Distinct from Falade in outcome: as of the
+sources checked this round, the Daggermouth deal has not been cancelled.
+
+Two housekeeping corrections, dates now locked down: the UK Society of
+Authors' "Human Authored" declaration scheme (with the US Authors Guild)
+launched at the London Book Fair on **March 10, 2026** — a free,
+honour-code registration scheme for SoA members. "SPUR" launched
+**February 26, 2026**, but is a **news-publishing** AI-licensing alliance
+(BBC, Financial Times, Guardian, Sky News, Telegraph Media Group, since
+expanded internationally) — not a book-publishing alliance as earlier
+notes ambiguously implied. Neither is book-industry-specific in the way
+prior mentions suggested for SPUR; corrected here so a future round
+doesn't cite it as a book-publishing standards body.
+
+## What changed in ROADMAP.md
+
+Nothing added to "Next up" — no finding this round cleared the bar of
+being both new and dated within the one-day window. This is the third
+round (after 20 and 22) to add zero new checklist items. The Falade
+reconciliation corrects a standing ambiguity but was never a checklist
+item itself (round 19 filed it as a landscape note only), so there is
+nothing in "Next up" to amend. The tenth-straight-research-only-day count
+is recorded in the Shipped log entry per the round 19-23 convention of
+noting it without re-raising the cadence request, since round 19 already
+established that repeating the request adds no new information on its
+own.
+
+## Round 24 sources
+
+- [Publishers Lunch: "Seven-Figure Book Deal Cancelled Over AI Suspicions..."](https://lunch.publishersmarketplace.com/2026/07/seven-figure-book-deal-cancelled-over-ai-suspicions-raises-questions-about-ai-guardrails/) (2026-07-31)
+- [Boing Boing: pulled $2.4M deal over AI concerns](https://boingboing.net/2026/07/31/unpublished-novels-2-4m-deal-pulled-over-ai-concerns.html) (2026-07-31)
+- [Deadline: AI questions surround debut novel/book/film buzz](https://deadline.com/2026/07/ai-questions-debut-novel-book-film-buzz-1237013254/) (2026-07-29)
+- [Vanguard News: Nigerian author Jerry Falade loses $2M book deal](https://www.vanguardngr.com/2026/08/nigerian-author-jerry-falade-loses-2m-book-deal-over-ai-allegations/)
+- [Publishers Weekly: after the cancellation of "Call Me, I'll Hide the Body," what comes next](https://www.publishersweekly.com/pw/by-topic/industry-news/publisher-news/article/100983-after-the-cancellation-of-call-me-i-ll-hide-the-body-what-comes-next.html)
+- [TheGrio](https://thegrio.com/2026/08/04/jerry-falade-call-me-ill-hide-the-body-deal-pulled/) (2026-08-04)
+- [Plagiarism Today](https://www.plagiarismtoday.com/2026/08/05/author-loses-2-million-book-deal-over-ai-allegations/amp/) (2026-08-05)
+- [WebNovel Assistant GitHub releases](https://github.com/HatanoChihiro/obsidian-webnovel-assistant/releases)
+- [CEATL: UK Human Authored scheme launched by SoA](https://www.ceatl.eu/uk-human-authored-scheme-launched-by-soa)
+- [Human Authored FAQ](https://humanauthored.co.uk/faqs/)
+- [INMA: UK publishers form SPUR](https://www.inma.org/blogs/Digital-Platform-Initiative/post.cfm/uk-publishers-form-spur-as-global-ai-standards-movement-accelerates)
+- [Press Gazette: SPUR expansion](https://pressgazette.co.uk/news/ai-licensing-coalition-spur-in-huge-expansion/)

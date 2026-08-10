@@ -595,6 +595,56 @@ scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
 
+- 2026-08-10 — Research round 24 (autopilot; no code). Tenth consecutive
+  research-only day (rounds 15-24, Aug 1-10). Dispatched the same four
+  parallel passes as recent rounds (NovelCrafter/Sudowrite; Dabble/
+  Scrivener/Campfire; type.ai/Obsidian/new-entrant scan; broader
+  industry/legal sentiment), each briefed on rounds 1-23's findings and
+  searching for material dated after round 23's 2026-08-09 cutoff. This
+  was the driest round since round 22: three of four passes came back
+  genuinely empty (NovelCrafter/Sudowrite; Dabble/Scrivener/Campfire,
+  the second fully-dry result for that pass; and no new items in the
+  five standing industry/legal theme areas), and the fourth pass mostly
+  resolved an old ambiguity rather than surfacing new competitive
+  material — the industry/legal pass confirmed the "Jerry Falade" and
+  "Nigerian chemistry-PhD-cleaner-in-Houston thriller" pulled-deal
+  reports flagged unresolved since round 19/23 are the *same* incident,
+  not two: Falade is the real-life Nigerian PhD candidate (at SMU in
+  Dallas) whose novel's fictional narrator is a Nigerian PhD student in
+  Houston — the two-city detail is what made prior rounds read it as two
+  stories. No checklist action needed (it was a landscape note, never a
+  "Next up" item). The type.ai/Obsidian pass found one dated but minor
+  item — WebNovel Assistant shipped v3.8.0 on 2026-08-09, a UI/lore-
+  organization update with no AI added, leaving round 23's "zero AI"
+  finding unchanged — and re-ran the four-pillar check (local AI +
+  task tracker + focus timer + worldbuilding, all in one app) for an
+  eleventh time across rounds 15-24, still empty. Also worth flagging:
+  the research environment's network-egress access got measurably worse
+  this round — plotforge.app is now hard-blocked rather than just
+  403'ing, and the same hard block newly covers type.ai, storyforge.com,
+  mediachance.com, forum.obsidian.md, community.obsidian.md,
+  obsidianstats.com, capterra.com, and peerpush.net, on top of the
+  sudowrite/novelcrafter feedback-site blocks already logged since round
+  22 — a cadence-independent degradation worth a mention for whoever
+  next reviews source access, alongside round 23's flagged-but-unchecked
+  "Sudowrite Story Engine 3.0"/"Developer API" items, which this round's
+  brief didn't carry forward and remain open for round 25. No new
+  checklist items — nothing this round cleared the bar of being both new
+  and dated within the one-day window; per round 19's note that
+  repeating the cadence-frequency request adds nothing further on its
+  own, this entry records the day count without re-raising it. Full
+  notes in RESEARCH.md Round 24.
+
+  **Housekeeping note (repo hygiene, not research):** at the start of this
+  run, HEAD was detached two commits ahead of the local `main` branch —
+  rounds 22 and 23 had been committed by a prior run but the `main` ref
+  itself was never advanced, so those two commits weren't reachable from
+  any branch. Confirmed it was a clean fast-forward (no divergence),
+  moved `main` to include them, and confirmed `origin/main` already had
+  them (a prior push had succeeded even though the local ref update
+  apparently hadn't completed). No content was lost; flagging only so a
+  future run isn't surprised by a detached HEAD at startup.
+
 - 2026-08-09 — Research round 23 (autopilot; no code). Ninth consecutive
   research-only day (rounds 15-23, Aug 1-9). Dispatched the same four
   parallel passes as recent rounds (NovelCrafter/Sudowrite; Dabble/
