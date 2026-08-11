@@ -2910,3 +2910,140 @@ own.
 - [Human Authored FAQ](https://humanauthored.co.uk/faqs/)
 - [INMA: UK publishers form SPUR](https://www.inma.org/blogs/Digital-Platform-Initiative/post.cfm/uk-publishers-form-spur-as-global-ai-standards-movement-accelerates)
 - [Press Gazette: SPUR expansion](https://pressgazette.co.uk/news/ai-licensing-coalition-spur-in-huge-expansion/)
+
+# Round 25 (2026-08-11)
+
+Eleventh consecutive day this dedicated research schedule has fired
+research-only (rounds 15-25, Aug 1 through Aug 11). Same four parallel
+research passes as recent rounds (NovelCrafter/Sudowrite; Dabble/
+Scrivener/Campfire; type.ai/Obsidian/Notion plus new-entrant scan; broader
+industry/legal sentiment), each briefed on rounds 1-24's findings and told
+to search specifically for material dated after round 24's 2026-08-10
+cutoff — a one-day window. Three of four passes came back genuinely empty;
+the fourth found one genuinely new entrant.
+
+## NovelCrafter / Sudowrite
+
+Nothing dated 2026-08-10 or later for either product. Sudowrite's status
+page currently shows operational, with no new incident since the Aug 1-3
+outage (#877582) already on record. The most recent items found (GPT-5.6
+credit-cost cuts, Kimi K3, a mobile crash fix at v2026.26.16, a Chat
+"working" indicator fix, and one Trustpilot-adjacent complaint about
+"slow, lagging and unstable chat") all cluster around Aug 1-4, 2026 —
+before the cutoff and already logged or matching the already-logged
+pattern, so none are reported as new. Round 23/24's two open leads —
+"Sudowrite Story Engine 3.0" and a Sudowrite "Developer API" (alleged
+Python/Node SDK, $15/1M input tokens, 500 req/min enterprise tier) —
+remain unconfirmed. Both claims trace only to SEO/aggregator sites
+(aitoolsdevpro.com, apitracker.io, toolify.ai), never to a dated primary
+announcement; the one primary-adjacent item found, a changelog line
+reading "Introducing: Story Engine!", reads as the original feature
+launch, not a "3.0" milestone. Carried forward again for round 26.
+
+Access note: feedback.sudowrite.com, feedback.novelcrafter.com,
+status.sudowrite.com, releasebot.io, and tickerr.ai were all
+egress-blocked this round; every finding above relies on search-index
+snippets rather than direct fetches. Neither r/sudowrite nor r/NovelCrafter
+returned indexed discussion this round (the subreddits may simply be too
+small for the search index, not a new block).
+
+## Dabble / Scrivener / Campfire
+
+Completely dry. Checked Literature & Latte's release notes and forums
+(indexed content tops out at the already-logged 3.5.2, no evidence of
+anything newer), Dabble's Trustpilot (most recent indexed review still
+February 2026; 2.30/5 rating unchanged) and G2 (4.3/5 on only 20 reviews,
+a pre-existing low-sample discrepancy, not new), and Campfire's Steam news
+and pricing page (still the a-la-carte module system, ~$12-12.50/mo or
+$375 lifetime) — nothing dated 2026-08-10 or later on any of the three.
+No pricing changes, no funding/acquisition news for either Dabble or
+Literature & Latte.
+
+Access note: forum.literatureandlatte.com, ca.trustpilot.com,
+store.steampowered.com, and steamcommunity.com were all egress-blocked
+this round, forcing reliance on search-index snippets. Generic "Dabble"
+and "Campfire" searches continue to collide with an unrelated UK/AU
+betting app and other unrelated companies of the same names, a
+recurring noise source flagged in prior rounds.
+
+## type.ai / Obsidian / Notion / new-entrant scan
+
+**New entrant, not logged in any of the prior 24 rounds: Scríob
+(scriob.app).** A local-first "Writing & World-Building Studio" for
+Windows/Linux/macOS: a manuscript editor, a relational story wiki
+(characters/places/factions with inline lore auto-linking and consistency
+checks), an infinite storyboarding canvas, and AI that runs entirely
+on-device via Ollama or Apple Intelligence — "nothing leaves your
+machine." Free to write forever; only cross-device sync is paid. This is
+the closest local-AI-plus-worldbuilding combination found since WebNovel
+Assistant (round 22-23), but a dedicated check of its feature list — site
+description, feature pages, and sprint/pomodoro/task-specific search
+queries — found no task manager and no focus/sprint timer anywhere. Three
+pillars (local AI, worldbuilding, editor), not four. Its exact
+launch/release date couldn't be pinned down (scriob.app is proxy-blocked
+for direct fetch, only search snippets reachable), so it's logged as
+new-to-this-research rather than confirmed as launched after round 24's
+cutoff — folded into the four-app-bundle item either way, since it's the
+first product change in over a dozen rechecks that narrows one side of
+the gap (local AI + worldbuilding) even though it leaves the other side
+(task tracker + timer) untouched.
+
+WebNovel Assistant shipped v3.8.1 (bug fixes only: sidebar focus clicks,
+chapter-title inheritance, immersive-mode file list, sticky-note sizing on
+mobile) with a GitHub release timestamp of Aug 10, 12:55 — borderline on
+the cutoff, no AI added, so it changes nothing about the standing
+zero-AI finding.
+
+The four-pillar check (local/private AI generation + task tracking +
+focus timer + worldbuilding, all in one app) stays **confirmed empty** —
+still no product combines all four, now checked across twelve rounds
+(15/17/18/19/20/21/22/23/24/25 plus the two mid-cadence resolutions).
+Scríob narrows the AI-plus-worldbuilding half of the search space without
+closing it.
+
+Ruled out as noise: Scraib.app (a Mac-only menu-bar text-rewrite utility
+that happens to support Ollama among other providers — general-purpose,
+not a novel-writing app, irrelevant to the four-pillar question). No
+dated changes found for LocalProse, Noveler, type.ai, or Notion
+templates; Noveler's "AI chat" feature still can't be confirmed as local
+vs. cloud since community.obsidian.md remains proxy-blocked — worth a
+direct check if access recovers.
+
+## Broader industry / legal sentiment
+
+Nothing dated 2026-08-10 or later across all five standing theme areas
+(training-consent anxiety, AI-detection false positives, training-data
+lawsuits/regulation, cloud-writing outages, NaNoWriMo-successor
+landscape). One clarification, not a new finding: Kadrey v. Meta has a
+residual open claim over alleged BitTorrent-based distribution of
+training data, separate from and not contradicting the already-logged
+fair-use ruling on the training question itself — worth having on record
+so a future round doesn't mistake the open claim for a reopened
+fair-use fight. The "Daggermouth" controversy and the Falade reconciliation
+were both re-surfaced by search this round but match round 18's and
+round 24's already-logged findings exactly, not new incidents.
+
+Access note: the network egress blocklist widened again this round —
+feedback.sudowrite.com, docs.sudowrite.com, and releasebot.io joined the
+already-hard-blocked list from round 24 (plotforge.app, type.ai,
+storyforge.com, mediachance.com, forum.obsidian.md, community.obsidian.md,
+obsidianstats.com, capterra.com, peerpush.net), and scriob.app is blocked
+too. Primary-source verification (Sudowrite's own docs/changelog,
+Scríob's own site) is now the exception rather than the norm in this
+environment; search-index snippets are carrying nearly every finding
+across all four passes this round and the last several.
+
+## What changed in ROADMAP.md
+
+One addition, folded into the existing four-app-bundle item rather than a
+new bullet: Scríob (scriob.app) as a new-to-this-cadence local-AI +
+worldbuilding entrant that still lacks a task tracker and focus timer, so
+the fourth-app gap it tracks stays open on both sides. No other checklist
+changes. The eleventh-straight-research-only-day count is recorded in the
+Shipped log entry per the round 19-24 convention of noting it without
+re-raising the cadence request.
+
+## Round 25 sources
+
+- [Scríob — Writing & World-Building Studio](https://scriob.app/)
+- [WebNovel Assistant v3.8.1 release](https://github.com/HatanoChihiro/obsidian-webnovel-assistant/releases/tag/3.8.1)

@@ -346,6 +346,19 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       is not "nobody bundles the four apps" (no longer true) but "nobody
       bundles the four apps *and* writes with you, locally, for free" —
       still fully unclaimed after this check.
+      Research round 25 (2026-08-11) finds a new-to-this-cadence entrant on
+      the AI side of the gap: Scríob (scriob.app), a local-first "Writing &
+      World-Building Studio" running AI on-device via Ollama or Apple
+      Intelligence (manuscript editor, relational story wiki with
+      auto-linking lore and consistency checks, infinite storyboard canvas,
+      "nothing leaves your machine," free to write forever). It is the
+      closest local-AI-plus-worldbuilding combination found since WebNovel
+      Assistant, but a dedicated check of its feature list found no task
+      manager and no focus/sprint timer anywhere — a three-pillar tool
+      (local AI, worldbuilding, editor), not four. The gap this item tracks
+      stays open on both sides: still no product pairs real local AI with a
+      task tracker and a focus timer, and still no product pairs all four
+      pillars with a genuine local writing partner.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -594,6 +607,42 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-08-11 — Research round 25 (autopilot; no code). Eleventh consecutive
+  research-only day (rounds 15-25, Aug 1-11). Same four parallel passes as
+  recent rounds (NovelCrafter/Sudowrite; Dabble/Scrivener/Campfire;
+  type.ai/Obsidian/new-entrant scan; broader industry/legal sentiment),
+  each briefed on rounds 1-24's findings and searching for material dated
+  after round 24's 2026-08-10 cutoff — a one-day window. Three of four
+  passes came back genuinely empty: NovelCrafter/Sudowrite (Sudowrite's
+  status page shows operational, no new incident since the Aug 1-3
+  outage; the two round-23/24 open leads — "Sudowrite Story Engine 3.0"
+  and a Sudowrite "Developer API" — remain unconfirmed, tracing only to
+  SEO/aggregator content rather than a primary announcement, carried
+  forward again for round 26); Dabble/Scrivener/Campfire (nothing dated
+  in-window across pricing, outages, reviews, or forums); and the
+  industry/legal pass (no new lawsuit, ruling, survey, or AI-detection
+  book-deal controversy in-window; confirmed Kadrey v. Meta has a residual
+  open BitTorrent-distribution claim beyond the already-logged fair-use
+  ruling, not a new suit). The type.ai/Obsidian pass surfaced one
+  genuinely new find: Scríob (scriob.app), a local-first writing app not
+  logged in any prior round, running AI on-device via Ollama or Apple
+  Intelligence alongside a worldbuilding wiki and story editor — folded
+  into the four-app-bundle item as the closest local-AI-plus-worldbuilding
+  match since WebNovel Assistant, but confirmed to have no task manager or
+  focus timer, so the fourth-app gap stays open on both sides (still no
+  product pairs local AI with task-tracking and a timer; still no product
+  pairs all four pillars with a genuine local writing partner). Also
+  logged: WebNovel Assistant shipped a same-window v3.8.1 bug-fix patch
+  (no AI added, timestamp borderline on the cutoff) and the network
+  egress blocklist widened again this round (feedback.sudowrite.com,
+  docs.sudowrite.com, status.sudowrite.com, releasebot.io, tickerr.ai,
+  trustpilot.com, and forum.literatureandlatte.com all blocked, on top of
+  round 24's list), continuing the degradation flagged the last several
+  rounds. No new checklist items beyond the four-app-bundle addition. Per
+  round 19's note that repeating the cadence-frequency request adds
+  nothing further on its own, this entry records the day count without
+  re-raising it. Full notes in RESEARCH.md Round 25.
 
 - 2026-08-10 — Research round 24 (autopilot; no code). Tenth consecutive
   research-only day (rounds 15-24, Aug 1-10). Dispatched the same four
