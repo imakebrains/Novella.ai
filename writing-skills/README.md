@@ -25,6 +25,11 @@ Novella.ai/writing-skills .`
 - **`vendor/`** — complete third-party skill suites, licenses intact
   (see `vendor/README.md` for provenance). Don't edit in place; distill
   improvements into `skills/` instead.
+- **`reference-library/`** — full-text public-domain and openly licensed
+  works: the craft canon (`craft/`) and technique-exemplar fiction
+  (`fiction/`), each entry indexed with provenance, license, and the
+  lesson it carries. Only confirmed-free works, ever — see the folder's
+  INDEX.md.
 
 ## The skills
 

@@ -680,6 +680,18 @@ dependencies were rebuilt from call sites the same day (originals
 confirmed unrecoverable); the rebuilt skills are reconstructions — when
 in doubt, the playbook's expectations are the spec.
 
+**Reference-library stockpile (standing pass, owner-added 2026-08-12):**
+`writing-skills/reference-library/` stockpiles full-text works that are
+genuinely free to copy — public domain (Project Gutenberg via its
+GITenberg GitHub mirrors, Standard Ebooks' GitHub org) and openly
+licensed (CC) — craft books and technique-exemplar fiction. Every file
+gets provenance and license recorded in the folder's INDEX.md; PG
+header/footer boilerplate is stripped per their trademark license.
+Scouting rounds keep adding to it. Nothing goes in without a confirmed
+public-domain or open license — the library must never carry a work that
+could poison the repo. Note: gutenberg.org and standardebooks.org are
+egress-blocked here; the GitHub mirrors are the working route.
+
 **Source-access workaround (Round 1 finding, verified in this sandbox):**
 when direct fetches are egress-blocked — the norm since research round 22 —
 GitHub `releases.atom` feeds still read fine via WebFetch, and
