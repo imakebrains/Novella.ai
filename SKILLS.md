@@ -104,6 +104,25 @@ owner is on Windows).
 (Newest first. Each round: what was found, authorship notes, what was
 acquired or queued, and what next round should chase.)
 
+# Round 1 addendum — reference library seeded (2026-08-12, same day)
+
+Owner-directed: stockpile publicly downloadable books into the repo.
+Policy set: **confirmed public domain or open license only** — anything
+unverifiable gets linked in sources/, never stored. First haul, acquired
+via GITenberg GitHub mirrors (gutenberg.org itself egress-blocked): **26
+works, ~1.95M words** into `writing-skills/reference-library/` — the
+public-domain craft canon (15: Aristotle's Poetics through Forster's
+Aspects of the Novel, incl. Lubbock's Craft of Fiction, Wharton's
+Writing of Fiction, Polti's 36 Dramatic Situations) and 11 technique-
+exemplar novels/collections (Austen for free indirect style, Ford for
+unreliable narration, Woolf for interiority, Gatsby for peripheral
+narration, 180 Maupassant stories for turn endings). One miss: Bliss
+Perry's A Study of Prose Fiction (no unblocked source). Full provenance
+in reference-library/INDEX.md. Future rounds keep adding — next
+candidates: retry Perry, CC-licensed craft textbooks (Open SUNY
+"Naming the Unnameable", BCcampus self-publishing guide) if a GitHub
+mirror exists, more Chekhov/Garnett volumes.
+
 # Round 1 (2026-08-12)
 
 First scouting round, run live with the owner. Four parallel scouts:
