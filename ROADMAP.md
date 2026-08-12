@@ -81,10 +81,48 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
          the writing-style system and word-level diffing in `src/ui/diff.ts`;
          this wires them to a selection. The diff and selection logic are
          unit-testable.
-      7. **"Style me" at project creation** (WITH-OWNER). A short design-taste
-         flow when starting a project that tailors the app's look to how that
-         person wants to work. Extends the existing Appearance settings and the
-         first-run wizard.
+      7. **"Style me" / conversational onboarding** (WITH-OWNER on taste, but
+         the mechanism is PROVEN — see below). The owner pointed at Lingrow's
+         onboarding as the target feeling: you talk with it, and answering
+         "what's your favourite colour?" recolours the app *mid-conversation*.
+         Small touches that make it feel welcoming, then Apple-grade clarity —
+         easy for anyone regardless of tech knowledge.
+
+         What that actually decomposes into:
+         - **A conversation, not a form.** One question per screen, arriving as
+           typed-out messages rather than a wall of fields. Our FirstRunWizard
+           (`src/ui/FirstRunWizard.tsx`) already has the 4 steps and the skip
+           path; this is a presentation change to it, not a new system.
+         - **Each answer visibly changes the app as you answer it.** This is the
+           whole trick and it is the part that must not be faked.
+         - **Apple-grade restraint:** one decision per screen, generous
+           whitespace, real motion (never snapping), no jargon.
+
+         VERIFIED 2026-08-12 in the running app — the hard half already exists:
+         `applyPersonalization()` in `src/ui/personalize.ts` sets accent as an
+         inline CSS variable on `<html>`, costing **0.3ms**, and real painted
+         elements follow immediately (measured: `.brand-mark`, the CodeMirror
+         caret, the active line). `readableOn()` auto-picks a legible foreground
+         both ways — pale accent gives `#131113`, dark accent gives `#f5f0ea` —
+         so no colour choice can make the UI unreadable. Reset restores the
+         theme cleanly. The Lingrow colour moment is therefore wiring, not
+         research.
+
+         **The constraint Lingrow does not have, and the design decision that
+         follows.** Lingrow is a cloud app with a server. Novella at first launch
+         has NO AI — Ollama is not installed and no API key exists. A genuinely
+         model-backed onboarding chat would need setup before the setup, or a
+         phone-home, either of which breaks the zero-key promise that is the
+         whole thesis. So: **the onboarding conversation is SCRIPTED, not
+         model-backed.** Typed-message pacing, branching on answers, zero
+         network, works offline on first launch forever. It may *offer* to set
+         up local AI as one of its questions, but it must never depend on it.
+         Do not "upgrade" this to a live model later without re-reading this
+         paragraph.
+
+         Sequencing note: this should land AFTER the responsive/mobile pass.
+         A premium first impression that renders at 0px on a phone is worth
+         less than nothing.
       8. **Absorb the type.ai lessons generally** (research round 27). What
          reviewers like is *interaction*, not model quality — selective inline
          edits, and an AI that lives in the document. What they dislike is
