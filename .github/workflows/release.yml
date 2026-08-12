@@ -63,7 +63,14 @@ jobs:
         with:
           tagName: ${{ github.event.inputs.tag || github.ref_name }}
           releaseName: "Novella ${{ github.event.inputs.tag || github.ref_name }}"
-          releaseBody: "Download the installer for your platform below. Novella checks here for updates automatically."
+          releaseBody: |
+            Download the installer for your platform below. Novella checks here for updates automatically.
+
+            **Windows:** SmartScreen will warn that the app is unrecognized — these builds aren't code-signed yet. Click **More info → Run anyway**.
+
+            **macOS:** Gatekeeper may say the app "is damaged" — that means unsigned, not corrupt. Right-click the app → **Open** → **Open**.
+
+            Your writing stays on your machine: plain Markdown files in a folder you choose, no account, no server, no telemetry. See SECURITY.md in the repo for the audit.
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
