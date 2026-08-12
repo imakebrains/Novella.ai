@@ -3177,3 +3177,79 @@ entry.
 - [Novel Forge AI](https://www.mediachance.com/novelforge/)
 - [TechCrunch: Pangram raises $9M](https://techcrunch.com/2026/07/29/as-ai-content-floods-the-internet-pangram-raises-9m-to-detect-it/)
 - [Tech Times: Daggermouth hardcover flagged by AI researchers](https://www.techtimes.com/articles/321780/20260728/daggermouth-hardcover-drops-today-booktok-hit-flagged-ai-researchers.htm)
+
+
+---
+
+# Round 27 (2026-08-12) — Type.ai, at the owner's request
+
+The owner sent type.ai's landing page and asked what people like and dislike
+about it, with an eye to borrowing the good parts. This round is that, plus
+the design conclusions that fall out of it.
+
+## What people praise (and it is never the model)
+
+Every positive review lands on the same two things, and neither is "the AI
+is smarter":
+
+1. **Suggestions are selective, not all-or-nothing.** You highlight a
+   passage, ask for a rewrite / shorten / expand / reframe, and the proposed
+   edit appears *inline* against your text — accept or reject them one at a
+   time or in a batch. Reviewers specifically praise being able to write
+   normally and use suggestions selectively instead of accepting everything.
+   The unit of AI help is a sentence you chose, not a wall of generated prose
+   you then have to reconcile.
+2. **The AI lives inside the document.** Type Chat is a chat panel embedded
+   in the editor and bound to the open manuscript — "no more copy-pasting
+   between tools." Reviewers credit its reading the whole document (not just
+   the last exchange) for making it useful on long-form work: tone
+   consistency across sections, multi-part arguments, sanity-checking
+   research-heavy writing.
+
+Both are *workflow* wins, not intelligence wins. That matters for us: a
+local 8B model in the right interaction shape can beat a frontier model in
+the wrong one.
+
+## What people dislike
+
+- **Shallow output needing heavy edits** — "fast but sometimes lacks depth,"
+  "often requiring significant edits to meet standards." The same complaint
+  aimed at Sudowrite's polish-without-substance.
+- **Context misses producing awkward phrasing** — it occasionally
+  misunderstands what a passage is doing.
+- **Pricing** — called uncompetitive and inflexible, especially for
+  freelancers. Same shape as the NovelCrafter complaint: the subscription is
+  not the whole cost, and it does not flex.
+- **English only.**
+
+## What this means for Novella
+
+The two liked things are interaction design we do not have, and both are in
+reach:
+
+- Our Assistant is a **one-shot generate-and-insert panel**. Type's is a
+  **conversation bound to the document**. Same model access, very different
+  feel.
+- We already have the writing-style system and word-level diffing in
+  `src/ui/diff.ts` (built for History). A highlight to reword-in-style to
+  inline accept/reject flow is those two existing pieces wired to a text
+  selection. Assembly, not invention.
+
+The disliked things are ours to win by construction rather than by trying
+harder: shallow generic prose is what a style *learned from the writer's own
+pages* fixes (already on the backlog as the voice-matching item), and the
+pricing complaint cannot touch a local model with no marginal cost.
+
+One caution worth stating plainly: type.ai is repeatedly the tool reviewers
+pick **over** NovelCrafter, and never for features — always for friction.
+Round 1 recorded it as "minutes to first useful output." Owner round 5 adds
+surface area to Novella. Each addition has to pay for itself against that.
+
+### Round 27 sources
+
+- [Type.ai pros and cons — G2](https://www.g2.com/products/type-ai/reviews?qs=pros-and-cons)
+- [Type.ai Review: My Top Pick After Testing Three AI Writing Tools](https://ilampadmanabhan.medium.com/type-ai-review-719f59c68dbb)
+- [Write On! The Magic of Inline Commands — Type.ai blog](https://blog.type.ai/post/writing-with-ai-commands)
+- [Introducing a faster way to edit with AI — Type.ai blog](https://blog.type.ai/post/introducing-a-faster-way-to-edit-with-ai)
+- [Brainstorm, write, and rewrite with Type Chat — Type.ai blog](https://blog.type.ai/post/brainstorm-and-rewrite-with-chat)
+- [Type AI Reviews (2025) — aitools.xyz](https://aitools.xyz/tools/type-ai/reviews)

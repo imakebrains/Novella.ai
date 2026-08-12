@@ -9,7 +9,15 @@ dated log line, and pushes. Humans edit it freely — reorder, add, strike.
 - `npx tsc --noEmit` clean, `npx tsx test-units.ts` green, `npm run verify` green.
 - Pure logic gets unit tests in `test-units.ts`.
 - UI changes verified in the running app (dev server + `window.__novella`),
-  not assumed.
+  not assumed — **when a browser is available**. It usually is not on the
+  cloud runner, and that is NOT a reason to skip building. Twenty
+  consecutive research-only runs (rounds 7–26) happened because every
+  backlog item was UI work and this line read as an absolute bar. It is
+  not. Without a browser: build it, unit-test the logic properly, and
+  write in the log line exactly which parts are verified and which still
+  need a human at the screen. Honest partial verification beats twenty
+  days of no code.
+- Never claim a UI was verified live if it was not. Say which is which.
 - Never rewrite `src/core/vault.ts` (Phase 1 engine — small guarded fixes only).
 - Match the codebase's comment voice: explain constraints, not mechanics.
 - Commit to `main` with the Co-Authored-By line; push.
@@ -33,6 +41,56 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
 (plain Markdown, one-click export — lock-in is a churn engine, not a moat).
 
 ## Next up
+
+- [ ] **OWNER ROUND 5 (2026-08-12) — the type.ai comparison.** Eight changes
+      the owner asked for after looking at type.ai. They deferred these to a
+      working session ("we will work on this after session usage resets"), so
+      do NOT bulk-build them autonomously. The four marked CLOUD-OK have a
+      pure-logic core and no taste dependency and ARE fair game for a build
+      run — take one, extract its logic, unit-test it, and say in the log
+      which parts a human still needs to look at. The four marked WITH-OWNER
+      are design and taste calls; leave them.
+
+      1. **Interactive calendar** (CLOUD-OK for the local half). Today it only
+         displays. Wants: create, edit and schedule events; plan in it. The
+         event store and date maths are pure and unit-testable; the panel is a
+         thin layer over them. Google Calendar sync is a separate later piece
+         and is NEEDS OWNER (Google Cloud project + OAuth consent screen) —
+         build the local planner first and never fake a connection.
+      2. **Split the Board from Write entirely** (WITH-OWNER). The Board should
+         stop being manuscript-centric and become its own space: character
+         information, a story board, and a home for memories, schedules and
+         plans. This is an information-architecture change, not a feature — it
+         touches the mode switch in App.tsx, Corkboard, and what "a board"
+         means. Scope it with the owner before moving code.
+      3. **Settings modal keeps one size** (CLOUD-OK). It shrinks when a tab has
+         little content, so the dialog jumps as you move between tabs. Give it a
+         stable min-height. Small and pure CSS.
+      4. **New logo** (WITH-OWNER). The square/diamond mark should become an open
+         book, or something with more character. Touches the titlebar brand, the
+         Tauri icon set and the PWA manifest icons — so it means regenerating
+         `src-tauri/icons/*` from a new source image.
+      5. **A real Chat section, not "Assistant"** (CLOUD-OK for the core).
+         Type.ai's most-praised feature: a persistent chat panel bound to the
+         open manuscript, connected to Claude / ChatGPT / local, that keeps its
+         thread instead of being one-shot generate-and-insert. Message history
+         and context assembly are testable without a browser.
+      6. **Highlight, reword in a chosen style, replace inline** (CLOUD-OK for
+         the core). The other thing type.ai reviewers praise: select a passage,
+         get alternatives, accept or reject them individually. We already have
+         the writing-style system and word-level diffing in `src/ui/diff.ts`;
+         this wires them to a selection. The diff and selection logic are
+         unit-testable.
+      7. **"Style me" at project creation** (WITH-OWNER). A short design-taste
+         flow when starting a project that tailors the app's look to how that
+         person wants to work. Extends the existing Appearance settings and the
+         first-run wizard.
+      8. **Absorb the type.ai lessons generally** (research round 27). What
+         reviewers like is *interaction*, not model quality — selective inline
+         edits, and an AI that lives in the document. What they dislike is
+         shallow output, occasional context misses, and inflexible pricing. The
+         first two are ours to win with the voice-matching item; the third we
+         win by construction.
 
 - [x] **Slash commands in the editor** — shipped 2026-07-22.
 - [x] **Writing sprints (the fourth app)** — shipped 2026-07-23.
