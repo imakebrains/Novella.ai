@@ -672,8 +672,17 @@ AI-generated content farms, and note authorship on every find. Acquired
 skills live in `.claude/skills/` (picked up automatically by future
 sessions); SKILLS.md holds the library index and the dated scouting notes,
 parallel to RESEARCH.md. Open acquisition goal: the novel-playbook suite's
-missing dependency stack (see SKILLS.md) — ask the owner for an export from
-the original chat before rebuilding from scratch.
+five still-missing dependency skills (see SKILLS.md — three of the original
+eight were recovered from public repos in Round 1) — ask the owner for an
+export from the original chat before rebuilding from scratch.
+
+**Source-access workaround (Round 1 finding, verified in this sandbox):**
+when direct fetches are egress-blocked — the norm since research round 22 —
+GitHub `releases.atom` feeds still read fine via WebFetch, and
+`openrss.org/<url>` generates feeds for feed-less changelog pages. Research
+passes should prefer feeds over raw fetches for competitor monitoring, and
+git-scrape what matters: save fetched snapshots into the repo so `git diff`
+becomes the change detector.
 
 ## Adding to this list
 
@@ -691,6 +700,28 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-08-12 — Skills scouting round 1 (owner-directed, same session as
+  round 26; no app code). Owner added a standing skills-and-assets
+  scouting pass to the research cadence and supplied a zip of seven
+  novel-writing lifecycle skills gathered in a prior chat — imported to
+  `.claude/skills/` (novel-playbook + six stage skills). First scouting
+  round ran four parallel scouts (skills ecosystem; human-authored craft
+  sources; writer assets; general utility). Headline: three of the
+  playbook suite's eight missing stack dependencies exist as public repos
+  and were vendored under `vendor/skills/` with licenses intact
+  (creative-writing-skills, story-skills, author-toolkit) plus a CC0
+  novel-starter vault; the other five have no public versions — owner
+  export requested. A distillation queue of human-authored craft sources
+  (Matt Bird's story checklist, Swain/Fawkes scene mechanics, Emma
+  Darwin's psychic distance, Holly Lisle revision, MICE Quotient, Shunn
+  format, style-sheet ledger) is logged in SKILLS.md Round 1, along with
+  an adopted feed-based monitoring pattern (releases.atom via WebFetch)
+  that counters the egress degradation logged since round 22. Also fixed
+  this session, outside the cadence: GitHub Pages deploy was failing at
+  configure-pages because Pages wasn't enabled on the repo; owner flipped
+  Settings → Pages → Source = GitHub Actions, run 14 re-ran green, the
+  web build now deploys.
 
 - 2026-08-12 — Research round 26 (autopilot; no code). Twelfth consecutive
   research-only day (rounds 15-26, Aug 1-12). Same four parallel passes as
