@@ -359,6 +359,18 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       stays open on both sides: still no product pairs real local AI with a
       task tracker and a focus timer, and still no product pairs all four
       pillars with a genuine local writing partner.
+      Research round 26 (2026-08-12) found no dated news at all — the third
+      fully dry round on record (after 20 and 22) — but surfaced one more
+      established-but-not-previously-logged entrant while re-running the
+      same check: Novel Forge AI (mediachance.com/novelforge), a desktop
+      novel-planning/writing suite with local AI support (Ollama/LM
+      Studio/Llama.cpp), 50+ AI assistants, and style/dictionary/TTS tools.
+      No task tracker or focus/sprint timer found anywhere in its feature
+      list — same shape as Scríob and PlotForge before it, another
+      local-AI-plus-writing-tools product that leaves the fourth-app gap
+      untouched. Thirteenth dedicated recheck (rounds 15, 17-26) still finds
+      no product pairing local AI with both a task tracker and a focus
+      timer.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -607,6 +619,43 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-08-12 — Research round 26 (autopilot; no code). Twelfth consecutive
+  research-only day (rounds 15-26, Aug 1-12). Same four parallel passes as
+  recent rounds (NovelCrafter/Sudowrite; Dabble/Scrivener/Campfire;
+  type.ai/Obsidian/new-entrant scan; broader industry/legal sentiment),
+  each briefed on rounds 1-25's findings and searching for material dated
+  after round 25's 2026-08-11 cutoff — a one-day window. This is the third
+  fully dry round on record (after rounds 20 and 22): all four passes came
+  back with no genuinely new, in-window material. NovelCrafter/Sudowrite —
+  Sudowrite's status page shows operational, no new incident since the
+  Aug 1-3 outage; round 23-25's two open leads ("Sudowrite Story Engine
+  3.0" and a Sudowrite Developer API) remain unconfirmed by any primary
+  source, carried forward again for round 27; one undated, unconfirmed
+  Reddit mention of Sudowrite "refusing to generate" some content surfaced
+  but isn't dated or verified, so it's noted here rather than turned into
+  a checklist item. Dabble/Scrivener/Campfire — nothing dated in-window
+  across releases, pricing, reviews, or outages. type.ai/Obsidian/
+  new-entrant scan — no update to Scríob or WebNovel Assistant since round
+  25; the four-pillar check (local AI + task tracker + focus timer +
+  worldbuilding) stayed empty for a thirteenth dedicated recheck, but
+  surfaced one established-but-not-previously-logged entrant, Novel Forge
+  AI (mediachance.com/novelforge — local AI via Ollama/LM Studio/
+  Llama.cpp, 50+ AI assistants, no task tracker or timer), folded into the
+  four-app-bundle item. Industry/legal pass — nothing dated in-window
+  across all five standing theme areas; two pre-window items worth a
+  mention for a future round's context but not logged as findings today:
+  Pangram (the AI-detection vendor central to several already-logged book-
+  deal cancellations) raised $9M and shipped "Pangram 4" on July 29, and a
+  H.M. Wolfe/*Daggermouth*/Simon & Schuster AI-detection cancellation
+  (flagged ~July 27-28 via a Stony Brook Pangram study) surfaced that may
+  or may not be the same incident behind round 22's Aug 4 Guardian
+  interview about racial bias in AI-authorship suspicion — unreconciled,
+  flagged for round 27 the way the Falade/Nigerian-thriller ambiguity was
+  flagged and later resolved in rounds 19-24. Access notes: apitracker.io
+  and dabblewriter.com joined the egress blocklist this round, on top of
+  the already-blocked sites logged since round 22 — primary-source access
+  keeps narrowing, not recovering. Full notes in RESEARCH.md Round 26.
 
 - 2026-08-11 — Research round 25 (autopilot; no code). Eleventh consecutive
   research-only day (rounds 15-25, Aug 1-11). Same four parallel passes as

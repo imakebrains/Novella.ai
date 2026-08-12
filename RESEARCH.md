@@ -3047,3 +3047,133 @@ re-raising the cadence request.
 
 - [Scríob — Writing & World-Building Studio](https://scriob.app/)
 - [WebNovel Assistant v3.8.1 release](https://github.com/HatanoChihiro/obsidian-webnovel-assistant/releases/tag/3.8.1)
+
+# Round 26 (2026-08-12)
+
+Twelfth consecutive day this dedicated research schedule has fired
+research-only (rounds 15-26, Aug 1 through Aug 12). Same four parallel
+research passes as recent rounds (NovelCrafter/Sudowrite; Dabble/
+Scrivener/Campfire; type.ai/Obsidian/Notion plus new-entrant scan; broader
+industry/legal sentiment), each briefed on rounds 1-25's findings and told
+to search specifically for material dated after round 25's 2026-08-11
+cutoff — a one-day window. This is the **third fully dry round on record**
+(after rounds 20 and 22): all four passes came back with nothing genuinely
+new and in-window, though two passes surfaced not-previously-logged
+background material worth recording.
+
+## NovelCrafter / Sudowrite
+
+Nothing dated 2026-08-11 or later. Sudowrite's status page shows
+operational, no new incident since the already-logged Aug 1-3 outage
+(#877582). Round 23-25's two open leads — "Sudowrite Story Engine 3.0"
+and a Sudowrite Developer API/SDK ($15/1M input tokens, 500 req/min
+enterprise tier claimed) — remain unconfirmed by any primary source; the
+only primary-adjacent hit is the original "Introducing: Story Engine!"
+changelog entry, which reads as the initial launch, not a "3.0" milestone.
+Both rumors trace only to SEO/aggregator sites (aitoolsdevpro.com,
+apitracker.io, toolify.ai). Carried forward again for round 27.
+
+One thin, unconfirmed data point: an undated Reddit mention describes
+Sudowrite "refusing to generate" some content — not dated, not verified
+against a primary source, and possibly unrelated to (or in tension with)
+the already-logged "uncensored fiction" marketing push around Muse. Not
+logged as a finding; worth a direct follow-up if a dated version surfaces.
+
+NovelCrafter's own blog has a June 11, 2026 post on NSFW model-testing
+methodology, not previously logged but well outside this round's window,
+so noted here only for completeness, not as new.
+
+Access note: feedback.sudowrite.com, status.sudowrite.com (content beyond
+snippets), docs.sudowrite.com, and feedback.novelcrafter.com remained
+blocked as in prior rounds. **apitracker.io is newly blocked** this round.
+
+## Dabble / Scrivener / Campfire
+
+Completely dry — no changelog, pricing, review, or outage activity dated
+2026-08-11 or later for any of the three. Scrivener stays at 3.5.2 (no
+3.5.3 found). No new Dabble reviews or posts. No Campfire changelog past
+the already-logged "State of the Campfire: 2026" roadmap post; no fix
+found yet for the recurring mid-sentence cursor-jump bug reported at
+v1.3.2.
+
+Access note: **dabblewriter.com is newly blocked** for direct fetch this
+round, joining forum.literatureandlatte.com and the Trustpilot/Steam
+domains already blocked in prior rounds.
+
+## type.ai / Obsidian / Notion / new-entrant scan
+
+No update to Scríob (scriob.app) or WebNovel Assistant since round 25's
+findings — both remain at their last-logged state (Scríob: three pillars,
+no task tracker/timer; WebNovel Assistant: v3.8.1, all four pillars except
+AI). type.ai returned no news at all. Longform's last release is still
+2025-03-20. Notion's writing-related marketplace templates (Writing Novel
+Tracker, World Building Bible, a Pomodoro-inclusive "Novel & Fanfic Writer
+Hub") are static templates, not products, and carry no AI — none close the
+gap.
+
+**One established-but-not-previously-logged entrant surfaced: Novel Forge
+AI** (mediachance.com/novelforge). A desktop novel-planning/writing suite
+with local AI support via Ollama, LM Studio, or Llama.cpp; 50+ named "AI
+assistants" for planning/drafting tasks; plus style/dictionary tools and
+TTS. This is an established mediachance.com product, not a fresh launch —
+no date attaches it to this reporting window, so it's logged as
+new-to-this-cadence rather than as breaking news, the same treatment
+Scríob got in round 25. A dedicated check of its feature list found no
+task manager and no focus/sprint timer anywhere. Same shape as every prior
+"closest analog" entrant (Scríob, PlotForge, Novel Mage): real local AI,
+real writing/planning tools, zero task-tracking or timer functionality.
+
+The four-pillar check (local/private AI generation + task tracking +
+focus timer + worldbuilding, all in one app) stays **confirmed empty** —
+now checked across thirteen rounds (15/17-26 plus the two mid-cadence
+resolutions). Novel Forge AI, like Scríob before it, narrows nothing new;
+it's simply one more product occupying the same three-pillar space.
+
+## Broader industry / legal sentiment
+
+Nothing dated 2026-08-11 or later across all five standing theme areas.
+Two pre-window items surfaced that hadn't been logged before, recorded
+here for context rather than as new findings:
+
+- **Pangram**, the AI-detection vendor whose runs sit behind several
+  already-logged book-deal cancellations, raised $9M and shipped "Pangram
+  4" on July 29, 2026 (TechCrunch). Pre-dates this round's window but is
+  useful background the next time an AI-detection cancellation story
+  surfaces, since it's very likely the same detector vendor each time.
+- A H.M. Wolfe / *Daggermouth* / Simon & Schuster AI-detection
+  cancellation, flagged around July 27-28, 2026 via a Stony Brook study
+  run through Pangram (Tech Times). This **may or may not be the same
+  incident** behind round 22's Aug 4 Guardian interview about a pattern of
+  racial bias in how AI-authorship suspicion gets applied to Black
+  authors' book deals — both involve a Black author and an AI-detection-
+  driven deal loss in roughly the same window, but the source material
+  found this round didn't confirm or rule out the connection. Flagged
+  unreconciled for round 27, the same way the Jerry Falade / "Nigerian
+  chemistry-PhD-cleaner-in-Houston thriller" ambiguity was flagged in
+  round 19 and resolved (as one incident, not two) in round 24. As with
+  round 22's original note: this is recorded for awareness and accuracy
+  only, explicitly not as a marketing angle — it's a claim about how other
+  authors' accusations get adjudicated, not a product-comparison data
+  point about Novella.
+
+No new lawsuit, ruling, EU AI Act enforcement action, or NaNoWriMo-
+successor development this round.
+
+## What changed in ROADMAP.md
+
+One addition, folded into the existing four-app-bundle item: Novel Forge
+AI as a new-to-this-cadence local-AI entrant that still lacks a task
+tracker and focus timer, reinforcing rather than narrowing the standing
+gap. No other checklist changes — this round's other findings (the two
+carried-forward Sudowrite rumors, the unconfirmed Reddit mention, the
+Pangram/Daggermouth background items, and the widened egress blocklist)
+are recorded here and in the Shipped log entry but didn't clear the bar
+for a checklist edit. The twelfth-straight-research-only-day count and the
+third-fully-dry-round distinction are both recorded in the Shipped log
+entry.
+
+## Round 26 sources
+
+- [Novel Forge AI](https://www.mediachance.com/novelforge/)
+- [TechCrunch: Pangram raises $9M](https://techcrunch.com/2026/07/29/as-ai-content-floods-the-internet-pangram-raises-9m-to-detect-it/)
+- [Tech Times: Daggermouth hardcover flagged by AI researchers](https://www.techtimes.com/articles/321780/20260728/daggermouth-hardcover-drops-today-booktok-hit-flagged-ai-researchers.htm)
