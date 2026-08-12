@@ -671,10 +671,14 @@ human-authored sources (real writers, editors, practitioners) over
 AI-generated content farms, and note authorship on every find. Acquired
 skills live in `.claude/skills/` (picked up automatically by future
 sessions); SKILLS.md holds the library index and the dated scouting notes,
-parallel to RESEARCH.md. Open acquisition goal: the novel-playbook suite's
-five still-missing dependency skills (see SKILLS.md — three of the original
-eight were recovered from public repos in Round 1) — ask the owner for an
-export from the original chat before rebuilding from scratch.
+parallel to RESEARCH.md. The library itself lives in `writing-skills/` at
+the repo root (skills + sources + vendor), self-contained so it can move
+to its own GitHub repo once the owner creates one and grants access —
+repo creation from this environment was tried 2026-08-12 and denied
+(credential scoped to this repo only). The playbook suite's five missing
+dependencies were rebuilt from call sites the same day (originals
+confirmed unrecoverable); the rebuilt skills are reconstructions — when
+in doubt, the playbook's expectations are the spec.
 
 **Source-access workaround (Round 1 finding, verified in this sandbox):**
 when direct fetches are egress-blocked — the norm since research round 22 —

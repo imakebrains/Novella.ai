@@ -3,9 +3,18 @@
 The companion to RESEARCH.md, but for *capability* instead of competitive
 intelligence. This file tracks two things:
 
-1. **The acquired library** — Agent Skills and reusable assets committed to
-   this repo (under `.claude/skills/`), where every future session in this
-   repo picks them up automatically.
+1. **The acquired library** — lives in **`writing-skills/`** at the repo
+   root (skills + sources index + vendored suites), a self-contained
+   folder designed to lift out into its own GitHub repo. Skills meant to
+   be active in this repo are also installed under `.claude/skills/`,
+   where every future session picks them up automatically.
+
+   *Dedicated-repo status (owner request, 2026-08-12):* the owner wants
+   this library in its own GitHub repo. Creation was attempted and
+   **denied** — the automation's GitHub credential is scoped to
+   imakebrains/Novella.ai only (403 on create). Blocked on the owner:
+   create an empty `writing-skills` repo on GitHub and add it to this
+   environment's repository access; the folder then moves over unchanged.
 2. **Scouting rounds** — dated notes from the recurring skills-and-assets
    scouting pass (see "Research cadence" in ROADMAP.md), which hunts for
    new or improved skills, distillable human-authored craft sources, and
@@ -48,16 +57,20 @@ original import: `master-novel`, `conversational-authority`, `every-word`,
 `author-toolkit`, `graphify-novel`. Without the stack they still work as
 disciplined checklists.
 
-**Stack recovery status (Round 1, 2026-08-12):** three of the eight exist
-as real public repos and are now vendored (see below): `story-skills`,
-`creative-writing-skills`, `author-toolkit`. The other five
-(`master-novel`, `conversational-authority`, `every-word`,
-`manuscript-export`, `graphify-novel`) have **no public versions** — they
-were likely private to the owner's original chat. Near-equivalents found:
-`avoid-ai-writing` covers much of what `every-word` implies (prose-pattern
-audits), and two pandoc-based EPUB skills cover the `manuscript-export`
-slot. **Ask the owner for an export of the five missing ones from the
-original chat before rebuilding from scratch.**
+**Stack recovery status (updated 2026-08-12, same day):** three of the
+eight exist as real public repos and are vendored (see below):
+`story-skills`, `creative-writing-skills`, `author-toolkit`. The other
+five (`master-novel`, `conversational-authority`, `every-word`,
+`manuscript-export`, `graphify-novel`) had no public versions, and the
+owner confirmed the originals are unrecoverable — so they were **rebuilt
+from their call sites** (every mention across the seven playbook skills:
+ledger names and column schemas, the ten line-pass names, the compile
+command, export flags, wake-date queries) as original skills. The rebuilt
+five live in `writing-skills/skills/` alongside library copies of the
+playbook suite, and are installed in `.claude/skills/`. They are
+reconstructions, not restorations — if any behaves differently than the
+owner remembers, treat the playbook's expectations as the spec and fix
+the rebuilt skill, not the playbook.
 
 ### Vendored suites — acquired 2026-08-12 (Round 1)
 
