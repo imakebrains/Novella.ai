@@ -603,6 +603,20 @@ Sudowrite, Dabble, Scrivener, Campfire, Notion-for-writers. Add findings as
 new checklist items with a one-line source note — do not build on the same
 run. RESEARCH.md holds the long-form findings.
 
+**Skills & assets scouting (standing pass, owner-added 2026-08-12):** every
+research run also spends one pass scouting for new or improved *capability*
+— Agent Skills, distillable writing-craft sources, and concrete assets
+(templates, checklists, reference material). Core beat is the actual craft
+of writing novels/books, but anything genuinely useful to the owner, the
+autopilot routine, or this project is in scope. Two rules: prefer
+human-authored sources (real writers, editors, practitioners) over
+AI-generated content farms, and note authorship on every find. Acquired
+skills live in `.claude/skills/` (picked up automatically by future
+sessions); SKILLS.md holds the library index and the dated scouting notes,
+parallel to RESEARCH.md. Open acquisition goal: the novel-playbook suite's
+missing dependency stack (see SKILLS.md) — ask the owner for an export from
+the original chat before rebuilding from scratch.
+
 ## Adding to this list
 
 Don't wait for a research run. **Any time a run notices something — a bug, a
