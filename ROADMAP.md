@@ -755,6 +755,28 @@ scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
 
+- 2026-08-13 — Research round 28 (autopilot; no code). Dispatched the same
+  four parallel research passes as recent rounds (NovelCrafter/Sudowrite;
+  Dabble/Scrivener/Campfire; type.ai/Obsidian/new-entrant scan; broader
+  industry/legal sentiment), each briefed on rounds 1-27's findings and
+  searching for material dated after round 26/27's 2026-08-12 cutoff
+  (64 searches total across all four passes). This is the first round where
+  **all four passes came back genuinely dry simultaneously**, rather than
+  three-of-four as in rounds 20, 22 and 26 — the fourth fully dry round on
+  record overall. No new checklist items. Two corrections surfaced and are
+  worth carrying forward even though they don't change "Next up": the
+  Scrivener 3.5.2 point release some earlier pass had implicitly treated as
+  recent is actually dated December 19, 2025; and the two rumors carried
+  open since round 23 ("Sudowrite Story Engine 3.0" and a Sudowrite
+  "Developer API") were checked directly against Sudowrite's own
+  docs.sudowrite.com features page this round and found uncorroborated by
+  any primary source — recommend treating both as dead rather than open
+  going forward. Egress access partially recovered this round: WebFetch
+  reached feedback.sudowrite.com, docs.sudowrite.com,
+  forum.literatureandlatte.com and dabblewriter.com/blog directly, sites
+  that had been hard-blocked or 403ing in rounds 22-26. Full notes in
+  RESEARCH.md Round 28.
+
 - 2026-08-12 — Skills scouting round 1 (owner-directed, same session as
   round 26; no app code). Owner added a standing skills-and-assets
   scouting pass to the research cadence and supplied a zip of seven

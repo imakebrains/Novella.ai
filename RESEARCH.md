@@ -3253,3 +3253,110 @@ surface area to Novella. Each addition has to pay for itself against that.
 - [Introducing a faster way to edit with AI — Type.ai blog](https://blog.type.ai/post/introducing-a-faster-way-to-edit-with-ai)
 - [Brainstorm, write, and rewrite with Type Chat — Type.ai blog](https://blog.type.ai/post/brainstorm-and-rewrite-with-chat)
 - [Type AI Reviews (2025) — aitools.xyz](https://aitools.xyz/tools/type-ai/reviews)
+
+---
+
+# Round 28 (2026-08-13) — cadence, fully dry
+
+Fourth fully-dry round on record (after rounds 20, 22, 26), and this one is
+dry across all four passes simultaneously rather than three-of-four — a
+first. Same four parallel passes as recent rounds, each briefed on rounds
+1-27's findings and told to search specifically for material dated after
+round 26/27's 2026-08-12 cutoff. Total: 64 searches plus targeted fetches
+across all four passes. None found anything datable to after 2026-08-12.
+
+## NovelCrafter / Sudowrite
+
+Nothing new. Sudowrite's official changelog (feedback.sudowrite.com) and
+releasebot.io both cap out at the already-logged August 3 entry ("Cheaper
+GPT-5.6 Models, Plus a Batch of Chat Fixes"); status.sudowrite.com shows no
+incidents. NovelCrafter's changelog still tops out at the March 21 Codex
+update; its status page shows no incidents in 14 days. Rumor check on the
+two items carried forward since round 23 ("Sudowrite Story Engine 3.0" and
+a Sudowrite "Developer API"): both checked directly against
+docs.sudowrite.com's own features page this round and **neither is
+corroborated by any primary source** — "Story Engine 3.0" traces only to a
+low-quality SEO/affiliate blog (aitoolsdevpro.com), and the "Developer API"
+traces only to a third-party aggregator (apitracker.io) with no
+confirmation on sudowrite.com or its docs. Recommend treating both as dead
+rumors rather than open leads from here — no primary source has surfaced in
+five rounds of checking (23 through 28). Egress note: no new blocks this
+round; WebFetch reached feedback.sudowrite.com, docs.sudowrite.com,
+feedback.novelcrafter.com and status.novelcrafter.com directly, a partial
+recovery from the harder blocks logged in rounds 22-26.
+
+## Dabble / Scrivener / Campfire
+
+Nothing new. Scrivener's most recent point release (3.5.2, Tahoe scroller
+fix) is confirmed dated December 19, 2025 — well outside any prior round's
+window, meaning it had been mis-cited as recent in earlier passes; flagging
+so no future round cites it as current news again. Dabble's Trustpilot
+complaints found this round trace to February 2026. Campfire's latest
+versioned changelog entry is still v1.3.2 (June 29, 2026); the "State of
+the Campfire: 2026" roadmap page is unchanged and still undated. Egress
+note: no new hard blocks — WebFetch reached forum.literatureandlatte.com and
+dabblewriter.com/blog directly this round, another partial recovery from
+recent rounds' blocks (Trustpilot itself still only accessible via search
+snippets, not confirmed reachable directly).
+
+## type.ai / Obsidian / new entrants / four-pillar check
+
+Nothing new for type.ai beyond round 27's already-thorough coverage. For the
+Obsidian plugin ecosystem, checked GitHub release Atom feeds directly for
+precise timestamps (bypassing the blocked forum/community/obsidianstats
+domains) rather than relying on search snippets: both actively-developed
+plugins shipped releases dated **2026-08-12**, the same calendar day as the
+round 26/27 cutoff rather than strictly after it — StoryLine v1.10.58
+(09:09 UTC, scene/chapter range exports, default Kanban status ordering) and
+WebNovel Assistant v3.8.2 (14:17 UTC, chapter-nav/task-persistence fixes).
+Worth naming for precision but neither clears the "after 2026-08-12" bar
+this round used, so not logged as a finding. No genuinely new product
+surfaced in the new-entrant scan — one low-signal App Store listing
+("NovelWriter," on-device/Apple Intelligence claim) turned up with no
+verifiable launch date and reads as a generic mobile story-generator, not a
+serious desktop competitor; not logged. The four-pillar recheck (local AI +
+task tracker + focus timer + worldbuilding, one app) is still empty after a
+fifteenth dedicated pass across rounds 15, 17-28 — closest matches remain
+WebNovel Assistant/StoryLine (all four pillars via Obsidian community
+plugins, zero AI) and Scríob (local AI + worldbuilding + editor, no task
+tracker/timer); LocalProse has a Focus mode + worldbuilding + local AI but
+still no task tracker.
+
+## Industry / legal sentiment
+
+Nothing new across all five standing theme areas. AI-training/copyright:
+Kadrey v. Meta's residual BitTorrent claim has no summary-judgment briefing
+until Feb 2027; the Google/Gemini publisher suit shows no docket movement
+since mid-July; Bartz v. Anthropic's only forward note is that its 30-day
+appeal window runs through 2026-08-19 (a date worth watching next round, not
+an event yet). Author sentiment: no new survey; the untraceable "78% of
+authors now use AI" stat still hasn't surfaced a primary source and stays
+uncited. AI-detection/pulled deals: all coverage of Falade/Minotaur, Shy
+Girl/Hachette, and Daggermouth/Pangram still dated on or before 2026-08-12,
+no new incident; one added texture, not a new event — Falade told the
+Guardian that AI-detection tools "are widely known to produce false
+positives" and that three Black authors had deals cancelled or disrupted
+over AI suspicion this year alone, consistent with (not additive to) the
+already-logged Aug 4 Guardian racial-bias item. NaNoWriMo-successor
+fragmentation: unchanged, no consolidation or new entrant. AI-flooding
+dynamics: no update beyond the already-logged arXiv paper (2607.20349).
+
+## What changed in ROADMAP.md
+
+Nothing. No finding this round cleared the bar of being both new and dated
+within the one-day-plus window, across any of the four passes — the first
+round where all four came back dry simultaneously rather than three of
+four. Two corrections worth carrying forward even though they don't change
+the checklist: the Scrivener 3.5.2 release date (actually Dec 19 2025, not
+recent) and the "Sudowrite Story Engine 3.0" / "Developer API" rumors
+(checked directly against Sudowrite's own docs and found no corroboration —
+treat as dead, not open, going forward).
+
+## Round 28 sources
+
+- feedback.sudowrite.com, docs.sudowrite.com, status.sudowrite.com, releasebot.io
+- feedback.novelcrafter.com, status.novelcrafter.com
+- forum.literatureandlatte.com, dabblewriter.com/blog
+- github.com/PixeroJan/obsidian-storyline/releases.atom
+- github.com/HatanoChihiro/obsidian-webnovel-assistant/releases.atom
+- scriob.app, plotforge.app, novelmage.com, mergen.ink, epilogue.page
