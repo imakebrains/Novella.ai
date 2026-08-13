@@ -24,6 +24,7 @@ import {
   tapAdvance,
 } from "./src/ui/introScript";
 import { cycleTab, type TabId } from "./src/ui/inspectorTabs";
+import { glowModeOf } from "./src/ui/personalize";
 import { acceptsTemperature } from "./src/ai/models";
 import { parseNote, serializeNote, extractWikiLinks, Vault } from "./src/core/vault";
 import { checkContinuity } from "./src/analysis/continuity";
@@ -1041,6 +1042,16 @@ lied, and Wren had known that since she was nine.
   check("tools: wraps at the end", cycleTab("history", vis, 1), "links");
   check("tools: hidden current falls to first visible", cycleTab("music" as TabId, vis, 1), "links");
   check("tools: empty visible is a no-op", cycleTab("links", [] as TabId[], 1), "links");
+}
+
+
+/* ---------- glow mode migration ---------- */
+
+{
+  check("glow: absent means off", glowModeOf({}), "off");
+  check("glow: old boolean reads as follow", glowModeOf({ glow: true }), "follow");
+  check("glow: explicit mode wins over the old flag", glowModeOf({ glow: true, glowMode: "drift" }), "drift");
+  check("glow: off stays off", glowModeOf({ glowMode: "off" }), "off");
 }
 
 /* ---------- report ---------- */

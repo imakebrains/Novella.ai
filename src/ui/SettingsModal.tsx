@@ -20,7 +20,9 @@ import { AgentsPanel } from "./AgentsPanel";
 import { replayIntro } from "./WelcomeIntro";
 import { INTRO_SWATCHES } from "./introScript";
 import { tabPrefs, useTabPrefs, type TabId } from "./inspectorTabs";
+import { toBannerDataUrl } from "../state/projects";
 import {
+  glowModeOf,
   loadPersonalization,
   resetPersonalization,
   savePersonalization,
@@ -299,21 +301,52 @@ function AppearanceTab() {
       <section className="ap-section">
         <h3 className="ap-title">Ambient glow</h3>
         <p className="ap-sub">
-          A soft accent light that drifts with your cursor. The welcome
-          screen kept on. Purely a mood; off by default.
+          A soft accent light behind your work — the welcome screen kept on.
+          Purely a mood; off by default.
         </p>
         <label className="personalize-row">
-          <span>Follow the cursor</span>
-          <label className="switch">
-            <input
-              type="checkbox"
-              checked={personal.glow === true}
-              onChange={(e) => change({ glow: e.target.checked })}
-              aria-label="Ambient glow"
-            />
-            <span className="switch-track" />
-          </label>
+          <span>Glow</span>
+          <select
+            value={glowModeOf(personal)}
+            onChange={(e) =>
+              change({ glowMode: e.target.value as Personalization["glowMode"], glow: undefined })
+            }
+            aria-label="Ambient glow mode"
+          >
+            <option value="off">Off (default)</option>
+            <option value="follow">Follow my cursor</option>
+            <option value="drift">Drift on its own</option>
+          </select>
         </label>
+      </section>
+
+      <section className="ap-section">
+        <h3 className="ap-title">Backdrop</h3>
+        <p className="ap-sub">
+          Any image you love, softened behind frosted glass. It never
+          competes with your words.
+        </p>
+        <div className="btn-row">
+          <label className="btn-ghost ap-upload">
+            {personal.bgImage ? "Change image\u2026" : "Choose an image\u2026"}
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                void toBannerDataUrl(file, 1600).then((url) => change({ bgImage: url }));
+                e.target.value = "";
+              }}
+            />
+          </label>
+          {personal.bgImage && (
+            <button className="btn-ghost" onClick={() => change({ bgImage: undefined })}>
+              Remove
+            </button>
+          )}
+        </div>
       </section>
 
       <section className="ap-section">

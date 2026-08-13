@@ -5948,3 +5948,55 @@ body.focus-mode .cm-editor {
   border-color: var(--accent);
   color: var(--fg-primary);
 }
+
+/* ============================================================
+   Backdrop + glass (owner round 8) — and the glow, de-banded.
+   ============================================================ */
+
+/* Heavy blur is what kills the visible gradient rings: banding lives
+   in low-alpha radial stops on dark surfaces, and a 70px gaussian
+   erases the steps entirely. */
+.ambient-glow-orb {
+  filter: blur(70px);
+}
+
+/* The writer's chosen image, softened into atmosphere. Scaled up a
+   touch so the blur never exposes its own edges. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.backdrop-img {
+  position: absolute;
+  inset: -3%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(14px) saturate(1.05);
+  transform: scale(1.05);
+}
+
+/* Frosted glass: with a backdrop set, the big surfaces go translucent
+   and blur what's behind them, so the image reads as light through
+   glass. Text sits on the frosted layer, never on the photo. */
+:root.has-backdrop .app {
+  background: transparent;
+}
+:root.has-backdrop .titlebar,
+:root.has-backdrop .pane,
+:root.has-backdrop .editor,
+:root.has-backdrop .corkboard {
+  background: color-mix(in srgb, var(--bg-app) 72%, transparent);
+  backdrop-filter: blur(10px) saturate(1.1);
+}
+:root.has-backdrop .cm-editor,
+:root.has-backdrop .editor-head,
+:root.has-backdrop .beats {
+  background: transparent;
+}
+:root.has-backdrop .banner {
+  background: color-mix(in srgb, var(--bg-raised) 80%, transparent);
+  backdrop-filter: blur(10px);
+}

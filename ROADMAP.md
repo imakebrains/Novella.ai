@@ -755,6 +755,18 @@ scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
 
+- 2026-08-13 — Glow v2 + backdrops (session; owner round 8). The ambient
+  glow's visible gradient rings are gone — a 70px blur on the orb erases
+  the banding — and it now has two moods: follow the cursor, or drift on
+  its own along a slow Lissajous wander (settings select; the old boolean
+  reads as "follow" via pure glowModeOf, 4 unit checks). New: Backdrop —
+  upload any image and it sits blurred behind the app while the titlebar
+  and panes go frosted glass (72% color-mix + backdrop-filter), so the
+  picture reads as light behind glass, never noise behind text. Verified
+  live: drift transform advances without pointer input, upload → glass →
+  Remove round-trips through the real save path, glass computed at
+  color(srgb … / 0.72) + blur(10px). 267 checks green, tsc clean.
+
 - 2026-08-12 — Premium pass (session; owner round 7). The Tools button
   is now the accent-lit door it should be, and scrolling over it flips
   through tools without opening the menu (pure cycleTab + 5 unit

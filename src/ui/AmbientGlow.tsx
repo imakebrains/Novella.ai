@@ -1,24 +1,25 @@
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import {
+  glowModeOf,
   loadPersonalization,
   personalizationVersion,
   subscribePersonalization,
 } from "./personalize";
 
-/* Ambient glow — the intro's warm radial, kept on and given the mouse.
+/* Ambient glow — the intro's warm radial, given a life of its own.
 
-   A single accent-tinted light that drifts toward the cursor, easing the
-   whole way (a light source, not a cursor decal). Opt-in from Settings →
-   Appearance, off by default: it's a mood. soft-light blending keeps text
-   legible on both dark and light themes, pointer-events never intercept,
-   and the layer sits under every modal. Honors reduced motion by simply
-   not existing — a stationary spotlight helps no one. */
+   Two moods: "follow" eases after the cursor like a light source held a
+   beat behind the hand; "drift" wanders a slow figure-eight on its own.
+   Heavy CSS blur on the orb removes gradient banding on dark surfaces
+   (the visible-rings complaint). soft-light blending keeps text legible,
+   pointer-events never intercept, and reduced motion means it simply
+   does not exist — a stationary spotlight helps no one. */
 
 export function AmbientGlow() {
   useSyncExternalStore(subscribePersonalization, personalizationVersion, personalizationVersion);
+  const mode = glowModeOf(loadPersonalization());
   const enabled =
-    loadPersonalization().glow === true &&
-    !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    mode !== "off" && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const layer = useRef<HTMLDivElement>(null);
   const target = useRef({ x: window.innerWidth / 2, y: window.innerHeight * 0.4 });
@@ -27,11 +28,19 @@ export function AmbientGlow() {
   useEffect(() => {
     if (!enabled) return;
     let raf = 0;
+    let t = 0;
     const onMove = (e: PointerEvent) => {
-      target.current = { x: e.clientX, y: e.clientY };
+      if (mode === "follow") target.current = { x: e.clientX, y: e.clientY };
     };
     const step = () => {
-      // Ease at 8%/frame: far enough behind the cursor to read as light.
+      if (mode === "drift") {
+        // A slow Lissajous wander — organic, never a loop you can spot.
+        t += 0.0016;
+        target.current = {
+          x: window.innerWidth * (0.5 + 0.34 * Math.sin(t)),
+          y: window.innerHeight * (0.45 + 0.3 * Math.sin(t * 0.73 + 1.7)),
+        };
+      }
       pos.current.x += (target.current.x - pos.current.x) * 0.08;
       pos.current.y += (target.current.y - pos.current.y) * 0.08;
       if (layer.current) {
@@ -45,7 +54,7 @@ export function AmbientGlow() {
       window.removeEventListener("pointermove", onMove);
       cancelAnimationFrame(raf);
     };
-  }, [enabled]);
+  }, [enabled, mode]);
 
   if (!enabled) return null;
   return (

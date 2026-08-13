@@ -21,6 +21,18 @@ export interface Personalization {
   /** Ambient glow: a soft accent light that follows the cursor. Off by
       default — it's a mood, not a requirement. */
   glow?: boolean;
+  /** "follow" tracks the cursor; "drift" wanders on its own. The old
+      boolean `glow` reads as "follow" — see glowModeOf(). */
+  glowMode?: "off" | "follow" | "drift";
+  /** A backdrop image (data URL, downscaled at upload). Surfaces go
+      frosted-glass over it — see .has-backdrop in app.css. */
+  bgImage?: string;
+}
+
+/** One place decides what the glow does, old flag included. */
+export function glowModeOf(p: Personalization): "off" | "follow" | "drift" {
+  if (p.glowMode) return p.glowMode;
+  return p.glow === true ? "follow" : "off";
 }
 
 const KEY = "novella.personalize";
@@ -123,6 +135,8 @@ export function applyPersonalization(p: Personalization): void {
   } else {
     root.removeProperty("--editor-measure");
   }
+
+  document.documentElement.classList.toggle("has-backdrop", !!p.bgImage);
 
   if (p.corners === "sharp") {
     root.setProperty("--radius-sm", "3px");
