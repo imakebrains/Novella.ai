@@ -182,7 +182,7 @@ export function ExportModal({ onClose }: { onClose: () => void }) {
           </>
           )}
 
-          <h3 className="settings-cat">Format</h3>
+          <h3 className="ap-title">Format</h3>
           <div className="format-list">
             {FORMATS.map((f) => (
               <label key={f.id} className={`radio-row ${format === f.id ? "on" : ""}`}>
@@ -191,6 +191,7 @@ export function ExportModal({ onClose }: { onClose: () => void }) {
                   name="export-format"
                   checked={format === f.id}
                   onChange={() => setFormat(f.id)}
+                  style={{ accentColor: "var(--accent)" }}
                 />
                 <span className="radio-text">
                   <span className="radio-label">{f.label}</span>
@@ -225,8 +226,21 @@ export function ExportModal({ onClose }: { onClose: () => void }) {
           )}
 
           <div className="btn-row">
-            <button className="btn-primary" onClick={() => void run()} disabled={busy || (empty && format !== "backup")}>
-              {busy ? "Working…" : format === "backup" ? "Back up now" : `Export ${FORMATS.find((f) => f.id === format)?.label}`}
+            <button
+              className="btn-primary"
+              onClick={() => void run()}
+              disabled={busy || (empty && format !== "backup")}
+              style={{ minWidth: 160 }}
+            >
+              {busy ? (
+                <>
+                  <span className="spinner" aria-hidden /> Working…
+                </>
+              ) : format === "backup" ? (
+                "Back up now"
+              ) : (
+                `Export ${FORMATS.find((f) => f.id === format)?.label}`
+              )}
             </button>
             <button className="btn-ghost" onClick={onClose}>
               Close

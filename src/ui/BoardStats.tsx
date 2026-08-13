@@ -69,7 +69,22 @@ export function BoardStats({
 
       {rows.length === 0 ? (
         <div className="empty-state">
-          <p>No chapters yet — nothing to measure.</p>
+          <span className="empty-glyph" aria-hidden>
+            ⁂
+          </span>
+          <p className="empty-line">No chapters yet — nothing to measure.</p>
+          <button
+            className="empty-cta"
+            onClick={() => {
+              // Same naming guard as the corkboard's ghost tile — a note
+              // titled "Chapter 1" may exist even when no chapters do.
+              let n = 1;
+              while (store.vault.resolveLink(`Chapter ${n}`)) n++;
+              onOpen(store.createNote("chapter", `Chapter ${n}`).id);
+            }}
+          >
+            New chapter
+          </button>
         </div>
       ) : (
         <div className="stats-wrap">

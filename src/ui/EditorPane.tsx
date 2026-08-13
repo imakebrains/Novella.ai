@@ -439,8 +439,22 @@ export function EditorPane() {
     return (
       <main className="editor">
         <div className="empty-state">
-          <p>No note open.</p>
-          <p className="muted">Pick a chapter or note from the left to start writing.</p>
+          <span className="empty-glyph" aria-hidden>
+            ❧
+          </span>
+          <p className="empty-line">Nothing open yet. Your chapters live in the left pane.</p>
+          <button
+            className="empty-cta"
+            onClick={() => {
+              // App owns the palette state and has no exported opener — it
+              // listens for Ctrl/Cmd+K on window, so send that exact event.
+              window.dispatchEvent(
+                new KeyboardEvent("keydown", { key: "k", ctrlKey: true }),
+              );
+            }}
+          >
+            Open the palette — Ctrl+K
+          </button>
         </div>
       </main>
     );

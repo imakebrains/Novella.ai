@@ -51,9 +51,12 @@ export function TasksPanel() {
 
   if (all.length === 0) {
     return (
-      <div className="tasks-empty">
-        <p className="hint">No tasks yet.</p>
-        <p className="hint">
+      <div className="empty-state">
+        <span className="empty-glyph" aria-hidden>
+          ✓
+        </span>
+        <p className="empty-line">No tasks yet.</p>
+        <p className="empty-line muted">
           Type <code>- [ ] something to do</code> on its own line in any note — a chapter, a
           codex entry, anywhere — and it shows up here as a real checkbox.
         </p>

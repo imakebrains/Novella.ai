@@ -314,6 +314,7 @@ function AgentDetail({
             checked={agent.enabled}
             onChange={(e) => agentStore.update(agent.id, { enabled: e.target.checked })}
           />
+          <span className="switch-track" />
         </label>
       </div>
       {agent.description && <p className="agent-detail-desc">{agent.description}</p>}
@@ -360,7 +361,7 @@ function AgentDetail({
 
       <div className="settings-section-label">The brief</div>
       <textarea
-        className="agent-instructions"
+        className="agent-instructions field-input"
         rows={5}
         value={agent.instructions}
         onChange={(e) => agentStore.update(agent.id, { instructions: e.target.value })}
@@ -371,6 +372,7 @@ function AgentDetail({
         <label>
           Reads
           <select
+            className="field-input field-select"
             value={agent.scope}
             onChange={(e) => agentStore.update(agent.id, { scope: e.target.value as AgentScope })}
           >
@@ -384,6 +386,7 @@ function AgentDetail({
         <label>
           Runs
           <select
+            className="field-input field-select"
             value={triggerKind}
             onChange={(e) =>
               agentStore.update(agent.id, {
@@ -402,6 +405,7 @@ function AgentDetail({
           <label>
             {triggerKind === "interval" ? "Minutes" : "Cooldown (min)"}
             <input
+              className="field-input"
               type="number"
               min={triggerKind === "interval" ? 10 : 5}
               value={minutes}
@@ -478,21 +482,21 @@ function NewAgentForm({
       </p>
 
       <input
-        className="search bare"
+        className="search bare field-input"
         value={name}
         placeholder="Name — e.g. Timeline warden"
         onChange={(e) => setName(e.target.value)}
         aria-label="Agent name"
       />
       <input
-        className="search bare"
+        className="search bare field-input"
         value={description}
         placeholder="One line on what it's for (shown on its card)"
         onChange={(e) => setDescription(e.target.value)}
         aria-label="Agent description"
       />
       <textarea
-        className="agent-instructions"
+        className="agent-instructions field-input"
         value={instructions}
         placeholder="The brief. e.g. Check every date and day-of-week mentioned against the chapter order and list contradictions with quotes."
         rows={5}
@@ -502,7 +506,11 @@ function NewAgentForm({
       <div className="agent-form-row">
         <label>
           Reads
-          <select value={scope} onChange={(e) => setScope(e.target.value as AgentScope)}>
+          <select
+            className="field-input field-select"
+            value={scope}
+            onChange={(e) => setScope(e.target.value as AgentScope)}
+          >
             {SCOPES.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.label}
@@ -512,7 +520,11 @@ function NewAgentForm({
         </label>
         <label>
           Runs
-          <select value={triggerKind} onChange={(e) => setTriggerKind(e.target.value as TriggerKind)}>
+          <select
+            className="field-input field-select"
+            value={triggerKind}
+            onChange={(e) => setTriggerKind(e.target.value as TriggerKind)}
+          >
             {TRIGGERS.map((t) => (
               <option key={t.id} value={t.id}>
                 {t.label}
@@ -524,6 +536,7 @@ function NewAgentForm({
           <label>
             {triggerKind === "interval" ? "Minutes" : "Cooldown (min)"}
             <input
+              className="field-input"
               type="number"
               min={triggerKind === "interval" ? 10 : 5}
               value={minutes}

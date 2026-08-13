@@ -29,13 +29,16 @@ export function ContinuityPanel() {
 
   if (findings.length === 0) {
     return (
-      <div className="continuity-panel">
-        <p className="hint">
+      <div className="empty-state">
+        <span className="empty-glyph" aria-hidden>
+          ❦
+        </span>
+        <p className="empty-line">
           Nothing out of order that these checks can see: no one on stage before
           their entrance, no near-duplicate codex names, no dangling links, every
           chapter placed, every POV known.
         </p>
-        <p className="hint">
+        <p className="empty-line muted">
           These are the provable checks — they run from your files alone, no AI
           involved. Give a codex note <code>introduced: 3</code> in its
           frontmatter and Novella will flag any earlier chapter that mentions

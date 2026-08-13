@@ -57,10 +57,10 @@
 .badge-warn {
   margin-left: var(--space-2);
   padding: 0 5px;
-  font-size: 10px;
+  font-size: var(--text-2xs);
   color: var(--bg-app);
   background: var(--fg-muted);
-  border-radius: 3px;
+  border-radius: var(--radius-xs);
 }
 
 .brand {
@@ -289,7 +289,7 @@
   display: inline-block;
   font-size: 9px;
   color: var(--fg-muted);
-  transition: transform 120ms ease;
+  transition: transform var(--motion-quick) var(--ease-enter);
 }
 .caret.closed {
   transform: rotate(-90deg);
@@ -432,16 +432,11 @@
   overflow-y: auto;
 }
 
+/* Layout only — the round-9 empty-state primitive owns the look. */
 .empty-state {
-  display: grid;
-  place-content: center;
-  gap: var(--space-2);
   height: 100%;
-  text-align: center;
-  color: var(--fg-secondary);
 }
 .empty-state .muted {
-  font-size: var(--text-sm);
   color: var(--fg-muted);
 }
 
@@ -673,7 +668,7 @@
   display: grid;
   place-items: center;
   padding: var(--space-5);
-  background: rgb(0 0 0 / 0.5);
+  background: var(--scrim);
   z-index: 50;
 }
 
@@ -685,7 +680,7 @@
   background: var(--bg-pane);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
 }
 
@@ -777,7 +772,7 @@
   background: var(--bg-pane);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
 }
 
@@ -896,7 +891,7 @@
 
 .chip.download,
 .chip.secret {
-  font-size: 10px;
+  font-size: var(--text-2xs);
   color: var(--fg-muted);
   background: var(--bg-raised);
 }
@@ -925,7 +920,7 @@
   background: var(--bg-hover);
   border: 1px solid var(--border-strong);
   border-radius: 999px;
-  transition: background 120ms ease;
+  transition: background var(--motion-quick) var(--ease-enter);
   pointer-events: none;
 }
 .switch-track::after {
@@ -937,7 +932,7 @@
   height: 12px;
   background: var(--fg-muted);
   border-radius: 50%;
-  transition: transform 120ms ease, background 120ms ease;
+  transition: transform var(--motion-quick) var(--ease-enter), background var(--motion-quick) var(--ease-enter);
 }
 .switch input:checked + .switch-track {
   background: var(--accent);
@@ -1002,7 +997,7 @@
   padding: 3px var(--space-3);
   border-radius: 999px;
   background: var(--bg-raised);
-  transition: background 140ms var(--ease), border-color 140ms var(--ease);
+  transition: background var(--motion-quick) var(--ease), border-color var(--motion-quick) var(--ease);
 }
 .brand-vault:hover:not(:disabled) {
   background: var(--bg-hover);
@@ -1013,7 +1008,7 @@
   width: 30px;
   height: 30px;
   border-radius: var(--radius-md);
-  transition: background 140ms var(--ease), color 140ms var(--ease);
+  transition: background var(--motion-quick) var(--ease), color var(--motion-quick) var(--ease);
 }
 
 .save-btn {
@@ -1045,7 +1040,7 @@
 .tab {
   padding: var(--space-1) var(--space-3);
   border-radius: 999px;
-  transition: background 140ms var(--ease), color 140ms var(--ease);
+  transition: background var(--motion-quick) var(--ease), color var(--motion-quick) var(--ease);
 }
 .tab.on {
   background: var(--accent-soft);
@@ -1059,7 +1054,7 @@
   padding: var(--space-2) var(--space-3);
   background: var(--bg-app);
   border-radius: var(--radius-md);
-  transition: border-color 140ms var(--ease), box-shadow 140ms var(--ease);
+  transition: border-color var(--motion-quick) var(--ease), box-shadow var(--motion-quick) var(--ease);
 }
 .search:focus {
   border-color: var(--accent);
@@ -1077,7 +1072,7 @@
   border-left: none;
   border-radius: 0 999px 999px 0;
   margin-right: var(--space-3);
-  transition: background 120ms var(--ease), color 120ms var(--ease);
+  transition: background var(--motion-quick) var(--ease), color var(--motion-quick) var(--ease);
 }
 .note-item.active {
   background: var(--accent-soft);
@@ -1167,7 +1162,7 @@
   position: absolute;
   inset: 0 4px;
   background: var(--border);
-  transition: background 140ms var(--ease);
+  transition: background var(--motion-quick) var(--ease);
 }
 .resizer:hover::before,
 .resizer:focus-visible::before,
@@ -1181,7 +1176,7 @@
   border-radius: 999px;
   background: var(--border-strong);
   opacity: 0;
-  transition: opacity 140ms var(--ease);
+  transition: opacity var(--motion-quick) var(--ease);
 }
 .resizer:hover .resizer-grip,
 .resizer:focus-visible .resizer-grip,
@@ -1237,7 +1232,7 @@ body:has(.resizer.dragging) {
 .meter-fill {
   height: 100%;
   border-radius: 999px;
-  transition: width 240ms var(--ease);
+  transition: width var(--motion-standard) var(--ease);
 }
 .meter-fill.good {
   background: var(--success);
@@ -1265,7 +1260,7 @@ body:has(.resizer.dragging) {
 }
 .finding-tag {
   flex: 0 0 auto;
-  font-size: 10px;
+  font-size: var(--text-2xs);
   font-variant-numeric: tabular-nums;
   color: var(--accent);
 }
@@ -1314,7 +1309,7 @@ body:has(.resizer.dragging) {
   text-align: left;
   color: var(--fg-secondary);
   border-radius: var(--radius-md);
-  transition: background 140ms var(--ease), color 140ms var(--ease);
+  transition: background var(--motion-quick) var(--ease), color var(--motion-quick) var(--ease);
 }
 .settings-nav-item:hover {
   background: var(--bg-hover);
@@ -1348,7 +1343,7 @@ body:has(.resizer.dragging) {
   background: var(--bg-app);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  transition: border-color 140ms var(--ease), background 140ms var(--ease);
+  transition: border-color var(--motion-quick) var(--ease), background var(--motion-quick) var(--ease);
 }
 .radio-row:hover {
   border-color: var(--border-strong);
@@ -1367,7 +1362,7 @@ body:has(.resizer.dragging) {
 }
 .radio-detail {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: var(--text-2xs);
   color: var(--fg-muted);
 }
 
@@ -1429,7 +1424,7 @@ body:has(.resizer.dragging) {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  transition: border-color 140ms var(--ease), box-shadow 140ms var(--ease);
+  transition: border-color var(--motion-quick) var(--ease), box-shadow var(--motion-quick) var(--ease);
 }
 .project-card:hover {
   border-color: var(--border-strong);
@@ -1459,7 +1454,7 @@ body:has(.resizer.dragging) {
   display: flex;
   gap: var(--space-1);
   opacity: 0;
-  transition: opacity 140ms var(--ease);
+  transition: opacity var(--motion-quick) var(--ease);
 }
 .project-card:hover .project-banner-actions,
 .project-banner-actions:focus-within {
@@ -1467,11 +1462,11 @@ body:has(.resizer.dragging) {
 }
 .banner-btn {
   padding: 3px var(--space-2);
-  font-size: 10px;
+  font-size: var(--text-2xs);
   color: var(--fg-primary);
   /* Legible over an arbitrary photo, in any theme. */
-  background: rgb(0 0 0 / 0.55);
-  color: #fff;
+  background: var(--scrim-image);
+  color: var(--fg-on-image);
   border-radius: var(--radius-sm);
   backdrop-filter: blur(4px);
 }
@@ -1512,7 +1507,7 @@ body:has(.resizer.dragging) {
 .project-path {
   margin-top: var(--space-2);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: var(--text-2xs);
   color: var(--fg-muted);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1556,9 +1551,9 @@ body:has(.resizer.dragging) {
   z-index: 1;
   padding: var(--space-4) var(--space-6);
   font-family: var(--font-display);
-  font-size: 1.75rem;
+  font-size: var(--text-2xl);
   font-weight: 600;
-  color: #fff;
+  color: var(--fg-on-image);
   text-shadow: 0 1px 12px rgb(0 0 0 / 0.6);
 }
 
@@ -1590,8 +1585,8 @@ body:has(.resizer.dragging) {
   background: var(--bg-app);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  transition: border-color 140ms var(--ease), transform 140ms var(--ease),
-    box-shadow 140ms var(--ease);
+  transition: border-color var(--motion-quick) var(--ease), transform var(--motion-quick) var(--ease),
+    box-shadow var(--motion-quick) var(--ease);
 }
 .theme-card:hover {
   transform: translateY(-2px);
@@ -1778,7 +1773,7 @@ body:has(.resizer.dragging) {
   padding: var(--space-2);
   overflow-x: auto;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: var(--text-2xs);
   line-height: 1.5;
   color: var(--fg-secondary);
   background: var(--bg-app);
@@ -1837,7 +1832,7 @@ body:has(.resizer.dragging) {
   font-size: var(--text-xs);
   color: var(--fg-muted);
   border-radius: 999px;
-  transition: background 140ms var(--ease), color 140ms var(--ease);
+  transition: background var(--motion-quick) var(--ease), color var(--motion-quick) var(--ease);
 }
 .view-switch button:hover {
   color: var(--fg-secondary);
@@ -1865,9 +1860,11 @@ body:has(.resizer.dragging) {
   max-width: 1180px;
   margin: 0 auto var(--space-5);
 }
+/* One definition. A second, conflicting .board-head used to live in the
+   comfy pass; its alignment silently won. Merged here. */
 .board-title {
   margin: 0;
-  font-size: 1.75rem;
+  font-size: var(--text-2xl);
 }
 .board-meta {
   font-size: var(--text-xs);
@@ -1897,8 +1894,8 @@ body:has(.resizer.dragging) {
   touch-action: none;
   user-select: none;
   outline: none;
-  transition: transform 140ms var(--ease), box-shadow 140ms var(--ease),
-    border-color 140ms var(--ease), opacity 140ms var(--ease);
+  transition: transform var(--motion-quick) var(--ease), box-shadow var(--motion-quick) var(--ease),
+    border-color var(--motion-quick) var(--ease), opacity var(--motion-quick) var(--ease);
 }
 .board-card:hover {
   transform: translateY(-2px);
@@ -2132,7 +2129,7 @@ body:has(.resizer.dragging) {
   background: transparent;
   color: var(--fg-muted);
   cursor: pointer;
-  transition: border-color 0.12s var(--ease), color 0.12s var(--ease);
+  transition: border-color var(--motion-quick) var(--ease), color var(--motion-quick) var(--ease);
 }
 .ghost-card:hover {
   border-color: var(--accent);
@@ -2176,8 +2173,8 @@ body:has(.resizer.dragging) {
   height: 22px;
   border: none;
   border-radius: 50%;
-  background: rgb(0 0 0 / 0.55);
-  color: #fff;
+  background: var(--scrim-image);
+  color: var(--fg-on-image);
   font-size: var(--text-xs);
   cursor: pointer;
   opacity: 0;
@@ -2204,7 +2201,7 @@ body:has(.resizer.dragging) {
   gap: 2px;
   margin-left: auto;
   opacity: 0;
-  transition: opacity 140ms var(--ease);
+  transition: opacity var(--motion-quick) var(--ease);
 }
 .board-card:hover .card-nudge,
 .card-nudge:focus-within {
@@ -2262,11 +2259,11 @@ body:has(.resizer.dragging) {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 10px;
+  font-size: var(--text-2xs);
 }
 .card-words {
   margin-left: auto;
-  font-size: 10px;
+  font-size: var(--text-2xs);
   color: var(--fg-muted);
   font-variant-numeric: tabular-nums;
 }
@@ -2280,13 +2277,13 @@ body:has(.resizer.dragging) {
 }
 .critique-chip {
   padding: 3px var(--space-2);
-  font-size: 10px;
+  font-size: var(--text-2xs);
   letter-spacing: 0.03em;
   color: var(--fg-muted);
   background: transparent;
   border: 1px solid var(--border);
   border-radius: 999px;
-  transition: all 140ms var(--ease);
+  transition: all var(--motion-quick) var(--ease);
 }
 .critique-count {
   margin-left: 4px;
@@ -2318,7 +2315,7 @@ body:has(.resizer.dragging) {
   padding: 1px 5px;
   margin-right: 3px;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: var(--text-2xs);
   color: var(--accent);
   background: var(--accent-soft);
   border-radius: var(--radius-sm);
@@ -2395,7 +2392,7 @@ body:has(.resizer.dragging) {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   outline: none;
-  transition: border-color 140ms var(--ease), box-shadow 140ms var(--ease);
+  transition: border-color var(--motion-quick) var(--ease), box-shadow var(--motion-quick) var(--ease);
 }
 .beat-text:focus {
   border-color: var(--accent);
@@ -2409,7 +2406,7 @@ body:has(.resizer.dragging) {
   color: var(--accent);
   background: var(--accent-soft);
   border-radius: 999px;
-  transition: background 140ms var(--ease), opacity 140ms var(--ease);
+  transition: background var(--motion-quick) var(--ease), opacity var(--motion-quick) var(--ease);
 }
 .beat-action:hover:not(:disabled) {
   background: color-mix(in srgb, var(--accent) 22%, transparent);
@@ -2459,12 +2456,6 @@ body:has(.resizer.dragging) {
 /* ---------- revision history ---------- */
 
 .history-panel,
-.history-empty {
-  padding: var(--space-3);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
 
 .revision-list {
   list-style: none;
@@ -2480,7 +2471,7 @@ body:has(.resizer.dragging) {
   border-radius: var(--radius-md);
   background: var(--bg-raised);
   overflow: hidden;
-  transition: border-color 0.15s var(--ease);
+  transition: border-color var(--motion-quick) var(--ease);
 }
 
 .revision.open {
@@ -2567,7 +2558,7 @@ body:has(.resizer.dragging) {
   display: inline-block;
   width: 10px;
   height: 10px;
-  border-radius: 3px;
+  border-radius: var(--radius-xs);
 }
 .swatch.add { background: color-mix(in srgb, var(--success) 55%, transparent); }
 .swatch.remove { background: color-mix(in srgb, var(--danger) 45%, transparent); }
@@ -2681,7 +2672,7 @@ body:has(.resizer.dragging) {
   padding: var(--space-2);
   background: var(--bg-raised);
   opacity: 0.6;
-  transition: opacity 0.12s var(--ease), border-color 0.12s var(--ease);
+  transition: opacity var(--motion-quick) var(--ease), border-color var(--motion-quick) var(--ease);
 }
 
 /* Selected entries lead; unselected recede without disappearing. */
@@ -2780,7 +2771,7 @@ body:has(.resizer.dragging) {
   stroke: var(--accent);
   stroke-width: 2.5;
   stroke-linecap: round;
-  transition: stroke-dashoffset 0.4s var(--ease);
+  transition: stroke-dashoffset var(--motion-slow) var(--ease);
 }
 
 .goal-meter.met .goal-ring-fill {
@@ -2796,11 +2787,11 @@ body:has(.resizer.dragging) {
 
 .goal-check {
   color: var(--success);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .goal-streak {
-  font-size: 10px;
+  font-size: var(--text-2xs);
   white-space: nowrap;
 }
 
@@ -2837,6 +2828,7 @@ body:has(.resizer.dragging) {
 }
 
 .session-bars {
+  position: relative; /* anchors .session-goal-line */
   display: flex;
   align-items: flex-end;
   gap: 2px;
@@ -2852,7 +2844,7 @@ body:has(.resizer.dragging) {
   min-height: 2px;
   background: var(--border-strong);
   border-radius: 2px 2px 0 0;
-  transition: background 0.15s var(--ease);
+  transition: background var(--motion-quick) var(--ease);
 }
 
 .session-bar.met {
@@ -2899,21 +2891,12 @@ body.focus-mode .cm-editor {
   font-size: var(--text-xs);
   cursor: pointer;
   opacity: 0.4;
-  transition: opacity 0.2s var(--ease);
+  transition: opacity var(--motion-standard) var(--ease);
   z-index: 20;
 }
 
 .focus-exit:hover {
   opacity: 1;
-}
-
-/* ---------- board header (shared by cards + grid) ---------- */
-
-.board-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-3);
 }
 
 .board-head-right {
@@ -3025,7 +3008,7 @@ body.focus-mode .cm-editor {
   background: var(--bg-raised);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow);
   padding: var(--space-2);
   width: 190px;
 }
@@ -3188,7 +3171,7 @@ body.focus-mode .cm-editor {
   line-height: 1;
   padding: 2px var(--space-2);
   opacity: 0;
-  transition: opacity 0.12s var(--ease);
+  transition: opacity var(--motion-quick) var(--ease);
 }
 .pg-cell:hover .pg-point-add,
 .pg-point-add:focus {
@@ -3208,7 +3191,7 @@ body.focus-mode .cm-editor {
   width: 1.05em;
   height: 1.05em;
   border: 1.5px solid var(--border-strong);
-  border-radius: 5px;
+  border-radius: calc(var(--radius-sm) - 2px);
   margin-right: 0.45em;
   cursor: pointer;
   vertical-align: baseline;
@@ -3217,7 +3200,7 @@ body.focus-mode .cm-editor {
   line-height: 1;
   color: var(--accent-fg);
   background: var(--bg-raised);
-  transition: background 0.12s var(--ease), border-color 0.12s var(--ease);
+  transition: background var(--motion-quick) var(--ease), border-color var(--motion-quick) var(--ease);
 }
 
 .cm-task-box:hover {
@@ -3236,12 +3219,6 @@ body.focus-mode .cm-editor {
 /* ---------- tasks panel ---------- */
 
 .tasks-panel,
-.tasks-empty {
-  padding: var(--space-3);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
 
 .tasks-summary {
   font-family: var(--font-mono);
@@ -3289,7 +3266,7 @@ body.focus-mode .cm-editor {
   width: 18px;
   height: 18px;
   border: 1.5px solid var(--border-strong);
-  border-radius: 5px;
+  border-radius: calc(var(--radius-sm) - 2px);
   background: var(--bg-raised);
   color: var(--accent-fg);
   cursor: pointer;
@@ -3381,7 +3358,7 @@ body.focus-mode .cm-editor {
   align-items: center;
   justify-content: center;
   gap: var(--space-1);
-  transition: background 0.12s var(--ease), color 0.12s var(--ease), transform 0.12s var(--ease);
+  transition: background var(--motion-quick) var(--ease), color var(--motion-quick) var(--ease), transform var(--motion-quick) var(--ease);
 }
 .quick-create-word {
   font-weight: 600;
@@ -3404,7 +3381,7 @@ body.focus-mode .cm-editor {
   background: var(--bg-raised);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow);
   padding: var(--space-3);
   display: flex;
   flex-direction: column;
@@ -3462,7 +3439,7 @@ body.focus-mode .cm-editor {
 .letter-row {
   padding: var(--space-2) var(--space-2) 2px;
   font-size: var(--text-xs);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.1em;
   color: var(--fg-muted);
   border-bottom: 1px solid var(--border);
@@ -3635,7 +3612,7 @@ body.focus-mode .cm-editor {
   background: var(--bg-raised);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow);
   padding: var(--space-2);
   display: flex;
   flex-direction: column;
@@ -3730,20 +3707,20 @@ body.focus-mode .cm-editor {
 
 .music-frame {
   overflow: hidden;
-  transition: height 0.2s var(--ease);
+  transition: height var(--motion-standard) var(--ease);
 }
 
-.banner-btn {
+.dock-btn {
   background: none;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--fg-secondary);
   cursor: pointer;
   font-size: var(--text-xs);
-  padding: 2px var(--space-2);
+  padding: var(--space-05) var(--space-2);
 }
 
-.banner-btn:hover {
+.dock-btn:hover {
   border-color: var(--border-strong);
   color: var(--fg-primary);
 }
@@ -3841,19 +3818,10 @@ body.focus-mode .cm-editor {
 }
 
 .planner-met {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* ---------- the comfy-premium pass ---------- */
-
-.board-card {
-  transition: transform 0.16s var(--ease), box-shadow 0.16s var(--ease);
-}
-
-.board-card:hover:not(.dragging) {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-lg);
-}
 
 /* A candle-warm wash behind the board, drawn from the theme accent. */
 .corkboard {
@@ -4093,15 +4061,12 @@ body.focus-mode .cm-editor {
   color: var(--fg-muted);
 }
 
+/* Type only — surface styling comes from .field-input, which these
+   controls now wear (a heavier selector here used to out-rank it). */
 .agent-form-row select,
 .agent-form-row input {
-  background: var(--bg-raised);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--fg-primary);
   font-family: var(--font-ui);
   font-size: var(--text-sm);
-  padding: var(--space-1) var(--space-2);
 }
 
 .agent-form-row input[type="number"] {
@@ -4133,7 +4098,7 @@ body.focus-mode .cm-editor {
   line-height: 1;
   color: var(--fg-muted);
   opacity: 0;
-  transition: opacity 0.12s var(--ease);
+  transition: opacity var(--motion-quick) var(--ease);
 }
 
 .inspector-tabs .tab:hover .tab-close {
@@ -4162,7 +4127,7 @@ body.focus-mode .cm-editor {
   background: var(--bg-raised);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow);
   padding: var(--space-1);
   display: flex;
   flex-direction: column;
@@ -4279,7 +4244,7 @@ body.focus-mode .cm-editor {
 
 .cal-day.today {
   border-color: var(--accent);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .cal-day.selected {
@@ -4361,14 +4326,14 @@ body.focus-mode .cm-editor {
 .sprint-preset {
   flex: 1;
   padding: var(--space-2);
-  background: var(--bg-primary);
+  background: var(--bg-raised);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--fg-primary);
   font-family: var(--font-ui);
   font-size: var(--text-sm);
   cursor: pointer;
-  transition: background 0.15s var(--ease), border-color 0.15s var(--ease);
+  transition: background var(--motion-quick) var(--ease), border-color var(--motion-quick) var(--ease);
 }
 
 .sprint-preset:hover {
@@ -4715,7 +4680,7 @@ body.focus-mode .cm-editor {
   color: var(--fg-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  font-size: 10px;
+  font-size: var(--text-2xs);
 }
 
 .agent-example {
@@ -4788,7 +4753,7 @@ body.focus-mode .cm-editor {
 
 .board-pick.add {
   color: var(--fg-muted);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .board-new-name {
@@ -4829,7 +4794,7 @@ body.focus-mode .cm-editor {
   cursor: pointer;
   color: var(--fg-muted);
   opacity: 0;
-  transition: opacity 0.12s var(--ease);
+  transition: opacity var(--motion-quick) var(--ease);
   border-style: dashed;
 }
 
@@ -4876,7 +4841,7 @@ body.focus-mode .cm-editor {
   background: var(--bg-raised);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow);
   padding: var(--space-1);
   display: flex;
   flex-direction: column;
@@ -4894,7 +4859,7 @@ body.focus-mode .cm-editor {
 }
 
 .editor-menu-label {
-  font-size: 10px;
+  font-size: var(--text-2xs);
   color: var(--fg-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -4966,7 +4931,7 @@ body.focus-mode .cm-editor {
 .web-edge {
   fill: none;
   stroke: color-mix(in srgb, var(--fg-muted) 40%, transparent);
-  transition: opacity 0.15s var(--ease);
+  transition: opacity var(--motion-quick) var(--ease);
 }
 
 .web-edge.dim {
@@ -4975,7 +4940,7 @@ body.focus-mode .cm-editor {
 
 .web-node {
   cursor: pointer;
-  transition: opacity 0.15s var(--ease);
+  transition: opacity var(--motion-quick) var(--ease);
 }
 
 .web-node.dim {
@@ -5195,7 +5160,7 @@ body.focus-mode .cm-editor {
   background: var(--accent);
   border-radius: 4px 4px 0 0;
   min-height: 3px;
-  transition: height 0.25s var(--ease);
+  transition: height var(--motion-standard) var(--ease);
 }
 
 .stats-bar.short {
@@ -5263,7 +5228,7 @@ body.focus-mode .cm-editor {
   flex: 1;
   max-width: 40px;
   height: 12px;
-  border-radius: 3px;
+  border-radius: var(--radius-xs);
   background: var(--bg-raised);
   border: 1px solid var(--border);
 }
@@ -5336,7 +5301,7 @@ body.focus-mode .cm-editor {
 /* ---------- tab manager additions ---------- */
 
 .tab-plus-title {
-  font-size: 10px;
+  font-size: var(--text-2xs);
   color: var(--fg-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -5350,7 +5315,7 @@ body.focus-mode .cm-editor {
 }
 
 .tab-plus-hint {
-  font-size: 10px;
+  font-size: var(--text-2xs);
   color: var(--fg-muted);
   padding: var(--space-1) var(--space-2);
   border-top: 1px solid var(--border);
@@ -5438,12 +5403,12 @@ body.focus-mode .cm-editor {
 
 .diff-word.add {
   background: color-mix(in srgb, var(--success) 22%, transparent);
-  border-radius: 3px;
+  border-radius: var(--radius-xs);
 }
 
 .diff-word.remove {
   background: color-mix(in srgb, var(--danger) 18%, transparent);
-  border-radius: 3px;
+  border-radius: var(--radius-xs);
   text-decoration: line-through;
   text-decoration-color: color-mix(in srgb, var(--danger) 55%, transparent);
 }
@@ -5464,7 +5429,7 @@ body.focus-mode .cm-editor {
   background: var(--bg-app);
   overflow: hidden;
   opacity: 1;
-  transition: opacity 400ms var(--ease-color);
+  transition: opacity var(--motion-slow) var(--ease-color);
 }
 .intro.closing {
   opacity: 0;
@@ -5601,7 +5566,7 @@ body.focus-mode .cm-editor {
 .intro-seg {
   width: 34px;
   height: 3px;
-  border-radius: 2px;
+  border-radius: var(--radius-xs);
   background: var(--border-strong);
   transition: background var(--motion-standard) var(--ease-color);
 }
@@ -6152,4 +6117,465 @@ body.focus-mode .cm-editor {
   .reword-pop {
     animation: none;
   }
+}
+
+/* ============================================================
+   System pass (round 9) — one recipe per role.
+   New primitives live here; bug fixes were made in place above.
+   Sourced from docs/DESIGN-SYSTEM.md.
+   ============================================================ */
+
+/* ---- 9.1 focus: one ring, everywhere ---- */
+/* The designed ring existed on ~2 of ~25 focusable styles; everything
+   else showed the UA default or nothing (an accessibility bug). */
+:where(button, [role="button"], a, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+.cm-content:focus-visible,
+.cm-editor :focus-visible {
+  outline: none;
+}
+
+/* ---- 9.2 buttons come alive ---- */
+.btn-primary {
+  transition: filter var(--motion-quick) var(--ease-color),
+    transform var(--motion-quick) var(--ease-enter),
+    box-shadow var(--motion-quick) var(--ease-enter);
+}
+.btn-primary:hover {
+  filter: brightness(1.08);
+  box-shadow: var(--shadow-sm);
+}
+/* The universal press — colored elements brighten on hover, everything
+   gives under the finger. */
+:where(.btn-primary, .btn-ghost, .save-btn, .icon-btn, .tool-picker-btn,
+  .quick-create-btn, .banner-action, .ap-tool-chip, .view-switch button,
+  .tasks-mode-btn, .board-pick, .sprint-preset, .cal-day, .intro-primary,
+  .reword-style, .empty-cta):active {
+  transform: scale(0.97);
+}
+
+/* ---- 9.3 scrollbars: pill thumb, invisible hit padding ---- */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  background-clip: content-box;
+  border: 3px solid transparent;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--fg-muted);
+}
+
+/* ---- 9.4 shared primitives ---- */
+/* THE menu surface + item. Bespoke menus migrate to these. */
+.menu-pop {
+  position: absolute;
+  z-index: 40;
+  min-width: 180px;
+  padding: var(--space-1);
+  background: var(--bg-raised);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+}
+.menu-item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border: none;
+  background: none;
+  color: var(--fg-primary);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: var(--text-sm);
+  text-align: left;
+  cursor: pointer;
+}
+.menu-item:hover {
+  background: var(--bg-hover);
+}
+.menu-item.danger {
+  color: var(--danger);
+}
+
+/* THE text field. One background (bg-editor: "you write here"), one ring. */
+.field-input {
+  padding: var(--space-1) var(--space-2);
+  background: var(--bg-editor);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--fg-primary);
+  font: inherit;
+  caret-color: var(--accent);
+  transition: border-color var(--motion-quick) var(--ease-color),
+    box-shadow var(--motion-quick) var(--ease-color);
+}
+.field-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
+}
+
+/* Native selects stop leaking the OS look through five themes. */
+.select,
+.field-select {
+  appearance: none;
+  padding-right: calc(var(--space-4) + 8px);
+  background-image: linear-gradient(45deg, transparent 50%, var(--fg-muted) 50%),
+    linear-gradient(135deg, var(--fg-muted) 50%, transparent 50%);
+  background-position: calc(100% - 14px) 55%, calc(100% - 9px) 55%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+
+/* ---- 9.5 empty states: dimmed serif glyph, one line, one quiet action ---- */
+.empty-state {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+  color: var(--fg-muted);
+  animation: rise-in var(--motion-standard) var(--ease-enter);
+}
+.empty-glyph {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  opacity: 0.35;
+}
+.empty-line {
+  font-size: var(--text-sm);
+  max-width: 36ch;
+  line-height: var(--leading-ui);
+  margin: 0;
+}
+.empty-cta {
+  margin-top: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: none;
+  color: var(--fg-secondary);
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: border-color var(--motion-quick) var(--ease-color),
+    color var(--motion-quick) var(--ease-color);
+}
+.empty-cta:hover {
+  border-color: var(--accent);
+  color: var(--fg-primary);
+}
+
+/* ---- 9.6 loading language: one spinner, one caret, no width changes ---- */
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-soft);
+  border-top-color: var(--accent);
+  animation: spin 800ms linear infinite;
+}
+@keyframes spin {
+  to {
+    rotate: 1turn;
+  }
+}
+
+/* AI streaming affordance — .generated and beats ONLY, never .cm-editor. */
+.stream-caret::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: var(--space-05);
+  background: var(--accent);
+  vertical-align: text-bottom;
+  animation: caret-blink 1s steps(1) infinite;
+}
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ---- 9.7 the numeric voice: anything that ticks sits still ---- */
+/* The serif has no tabular figures, so live numbers were jittering.
+   Numbers that change get the UI face + tabular figures; words keep
+   the serif. */
+.tnum,
+.save-status,
+.critique-count,
+.cal-clock-time,
+.goals-today,
+.goal-today,
+.session-stat-value,
+.stat-value,
+.card-index,
+.chapter-table td.num {
+  font-family: var(--font-ui);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* ---- 9.8 caret + selection ---- */
+.cm-content,
+input,
+textarea {
+  caret-color: var(--accent);
+}
+
+/* ---- 9.9 tooltips: ours, not the OS default ---- */
+[data-tip] {
+  position: relative;
+}
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  translate: -50% 0;
+  padding: var(--space-05) var(--space-2);
+  background: var(--bg-raised);
+  color: var(--fg-primary);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  font-size: var(--text-xs);
+  font-family: var(--font-ui);
+  font-weight: 400;
+  line-height: var(--leading-ui);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--motion-quick) var(--ease-enter);
+  transition-delay: 400ms;
+  z-index: 60;
+}
+[data-tip]:hover::after,
+[data-tip]:focus-visible::after {
+  opacity: 1;
+}
+[data-tip]:not(:hover):not(:focus-visible)::after {
+  transition-delay: 0ms;
+}
+
+/* ---- 9.10 overline labels: one voice ---- */
+.settings-section-label {
+  display: block;
+  margin: var(--space-4) 0 var(--space-2);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--fg-muted);
+}
+
+/* ---- 9.11 body rhythm ---- */
+body {
+  line-height: var(--leading-ui);
+}
+
+/* ---- 9.12 border softening: floating chrome loses the hard edge ---- */
+/* --border-strong is for interactive/hover edges and drag targets. */
+.modal,
+.palette,
+.undo-toast,
+.music-dock,
+.quick-create-pop,
+.tool-picker-menu,
+.board-picker-menu,
+.tab-plus-pop,
+.editor-menu,
+.pg-thread-pop {
+  border-color: var(--border-soft);
+}
+
+/* ---- 9.13 the goal line, finally drawn ---- */
+/* .session-goal-line set `bottom` on a static parent and never rendered. */
+.session-goal-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed color-mix(in srgb, var(--accent) 55%, transparent);
+  pointer-events: none;
+}
+
+/* ---- 9.14 board entrances: boards and dock arrive like the modals do ---- */
+.corkboard,
+.music-dock {
+  animation: surface-in var(--motion-standard) var(--ease-enter);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 1.2s; /* slow, not frozen mid-arc */
+  }
+  .stream-caret::after {
+    animation: none;
+    opacity: 1;
+  }
+  .empty-state,
+  .corkboard,
+  .music-dock {
+    animation: none;
+  }
+  [data-tip]::after {
+    transition: none;
+  }
+}
+
+/* ---- 9.15 command palette: flagship surface, current-era finish ---- */
+/* Row hover/selection is a hot path: NO transition, per the frequency
+   rule — instant beats smooth when it happens forty times a minute. */
+.palette-row.picked {
+  background: var(--accent-soft);
+}
+.palette-kind.chapter {
+  color: var(--type-chapter);
+}
+.palette-kind.note {
+  color: var(--type-note);
+}
+.palette-kind.command {
+  color: var(--accent);
+}
+.palette-foot {
+  font-family: var(--font-ui);
+  font-size: var(--text-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--fg-muted);
+}
+
+/* ---- 9.16 banners: designed, not bolted on ---- */
+.banner {
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  margin: var(--space-2) var(--space-2) 0;
+  box-shadow: var(--shadow-sm);
+  animation: surface-in var(--motion-standard) var(--ease-enter);
+}
+.banner-icon {
+  flex: none;
+  opacity: 0.7;
+}
+.banner-action {
+  padding: var(--space-05) var(--space-2);
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: none;
+  color: var(--fg-primary);
+  text-decoration: none;
+  font: inherit;
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: border-color var(--motion-quick) var(--ease-color),
+    color var(--motion-quick) var(--ease-color);
+}
+.banner-action:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ---- 9.17 connection cards wake up ---- */
+.connection-card {
+  transition: border-color var(--motion-quick) var(--ease-color),
+    background var(--motion-quick) var(--ease-color),
+    opacity var(--motion-quick) var(--ease-color);
+}
+.connection-card:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-hover);
+}
+.hint.probe-ok {
+  color: var(--success);
+}
+.hint.probe-bad {
+  color: var(--danger);
+}
+
+/* ---- 9.18 one pane-header voice ---- */
+/* The right pane's serif headers are the pattern; the left pane and the
+   sprint timer still spoke caps-sans. One voice now. */
+.sprint-title {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: var(--fg-secondary);
+}
+
+/* ---- 9.19 table view joins the family ---- */
+.chapter-table th {
+  border-bottom-color: var(--border);
+}
+.chapter-table td.num {
+  font-family: var(--font-ui);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* ---- 9.20 menus share one geometry ---- */
+.tool-picker-menu,
+.board-picker-menu,
+.tab-plus-pop,
+.editor-menu,
+.pg-thread-pop,
+.quick-create-pop {
+  border-radius: var(--radius-md);
+}
+
+/* ---- 9.21 goal figures in the titlebar ---- */
+.goal-today {
+  font-size: var(--text-2xs);
+  color: var(--fg-secondary);
+}
+
+/* ---- 9.22 fields inside ap-sections + selects grow up ---- */
+/* Field label rows inside the new sections breathe like the sections. */
+.ap-section .setting {
+  margin-bottom: var(--space-3);
+}
+.ap-section .setting-label {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+/* Selects share the field focus language. */
+.select:focus,
+.field-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
+}
+/* A field-input next to a button keeps stretching. */
+.music-input-row .field-input {
+  flex: 1 1 auto;
+}
+
+/* A tip inside a tip: hovering the child would stack both bubbles —
+   the ancestor stands down while a nested tip is hovered. */
+[data-tip]:has([data-tip]:hover)::after {
+  opacity: 0;
+  transition-delay: 0ms;
 }

@@ -33,15 +33,18 @@ export function HistoryPanel() {
 
   if (revisions.length === 0) {
     return (
-      <div className="history-empty">
-        <p className="hint">No earlier versions yet.</p>
-        <p className="hint">
+      <div className="empty-state">
+        <span className="empty-glyph" aria-hidden>
+          ↺
+        </span>
+        <p className="empty-line">No earlier versions yet.</p>
+        <p className="empty-line muted">
           Novella saves one automatically before the assistant writes into your
           prose, and each time your work is saved. Nothing is recorded while you
           type — only at the moments you might want to undo.
         </p>
         {!store.isPersistent() && (
-          <p className="hint">
+          <p className="empty-line muted">
             No folder is open, so history lives in this browser only. Open a
             project folder and it will be stored alongside the book.
           </p>

@@ -81,7 +81,7 @@ export function MusicDock({ open, onClose }: { open: boolean; onClose: () => voi
           <div className="music-head-actions">
             {embed && !mini && (
               <button
-                className="banner-btn"
+                className="dock-btn"
                 onClick={() => musicStore.clear()}
                 title="Remove this playlist and pick another"
               >

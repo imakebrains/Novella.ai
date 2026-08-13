@@ -106,69 +106,82 @@ function ProfileTab() {
 
   return (
     <>
-      <p className="hint">
-        Used on title pages and exports. Stored on this machine only — Novella has no
-        account system and nothing here is ever sent anywhere.
-      </p>
+      <section className="ap-section">
+        <h3 className="ap-title">Your byline</h3>
+        <p className="ap-sub">
+          Used on title pages and exports. Stored on this machine only — Novella has no
+          account system and nothing here is ever sent anywhere.
+        </p>
 
-      <Field label="Author name">
-        <input
-          className="search bare"
-          value={profile.name}
-          onChange={(e) => update({ name: e.target.value })}
-          placeholder="For the copyright line"
-        />
-      </Field>
+        <Field label="Author name">
+          <input
+            className="field-input"
+            value={profile.name}
+            onChange={(e) => update({ name: e.target.value })}
+            placeholder="For the copyright line"
+          />
+        </Field>
 
-      <Field label="Pen name">
-        <input
-          className="search bare"
-          value={profile.penName}
-          onChange={(e) => update({ penName: e.target.value })}
-          placeholder="If you publish under a different name"
-        />
-      </Field>
+        <Field label="Pen name">
+          <input
+            className="field-input"
+            value={profile.penName}
+            onChange={(e) => update({ penName: e.target.value })}
+            placeholder="If you publish under a different name"
+          />
+        </Field>
 
-      <Field label="Website">
-        <input
-          className="search bare"
-          value={profile.website}
-          onChange={(e) => update({ website: e.target.value })}
-          placeholder="Optional, for front matter"
-        />
-      </Field>
+        <Field label="Website">
+          <input
+            className="field-input"
+            value={profile.website}
+            onChange={(e) => update({ website: e.target.value })}
+            placeholder="Optional, for front matter"
+          />
+        </Field>
+      </section>
 
-      <Field label="Default POV">
-        <select
-          className="select bare"
-          value={profile.defaultPov}
-          onChange={(e) => update({ defaultPov: e.target.value as typeof profile.defaultPov })}
-        >
-          <option value="unset">Not set</option>
-          <option value="third-limited">Third person limited</option>
-          <option value="first">First person</option>
-          <option value="third-omniscient">Third person omniscient</option>
-        </select>
-      </Field>
+      <section className="ap-section">
+        <h3 className="ap-title">How you write</h3>
+        <p className="ap-sub">
+          The point of view your stories usually open in, and a daily target if you
+          like one to chase. Neither is required, and both are easy to change.
+        </p>
 
-      <Field label="Daily goal">
-        <input
-          className="search bare"
-          type="number"
-          min={0}
-          step={100}
-          value={profile.dailyGoal || ""}
-          onChange={(e) => update({ dailyGoal: Number(e.target.value) || 0 })}
-          placeholder="Words per day, blank for none"
-        />
-      </Field>
+        <Field label="Default POV">
+          <select
+            className="select bare"
+            value={profile.defaultPov}
+            onChange={(e) => update({ defaultPov: e.target.value as typeof profile.defaultPov })}
+          >
+            <option value="unset">Not set</option>
+            <option value="third-limited">Third person limited</option>
+            <option value="first">First person</option>
+            <option value="third-omniscient">Third person omniscient</option>
+          </select>
+        </Field>
 
-      <div className="settings-section-label">Your writing</div>
-      <SessionSummary />
-      <p className="hint">
-        Counts net words added to the manuscript — a day spent cutting still counts as work,
-        so the bar can dip below zero and that's honest. Nothing here leaves your machine.
-      </p>
+        <Field label="Daily goal">
+          <input
+            className="field-input"
+            type="number"
+            min={0}
+            step={100}
+            value={profile.dailyGoal || ""}
+            onChange={(e) => update({ dailyGoal: Number(e.target.value) || 0 })}
+            placeholder="Words per day, blank for none"
+          />
+        </Field>
+      </section>
+
+      <section className="ap-section">
+        <h3 className="ap-title">Your writing</h3>
+        <p className="ap-sub">
+          Counts net words added to the manuscript — a day spent cutting still counts as work,
+          so the bar can dip below zero and that's honest. Nothing here leaves your machine.
+        </p>
+        <SessionSummary />
+      </section>
     </>
   );
 }
@@ -563,15 +576,15 @@ function UpdatesSection() {
   };
 
   return (
-    <section className="settings-group">
-      <h3 className="settings-cat">App updates</h3>
-      <p className="hint">
+    <section className="ap-section">
+      <h3 className="ap-title">App updates</h3>
+      <p className="ap-sub">
         Novella {currentVersion()}. Point this at the app's GitHub repository and updates
         are checked and fetched from its releases — no visiting the site.
       </p>
       <div className="music-input-row">
         <input
-          className="search bare"
+          className="field-input"
           value={repo}
           placeholder="owner/repository"
           onChange={(e) => setRepo(e.target.value)}
@@ -609,14 +622,14 @@ function UpdatesSection() {
 function ProvidersSection() {
   const providers = pluginHost.providers();
   const [active, setActive] = useState(activeProviderSlash());
-  const [probe, setProbe] = useState<string | null>(null);
+  const [probe, setProbe] = useState<{ kind: "busy" | "ok" | "bad"; text: string } | null>(null);
   const [models, setModels] = useState<string[] | null>(null);
 
   const custom = pluginHost.list().find((p) => p.id === "provider-openai-compatible");
   const customSettings = pluginHost.settingsFor("provider-openai-compatible");
 
   const testCustom = async () => {
-    setProbe("Checking…");
+    setProbe({ kind: "busy", text: "Checking…" });
     setModels(null);
     try {
       const found = await listRemoteModels(
@@ -624,21 +637,21 @@ function ProvidersSection() {
         String(customSettings.get("apiKey") ?? ""),
       );
       setModels(found);
-      setProbe(`Connected · ${found.length} models available`);
+      setProbe({ kind: "ok", text: `Connected · ${found.length} models available` });
     } catch (err) {
-      setProbe(err instanceof Error ? err.message : String(err));
+      setProbe({ kind: "bad", text: err instanceof Error ? err.message : String(err) });
     }
   };
 
   return (
     <>
-      <section className="settings-group">
-        <h3 className="settings-cat">Local AI</h3>
+      <section className="ap-section">
+        <h3 className="ap-title">Local AI</h3>
         <SetupPanel />
       </section>
 
-      <section className="settings-group">
-        <h3 className="settings-cat">Which model writes</h3>
+      <section className="ap-section">
+        <h3 className="ap-title">Which model writes</h3>
         {providers.length === 0 ? (
           <p className="hint">No providers are on. Enable one under Plugins.</p>
         ) : (
@@ -668,9 +681,9 @@ function ProvidersSection() {
       </section>
 
       {custom && (
-        <section className="settings-group">
-          <h3 className="settings-cat">Custom endpoint</h3>
-          <p className="hint">
+        <section className="ap-section">
+          <h3 className="ap-title">Custom endpoint</h3>
+          <p className="ap-sub">
             Anything speaking the OpenAI API works — OpenRouter, Groq, DeepSeek, LM Studio,
             or a service that doesn't exist yet.
           </p>
@@ -712,7 +725,7 @@ function ProvidersSection() {
           </Field>
 
           {custom.settingsSchema?.map((f) => (
-            <SettingRow key={f.key} pluginId={custom.id} field={f} />
+            <SettingRow key={f.key} pluginId={custom.id} field={f} fieldInput />
           ))}
 
           <div className="btn-row">
@@ -720,7 +733,15 @@ function ProvidersSection() {
               Test connection
             </button>
           </div>
-          {probe && <p className="hint">{probe}</p>}
+          {probe && (
+            <p
+              className={`hint${
+                probe.kind === "ok" ? " probe-ok" : probe.kind === "bad" ? " probe-bad" : ""
+              }`}
+            >
+              {probe.text}
+            </p>
+          )}
           {models && models.length > 0 && (
             <div className="chips">
               {models.slice(0, 24).map((m) => (
@@ -892,7 +913,17 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function SettingRow({ pluginId, field }: { pluginId: string; field: SettingField }) {
+function SettingRow({
+  pluginId,
+  field,
+  fieldInput,
+}: {
+  pluginId: string;
+  field: SettingField;
+  /* Connections passes this so key/endpoint fields get the .field-input
+     focus ring; plugin rows keep their old look until that surface lands. */
+  fieldInput?: boolean;
+}) {
   const settings = pluginHost.settingsFor(pluginId);
   const [value, setValue] = useState<string>(() => {
     const v = settings.get(field.key);
@@ -945,7 +976,7 @@ function SettingRow({ pluginId, field }: { pluginId: string; field: SettingField
         />
       ) : (
         <input
-          className="search bare"
+          className={fieldInput ? "field-input" : "search bare"}
           type={field.kind === "password" ? "password" : field.kind === "number" ? "number" : "text"}
           value={value}
           placeholder={field.placeholder ?? ""}

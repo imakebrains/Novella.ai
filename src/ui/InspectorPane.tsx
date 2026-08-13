@@ -67,7 +67,15 @@ export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => 
   }, [plusOpen]);
 
   const renderTab = (id: TabId) => {
-    if (TAB_DEFS[id].needsNote && !active) return <p className="empty-note">Nothing open.</p>;
+    if (TAB_DEFS[id].needsNote && !active)
+      return (
+        <div className="empty-state">
+          <span className="empty-glyph" aria-hidden>
+            ¶
+          </span>
+          <p className="empty-line">Nothing open.</p>
+        </div>
+      );
     switch (id) {
       case "links":
         return <LinksTab />;
@@ -154,7 +162,12 @@ function LinksTab() {
     <>
       <Section title="Backlinks" count={backlinks.length}>
         {backlinks.length === 0 ? (
-          <p className="hint">Nothing references this yet.</p>
+          <div className="empty-state">
+            <span className="empty-glyph" aria-hidden>
+              §
+            </span>
+            <p className="empty-line">Nothing references this yet.</p>
+          </div>
         ) : (
           backlinks.map(({ note, count }) => (
             <button key={note.id} className="link-row" onClick={() => store.open(note.id)}>
@@ -177,7 +190,7 @@ function LinksTab() {
                 <span className="link-name">{note.title}</span>
               </button>
             ) : (
-              <div key={name} className="link-row unresolved" title="Not yet written">
+              <div key={name} className="link-row unresolved" data-tip="Not yet written">
                 <span className="type-dot" data-type="dangling" />
                 <span className="link-name">{name}</span>
               </div>
@@ -367,7 +380,12 @@ function AssistantTab() {
           Only the codex entries this scene references get sent — never the whole thing.
         </p>
         {ctx.referenced.length === 0 ? (
-          <p className="hint">No codex entries referenced yet.</p>
+          <div className="empty-state">
+            <span className="empty-glyph" aria-hidden>
+              ❧
+            </span>
+            <p className="empty-line">No codex entries referenced yet.</p>
+          </div>
         ) : (
           ctx.referenced.map((n) => (
             <button key={n.id} className="link-row" onClick={() => store.open(n.id)}>
@@ -442,7 +460,7 @@ function AssistantTab() {
           >
             + New style
           </button>
-          <label className="btn-ghost upload-style" title="Import a .txt or .md file as a style">
+          <label className="btn-ghost upload-style" data-tip="Import a .txt or .md file as a style">
             Upload style…
             <input
               type="file"
@@ -481,8 +499,17 @@ function AssistantTab() {
             className="btn-primary"
             onClick={() => void runGenerate()}
             disabled={busy || daemon !== "ready"}
+            style={{ minWidth: 150 }}
           >
-            {busy ? "Writing…" : chosen ? `Run “${chosen.title}”` : "Continue the scene"}
+            {busy ? (
+              <>
+                <span className="spinner" aria-hidden /> Writing…
+              </>
+            ) : chosen ? (
+              `Run “${chosen.title}”`
+            ) : (
+              "Continue the scene"
+            )}
           </button>
           {busy && (
             <button className="btn-ghost" onClick={() => abort.current?.abort()}>
@@ -495,7 +522,7 @@ function AssistantTab() {
 
         {output && (
           <>
-            <div className="generated">{output}</div>
+            <div className={busy ? "generated stream-caret" : "generated"}>{output}</div>
             <div className="btn-row">
               <button
                 className="btn-primary"
@@ -517,7 +544,12 @@ function AssistantTab() {
 }
 
 function DaemonStatus({ state, models }: { state: DaemonState; models: OllamaModel[] }) {
-  if (state === "checking") return <p className="hint">Checking for Ollama…</p>;
+  if (state === "checking")
+    return (
+      <p className="hint">
+        <span className="spinner" aria-hidden /> Checking for Ollama…
+      </p>
+    );
 
   // Both failure states are fixable from inside the app — no terminal,
   // no visiting a download page.

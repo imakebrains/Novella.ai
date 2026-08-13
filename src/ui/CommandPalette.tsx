@@ -129,7 +129,7 @@ export function CommandPalette({
               onMouseEnter={() => setSelected(i)}
               onClick={() => run(item)}
             >
-              <span className="palette-kind">
+              <span className={`palette-kind ${item.kind}`}>
                 {item.kind === "command" ? "›" : item.kind === "chapter" ? "§" : "✦"}
               </span>
               <span className="palette-label">{item.label}</span>

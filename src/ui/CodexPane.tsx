@@ -181,7 +181,15 @@ export function CodexPane({
         })}
 
         {matches && matches.size === 0 && (
-          <p className="empty-note">No matches for “{query}”.</p>
+          <div className="empty-state">
+            <span className="empty-glyph" aria-hidden>
+              ◦
+            </span>
+            <p className="empty-line">No matches for “{query}”.</p>
+            <button className="empty-cta" onClick={() => setQuery("")}>
+              Clear search
+            </button>
+          </div>
         )}
 
         {dangling.length > 0 && !query && (

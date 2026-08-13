@@ -213,7 +213,7 @@ export function BeatsPanel() {
 
           {output && (
             <div className="beat-output">
-              <div className="generated">{output.text || "…"}</div>
+              <div className="generated">{output.text || <span className="stream-caret" />}</div>
               <div className="btn-row">
                 <button className="btn-primary" onClick={accept} disabled={busyIndex !== null}>
                   Add to chapter

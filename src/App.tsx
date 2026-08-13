@@ -246,14 +246,14 @@ export default function App() {
           <button
             className="brand-vault"
             onClick={() => setProjectsOpen(true)}
-            title={root ?? "No folder open — click to choose a project"}
+            data-tip={root ?? "No folder open — click to choose a project"}
             disabled={store.isBusy()}
           >
             {activeProject?.name ?? vaultLabel}
             {!persistent && (
               <span
                 className="badge-warn"
-                title="No folder or browser storage is holding this project — edits vanish when the app closes. Click to choose a project."
+                data-tip="Not saved anywhere — edits vanish when the app closes"
               >
                 in memory
               </span>
@@ -292,7 +292,7 @@ export default function App() {
               className="save-btn"
               onClick={() => void store.saveAll()}
               disabled={store.isBusy()}
-              title={
+              data-tip={
                 persistent
                   ? "Save to disk (Ctrl+S)"
                   : "No folder open — this only updates the current session"
@@ -304,7 +304,7 @@ export default function App() {
           <button
             className={`icon-btn labeled ${leftOpen ? "on" : ""}`}
             onClick={() => setLeftOpen((v) => !v)}
-            title="Show or hide the left pane — your chapters, characters and notes"
+            data-tip="Chapters, characters and notes"
             aria-pressed={leftOpen}
           >
             ▤ <span>Codex</span>
@@ -312,7 +312,7 @@ export default function App() {
           <button
             className={`icon-btn labeled ${rightOpen ? "on" : ""}`}
             onClick={() => setRightOpen((v) => !v)}
-            title="Show or hide the right pane — links, tasks, history, assistant"
+            data-tip="Links, tasks, history, assistant"
             aria-pressed={rightOpen}
           >
             ▥ <span>Tools</span>
@@ -320,7 +320,7 @@ export default function App() {
           <button
             className={`icon-btn labeled ${focus ? "on" : ""}`}
             onClick={() => setFocus((v) => !v)}
-            title="Focus mode — just the page, nothing else (Ctrl+Shift+F). Esc leaves."
+            data-tip="Just the page (Ctrl+Shift+F)"
             aria-pressed={focus}
           >
             ◎ <span>Focus</span>
@@ -328,12 +328,17 @@ export default function App() {
           <button
             className="icon-btn theme-cycle"
             onClick={cycleTheme}
-            title={`${themeInfo.name} — click for the next theme`}
+            data-tip={`${themeInfo.name} — click for the next theme`}
             aria-label={`Theme: ${themeInfo.name}. Click to change.`}
           >
             <span className="theme-dot" style={{ background: themeInfo.swatch[2] }} />
           </button>
-          <button className="icon-btn" onClick={() => setSettingsOpen(true)} title="Settings">
+          <button
+            className="icon-btn"
+            onClick={() => setSettingsOpen(true)}
+            data-tip="Settings"
+            aria-label="Settings"
+          >
             ⚙
           </button>
         </div>
@@ -343,6 +348,9 @@ export default function App() {
 
       {!persistent && (
         <div className="banner">
+          <span className="banner-icon" aria-hidden>
+            ⚠
+          </span>
           {isTauri()
             ? "No vault folder open — edits live in memory only."
             : storage().kind === "web"
@@ -362,7 +370,14 @@ export default function App() {
         </div>
       )}
 
-      {store.error() && <div className="banner error">{store.error()}</div>}
+      {store.error() && (
+        <div className="banner error">
+          <span className="banner-icon" aria-hidden>
+            ⚠
+          </span>
+          {store.error()}
+        </div>
+      )}
 
       {mode === "board" ? (
         boardLayout === "grid" ? (
@@ -456,7 +471,7 @@ export default function App() {
       )}
 
       {focus && (
-        <button className="focus-exit" onClick={() => setFocus(false)} title="Leave focus mode (Esc)">
+        <button className="focus-exit" onClick={() => setFocus(false)} data-tip="Leave focus mode (Esc)">
           Leave focus
         </button>
       )}
@@ -501,7 +516,7 @@ function SaveStatus({
 }) {
   if (!persistent) {
     return dirty > 0 ? (
-      <span className="save-status warn" title="No vault folder is open, so nothing is being written to disk">
+      <span className="save-status warn" data-tip="No folder open — nothing is written to disk">
         not saving
       </span>
     ) : null;
@@ -509,7 +524,7 @@ function SaveStatus({
 
   if (state === "saving")
     return (
-      <span className="save-status" title="Writing your changes now">
+      <span className="save-status" data-tip="Writing your changes now">
         saving…
       </span>
     );
@@ -523,14 +538,14 @@ function SaveStatus({
     return (
       <span
         className="save-status"
-        title="Changes waiting — autosave writes 1.5s after you stop typing, or press Ctrl+S"
+        data-tip="Autosaves 1.5s after you pause — or Ctrl+S"
       >
         unsaved
       </span>
     );
   if (state === "saved" && lastSaved)
     return (
-      <span className="save-status ok" title={new Date(lastSaved).toLocaleTimeString()}>
+      <span className="save-status ok" data-tip={new Date(lastSaved).toLocaleTimeString()}>
         saved
       </span>
     );

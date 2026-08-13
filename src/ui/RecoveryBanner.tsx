@@ -37,6 +37,9 @@ export function RecoveryBanner() {
 
   return (
     <div className="banner recovery">
+      <span className="banner-icon" aria-hidden>
+        ↻
+      </span>
       <strong>Unsaved work found.</strong>
       <span>
         {found.length} {found.length === 1 ? "note has" : "notes have"} changes from {when} that

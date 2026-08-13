@@ -217,7 +217,7 @@ export function Corkboard({
                   boardStore.restore(snapshot);
                 });
               }}
-              title="Delete this board — its notes stay, and Undo is offered"
+              data-tip="Delete this board — its notes stay, and Undo is offered"
             >
               Delete board
             </button>
@@ -230,15 +230,21 @@ export function Corkboard({
         <div className="empty-state">
           {onManuscript ? (
             <>
-              <p>No chapters yet.</p>
-              <p className="muted">
+              <span className="empty-glyph" aria-hidden>
+                ✒
+              </span>
+              <p className="empty-line">No chapters yet.</p>
+              <p className="empty-line muted">
                 Anything typed <code>chapter</code> or <code>scene</code> shows up here.
               </p>
             </>
           ) : (
             <>
-              <p>Nothing on this board yet.</p>
-              <p className="muted">
+              <span className="empty-glyph" aria-hidden>
+                ☙
+              </span>
+              <p className="empty-line">Nothing on this board yet.</p>
+              <p className="empty-line muted">
                 Click the dashed <em>Add cards</em> tile below to pin chapters and
                 notes here — or right-click anything in the left pane or the editor.
               </p>
@@ -409,7 +415,7 @@ function AddCardsPicker({ boardId, onClose }: { boardId: string; onClose: () => 
       <div className="modal add-cards-modal" onClick={(e) => e.stopPropagation()}>
         <header className="modal-head">
           <h2>Add to “{board?.name ?? "board"}”</h2>
-          <button className="icon-btn" onClick={onClose} title="Done (Esc)">
+          <button className="icon-btn" onClick={onClose} data-tip="Done (Esc)">
             ✕
           </button>
         </header>
@@ -554,7 +560,7 @@ function Card({
           <img className="card-art" src={art} alt="" draggable={false} />
           <button
             className="card-art-remove"
-            title="Remove this image"
+            data-tip="Remove this image"
             onClick={(e) => {
               e.stopPropagation();
               void removeCardImage(note.id);
@@ -627,7 +633,7 @@ function Card({
           <button
             className="chip tag-add"
             data-no-drag
-            title="Add a tag"
+            data-tip="Add a tag"
             onClick={(e) => {
               e.stopPropagation();
               setAddingTag(true);
@@ -655,7 +661,7 @@ function Card({
           <button
             className="chip board-remove"
             data-no-drag
-            title="Take this card off the board (the note itself stays)"
+            data-tip="Take this card off the board (the note itself stays)"
             onClick={(e) => {
               e.stopPropagation();
               boardStore.removeNote(boardId, note.id);

@@ -755,6 +755,34 @@ scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
 
+- 2026-08-13 — The system pass (session; owner round 9). Research first:
+  an 8-agent workflow studied Craft/iA/Ulysses/Type.ai, Linear/Raycast/
+  Things/Arc, and premium-vs-cheap tells, then audited our own tokens,
+  surfaces, interactions, and typography — synthesized into
+  docs/DESIGN-SYSTEM.md (now the single source of truth). Shipped from
+  it: layered theme-tinted shadow stacks (dark gets an inset top bevel,
+  light stays warm ink); new tokens (--radius-xs, --text-2xs/2xl,
+  leading scale, --tracking-caps, --border-soft, --focus-ring,
+  theme-aware --scrim); six real bugs fixed (undefined --bg-primary,
+  .banner-btn class collision, the invisible agent enable switch,
+  unstyled .settings-section-label, the goal line that could never
+  render, duplicate .board-head); 43 duration literals onto motion
+  tokens; focus-visible rings everywhere (an accessibility gap); pill
+  scrollbars; universal press states; designed tooltips replacing OS
+  title= leaks on high-traffic chrome; one spinner + streaming-caret
+  loading language for every AI moment; tabular numerals on everything
+  that ticks; empty states rebuilt as glyph + line + real CTA across
+  eight panels (the palette CTA verified live); Settings Profile and
+  Connections migrated to the ap-section pattern; command palette
+  finished (type-colored kinds, shadow-lg, instant hot paths). Also
+  new: Reword in place — select prose, pick a voice (Tighten/Vivid/
+  Tension/Softer/Plainer or free-form), the rewrite streams in, Replace
+  lands at the exact selection, Ctrl+Z undoes. Verified end-to-end
+  against local llama3.1. 278 checks green; palette/shadows/tooltips/
+  scrim verified live by computed style (pane hidden, so no screenshot
+  this round — one human look across the five themes is the remaining
+  ask).
+
 - 2026-08-13 — Glow v2 + backdrops (session; owner round 8). The ambient
   glow's visible gradient rings are gone — a 70px blur on the orb erases
   the banding — and it now has two moods: follow the cursor, or drift on

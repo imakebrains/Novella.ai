@@ -57,13 +57,75 @@
 
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 
-  /* Shadow sets, shared by theme brightness. */
-  --shadow-dark-sm: 0 1px 3px rgb(0 0 0 / 0.45);
-  --shadow-dark: 0 8px 28px rgb(0 0 0 / 0.55);
-  --shadow-dark-lg: 0 20px 60px rgb(0 0 0 / 0.65);
-  --shadow-light-sm: 0 1px 3px rgb(90 70 50 / 0.1);
-  --shadow-light: 0 8px 28px rgb(90 70 50 / 0.14);
-  --shadow-light-lg: 0 20px 60px rgb(90 70 50 / 0.2);
+  /* Shadow sets, shared by theme brightness. Layered: offsets roughly
+     double per layer, alpha stays low. Dark = ambient depth + a 1px
+     inset top bevel (the machined edge); light = warm ink, never pure
+     black. Levels: sm = resting cards/chips · base = popovers/menus/
+     toasts/docked chrome · lg = modals and the palette. */
+  --shadow-dark-sm:
+    0 1px 2px rgb(0 0 0 / 0.35),
+    0 2px 8px rgb(0 0 0 / 0.22);
+  --shadow-dark:
+    inset 0 1px 0 rgb(255 255 255 / 0.04),
+    0 2px 4px rgb(0 0 0 / 0.3),
+    0 8px 24px rgb(0 0 0 / 0.35);
+  --shadow-dark-lg:
+    inset 0 1px 0 rgb(255 255 255 / 0.05),
+    0 4px 12px rgb(0 0 0 / 0.35),
+    0 16px 48px rgb(0 0 0 / 0.4),
+    0 32px 80px rgb(0 0 0 / 0.28);
+  --shadow-light-sm:
+    0 1px 2px rgb(90 70 50 / 0.08),
+    0 2px 6px rgb(90 70 50 / 0.06);
+  --shadow-light:
+    0 2px 4px rgb(90 70 50 / 0.08),
+    0 6px 16px rgb(90 70 50 / 0.09),
+    0 12px 32px rgb(90 70 50 / 0.07);
+  --shadow-light-lg:
+    0 4px 8px rgb(90 70 50 / 0.08),
+    0 12px 32px rgb(90 70 50 / 0.11),
+    0 24px 64px rgb(90 70 50 / 0.14);
+
+  /* ---- system pass (round 9) additions ----
+     All derive from theme tokens, so they re-resolve under every theme
+     and under accent personalization. */
+
+  /* radius: xs legitimizes the 2-3px micro tier (diff marks, badges,
+     tiny chips). Nested-radius law: inner = outer - 2px, always. */
+  --radius-xs: 3px;
+
+  /* spacing: the 2px micro unit. */
+  --space-05: 2px;
+
+  /* type: the 10px micro tier + the board/banner hero size. */
+  --text-2xs: 0.625rem;
+  --text-2xl: 1.75rem;
+
+  /* leading: three values instead of twelve. */
+  --leading-tight: 1.25;  /* headings, clamped titles */
+  --leading-ui: 1.5;      /* chrome, hints, labels — also set on body */
+  --leading-prose: 1.75;  /* editor default; user override wins */
+
+  /* tracking: ONE overline value. */
+  --tracking-caps: 0.06em;
+
+  /* borders: the soft border for floating/overlay chrome —
+     full-contrast --border-strong is for interactive edges only. */
+  --border-soft: color-mix(in srgb, var(--border-strong) 60%, transparent);
+
+  /* focus: the one ring, everywhere. */
+  --focus-ring: 0 0 0 3px var(--accent-soft);
+
+  /* glow: the one accent-glow recipe. For semantic glows, substitute
+     --success/--danger for --accent. */
+  --glow-accent: 0 4px 18px color-mix(in srgb, var(--accent) 28%, transparent);
+
+  /* scrims: modal backdrop tinted by the theme (flat black over vellum
+     parchment reads harsh); photo overlays stay true black because
+     cover art is arbitrary. */
+  --scrim: color-mix(in srgb, var(--bg-app) 22%, rgb(0 0 0 / 0.5));
+  --scrim-image: rgb(0 0 0 / 0.55);
+  --fg-on-image: #fff;
 }
 
 /* ============================================================

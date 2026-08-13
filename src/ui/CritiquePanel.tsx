@@ -105,7 +105,7 @@ export function CritiquePanel() {
             <p className="hint">Repeated words sitting near each other.</p>
             <div className="chips">
               {report.echoes.map((e) => (
-                <span key={e.word} className="chip echo" title={`${e.count}× · nearest ${e.nearest} words apart`}>
+                <span key={e.word} className="chip echo" data-tip={`${e.count}× · nearest ${e.nearest} words apart`}>
                   {e.word} <em>×{e.count}</em>
                 </span>
               ))}
@@ -152,7 +152,7 @@ export function CritiquePanel() {
         ) : (
           <div className="chips">
             {report.overused.map((o) => (
-              <span key={o.word} className="chip" title={`${o.per1000.toFixed(1)} per 1000 words`}>
+              <span key={o.word} className="chip" data-tip={`${o.per1000.toFixed(1)} per 1000 words`}>
                 {o.word} <em>×{o.count}</em>
               </span>
             ))}
