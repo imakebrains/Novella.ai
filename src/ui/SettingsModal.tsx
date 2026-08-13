@@ -18,6 +18,8 @@ import {
 } from "../state/updates";
 import { AgentsPanel } from "./AgentsPanel";
 import { replayIntro } from "./WelcomeIntro";
+import { INTRO_SWATCHES } from "./introScript";
+import { tabPrefs, useTabPrefs, type TabId } from "./inspectorTabs";
 import {
   loadPersonalization,
   resetPersonalization,
@@ -174,6 +176,7 @@ function ProfileTab() {
 function AppearanceTab() {
   const { theme, setTheme } = useTheme();
   const [personal, setPersonal] = useState<Personalization>(() => loadPersonalization());
+  const prefs = useTabPrefs();
 
   const change = (patch: Partial<Personalization>) => {
     const next = { ...personal, ...patch };
@@ -183,143 +186,186 @@ function AppearanceTab() {
 
   return (
     <>
-      <p className="hint">
-        Five worlds rather than a light switch. Pick whichever suits what you're writing.
-      </p>
+      <section className="ap-section">
+        <h3 className="ap-title">Theme</h3>
+        <p className="ap-sub">Five worlds, tuned for long sessions. Pick the one your story lives in.</p>
+        <div className="theme-grid">
+          {THEMES.map((t) => (
+            <button
+              key={t.id}
+              className={`theme-card ${theme === t.id ? "on" : ""}`}
+              onClick={() => setTheme(t.id)}
+              aria-pressed={theme === t.id}
+            >
+              <span className="theme-preview" style={{ background: t.swatch[0] }}>
+                <span className="theme-preview-pane" style={{ background: t.swatch[1] }} />
+                <span className="theme-preview-accent" style={{ background: t.swatch[2] }} />
+              </span>
+              <span className="theme-name">{t.name}</span>
+              <span className="theme-blurb">{t.blurb}</span>
+            </button>
+          ))}
+        </div>
+      </section>
 
-      <div className="theme-grid">
-        {THEMES.map((t) => (
-          <button
-            key={t.id}
-            className={`theme-card ${theme === t.id ? "on" : ""}`}
-            onClick={() => setTheme(t.id)}
-            aria-pressed={theme === t.id}
+      <section className="ap-section">
+        <h3 className="ap-title">Accent</h3>
+        <p className="ap-sub">The color on the spine. Everything follows it: buttons, caret, highlights.</p>
+        <div className="ap-swatches" role="radiogroup" aria-label="Accent color">
+          {INTRO_SWATCHES.map((hex) => (
+            <button
+              key={hex}
+              className={`ap-swatch ${personal.accent === hex ? "on" : ""}`}
+              style={{ background: hex }}
+              onClick={() => change({ accent: hex })}
+              aria-label={`Accent ${hex}`}
+            />
+          ))}
+          <label className="ap-swatch ap-swatch-custom" title="Any color you like">
+            <input
+              type="color"
+              value={personal.accent ?? "#e8a33d"}
+              onChange={(e) => change({ accent: e.target.value })}
+              aria-label="Custom accent color"
+            />
+            +
+          </label>
+        </div>
+      </section>
+
+      <section className="ap-section">
+        <h3 className="ap-title">The page</h3>
+        <p className="ap-sub">How your prose sits. Changes land as you drag.</p>
+        <div className="ap-page-preview" aria-hidden>
+          <p
+            style={{
+              fontFamily: "var(--font-prose)",
+              fontSize: "var(--text-prose)",
+              lineHeight: "var(--prose-leading, 1.75)",
+              margin: 0,
+            }}
           >
-            <span className="theme-preview" style={{ background: t.swatch[0] }}>
-              <span className="theme-preview-pane" style={{ background: t.swatch[1] }} />
-              <span className="theme-preview-accent" style={{ background: t.swatch[2] }} />
-            </span>
-            <span className="theme-name">{t.name}</span>
-            <span className="theme-blurb">{t.blurb}</span>
-          </button>
-        ))}
-      </div>
-
-      <section className="settings-group">
-        <h3 className="settings-cat">Make it yours</h3>
-        <p className="hint">
-          These sit on top of whichever theme is active, and follow this device
-          rather than the project.
-        </p>
-
+            The tide had taken the marker stones again, and she rewrote the
+            coast from memory.
+          </p>
+        </div>
         <label className="personalize-row">
-          <span>Accent color</span>
-          <input
-            type="color"
-            value={personal.accent ?? "#e8a33d"}
-            onChange={(e) => change({ accent: e.target.value })}
-            aria-label="Accent color"
-          />
-        </label>
-
-        <label className="personalize-row">
-          <span>Prose font</span>
+          <span>Font</span>
           <select
             value={personal.proseFont ?? "serif"}
-            onChange={(e) =>
-              change({ proseFont: e.target.value as Personalization["proseFont"] })
-            }
+            onChange={(e) => change({ proseFont: e.target.value as Personalization["proseFont"] })}
+            aria-label="Prose font"
           >
             <option value="serif">Book serif (default)</option>
             <option value="sans">Clean sans-serif</option>
             <option value="mono">Typewriter mono</option>
           </select>
         </label>
-
         <label className="personalize-row">
           <span>
-            Prose size <span className="hint-inline">{personal.proseSize ?? 17}px</span>
+            Size <span className="hint-inline">{personal.proseSize ?? 17}px</span>
           </span>
-          <input
-            type="range"
-            min={14}
-            max={24}
-            step={1}
-            value={personal.proseSize ?? 17}
-            onChange={(e) => change({ proseSize: Number(e.target.value) })}
-            aria-label="Prose text size in pixels"
-          />
+          <input type="range" min={14} max={24} step={1} value={personal.proseSize ?? 17}
+            onChange={(e) => change({ proseSize: Number(e.target.value) })} aria-label="Prose size" />
         </label>
-
-        <label
-          className="personalize-row"
-          title="How much air between lines in the editor. 1.75 is book-like; higher reads airier, lower fits more on screen."
-        >
+        <label className="personalize-row">
           <span>
-            Line spacing{" "}
-            <span className="hint-inline">{(personal.leading ?? 1.75).toFixed(2)}</span>
+            Line spacing <span className="hint-inline">{(personal.leading ?? 1.75).toFixed(2)}</span>
           </span>
-          <input
-            type="range"
-            min={1.4}
-            max={2.2}
-            step={0.05}
-            value={personal.leading ?? 1.75}
-            onChange={(e) => change({ leading: Number(e.target.value) })}
-            aria-label="Editor line spacing"
-          />
+          <input type="range" min={1.4} max={2.2} step={0.05} value={personal.leading ?? 1.75}
+            onChange={(e) => change({ leading: Number(e.target.value) })} aria-label="Line spacing" />
         </label>
-
-        <label
-          className="personalize-row"
-          title="How wide the column of text runs before wrapping. Narrow reads like a paperback; wide fills the screen."
-        >
+        <label className="personalize-row">
           <span>Page width</span>
-          <select
-            value={personal.measure ?? "standard"}
-            onChange={(e) =>
-              change({ measure: e.target.value as Personalization["measure"] })
-            }
-            aria-label="Editor page width"
-          >
-            <option value="narrow">Narrow — paperback</option>
+          <select value={personal.measure ?? "standard"}
+            onChange={(e) => change({ measure: e.target.value as Personalization["measure"] })}
+            aria-label="Page width">
+            <option value="narrow">Narrow, like a paperback</option>
             <option value="standard">Standard (default)</option>
-            <option value="wide">Wide — fill the screen</option>
+            <option value="wide">Wide, fill the screen</option>
           </select>
         </label>
-
-        <label
-          className="personalize-row"
-          title="Rounded is the themes' soft look; Sharp squares off every corner for a flatter, tool-like feel."
-        >
+        <label className="personalize-row">
           <span>Corners</span>
-          <select
-            value={personal.corners ?? "rounded"}
-            onChange={(e) =>
-              change({ corners: e.target.value as Personalization["corners"] })
-            }
-            aria-label="Corner style"
-          >
+          <select value={personal.corners ?? "rounded"}
+            onChange={(e) => change({ corners: e.target.value as Personalization["corners"] })}
+            aria-label="Corner style">
             <option value="rounded">Rounded (default)</option>
             <option value="sharp">Sharp</option>
           </select>
         </label>
+      </section>
 
-        <div className="btn-row">
-          <button
-            className="btn-ghost"
-            onClick={() => {
-              resetPersonalization();
-              setPersonal({});
-            }}
-          >
-            Back to the theme's own look
-          </button>
+      <section className="ap-section">
+        <h3 className="ap-title">Ambient glow</h3>
+        <p className="ap-sub">
+          A soft accent light that drifts with your cursor. The welcome
+          screen kept on. Purely a mood; off by default.
+        </p>
+        <label className="personalize-row">
+          <span>Follow the cursor</span>
+          <label className="switch">
+            <input
+              type="checkbox"
+              checked={personal.glow === true}
+              onChange={(e) => change({ glow: e.target.checked })}
+              aria-label="Ambient glow"
+            />
+            <span className="switch-track" />
+          </label>
+        </label>
+      </section>
+
+      <section className="ap-section">
+        <h3 className="ap-title">Tools menu</h3>
+        <p className="ap-sub">
+          Choose what lives in the Tools dropdown. Scrolling over the Tools
+          button flips through whatever you keep.
+        </p>
+        <div className="ap-tools">
+          {prefs.order.map((id) => {
+            const shown = !prefs.hidden.includes(id);
+            return (
+              <button
+                key={id}
+                className={`ap-tool-chip ${shown ? "on" : ""}`}
+                onClick={() => (shown ? tabPrefs.hide(id) : tabPrefs.show(id))}
+                aria-pressed={shown}
+              >
+                {shown ? "\u2713 " : ""}
+                {TOOL_LABELS[id]}
+              </button>
+            );
+          })}
         </div>
       </section>
+
+      <div className="btn-row">
+        <button
+          className="btn-ghost"
+          onClick={() => {
+            resetPersonalization();
+            setPersonal({});
+          }}
+        >
+          Back to the theme's own look
+        </button>
+      </div>
     </>
   );
 }
+
+const TOOL_LABELS: Record<TabId, string> = {
+  links: "Links",
+  critique: "Critique",
+  tasks: "Tasks",
+  history: "History",
+  assistant: "Assistant",
+  continuity: "Continuity",
+  goals: "Goals",
+  calendar: "Calendar",
+  music: "Music",
+};
 
 /* ---------------- shortcuts ---------------- */
 

@@ -20,6 +20,7 @@ import { BoardStats } from "./ui/BoardStats";
 import type { BoardLayout } from "./ui/BoardLayoutToggle";
 import { RecoveryBanner } from "./ui/RecoveryBanner";
 import { UndoToastHost } from "./ui/UndoToastHost";
+import { AmbientGlow } from "./ui/AmbientGlow";
 import { WelcomeIntro, introPending, registerIntroOpener } from "./ui/WelcomeIntro";
 import { useAutosave, type SaveState } from "./state/autosave";
 import { probeSetup } from "./setupProbe";
@@ -459,6 +460,7 @@ export default function App() {
         </button>
       )}
 
+      <AmbientGlow />
       <MusicDock open={musicOpen} onClose={() => setMusicOpen(false)} />
       <UndoToastHost />
 

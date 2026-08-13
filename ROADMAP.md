@@ -755,6 +755,20 @@ scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
 
+- 2026-08-12 — Premium pass (session; owner round 7). The Tools button
+  is now the accent-lit door it should be, and scrolling over it flips
+  through tools without opening the menu (pure cycleTab + 5 unit
+  checks). Which tools appear is now chosen in Settings. The Appearance
+  tab was rebuilt as five titled sections (Theme / Accent swatches with
+  custom picker / The page with a live prose preview / Ambient glow /
+  Tools menu); the settings modal keeps one height so tabs stop
+  jumping. New: Ambient glow — a soft accent light that eases after the
+  cursor (soft-light blend, under modals, opt-in, honors reduced
+  motion by not existing). Verified live: sections render, wheel
+  cycles both ways, orb mounts and eases (reduced-motion stub needed —
+  automation Chrome forces the preference), tool chips hide/show.
+  268 checks green.
+
 - 2026-08-13 — Research round 28 (autopilot; no code). Dispatched the same
   four parallel research passes as recent rounds (NovelCrafter/Sudowrite;
   Dabble/Scrivener/Campfire; type.ai/Obsidian/new-entrant scan; broader

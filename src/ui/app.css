@@ -5804,3 +5804,147 @@ body.focus-mode .cm-editor {
   transition: none !important;
   animation: none !important;
 }
+
+/* ============================================================
+   Premium pass (owner round 7): energized Tools button, ambient
+   glow layer, Appearance-tab redesign, settings stability.
+   ============================================================ */
+
+/* The Tools button earns its accent — it is the door to everything. */
+.tool-picker-btn {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  box-shadow: 0 0 0 0 var(--accent-soft);
+  transition: box-shadow var(--motion-quick) var(--ease-enter),
+    transform var(--motion-quick) var(--ease-enter),
+    border-color var(--motion-quick) var(--ease-color);
+}
+.tool-picker-btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent);
+  box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+.tool-picker-btn .picker-caret {
+  color: var(--accent);
+}
+
+/* Settings keeps one size no matter which tab is open — dialogs that
+   jump between tabs read as flimsy (owner round 5, item 3). */
+.settings-modal {
+  height: min(720px, 86dvh);
+}
+
+/* The ambient glow: one accent light under the modals, over the chrome.
+   soft-light keeps text legible on dark and light themes alike. */
+.ambient-glow {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  overflow: hidden;
+}
+.ambient-glow-orb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 800px;
+  height: 800px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--accent) 22%, transparent),
+    transparent 65%
+  );
+  mix-blend-mode: soft-light;
+  will-change: transform;
+}
+
+/* ---- Appearance, redesigned ---- */
+.ap-section {
+  padding: var(--space-4) 0 var(--space-5);
+  border-bottom: 1px solid var(--border);
+}
+.ap-section:last-of-type {
+  border-bottom: none;
+}
+.ap-title {
+  margin: 0 0 2px;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  letter-spacing: -0.01em;
+}
+.ap-sub {
+  margin: 0 0 var(--space-3);
+  color: var(--fg-muted);
+  font-size: var(--text-sm);
+  max-width: 52ch;
+}
+
+.ap-swatches {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  align-items: center;
+}
+.ap-swatch {
+  width: 38px;
+  height: 38px;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform var(--motion-quick) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.ap-swatch:hover {
+  transform: scale(1.15);
+}
+.ap-swatch.on {
+  border-color: var(--fg-primary);
+}
+.ap-swatch-custom {
+  display: grid;
+  place-items: center;
+  background: var(--bg-raised);
+  border: 1px dashed var(--border-strong);
+  color: var(--fg-muted);
+  font-size: var(--text-lg);
+  position: relative;
+  overflow: hidden;
+}
+.ap-swatch-custom input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.ap-page-preview {
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-editor);
+  color: var(--fg-primary);
+}
+
+.ap-tools {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.ap-tool-chip {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--bg-raised);
+  color: var(--fg-muted);
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: border-color var(--motion-quick) var(--ease-color),
+    color var(--motion-quick) var(--ease-color);
+}
+.ap-tool-chip.on {
+  border-color: var(--accent);
+  color: var(--fg-primary);
+}

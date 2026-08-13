@@ -14,7 +14,7 @@ import { SetupPanel } from "./SetupPanel";
 import { CalendarTab } from "./CalendarTab";
 import { GoalsTab } from "./GoalsTab";
 import { MusicTab } from "./MusicTab";
-import { tabPrefs, useTabPrefs, type TabId } from "./inspectorTabs";
+import { cycleTab, tabPrefs, useTabPrefs, type TabId } from "./inspectorTabs";
 
 /* The inspector: the writer's toolbelt, arranged by the writer.
 
@@ -99,15 +99,22 @@ export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => 
         <button
           className="tool-picker-btn"
           onClick={() => setPlusOpen((v) => !v)}
+          onWheel={(e) => {
+            // Scroll over the button to flip through tools without opening
+            // the menu — peek by wheel, commit by click.
+            e.preventDefault();
+            const dir = e.deltaY > 0 ? 1 : -1;
+            tabPrefs.setActive(cycleTab(tab, tabPrefs.visible(), dir));
+          }}
           aria-expanded={plusOpen}
-          title="Switch tool — links, tasks, history, assistant and more"
+          title="Switch tool — click for the menu, or scroll over this button to flip through"
         >
           {TAB_DEFS[tab].label} <span className="picker-caret">▾</span>
         </button>
 
         {plusOpen && (
           <div className="tool-picker-menu" role="menu">
-            {prefs.order.map((id) => (
+            {tabPrefs.visible().map((id) => (
               <button
                 key={id}
                 role="menuitem"

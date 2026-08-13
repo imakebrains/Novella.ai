@@ -23,6 +23,7 @@ import {
   substitute,
   tapAdvance,
 } from "./src/ui/introScript";
+import { cycleTab, type TabId } from "./src/ui/inspectorTabs";
 import { acceptsTemperature } from "./src/ai/models";
 import { parseNote, serializeNote, extractWikiLinks, Vault } from "./src/core/vault";
 import { checkContinuity } from "./src/analysis/continuity";
@@ -1028,6 +1029,18 @@ lied, and Wren had known that since she was nine.
   ok("intro: no marketing-enthusiasm vocabulary", screens.every((s) => s.lines.every((l) => !/excited|awesome|amazing/i.test(l))));
   check("intro: eight spine colors", INTRO_SWATCHES.length, 8);
   ok("intro: every swatch is a real hex", INTRO_SWATCHES.every((c) => /^#[0-9a-f]{6}$/i.test(c)));
+}
+
+
+/* ---------- tools wheel-cycling ---------- */
+
+{
+  const vis = ["links", "tasks", "history"] as TabId[];
+  check("tools: wheel down steps forward", cycleTab("links", vis, 1), "tasks");
+  check("tools: wheel up steps back", cycleTab("links", vis, -1), "history");
+  check("tools: wraps at the end", cycleTab("history", vis, 1), "links");
+  check("tools: hidden current falls to first visible", cycleTab("music" as TabId, vis, 1), "links");
+  check("tools: empty visible is a no-op", cycleTab("links", [] as TabId[], 1), "links");
 }
 
 /* ---------- report ---------- */

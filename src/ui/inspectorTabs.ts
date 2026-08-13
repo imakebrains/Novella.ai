@@ -137,3 +137,13 @@ export function useTabPrefs(): TabPrefs {
   useSyncExternalStore(tabPrefs.subscribe, tabPrefs.getVersion, tabPrefs.getVersion);
   return tabPrefs.get();
 }
+
+/** Wheel over the Tools button steps through the visible tools — a
+    premium loose-change interaction: scroll to peek, click to open.
+    Pure so the direction math is testable. */
+export function cycleTab(current: TabId, visible: TabId[], dir: 1 | -1): TabId {
+  if (visible.length === 0) return current;
+  const at = visible.indexOf(current);
+  if (at === -1) return visible[0]!;
+  return visible[(at + dir + visible.length) % visible.length]!;
+}

@@ -18,6 +18,9 @@ export interface Personalization {
   measure?: "narrow" | "standard" | "wide";
   /** Rounded is the theme default; sharp squares everything off. */
   corners?: "rounded" | "sharp";
+  /** Ambient glow: a soft accent light that follows the cursor. Off by
+      default — it's a mood, not a requirement. */
+  glow?: boolean;
 }
 
 const KEY = "novella.personalize";
@@ -36,14 +39,30 @@ export function loadPersonalization(): Personalization {
   }
 }
 
+const listeners = new Set<() => void>();
+let version = 0;
+export function subscribePersonalization(fn: () => void): () => void {
+  listeners.add(fn);
+  return () => {
+    listeners.delete(fn);
+  };
+}
+export function personalizationVersion(): number {
+  return version;
+}
+
 export function savePersonalization(p: Personalization): void {
   localStorage.setItem(KEY, JSON.stringify(p));
   applyPersonalization(p);
+  version++;
+  for (const l of listeners) l();
 }
 
 export function resetPersonalization(): void {
   localStorage.removeItem(KEY);
   applyPersonalization({});
+  version++;
+  for (const l of listeners) l();
 }
 
 /** Black or white, whichever reads on the given hex background. */
