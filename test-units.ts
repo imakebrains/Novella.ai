@@ -25,6 +25,7 @@ import {
 } from "./src/ui/introScript";
 import { cycleTab, type TabId } from "./src/ui/inspectorTabs";
 import { glowModeOf } from "./src/ui/personalize";
+import { buildRewordRequest, cleanReword, rewordable } from "./src/ui/rewordCore";
 import { acceptsTemperature } from "./src/ai/models";
 import { parseNote, serializeNote, extractWikiLinks, Vault } from "./src/core/vault";
 import { checkContinuity } from "./src/analysis/continuity";
@@ -1052,6 +1053,44 @@ lied, and Wren had known that since she was nine.
   check("glow: old boolean reads as follow", glowModeOf({ glow: true }), "follow");
   check("glow: explicit mode wins over the old flag", glowModeOf({ glow: true, glowMode: "drift" }), "drift");
   check("glow: off stays off", glowModeOf({ glowMode: "off" }), "off");
+}
+
+
+/* ---------- reword core ---------- */
+
+{
+  check("reword: plain reply passes through", cleanReword("The rain stopped."), "The rain stopped.");
+  check(
+    "reword: strips a code fence",
+    cleanReword("```\nThe rain stopped.\n```"),
+    "The rain stopped.",
+  );
+  check(
+    "reword: strips a preamble line",
+    cleanReword("Here is the rewritten passage:\nThe rain stopped."),
+    "The rain stopped.",
+  );
+  check(
+    "reword: strips wrapping quotes",
+    cleanReword('"The rain stopped."'),
+    "The rain stopped.",
+  );
+  check(
+    "reword: keeps interior dialogue quotes",
+    cleanReword('"Go," she said. "Now."'),
+    '"Go," she said. "Now."',
+  );
+  check("reword: one word is not rewordable", rewordable("word"), false);
+  check("reword: a sentence is rewordable", rewordable("The rain finally stopped."), true);
+  check(
+    "reword: a whole chapter is not",
+    rewordable(Array(601).fill("word").join(" ")),
+    false,
+  );
+  const req = buildRewordRequest("Tighten it.", "The rain stopped.", "Before text.", "After text.");
+  check("reword: prompt carries the passage", req.prompt.includes("The rain stopped."), true);
+  check("reword: prompt carries context", req.prompt.includes("Before text."), true);
+  check("reword: system bans wrappers", req.system.includes("ONLY the rewritten passage"), true);
 }
 
 /* ---------- report ---------- */

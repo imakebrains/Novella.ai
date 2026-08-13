@@ -28,6 +28,8 @@ import { moveParagraph } from "../core/paragraphs";
 import { boardStore, useBoards } from "../state/boards";
 import { SLASH_TRIGGER, SLASH_INSERT, matchSlashCommands } from "./slashCommands";
 import { analyseProse, type IssueKind } from "../analysis/prose";
+import { RewordPopover } from "./RewordPopover";
+import { rewordable } from "./rewordCore";
 
 /* Autocomplete inside [[ ]]. Sourced from the live vault every
    keystroke, so a character you created a moment ago is offered
@@ -155,8 +157,97 @@ const novellaTheme = EditorView.theme({
 export function EditorPane() {
   const version = useVaultVersion();
   const host = useRef<HTMLDivElement>(null);
+  const pane = useRef<HTMLElement>(null);
   const view = useRef<EditorView | null>(null);
   const mountedNoteId = useRef<string | undefined>(undefined);
+
+  /* Reword: a floating chip appears by a settled selection; clicking it
+     opens the style popover. Both positions are pane-relative so the
+     frosted-glass backdrop (whose backdrop-filter re-anchors fixed
+     descendants) can't strand them. */
+  const [rewordChip, setRewordChip] = useState<{ x: number; y: number } | null>(null);
+  const [reword, setReword] = useState<{
+    from: number;
+    to: number;
+    text: string;
+    before: string;
+    after: string;
+    pos: { x: number; y: number };
+  } | null>(null);
+  const chipTimer = useRef<number | undefined>(undefined);
+  const rewordOpen = useRef(false);
+  rewordOpen.current = reword !== null;
+
+  /** Place the chip above the selection end once the selection settles. */
+  const scheduleChip = (instance: EditorView) => {
+    window.clearTimeout(chipTimer.current);
+    chipTimer.current = window.setTimeout(() => {
+      if (rewordOpen.current) return;
+      const sel = instance.state.selection.main;
+      const text = instance.state.sliceDoc(sel.from, sel.to);
+      const paneEl = pane.current;
+      if (sel.empty || !rewordable(text) || !paneEl) {
+        setRewordChip(null);
+        return;
+      }
+      const coords = instance.coordsAtPos(sel.to);
+      if (!coords) {
+        setRewordChip(null);
+        return;
+      }
+      const rect = paneEl.getBoundingClientRect();
+      setRewordChip({
+        x: Math.min(Math.max(coords.right - rect.left, 8), rect.width - 96),
+        y: Math.max(coords.top - rect.top - 38, 4),
+      });
+    }, 250);
+  };
+
+  const openReword = () => {
+    const instance = view.current;
+    const paneEl = pane.current;
+    if (!instance || !paneEl || !rewordChip) return;
+    const sel = instance.state.selection.main;
+    const text = instance.state.sliceDoc(sel.from, sel.to);
+    if (sel.empty || !rewordable(text)) return;
+    const doc = instance.state.doc;
+    setReword({
+      from: sel.from,
+      to: sel.to,
+      text,
+      before: instance.state.sliceDoc(Math.max(0, sel.from - 400), sel.from),
+      after: instance.state.sliceDoc(sel.to, Math.min(doc.length, sel.to + 400)),
+      pos: {
+        x: Math.min(rewordChip.x, Math.max(paneEl.getBoundingClientRect().width - 356, 8)),
+        y: rewordChip.y + 42,
+      },
+    });
+    setRewordChip(null);
+  };
+
+  const applyReword = (newText: string) => {
+    const instance = view.current;
+    if (!instance || !reword) return;
+    let { from, to } = reword;
+    // The manuscript may have moved under the popover; only replace the
+    // exact text the writer approved, wherever it now lives.
+    if (instance.state.sliceDoc(from, to) !== reword.text) {
+      const at = instance.state.doc.toString().indexOf(reword.text);
+      if (at === -1) {
+        setReword(null);
+        return;
+      }
+      from = at;
+      to = at + reword.text.length;
+    }
+    instance.dispatch({
+      changes: { from, to, insert: newText },
+      selection: { anchor: from + newText.length },
+      scrollIntoView: true,
+    });
+    instance.focus();
+    setReword(null);
+  };
 
   // Which inline critique markers are on. Mirrored into a ref so a newly
   // created view can pick them up without waiting for a render.
@@ -294,6 +385,9 @@ export function EditorPane() {
           if (u.docChanged && mountedNoteId.current) {
             store.setBody(mountedNoteId.current, u.state.doc.toString());
           }
+          if (u.selectionSet || u.docChanged || u.geometryChanged) {
+            scheduleChip(u.view);
+          }
         }),
       ],
     });
@@ -333,6 +427,9 @@ export function EditorPane() {
 
     return () => {
       registerEditorInsert(null);
+      window.clearTimeout(chipTimer.current);
+      setRewordChip(null);
+      setReword(null);
       instance.destroy();
       view.current = null;
     };
@@ -352,7 +449,7 @@ export function EditorPane() {
   const words = active.body.trim() ? active.body.trim().split(/\s+/).length : 0;
 
   return (
-    <main className="editor">
+    <main className="editor" ref={pane}>
       <header className="editor-head">
         <div className="editor-title-wrap">
           <input
@@ -426,6 +523,25 @@ export function EditorPane() {
           noteId={active.id}
           noteTitle={active.title}
           onClose={() => setMenu(null)}
+        />
+      )}
+      {rewordChip && !reword && (
+        <button
+          className="reword-chip"
+          style={{ left: rewordChip.x, top: rewordChip.y }}
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={openReword}
+          title="Reword the selection — pick a style, replace in place. Ctrl+Z undoes it."
+        >
+          ✦ Reword
+        </button>
+      )}
+      {reword && (
+        <RewordPopover
+          selection={{ text: reword.text, before: reword.before, after: reword.after }}
+          pos={reword.pos}
+          onReplace={applyReword}
+          onClose={() => setReword(null)}
         />
       )}
     </main>
