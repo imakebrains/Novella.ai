@@ -12,6 +12,17 @@ import { diffParagraphs, diffWords, relativeTime } from "./src/ui/diff";
 import { moveParagraph } from "./src/core/paragraphs";
 import { matchPalette } from "./src/ui/palette";
 import { sortTable } from "./src/ui/chapterTable";
+import {
+  INTRO_SCRIPT,
+  INTRO_SWATCHES,
+  RETURNING_SCREEN,
+  glueOrphans,
+  inputReady,
+  lineDurationMs,
+  lineFinished,
+  substitute,
+  tapAdvance,
+} from "./src/ui/introScript";
 import { acceptsTemperature } from "./src/ai/models";
 import { parseNote, serializeNote, extractWikiLinks, Vault } from "./src/core/vault";
 import { checkContinuity } from "./src/analysis/continuity";
@@ -977,6 +988,46 @@ lied, and Wren had known that since she was nine.
   const clean = new Vault();
   clean.add(parseNote("Manuscript/Solo.md", "---\ntype: chapter\nname: Solo\norder: 1\n---\nJust prose."));
   check("continuity: clean vault has no findings", checkContinuity(clean).length, 0);
+}
+
+
+/* ---------- welcome intro engine ---------- */
+
+{
+  // Timing: constant-rate words, fade tail included.
+  check("intro: one word lasts exactly the fade", lineDurationMs("Begin."), 80);
+  check("intro: five words pace at 35ms/word", lineDurationMs("one two three four five"), 4 * 35 + 80);
+  check("intro: empty line takes no time", lineDurationMs("   "), 0);
+
+  // The impatience ladder: tap completes the line, tap again jumps the screen.
+  const mid = { lineIdx: 0, lineComplete: false };
+  const t1 = tapAdvance(mid, 3);
+  check("intro: first tap completes the streaming line", `${t1.lineIdx},${t1.lineComplete}`, "0,true");
+  const t2 = tapAdvance(t1, 3);
+  check("intro: second tap jumps to the last line", `${t2.lineIdx},${t2.lineComplete}`, "2,true");
+  const t3 = tapAdvance(t2, 3);
+  ok("intro: taps at the end change nothing", t3 === t2);
+
+  // The timer path walks lines one by one.
+  const f1 = lineFinished({ lineIdx: 0, lineComplete: true }, 3);
+  check("intro: finished line hands off to the next", `${f1.lineIdx},${f1.lineComplete}`, "1,false");
+  ok("intro: input appears only after the last line", !inputReady(f1, 3) && inputReady({ lineIdx: 2, lineComplete: true }, 3));
+
+  // Typography: no orphaned last words, ever.
+  check("intro: last space becomes non-breaking", glueOrphans("set up yours"), "set up yours");
+  check("intro: single words pass through", glueOrphans("Begin."), "Begin.");
+
+  // Substitution falls back warmly, never to a template artifact.
+  ok("intro: empty name never leaks braces", !substitute("Good to meet you, {{name}}.", {}).includes("{{"));
+  check("intro: name lands verbatim", substitute("Hi {{name}}.", { name: "Ashford" }), "Hi Ashford.");
+
+  // Script integrity: the copy rules are testable.
+  const screens = [...INTRO_SCRIPT, RETURNING_SCREEN];
+  ok("intro: every screen has at least one line", screens.every((s) => s.lines.length > 0));
+  ok("intro: no exclamation marks anywhere in the script", screens.every((s) => s.lines.every((l) => !l.includes("!"))));
+  ok("intro: no marketing-enthusiasm vocabulary", screens.every((s) => s.lines.every((l) => !/excited|awesome|amazing/i.test(l))));
+  check("intro: eight spine colors", INTRO_SWATCHES.length, 8);
+  ok("intro: every swatch is a real hex", INTRO_SWATCHES.every((c) => /^#[0-9a-f]{6}$/i.test(c)));
 }
 
 /* ---------- report ---------- */

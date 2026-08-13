@@ -20,7 +20,7 @@ import { BoardStats } from "./ui/BoardStats";
 import type { BoardLayout } from "./ui/BoardLayoutToggle";
 import { RecoveryBanner } from "./ui/RecoveryBanner";
 import { UndoToastHost } from "./ui/UndoToastHost";
-import { FirstRunWizard, firstRunPending } from "./ui/FirstRunWizard";
+import { WelcomeIntro, introPending, registerIntroOpener } from "./ui/WelcomeIntro";
 import { useAutosave, type SaveState } from "./state/autosave";
 import { probeSetup } from "./setupProbe";
 import { installAgentRunner } from "./state/agentRunner";
@@ -46,7 +46,7 @@ export default function App() {
   const [projectsOpen, setProjectsOpen] = useState(false);
   const [musicOpen, setMusicOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
-  const [wizardOpen, setWizardOpen] = useState(false);
+  const [introOpen, setIntroOpen] = useState(false);
   const activeProject = useActiveProject();
   const left = usePaneWidth("left", 268);
   const right = usePaneWidth("right", 340);
@@ -87,6 +87,11 @@ export default function App() {
       // project opens so the vault swap below counts as their "app open".
       installAgentRunner();
 
+      // The welcome runs once for everyone — returning writers see it too
+      // (their projects and settings are untouched; it's presentation).
+      // Settings can replay it any time.
+      if (introPending()) setIntroOpen(true);
+
       // Resume where the writer left off. Before this, every launch loaded
       // the demo world into memory even when their real project was one
       // click away — an app that forgets your book on restart isn't done.
@@ -113,7 +118,6 @@ export default function App() {
         // "Let's get started" interview opens over the seed world.
         setLeftOpen(false);
         setRightOpen(false);
-        if (firstRunPending()) setWizardOpen(true);
         if (storage().kind === "web") {
           // Browser first run: the seed world becomes a REAL project in
           // IndexedDB, so everything done to it persists. The browser is a
@@ -153,6 +157,12 @@ export default function App() {
       void probeSetup();
     };
     void boot();
+  }, []);
+
+  // Settings can reopen the welcome without owning it.
+  useEffect(() => {
+    registerIntroOpener(() => setIntroOpen(true));
+    return () => registerIntroOpener(null);
   }, []);
 
   // Keyboard: Ctrl/Cmd+K opens the palette; Ctrl/Cmd+S saves;
@@ -466,7 +476,7 @@ export default function App() {
       {exportOpen && <ExportModal onClose={() => setExportOpen(false)} />}
       {importOpen && <ImportModal onClose={() => setImportOpen(false)} />}
       {projectsOpen && <ProjectsPanel onClose={() => setProjectsOpen(false)} />}
-      {wizardOpen && <FirstRunWizard onDone={() => setWizardOpen(false)} />}
+      {introOpen && <WelcomeIntro onDone={() => setIntroOpen(false)} />}
     </div>
   );
 }

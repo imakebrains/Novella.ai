@@ -1,70 +1,156 @@
-# Novella.ai — Handoff for Claude Code
+# Novella — session handoff (rewritten 2026-08-12)
 
-Paste this into a new Claude Code session to continue the project. It carries the full context: the vision, the decisions already locked, what's already built and tested, and exactly what to do next.
+Paste-in context for a fresh Claude session. Everything decided, shipped, and
+pending, compressed. The repo itself is the deep record: ROADMAP.md (backlog +
+dated log of every run), RESEARCH.md (27 competitor-research rounds),
+AUTOPILOT.md (how the cloud routine behaves), docs/DESIGN-INTRO.md (the intro
+and motion spec), PLAN-sync.md (sync design awaiting owner decisions),
+SECURITY.md (audit).
 
----
+## What this is
 
-## What we're building
+**Novella** — a local-first writing app meant to beat NovelCrafter, Notion,
+Dabble, Scrivener and Sudowrite at the whole job: writing + worldbuilding +
+tasks + tracking in one place, offline, no API key, no per-word cost.
+Tauri v2 + React 19 + TS + Vite 6 + CodeMirror 6. The book is a folder of
+Markdown with YAML frontmatter; `src/core/vault.ts` is the protected Phase-1
+engine (**never rewrite it**). Storage adapters: Tauri (real folders),
+IndexedDB (web), memory (fallback) behind one interface in `src/storage/`.
 
-**Novella.ai** — a local-first desktop (and web) writing app with the **full capability set of NovelCrafter**, built as an independent app (its own code, name, and design — a feature-equivalent tool, not a copy of anyone's code or branding). It's for writing novels, novellas, and books chapter by chapter, with an AI writing partner that knows the author's world.
+- Repo: https://github.com/imakebrains/Novella.ai — public, **Apache-2.0**
+  (LICENSE + NOTICE: code free for anything incl. plugins/forks; the *name*
+  Novella is reserved). Owner: imakebrains / drewpmedia@gmail.com ("Drew").
+- Local clone: `C:\Users\drewp\Novella.ai` (NOT the OneDrive cwd).
+- **v0.2.0 is released** — tag → CI (release.yml) → installers on GitHub
+  Releases (Win .exe/.msi + macOS .dmg, unsigned; SmartScreen instructions in
+  the release notes). In-app update checker reads these.
+- Web build: `npm run build:web`, GitHub Pages workflow ready
+  (.github/workflows/pages.yml, `base:"./"`, mode-gated CSP).
+  **NEEDS OWNER (free): Settings → Pages → Source = GitHub Actions.**
 
-Three principles drive every decision:
-- **Local-first** — the whole book lives as plain Markdown files on disk. Works offline. Portable. Outlives the app.
-- **Model-agnostic** — the AI is a plugin. Claude or ChatGPT via the user's own API key is the primary engine; a free local model (Ollama) is the optional fallback.
-- **Extensible** — an Obsidian-style plugin system. Grammar, plagiarism, voice notes, imports, exporters are all toggles in Settings.
+## The gate (every change)
 
-## Decisions already locked (do not re-litigate)
+`npx tsc --noEmit` clean · `npx tsx test-units.ts` green (258 checks) ·
+`npm run verify` green · UI verified LIVE in the browser where one exists —
+and never claim live verification without it. Pure logic gets unit tests.
+Exit codes read bare, never through a pipe. Browser console lies (stale HMR
+errors); verify via live DOM with fresh timestamps. The Claude browser pane
+shares the owner's profile — probes leak into their app state; stash and
+restore, and clean up probe data. Known probe traps: `confirm()` is
+suppressed (never use it in app code — use undo toasts / armed buttons);
+element.focus()/blur() don't fire real focus events when the pane is
+unfocused; React onMouseEnter needs real mouseover, not dispatched
+mouseenter; background tabs throttle timers (bogus timing measurements).
 
-- The user builds nothing by hand — Claude codes and creates it.
-- Runs both as a desktop app and a web build from **one codebase** (Tauri shell + React).
-- AI is **mostly paid API models** (user's own key), with free local Ollama available when wanted. It does **not** have to be free — so token economy matters (see below), but frontier quality is the default.
-- Slash-command model switching: `/claude`, `/chatgpt`, `/local`. Honest reality: connecting Claude/ChatGPT means the user pastes a **developer API key** (pay-per-use); there is no way to ride a consumer subscription login, and we won't fake one.
-- The "database" is an **Obsidian-style vault**: a folder of Markdown files with YAML frontmatter. Wiki-links, backlinks, and a relationship graph are the writing brain.
-- **Plugin system**, Obsidian-style — enable capabilities in user Settings.
-- **One-install rule** (learned from the user's friend Evan's app "YellFlow," a local faster-whisper voice-to-notes tool): the user installs ONE thing. No "go download other software." Heavy assets (local AI model, grammar engine, speech model) auto-download once in the background with a progress bar, then run offline. The voice-notes plugin follows YellFlow's local faster-whisper approach.
+## Shipped and verified (highlights)
 
-## What's already built and TESTED (bring these files in)
+Editor: CodeMirror, [[wiki-links]] + aliases, autocomplete, slash menu
+("Plan step" not "beat"), Alt+↑/↓ paragraph moves, rename-in-place (blur
+reads the field, not state), inline critique chips with live counts
+(Sticky/Adverbs/Passive/Echoes) + Critique tab cross-ref, scene plan panel
+(never "beats" in UI; `beats` stays as the storage key), tasks as `- [ ]`,
+revision history with word-level diffs, autosave + crash recovery.
+Codex: typed groups, letter headers past 20 entries, persistent folds,
+manuscript group in book order, right-click menu everywhere (open/rename/
+template/export/boards/delete-with-undo + `.novella/trash/`).
+Boards: Cards/Grid/Table (Web+Stats components exist but are unreachable —
+cut on owner feedback), dropdown board picker, ghost tiles (+ New chapter /
++ Add cards / + New board), card images (drag-drop, `.novella/images/`),
+delete board = instant + Undo toast. Assistant: writing styles = exactly
+default + Extensive novel + Paragraph mode + Email writer + user-created
+(+ New style / Upload style), always-on `{{guidance}}` direction line.
+Ctrl+K palette; Table view; export DOCX/EPUB/MD/print-PDF/backup-zip with
+per-project presets; import docx/md/txt + codex auto-extraction; projects
+(fun preset names: The Big Book / A World to Keep / Small but Mighty /
+Blank Page); personalization (accent w/ auto-contrast, font, size, spacing,
+width, corners) applied via CSS vars in 0.3ms; 5 themes; goals/streaks/
+sprints/planner/calendar-display; music dock (draggable, minimizable);
+agents (run-all, reorder, undo delete); deterministic Continuity tab;
+OS-keychain API keys (Rust `keyring`, round-trip tested); Settings→Shortcuts
+reference; quiet first run.
 
-Phase 1 core is done and verified. The repo folder `novella/` contains:
+**Just built (2026-08-12): the Welcome intro + motion system**
+(docs/DESIGN-INTRO.md is the spec — read it before touching):
+`src/ui/introScript.ts` (pure: script, word-timing, impatience ladder —
+tap completes line, tap again completes screen; 17 unit checks),
+`src/ui/WelcomeIntro.tsx` (full-screen scripted narrator, NO chat cosplay,
+word-streaming serif lines, live accent recolor mid-conversation, theme
+chips hover-preview/click-commit, HONEST Ollama check, real-work
+interstitial, returning-writer path skips project creation, closing fade
+handoff, "Set up later" always visible), motion tokens in theme.css
+(--motion-quick/standard/slow/intro + easings), workspace entrance
+animations (modals/palette/toasts/menus/pane-glide), theme crossfade via
+one-shot `.theme-transitioning` class in useTheme, sacred no-animate rule
+on `.cm-editor` (typing latency never animates), prefers-reduced-motion
+zeroes everything. Replay: Settings → About → "Replay the intro"
+(replayIntro/registerIntroOpener bridge). FirstRunWizard.tsx deleted.
+Intro shows ONCE to everyone incl. the owner (their choice) via
+`novella.introSeen`; the flag was deliberately left UNSET in the owner's
+browser profile so they experience it on next launch.
+Verified live end-to-end twice (new-user path + returning path + replay +
+Set-up-later). NOT verifiable in this environment: hover-preview feel
+(pane can't synthesize real hover/focus) — needs one human hover.
+Owner's penName in the shared profile is now "Drew" (set during testing;
+they can change in Settings → Profile).
 
-- `src/core/vault.ts` — the writing-brain engine. Frontmatter parsing (via `gray-matter`), `[[wiki-link]]` extraction, backlink indexing from **both prose and frontmatter fields** (e.g. a scene's POV), relationship graph, alias-aware link resolution, full-text search, dangling-link detection, and round-trip save. **Ran clean against a seed world; compiles under `--strict`.**
-- `src/core/plugins.ts` — the plugin system. One `NovellaPlugin` interface for AI/grammar/plagiarism/import/capture/export, a `PluginManager`, per-plugin `settingsSchema` (renders config forms), and `firstRunDownload` metadata for the one-install rule. Ships example plugins: Claude, Ollama, LanguageTool, YellFlow-style voice notes. Compiles under `--strict`.
-- `test.ts` — the smoke test proving the engine works (`npx tsx test.ts`).
-- `README.md` — project overview and status.
-- `Novella-Blueprint.md` — full architecture + the complete NovelCrafter feature-parity checklist. **Read this for the feature scope.**
+## The cloud autopilot
 
-**Build directly on top of `vault.ts` and `plugins.ts` — do not rewrite them.**
+Daily cloud routine (local task deleted); reads ROADMAP.md (what) +
+AUTOPILOT.md (how). It went 20 research-only rounds because the gate's
+"UI verified live" read as an absolute bar with no browser — fixed by
+letting browserless runs build+unit-test+disclose, and capping research at
+1-in-3, never consecutive. It also stocks `.claude/skills/` +
+`writing-skills/` (craft skills + public-domain reference library).
+Multi-writer repo now: expect non-fast-forward pushes; rebase (their
+commits usually touch only ROADMAP/RESEARCH).
 
-## Tech stack
+## Owner voice & standing rules
 
-- Shell: **Tauri** (Rust core, tiny installer, native file access) → one codebase → Windows/Mac desktop + web build.
-- UI: **React + TypeScript**.
-- Data: **Markdown + YAML frontmatter** files (source of truth) + **SQLite** as a disposable, always-rebuildable search/link index.
-- Editor: a Markdown-aware rich editor (CodeMirror or TipTap) with `[[wiki-link]]` autocomplete.
-- AI: provider plugins → Anthropic / OpenAI APIs, or local Ollama at `http://localhost:11434`.
-- Grammar: LanguageTool (self-hosted, free).
+Blunt, wants premium Apple-grade feel ("simple by default, advanced on
+demand"), hates crowded menus and unexplained symbols (labels + tooltips
+everywhere; words over glyphs), wants everything customizable. Honesty is
+absolute: never fake AI/accounts/progress; NEEDS-OWNER items get flagged,
+never simulated. No confirm() dialogs. Undo over confirmation. One tap =
+visible consequence. Verify in the running app, then say exactly what was
+and wasn't verified.
 
-## Token economy (bake in from the start)
+## Open / pending
 
-Since it mostly uses paid models: send only codex entries referenced in the current scene (not the whole bible); summarize earlier chapters and cache the summaries; use prompt caching for stable context; show a live token/cost estimate before big generations; one-click fallback to the free local model.
+1. **Owner round 5** (top of ROADMAP, partly superseded by the intro work):
+   interactive calendar (local first; Google sync NEEDS OWNER OAuth),
+   Board split from Write into characters/storyboard/memories space
+   (WITH-OWNER), fixed-size settings modal (CLOUD-OK), open-book logo
+   (WITH-OWNER; regenerates src-tauri/icons + PWA icons), document-bound
+   Chat panel replacing one-shot Assistant (core CLOUD-OK), highlight→
+   reword-in-style→inline accept/reject (core CLOUD-OK; reuse diff.ts +
+   styles), type.ai lessons (RESEARCH round 27).
+2. **Approved plan phases remaining** (plan file: distributed-popping-
+   trinket.md): B finish = flip the Pages repo setting + verify URL;
+   C = responsive/mobile (at 375px the editor is 0px — grid must become
+   one pane + drawers <900px; titlebar ~660px overflow; touch-action fixes;
+   then PWA via vite-plugin-pwa mode-gated); D = Obsidian-style storage
+   safety (atomic writes, mtime don't-clobber guard in saveAll, conflict-
+   copy detection in ingest(), .novella/lock, discoverability copy);
+   E = open-source hygiene (ci.yml on push/PR, README rewrite + screenshot,
+   CONTRIBUTING, issue templates, tsconfig include test-units.ts, Linux
+   runner ubuntu-22.04).
+3. **NEEDS OWNER:** Pages setting (free); signing keys for silent
+   auto-update (money; ASK first); PLAN-sync.md three decisions (hosting/
+   custody/money; recommendation = C: user's own cloud folder); code-signing
+   certs (money, optional); private vulnerability reporting (free).
+4. **Known open bug:** phantom dirty flag on Tauri startup (task #13) —
+   instrumented in vaultStore.ts (~line 248), cause never established.
+5. Board virtualization true-windowing deferred (~300+ chapters);
+   model-driven continuity tier unbuilt; grammar/spellcheck scoping task;
+   Echoes detector too strict (triple repetition didn't trip it).
 
-## Immediate next steps (in priority order)
+## Verification quick-recipe
 
-1. Scaffold the real project: Vite + React + TypeScript, then add the Tauri shell. Wire in the existing `vault.ts` / `plugins.ts`.
-2. Build the Tauri file-access layer so the vault reads/writes a real folder on disk.
-3. Build the core UI: three panes — **Codex** (left), **manuscript editor** (center), **AI assistant** (right) — wired live to the vault engine. Chapter-by-chapter editing, live word counts, `[[link]]` autocomplete, backlink panel.
-4. Settings → Plugins screen (enable/disable, per-plugin config forms from `settingsSchema`).
-5. Wire the Claude provider plugin to real generation with codex-aware context + token economy.
-
-Then Phase 3 (scene-beat drafting, prompt library, outline/corkboard, version history) and Phase 4 (ecosystem plugins, packaging).
-
-## Confirm with the user before scaffolding
-
-- **OS:** Windows or Mac?
-- **Dev prerequisites:** is Node.js installed? Is Rust installed? (Rust is needed only to *build* Tauri; end users installing the finished app need nothing. Offer step-by-step setup if missing.)
-- **First-run default:** open a blank vault, or load the seed world so it works immediately? (Recommended: seed world.)
-- **First UI to build:** codex + editor, or the plugin/settings screen? (Recommended: codex + editor first, so the user is writing within minutes.)
-
-## The user's working style
-
-Ambitious, collaborative, wants it user-friendly and genuinely usable — not a toy. Prefers honest tradeoffs over hype. Has "other fun ideas" to add once the NovelCrafter-parity core is working — ask about these once Phase 1 UI is running.
+Dev server: preview_start "novella-dev" (port 5173 fixed — autoPort:false;
+tauri devUrl + strictPort + CSP all pin it; kill orphaned vite if held).
+Dev handle: `window.__novella` (store, boards, agents, deleteNoteWithUndo,
+history, importing, …). Desktop-only checks: `npm run tauri dev` with
+VITE_DEV_VAULT=<fixture> runs the disk self-test incl. the fs-capability
+probe (readBytes/listFiles/remove) — capabilities/default.json must grant
+every fs call tauriStorage makes; a missing grant only fails in packaged
+builds (v0.1.0 shipped broken that way — fixed in v0.2.0).

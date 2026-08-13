@@ -79,7 +79,20 @@ function apply(theme: Theme): void {
   for (const l of listeners) l();
 }
 
-// Put the saved theme on the document before first paint.
+/* A deliberate theme change crossfades once; every other token swap —
+   including first paint — stays instant. The class scopes the transition
+   (see .theme-transitioning in app.css), and the editor's sacred
+   no-animate rule still wins inside CodeMirror. */
+let fadeTimer: ReturnType<typeof setTimeout> | null = null;
+function applyWithCrossfade(theme: Theme): void {
+  const root = document.documentElement;
+  root.classList.add("theme-transitioning");
+  apply(theme);
+  if (fadeTimer) clearTimeout(fadeTimer);
+  fadeTimer = setTimeout(() => root.classList.remove("theme-transitioning"), 450);
+}
+
+// Put the saved theme on the document before first paint — no crossfade.
 apply(current);
 
 const themeStore = {
@@ -100,12 +113,12 @@ export function useTheme(): {
 } {
   const theme = useSyncExternalStore(themeStore.subscribe, themeStore.get, themeStore.get);
 
-  const setTheme = useCallback((t: Theme) => apply(t), []);
+  const setTheme = useCallback((t: Theme) => applyWithCrossfade(t), []);
 
   /** The title-bar button steps through them — a picker lives in Settings. */
   const cycle = useCallback(() => {
     const i = THEMES.findIndex((t) => t.id === current);
-    apply(THEMES[(i + 1) % THEMES.length]!.id);
+    applyWithCrossfade(THEMES[(i + 1) % THEMES.length]!.id);
   }, []);
 
   const info = THEMES.find((t) => t.id === theme) ?? THEMES[0]!;

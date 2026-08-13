@@ -777,6 +777,24 @@ scale; nothing but use would have caught it.
   that had been hard-blocked or 403ing in rounds 22-26. Full notes in
   RESEARCH.md Round 28.
 
+- 2026-08-12 — The Welcome (session; owner round 6: Lingrow/Apple-grade
+  premium first-run). BUILT to docs/DESIGN-INTRO.md, itself synthesized
+  from a 4-lens research fan-out (Lingrow site + onboarding evidence,
+  Apple HIG/product-page rules, premium-onboarding teardowns): a
+  full-screen scripted narrator — no chat cosplay, no fake AI — with
+  word-streamed serif lines, an accent pick that recolors the app
+  mid-conversation, hover-previewed theme chips, the honest Ollama
+  check, a real-work interstitial, a returning-writer path, and a
+  crossfade handoff. Motion system as tokens (quick/standard/slow +
+  easings), workspace entrance animations, one-shot theme crossfade,
+  sacred no-animate rule on the editor, reduced-motion zeroing.
+  Replay lives in Settings → About. Pure engine unit-tested (17 checks;
+  258 total). Verified live end-to-end twice; hover-preview *feel*
+  flagged for one human hover (this environment cannot synthesize real
+  hover events). FirstRunWizard retired. Also this session: v0.2.0
+  TAGGED AND RELEASED (installers live), HANDOFF.md rewritten as the
+  compressed all-context handoff at the owner's request.
+
 - 2026-08-12 — Skills scouting round 1 (owner-directed, same session as
   round 26; no app code). Owner added a standing skills-and-assets
   scouting pass to the research cadence and supplied a zip of seven

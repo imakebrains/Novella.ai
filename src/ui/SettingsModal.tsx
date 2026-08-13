@@ -17,6 +17,7 @@ import {
   type UpdateCheck,
 } from "../state/updates";
 import { AgentsPanel } from "./AgentsPanel";
+import { replayIntro } from "./WelcomeIntro";
 import {
   loadPersonalization,
   resetPersonalization,
@@ -775,7 +776,16 @@ function AboutTab() {
         of Markdown files on your disk. It works offline, and it outlives this app.
       </p>
       <Field label="Version">
-        <span className="about-value">0.1.0</span>
+        <span className="about-value">{currentVersion()}</span>
+      </Field>
+      <Field label="The welcome">
+        <button
+          className="btn-ghost"
+          title="Run the first-launch welcome again — your projects and settings are untouched"
+          onClick={() => replayIntro()}
+        >
+          Replay the intro
+        </button>
       </Field>
       <Field label="Your data">
         <span className="about-value">

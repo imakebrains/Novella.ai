@@ -14,6 +14,19 @@
    ============================================================ */
 
 :root {
+  /* ---- motion (docs/DESIGN-INTRO.md §2) ----
+     Entrances ease out; exits are equal or FASTER than entries; nothing
+     in the workspace exceeds --motion-slow. The editor's typing path
+     never animates — latency is the product. */
+  --motion-quick: 120ms; /* hover, focus, chip select, toast exit */
+  --motion-standard: 240ms; /* modals, drawers, pane toggles, toast enter */
+  --motion-slow: 400ms; /* theme crossfade, large surface changes */
+  --motion-intro: 600ms; /* the welcome experience only — never the workspace */
+  --motion-stagger: 40ms;
+  --ease-enter: cubic-bezier(0.25, 0.1, 0.3, 1);
+  --ease-color: cubic-bezier(0.4, 0, 0.6, 1);
+  --ease-hero: cubic-bezier(0.66, 0, 0.1, 1);
+
   --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua",
     Palatino, Georgia, serif;
   --font-prose: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
@@ -335,4 +348,24 @@ h3 {
   font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: -0.01em;
+}
+
+/* ---- reduced motion (docs/DESIGN-INTRO.md §2) ----
+   Content is never withheld: everything that would animate in is simply
+   there. The intro degrades to a sequence of static screens. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-quick: 0ms;
+    --motion-standard: 0ms;
+    --motion-slow: 0ms;
+    --motion-intro: 0ms;
+    --motion-stagger: 0ms;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
