@@ -791,6 +791,36 @@ scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
 
+- 2026-08-14 — Research round 29 (autopilot; no code). Dispatched the same
+  four parallel research passes as round 28 (NovelCrafter/Sudowrite;
+  Dabble/Scrivener/Campfire; type.ai/Obsidian/new-entrant scan; broader
+  industry/legal sentiment), each briefed on rounds 1-28's findings and
+  searching for material dated strictly after round 28's 2026-08-13 cutoff
+  (81 searches total). **Second consecutive fully dry round** (after round
+  28) and the fifth on record overall (20, 22, 26, 28, 29) — all four
+  passes found nothing that both cleared the date bar and was genuinely
+  new. No new checklist items. Two things worth carrying forward without
+  changing "Next up": Dabble's own help docs describe a "Dabble 3.0"
+  (real-time co-authoring, functional track changes, **PWA-only
+  distribution, no native desktop app**) but with no confirmable release
+  date — if a future round dates it, it sharpens the existing
+  performance/battery-advantage item, since a PWA is still a browser tab
+  underneath; and Bartz v. Anthropic's 30-day appeal window runs through
+  2026-08-19, the one dated event actually pending on this cadence's watch
+  list — next round should check it once past that date. Full notes in
+  RESEARCH.md Round 29.
+
+  **Housekeeping note (repo hygiene, not research):** at the start of this
+  run, HEAD was detached seven commits ahead of the local and remote
+  `main` branch — a prior session's work (culminating in "Owner round 10
+  queued," 2026-08-13) had been committed but `main` itself was never
+  advanced or pushed. Confirmed a clean fast-forward, moved `main` to
+  match, and pushed; `origin/main` now includes it. No content was lost.
+  This is the same failure mode round 24 already flagged once (there, two
+  commits) — recommend whoever next touches the autopilot script make it
+  always start from `git checkout main && git pull` rather than trusting
+  whatever ref the container happens to have checked out.
+
 - 2026-08-13 — The system pass (session; owner round 9). Research first:
   an 8-agent workflow studied Craft/iA/Ulysses/Type.ai, Linear/Raycast/
   Things/Arc, and premium-vs-cheap tells, then audited our own tokens,

@@ -3360,3 +3360,97 @@ treat as dead, not open, going forward).
 - github.com/PixeroJan/obsidian-storyline/releases.atom
 - github.com/HatanoChihiro/obsidian-webnovel-assistant/releases.atom
 - scriob.app, plotforge.app, novelmage.com, mergen.ink, epilogue.page
+
+# Round 29 (2026-08-14) — cadence, fully dry a second round running
+
+Same four parallel passes as round 28 (NovelCrafter/Sudowrite; Dabble/
+Scrivener/Campfire; type.ai/Obsidian/new-entrant scan; broader industry/
+legal sentiment), each briefed on rounds 1-28's findings and told to search
+specifically for material dated strictly after round 28's 2026-08-13
+cutoff. Total: 81 searches plus targeted fetches and GitHub releases.atom
+checks across all four passes. **Nothing cleared the bar** — this is the
+second fully-dry round in a row (28, then 29) and the fifth on record
+overall (after 20, 22, 26, 28, now 29).
+
+## NovelCrafter / Sudowrite
+
+Nothing new. Sudowrite's changelog (feedback.sudowrite.com) still tops out
+at the Aug 3 "Cheaper GPT-5.6 Models" entry; its status page shows two
+brief incidents on **Aug 12** (sudowrite.com down 3 min, mobile down 6
+min) — both predate the Aug 13 cutoff and are single-digit-minute blips,
+not worth logging even as a repeat. NovelCrafter's changelog is unchanged
+since March 21; status page clean for 14 days. The "Story Engine 3.0" and
+"Developer API" rumors, declared dead in round 28, stay dead — nothing
+surfaced to revive them. One recurring-but-not-new complaint theme worth
+naming for context: NovelCrafter users on forums report real spend often
+lands at $14-70/mo once BYOK API costs are added to the $4-20/mo
+subscription, and a large Codex inflates prompt costs further — long-
+standing chatter, not a fresh dated item, so not logged as a finding.
+
+## Dabble / Scrivener / Campfire
+
+Nothing new. Scrivener's official release-notes page confirms 3.5.2 is
+still current (Dec 18, 2025) — no 3.5.3. Campfire's changelog is still
+v1.3.2 (June 29); an old Sept 2025 outage tweet surfaced but is well
+outside any round's window. Dabble's blog and Trustpilot show nothing
+dated past the already-logged Feb 2026 complaints. One item flagged for a
+future round to confirm, not logged as new this round: Dabble's own help
+docs describe "Dabble 3.0" — real-time co-authoring, functional track
+changes, and **PWA-only distribution with no native desktop app** — but no
+page states a release date and it reads as already-current rather than a
+fresh announcement. If confirmed dated, the no-native-app detail sharpens
+the existing performance/battery-advantage item (a PWA is still fundamentally
+a browser tab, unlike Novella's native Tauri process) — worth a direct
+dated-changelog check next round before folding it in.
+
+## type.ai / Obsidian / new entrants / four-pillar check
+
+Nothing new for type.ai (changelog page 404s; only pre-existing April 2026
+review and G2 listing found). Obsidian plugin checks via releases.atom:
+WebNovel Assistant 3.8.2 and StoryLine 1.10.58 both land on **Aug 12**,
+one day before the cutoff, so not new; Novel Word Count's 5.0.0 major bump
+is Aug 3, already known. Longform is stale since March 2025. No new
+entrant surfaced — Spiral (Every/TrySpiral), Cotypist, and Juno were all
+checked and ruled out (cloud/general-purpose or missing the worldbuilding/
+task/timer pillars). The four-pillar check (local AI + task tracker +
+focus timer + worldbuilding, one app) stayed empty for a sixteenth
+dedicated pass across rounds 15, 17-29.
+
+## Industry / legal sentiment
+
+Nothing new across all five standing theme areas. The one live clock —
+Bartz v. Anthropic's 30-day appeal window — runs through **2026-08-19**,
+still five days out; no appeal filed as of the latest coverage (Aug 7). No
+new survey, no new pulled-deal incident (a KERA News piece on Falade/
+Minotaur is dated exactly 2026-08-13, same-day rather than after, and adds
+no new facts), no NaNoWriMo-successor consolidation, no AI-flooding
+follow-up data. Recommend the next round specifically re-check the Bartz
+appeal-window outcome once past Aug 19 — that's the one dated event
+actually pending in this cadence's watch list.
+
+## What changed in ROADMAP.md
+
+Nothing added to Next up — no finding this round cleared the bar of being
+both new and dated after 2026-08-13, across any of the four passes, matching
+rounds 20, 22, 26 and 28. Housekeeping only: at the start of this run HEAD
+was detached seven commits ahead of the local and remote `main` branch
+(rounds culminating in "Owner round 10 queued," 2026-08-13 — evidently
+committed by a prior session that never advanced `main` or pushed).
+Confirmed it was a clean fast-forward, moved `main` to include them, and
+pushed — `origin/main` now matches. No content was lost. This is the same
+class of issue round 24 flagged (two commits, that time); worth a permanent
+fix at some point (always `git checkout main` and fast-forward before
+committing, rather than trusting the initial checkout state) so future
+runs stop rediscovering it.
+
+## Round 29 sources
+
+- feedback.sudowrite.com, status.sudowrite.com, feedback.novelcrafter.com, status.novelcrafter.com
+- literatureandlatte.com/scrivener/release-notes, forum.literatureandlatte.com
+- campfirewriting.com, dabblewriter.com/blog, dabblewriter.com/review
+- github.com/HatanoChihiro/obsidian-webnovel-assistant/releases.atom
+- github.com/PixeroJan/obsidian-storyline/releases.atom
+- github.com/isaaclyman/obsidian-novel-word-count/releases.atom
+- github.com/kevboh/longform/releases.atom
+- type.ai, plotforge.app
+- Trustpilot, G2, Reddit r/writing, KERA News, Authors Alliance / TAA blog coverage of Bartz v. Anthropic
