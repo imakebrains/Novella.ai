@@ -502,7 +502,18 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       local-AI-plus-writing-tools product that leaves the fourth-app gap
       untouched. Thirteenth dedicated recheck (rounds 15, 17-26) still finds
       no product pairing local AI with both a task tracker and a focus
-      timer.
+      timer. Rounds 27-29 (see RESEARCH.md) kept rechecking without
+      finding a match; research round 30 (2026-08-15) re-ran the same
+      check a seventeenth time (rounds 15, 17-30) and again found nothing —
+      LocalProse (local AI + Pomodoro + worldbuilding, still no task
+      tracker) and PlotForge Desktop (whose "Sessions" tool has since
+      disappeared from its own site's tool list entirely, deepening rather
+      than resolving round 21's doubt that it was ever a focus timer) are
+      still the closest partial matches, both still three of four pillars.
+      The gap stays fully open on both sides after a year-plus of checking:
+      no product pairs a task tracker with a focus timer alongside writing
+      and worldbuilding, and no product pairs all four pillars with a
+      genuine local writing partner.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -663,7 +674,18 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       browser-tab app. Novella is a native Tauri process with a local
       vault, not a browser tab — first-run/marketing copy doesn't currently
       make this contrast. Cheap copy win, low priority, pairs with the
-      export-advantage item above.
+      export-advantage item above. Research round 30 (2026-08-15) confirms
+      and sharpens the case round 29 flagged but couldn't date: Dabble 3.0
+      (launched July 13, 2026 — real-time co-authoring, working track
+      changes, Time Machine version history, review copies for beta
+      readers) formally **retired Dabble's native desktop app** in favor of
+      PWA-only distribution across Mac/Windows/Linux/iOS/Android, installed
+      straight from the browser. A named, funded competitor moved *away*
+      from native and toward browser-tab-everywhere in the same release
+      that added its most-marketed features — the opposite direction from
+      Novella's native-Tauri bet — making this less a hypothetical
+      trade-off and more a live divergence in the market worth naming
+      directly in copy.
 - [ ] **Say the no-credit-limits advantage louder** — research round 10
       (2026-07-27): 2026 Sudowrite reviews' top complaint is no longer
       price alone ($29–59/month) but that credits "run out faster than
@@ -695,7 +717,14 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       new item: even Sudowrite's own bug list shows credits draining in
       ways users don't expect, the exact anxiety a metered system
       structurally cannot fully engineer away and a local model has none
-      of.
+      of. Research round 30 (2026-08-15) finds the same pattern continuing:
+      Sudowrite's Aug 14, 2026 changelog ("Improved Draft Estimates, Plus a
+      Bunch of Fixes") caps the Draft tool's charge at its own credit
+      estimate, stops charging credits for failed multi-step plans, and
+      fixes Write over-running past the requested length — three separate
+      credit-accuracy bugs patched in one release, on top of the two
+      already logged from round 21. Fourth consecutive dated release with
+      a credit-mechanics fix in it; read as a trend, not an incident.
 - [ ] **Fix the Claude Fable 5 blurb in the optional Anthropic provider** —
       research round 10 (2026-07-27): July 2026 coverage confirms Fable 5
       is Anthropic's purpose-built creative-writing model, topping
@@ -790,6 +819,49 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-08-15 — Research round 30 (autopilot; no code). Dispatched the same
+  four parallel research passes as rounds 28-29, each briefed on rounds
+  1-29's findings and searching for material dated after round 29's
+  2026-08-14 cutoff. **Not fully dry** — two of four passes surfaced
+  findings worth folding into "Next up," though neither rose to a
+  brand-new item; both fold into existing items. (1) Round 29's flagged-
+  but-unconfirmed "Dabble 3.0" rumor is now confirmed and dated: Dabble 3.0
+  launched July 13, 2026, and formally retired Dabble's native desktop app
+  for PWA-only distribution — folded into the performance/battery-
+  advantage item as a sharper, dated contrast to Novella's native-Tauri
+  bet. (2) Sudowrite's Aug 14, 2026 changelog shipped three more credit-
+  accuracy fixes in one release — folded into the no-credit-limits item as
+  a fourth consecutive dated release with a credit-mechanics patch in it,
+  now read as a trend. The four-pillar competitive check (local AI + task
+  tracker + focus timer + worldbuilding, one app) ran a seventeenth
+  dedicated recheck and again found no match; folded a short update into
+  the four-app-bundle item, including a minor wrinkle (PlotForge Desktop's
+  maybe-a-timer "Sessions" tool no longer appears on its own site).
+  Industry/legal sentiment pass was fully dry — Bartz v. Anthropic's
+  30-day appeal window closes 2026-08-19, four days out, still the one
+  pending dated event on the watch list. Full notes in RESEARCH.md
+  Round 30.
+
+  **Standing-pass gap flagged, not filled:** the Research cadence section's
+  "skills & assets scouting" standing pass (added 2026-08-12, meant to run
+  "every research run") has run exactly once since it was written, per
+  SKILLS.md's own log — this run didn't add a fifth pass for it either,
+  since the assigned scope was the four competitor-research passes.
+  Flagging here rather than letting the gap go unspoken again; a future
+  run or the owner should decide whether to fold it back into the
+  standard rotation or formally retire the standing-pass language.
+
+  **Housekeeping note (repo hygiene, not research):** at the start of this
+  run, HEAD was again detached — this time at round 29's own commit, with
+  the local `main` ref still parked eight commits back at the v0.2.0 tag
+  even though `origin/main` already had round 29 pushed. Confirmed a clean
+  fast-forward, moved local `main` to match `origin/main`. No content was
+  at risk (origin already had everything), but this is the third time this
+  exact class of issue has surfaced (rounds 24, 29, now 30) — the
+  recommended fix (start every run from `git checkout main && git pull`)
+  still hasn't been made permanent in whatever script or hook drives these
+  runs.
 
 - 2026-08-14 — Research round 29 (autopilot; no code). Dispatched the same
   four parallel research passes as round 28 (NovelCrafter/Sudowrite;

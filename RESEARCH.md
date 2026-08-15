@@ -3454,3 +3454,147 @@ runs stop rediscovering it.
 - github.com/kevboh/longform/releases.atom
 - type.ai, plotforge.app
 - Trustpilot, G2, Reddit r/writing, KERA News, Authors Alliance / TAA blog coverage of Bartz v. Anthropic
+
+# Round 30 (2026-08-15) — cadence, thin but not fully dry
+
+Same four parallel passes as rounds 28-29 (NovelCrafter/Sudowrite;
+Dabble/Scrivener/Campfire; type.ai/Obsidian/new-entrant/four-pillar scan;
+broader industry/legal sentiment), each briefed on rounds 1-29's findings
+and told to search specifically for material dated after round 29's
+2026-08-14 cutoff. Housekeeping first: the run started with HEAD detached
+at round 29's commit, eight commits ahead of the local `main` ref (local
+`main` was still parked at the v0.2.0 tag commit even though
+`origin/main` already had round 29 pushed) — confirmed clean fast-forward,
+moved local `main` to match `origin/main`, no content at risk. Same class
+of issue rounds 24 and 29 already flagged; the fix (always start a
+research run from `git checkout main && git pull` rather than trusting the
+container's initial checkout ref) still hasn't been made permanent.
+
+Unlike the last two rounds, this one is not fully dry — two of four passes
+surfaced material worth folding into "Next up," though nothing rose to a
+brand-new checklist item; both fold into existing items as reinforcement
+or resolution of a standing open question.
+
+## NovelCrafter / Sudowrite
+
+One dated item Sudowrite's own changelog missed round 29's Aug 3 cutoff by
+eleven days: an **Aug 14, 2026** entry, "Improved Draft Estimates, Plus a
+Bunch of Fixes." Three separate credit-accuracy fixes in one release — the
+Draft tool now caps its charge at its own estimate ceiling, failed
+multi-step Chat plans no longer charge credits at all, and Write now stops
+at the nearest full sentence instead of over-running past the requested
+length (previously a way to get charged for output beyond what was asked
+for). Also: custom Rewrite instructions now persist across uses, and Chat
+gets more reliable document reading/insertion. One regression noted in the
+entry itself: the rollout briefly broke the retired "My Voice" model
+option, fixed within about a day. Folded into the existing no-credit-limits
+item — this is the fourth consecutive dated Sudowrite release (after the
+two logged in round 14, plus round 21's Aug 3 entry) that ships a
+credit-mechanics fix, which reads as an ongoing trend in what Sudowrite
+itself keeps having to patch, not an isolated incident.
+
+Everything else checked is unchanged: status.sudowrite.com shows "all
+services online" (10:07am UTC 8/15), with the only listed incident an Aug
+11 blip (3-6 min, both services) predating the window; docs.sudowrite.com
+has nothing dated; feedback.novelcrafter.com/changelog still tops out at
+March 21; status.novelcrafter.com is clean 14 days running. Trustpilot for
+both products returned HTTP 403 to direct fetch this round — flagging as
+"unable to verify recency" rather than "checked clean," since indirect web
+search only surfaced already-characterized old reviews.
+
+## Dabble / Scrivener / Campfire
+
+The substantive finding this round: round 29's flagged-but-unconfirmed
+"Dabble 3.0" item is now **confirmed and dated**. Cross-referencing a
+Dabble Facebook post ("Dabble 3.0 launches tomorrow"), the
+dabblewriter.com/blog "Dabble launches today" post, the "8 Days, 8
+Reveals" campaign page, and the dabblewriter.com/docs/reference/whats-new-
+in-3 help doc all agree: **Dabble 3.0 launched July 13, 2026.** Confirmed
+features: real-time co-authoring, working track changes (accept/reject),
+Time Machine version history, review copies for beta readers — and,
+matching round 29's flag, the **native desktop app was formally retired**
+in favor of PWA-only distribution (Mac/Windows/Linux/iOS/Android, installs
+straight from the browser, works offline). July 13 predates round 29's
+Aug 14 cutoff, so by this cadence's own rule this isn't "new" news, but the
+*confirmation* is new to us — round 29 had it as an unconfirmed rumor with
+no date, and it's now a corroborated, multi-source, dated fact. Folded into
+the performance/battery-advantage item: a funded, named competitor moved
+away from native and toward browser-tab-everywhere in the very release that
+shipped its most-marketed features, which is a sharper contrast to
+Novella's native-Tauri bet than the general "browser tabs are slow" framing
+the item previously relied on.
+
+One methodology note for future rounds: campfirewriting.com/changelog and
+/updates both 404 now — the site appears to have been restructured since
+round 29 last used those URLs successfully. Could not confirm Campfire's
+current version number this round; next round should find the changelog's
+new location (or fall back to App Store release notes, which still showed
+nothing past Jul 6 this round) before concluding anything about Campfire is
+unchanged. Scrivener remains flatly unchanged (3.5.2, Dec 18 2025).
+
+## type.ai / Obsidian / new entrants / four-pillar check
+
+Nothing new. type.ai's site still shows no dated changelog anywhere. Four
+fresh search angles for new entrants (ProductHunt's August leaderboard,
+IndieHackers, itch.io, an App Store scan) surfaced nothing that clears the
+bar: an itch.io "Novel Writer" launch (~Aug 13, has worldbuilding/character
+sheets but no AI, no task tracker, no timer) and an existing "Fade in" App
+Store app (AI co-author + goal tracker + worldbuilding templates, but no
+focus timer, last updated April) were both checked and ruled out.
+
+The four-pillar check (local/private AI + task tracker + focus timer +
+worldbuilding, one purpose-built novel app) stayed empty for a
+**seventeenth dedicated pass** (rounds 15, 17-30). LocalProse was
+re-verified directly (v3.5.1, no changelog dates shown): still local AI
+(Gemma 3 QAT on-device) + Pomodoro focus mode + worldbuilding/"Universe"
+studio, still no dedicated task tracker — unchanged from round 29, not a
+new development. One small wrinkle worth tracking rather than acting on:
+PlotForge Desktop's own site (plotforge.app, footer now reads "Version
+2026-07-29 v1.026") lists 11 tools that **no longer include anything
+called "Sessions"** — the tool round 21 flagged as an unconfirmed maybe-
+focus-timer has either been renamed or quietly dropped from the current
+page. No third-party review confirms what happened to it either way. This
+doesn't resolve round 21's open question, it just makes "Sessions was ever
+a focus timer" less likely to ever get confirmed, since the feature itself
+may no longer exist under that name to check.
+
+## Industry / legal sentiment
+
+Fully dry, all five standing themes. Bartz v. Anthropic's appeal window
+(closes 2026-08-19) still has no filing as of the latest coverage — four
+days out now, worth the next round's first check once past that date. No
+new copyright suit, no new author-sentiment survey, no NaNoWriMo-successor
+consolidation, no fresh cloud-tool outage. CourtListener's docket blocked
+direct fetch (403) this round; indirect search found nothing newer than
+already-logged coverage.
+
+## What changed in ROADMAP.md
+
+No brand-new checklist item — everything this round surfaced folds into
+existing items as reinforcement or resolution of a standing open question,
+matching the file's established pattern for thin rounds. Three edits:
+the performance/battery-advantage item gained the confirmed, dated Dabble
+3.0 / native-app-retirement finding; the no-credit-limits item gained the
+Aug 14 Sudowrite changelog as a fourth data point in the credit-mechanics-
+fix trend; the four-app-bundle item's four-pillar sub-check gained its
+seventeenth-recheck update, including the PlotForge "Sessions" disappearance
+note. Also carried forward, not added: the standing "skills & assets
+scouting" pass the Research cadence section (added 2026-08-12) directs
+every research run to spend one pass on — SKILLS.md's log shows only one
+round of it, from the same day it was added, in the ~18 research rounds
+since. This run did not run that pass either (the assigned scope was the
+four competitor-research passes only); flagging here rather than silently
+continuing to skip it, since ROADMAP.md is the standing authority and says
+it should happen "every research run."
+
+## Round 30 sources
+
+- feedback.sudowrite.com, status.sudowrite.com, docs.sudowrite.com
+- feedback.novelcrafter.com, status.novelcrafter.com
+- dabblewriter.com/blog, dabblewriter.com/docs/reference/whats-new-in-3, Dabble Facebook, Dabble Trustpilot
+- literatureandlatte.com/scrivener/release-notes, forum.literatureandlatte.com
+- campfirewriting.com (changelog/updates routes now 404), Campfire App Store reviews
+- type.ai, localprose.com, plotforge.app
+- itch.io release-announcements, Apple App Store ("Fade in"), ProductHunt August 2026 leaderboard, IndieHackers
+- CourtListener (blocked), Authors Guild, National Law Review, Courthouse News, ailawsuittracker.com, manuscriptreport.com
+- Written Word Media, Authorlytica, Sudowrite/NovelCrafter status pages, Trustpilot (partially blocked), Reddit r/writing r/sudowrite r/NovelCrafter
