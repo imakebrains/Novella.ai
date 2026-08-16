@@ -514,6 +514,14 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       no product pairs a task tracker with a focus timer alongside writing
       and worldbuilding, and no product pairs all four pillars with a
       genuine local writing partner.
+      Research round 31 (2026-08-16) re-ran the same check an eighteenth
+      time (rounds 15, 17-31) and again found nothing — a fresh ProductHunt/
+      IndieHackers/itch.io sweep and a specific Epilogue re-check (local
+      Markdown, character/lore docs, but no AI, timer, or task tracker
+      mentioned anywhere) both came up empty. Fully dry round otherwise:
+      type.ai still has no dated changelog, Longform's Obsidian plugin is
+      still frozen at its March 2025 release, and no NaNoWriMo-successor
+      consolidation news surfaced.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -593,7 +601,13 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       Two separate Sudowrite outages in under four months, not one
       isolated incident — the "actively triaging" caveat carried since
       round 14 is wearing thinner with each fresh report, not holding
-      steady.
+      steady. Research round 31 (2026-08-16) finds a third, smaller data
+      point: status.sudowrite.com logs a brief Aug 11, 2026 partial outage
+      (3 min web, 6 min mobile), previously unlogged — minor on its own,
+      but it's now three separate Sudowrite status-page incidents inside
+      four months (Apr 22-23, Aug 1-3, Aug 11), not two; worth noting as
+      frequency rather than severity evidence. No new incident found this
+      round for Dabble, Campfire, Notion, or Google Docs.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent
@@ -662,7 +676,21 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       has already trained an LLM without permission, and 51% believe AI
       will "entirely replace" their work — a harder, more personal number
       than the existing 96%-want-consent stat, worth having alongside it
-      rather than in place of it.
+      rather than in place of it. Research round 31 (2026-08-16) found no
+      new survey or ruling, but flags two imminent dates worth checking
+      first thing next round: the Bartz v. Anthropic appeal window closes
+      **Aug 19, 2026** (no appeal filed as of this round — if none lands,
+      a claims portal opens end of August), and Kadrey v. Meta has a
+      mediation-outcome report due **Aug 21, 2026**. Also worth folding in
+      once confirmed: individual authors who opted out of the Bartz class
+      settlement are reportedly now filing separate suits against xAI and
+      Perplexity (tracker-level mention only, not yet primary-sourced), and
+      an EU AI Act Article 53 compliance gap — Google, Meta, and Microsoft
+      filed detailed training-data-summary templates while Anthropic,
+      Mistral, and xAI gave only vague prose responses — which is a minor
+      but concrete illustration that "discloses what it trained on" is
+      already inconsistent even among providers who must comply, sharpening
+      the contrast with Novella's structural "nothing to disclose" position.
 - [ ] **Say the export advantage louder** — research round 7: Sudowrite
       reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
       Novella already ships all three plus one-click backup
@@ -820,6 +848,34 @@ scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
 
+- 2026-08-16 — Research round 31 (autopilot; no code). Housekeeping first:
+  the session started with HEAD detached nine commits ahead of
+  `origin/main` (round 29, round 30, and several feature commits had never
+  been pushed) — confirmed a clean fast-forward, moved local `main` to
+  match, and pushed before starting new work; nothing was at risk, but
+  this is the same class of issue rounds 24, 29, and 30 already flagged,
+  still not fixed at the container level. Dispatched the same four
+  parallel research passes as rounds 28-30, each briefed on rounds 1-30's
+  findings and searching for material dated after round 30's 2026-08-15
+  cutoff. **Fourth consecutive thin-to-dry round** — no brand-new
+  checklist item; three small, previously-unlogged data points folded
+  into existing items instead. (1) The four-pillar competitive check
+  (local AI + task tracker + focus timer + worldbuilding, one app) ran an
+  eighteenth dedicated recheck and again found no match — folded into the
+  four-app-bundle item, including one new candidate ruled out (Epilogue:
+  local Markdown + lore docs, no AI, timer, or task tracker). (2)
+  status.sudowrite.com logs a brief, previously-unlogged Aug 11, 2026
+  partial outage (3 min web, 6 min mobile) — folded into the no-outage-
+  advantage item as a third status-page incident inside four months. (3)
+  Two imminent litigation dates worth checking first next round: the
+  Bartz v. Anthropic appeal window closes Aug 19, 2026 (no appeal filed
+  yet) and Kadrey v. Meta has a mediation-outcome report due Aug 21,
+  2026 — folded into the no-training/privacy-advantage item alongside a
+  minor EU AI Act Article 53 compliance-gap note (Google/Meta/Microsoft
+  filed detailed disclosures; Anthropic/Mistral/xAI gave only vague prose).
+  As in round 30, the standing skills-scouting pass was not run this round
+  either — flagging again rather than silently skipping it, since this
+  run's scope was the four competitor-research passes only.
 - 2026-08-15 — Research round 30 (autopilot; no code). Dispatched the same
   four parallel research passes as rounds 28-29, each briefed on rounds
   1-29's findings and searching for material dated after round 29's

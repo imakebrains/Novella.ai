@@ -3598,3 +3598,148 @@ it should happen "every research run."
 - itch.io release-announcements, Apple App Store ("Fade in"), ProductHunt August 2026 leaderboard, IndieHackers
 - CourtListener (blocked), Authors Guild, National Law Review, Courthouse News, ailawsuittracker.com, manuscriptreport.com
 - Written Word Media, Authorlytica, Sudowrite/NovelCrafter status pages, Trustpilot (partially blocked), Reddit r/writing r/sudowrite r/NovelCrafter
+
+# Round 31 (2026-08-16) — cadence, fourth consecutive thin/dry round
+
+Same four parallel passes as rounds 28-30 (NovelCrafter/Sudowrite;
+Dabble/Scrivener/Campfire; type.ai/Obsidian/new-entrant/four-pillar scan;
+broader industry/legal sentiment), each briefed on rounds 1-30's findings
+and told to search specifically for material dated after round 30's
+2026-08-15 cutoff. Housekeeping first: the run started with HEAD detached
+nine commits ahead of `origin/main` — round 29's and round 30's local
+commits (plus feature work in between) had never actually been pushed,
+even though prior rounds' log lines describe fixing this same class of
+issue. Confirmed `origin/main` was a clean ancestor of `HEAD`, fast-
+forwarded local `main` to match, and pushed successfully before starting
+new work — nothing was at risk, but this is now the third consecutive
+round (24, 29, 30, and now 31) to hit some variant of this problem, and
+the "always start from `git checkout main && git pull`" fix flagged since
+round 24 still isn't a hard rule anywhere a container could enforce it.
+Worth an explicit fix — a one-line SessionStart check, or a note at the
+very top of this cadence section — rather than relying on each round's
+own housekeeping paragraph to catch it by hand.
+
+Only minor footnotes this round — nothing rose to a new checklist item,
+and nothing was even strong enough to bump an item's priority. Closer to
+rounds 28-29 (fully dry) than round 30 (thin but not dry): all four
+passes independently reported "no new material," each with one or two
+small, previously-unlogged data points folded into existing ROADMAP items
+below rather than treated as headline findings.
+
+## NovelCrafter / Sudowrite
+
+Fully clean/unchanged for NovelCrafter: feedback.novelcrafter.com/changelog
+still tops out at March 21, 2026; status.novelcrafter.com shows zero
+incidents in 14 days; pricing unchanged (Scribe $4 / Hobbyist $8 / Artisan
+$14 / Specialist $20/mo). r/NovelCrafter and r/sudowrite were both
+unreachable via WebSearch's `site:` filter this round (returned nothing at
+all, including for control queries) — flagging as a search-tool
+limitation, not evidence either subreddit went quiet.
+
+Sudowrite: the Aug 14, 2026 changelog entry ("Improved Draft Estimates,
+Plus a Bunch of Fixes," already logged in round 30) is still the newest —
+confirmed via feedback.sudowrite.com/changelog and releasebot.io/updates/
+sudowrite after docs.sudowrite.com/en/changelog itself 500-errored on
+direct fetch. One new, previously-unlogged data point: status.sudowrite.com
+records a brief **Aug 11, 2026** partial outage (3 min sudowrite.com, 6 min
+mobile), resolved same day — small on its own, but it makes three separate
+Sudowrite status-page incidents inside four months (Apr 22-23, Aug 1-3, Aug
+11) rather than two. Folded into the no-outage-advantage item as a
+frequency note, not a severity escalation. Also worth a correction for
+future rounds: a mobile crash-fix build some review-aggregator summaries
+attribute to "August 2026" (v2026.26.16) actually dates to June 29, 2026 —
+not a new release, don't cite it as one if it resurfaces.
+
+## Dabble / Scrivener / Campfire
+
+Fully dry, all three. Dabble's blog has nothing past the already-known
+"Moving Forward: Dabble, NaNoWriMo, and the AI Discussion" post; Trustpilot
+403'd direct fetch and search surfaced only the same already-known
+complaints (large-book-deletion, unresponsive support, CPU/battery-hog).
+Scrivener release notes confirmed still at 3.5.2 (Dec 18, 2025). Campfire's
+changelog/release-notes/blog routes are still 404 (the restructure round
+30 flagged remains unresolved — next round should try
+campfirewriting.com/learn specifically, which this round found is the
+actual current blog index; newest post there is Update 42, May 26, 2026,
+still well before the window) and the App Store build is still 1.3.2
+(June 29, 2026) — no fix has shipped yet for the mid-sentence-reset/
+cursor-jump bug tracked since round 14.
+
+## type.ai / Obsidian / new entrants / four-pillar check
+
+Fully dry. type.ai still shows no dated changelog anywhere — a G2 listing
+notes the profile itself "has been inactive for over a year," which is new
+color on the existing "shallow/inflexible" criticism rather than a new
+complaint. Longform (Obsidian) is still frozen at v2.1.0 (March 2025);
+StoryLine and Noveler have no dated 2026 activity newer than the window.
+Notion-for-writers complaints (buried structure, clutter at scale) are
+unchanged; newest template review found (Gridfiti roundup) predates the
+cutoff.
+
+The four-pillar check (local/private AI + task tracker + focus timer +
+worldbuilding, one purpose-built novel app) ran an **eighteenth** dedicated
+pass (rounds 15, 17-31) and again found nothing. LocalProse re-verified
+unchanged (local Gemma 3 on-device + Pomodoro + worldbuilding, still no
+task tracker). PlotForge Desktop's changelog is still dated July 29, 2026 —
+nothing new, and still no timer or task tracker anywhere on the site. One
+new candidate checked and ruled out: **Epilogue** (Product Hunt, local
+Markdown storage, character/lore docs) — not AI-native at all, no timer or
+task tracker either. NaNoWriMo-successor fragmentation is unchanged;
+ProWritingAid's Novel November 2026 is confirmed running Nov 1-30 with
+October prep workshops, which is calendar-cycle continuity, not a new
+consolidation.
+
+## Industry / legal sentiment
+
+Fully dry on rulings and surveys, but two concrete near-term dates worth
+flagging for next round to check first: the **Bartz v. Anthropic** appeal
+window closes **Aug 19, 2026** (no appeal filed as of this round — if
+none lands, a claims portal opens end of August), and **Kadrey v. Meta**
+has a mediation-outcome report due **Aug 21, 2026**. CourtListener 403'd
+direct fetch on both dockets again; the Kadrey filing-activity date (Aug
+13, 2026) and mediation-report date came from search snippets, not the
+docket itself — treat as provisional until confirmed on a primary source.
+The Hachette/Cengage/Elsevier/Scott Turow Google suit (filed mid-July,
+already logged) has no new developments. No new author-consent survey wave
+found beyond the existing Authorlytica and Cambridge/Minderoo numbers —
+that theme is genuinely clean, not just unchecked. Two secondary,
+not-yet-primary-sourced leads worth a direct check next round rather than
+citing yet: individual authors who opted out of the Bartz class settlement
+reportedly filing separate suits against xAI and Perplexity, and an EU AI
+Act Article 53 compliance gap (Google/Meta/Microsoft filed detailed
+training-data-summary templates; Anthropic/Mistral/xAI gave only vague
+prose responses) — the latter is a minor but concrete illustration that
+"discloses what it trained on" is already uneven even among providers
+required to comply, which sharpens rather than changes the existing
+argument that Novella has nothing to disclose at all. No new cloud-tool
+outage found for Notion, Google Docs, or any vendor beyond the Sudowrite
+Aug 11 blip already folded in above.
+
+## What changed in ROADMAP.md
+
+No brand-new checklist item — a fourth consecutive thin-to-dry round.
+Three small footnotes folded into existing items: the four-app-bundle
+item's four-pillar sub-check gained its eighteenth-recheck update
+(Epilogue ruled out); the no-outage-advantage item gained the Aug 11
+Sudowrite blip as a frequency note; the no-training/privacy-advantage item
+gained the two imminent litigation dates to check next round plus the EU
+AI Act disclosure-gap color. As in round 30, the standing "skills & assets
+scouting" pass (ROADMAP.md's Research cadence section, added 2026-08-12)
+was not run this round either — this run's assigned scope was the four
+competitor-research passes only, matching the scheduled task's explicit
+instructions, but flagging again rather than silently continuing to skip
+a standing instruction the file itself says should happen "every research
+run."
+
+## Round 31 sources
+
+- feedback.sudowrite.com, status.sudowrite.com, docs.sudowrite.com (500 error), releasebot.io/updates/sudowrite
+- feedback.novelcrafter.com, status.novelcrafter.com
+- dabblewriter.com/blog, Dabble Trustpilot (blocked), Dabble Facebook (login wall)
+- literatureandlatte.com/scrivener/release-notes, forum.literatureandlatte.com
+- campfirewriting.com/learn (blog index, found this round), Campfire App Store version history
+- type.ai, G2 (type.ai profile), localprose.com, plotforge.app/changelog
+- Product Hunt (Epilogue), ProductHunt August leaderboard, IndieHackers, itch.io
+- CourtListener (blocked both dockets), Authors Alliance, TAA blog, Hachette press release, TechCrunch
+- Authorlytica, Cambridge/Minderoo study (no new wave), status pages for Notion/Google Docs/NovelCrafter/Campfire
+- TECHi, Pebblous (EU AI Act Article 53 coverage)
