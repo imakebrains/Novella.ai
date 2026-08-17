@@ -607,7 +607,20 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       but it's now three separate Sudowrite status-page incidents inside
       four months (Apr 22-23, Aug 1-3, Aug 11), not two; worth noting as
       frequency rather than severity evidence. No new incident found this
-      round for Dabble, Campfire, Notion, or Google Docs.
+      round for Dabble, Campfire, Notion, or Google Docs. Research round 32
+      (2026-08-17) adds a rare counter-data-point, reported honestly rather
+      than dropped: Sudowrite's Aug 14, 2026 changelog (already logged in
+      round 30 for its credit fixes) also fixed a cursor-jumping bug in the
+      mobile Story Bible editor — closing the specific mobile defect
+      flagged back in round 13 (Android could unexpectedly clear Story
+      Bible fields). One fixed bug doesn't erase three status-page
+      incidents in four months; the reliability argument should keep
+      leaning on incident frequency, not overstate current mobile
+      brokenness in a spot Sudowrite just patched. Also checked and
+      debunked a search-summary claim of an Aug 13 Campfire mobile
+      logout-bug fix — a direct follow-up found no such update and the
+      app still listed at v1.3.2 (June 2026); treat that claim as
+      unconfirmed if it resurfaces.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent
@@ -691,6 +704,17 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       but concrete illustration that "discloses what it trained on" is
       already inconsistent even among providers who must comply, sharpening
       the contrast with Novella's structural "nothing to disclose" position.
+      Research round 32 (2026-08-17) checked both imminent dates directly:
+      neither has resolved yet. The Bartz appeal window still closes Aug 19,
+      2026 (two days out), with class counsel confirming payments won't
+      begin until at least year-end regardless of whether an appeal lands.
+      Kadrey's mediation-outcome report is still due Aug 21, 2026, but a
+      docket check adds two dates that matter more for framing: non-expert
+      discovery doesn't close until Sept 21, 2026 and expert discovery until
+      Nov 9, 2026 — even a clean mediation report only clears one procedural
+      step, the case itself runs for months more. Nothing new for copy yet;
+      both dates now fall inside the next research cycle, so next round
+      should have real outcomes to report instead of dates to watch.
 - [ ] **Say the export advantage louder** — research round 7: Sudowrite
       reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
       Novella already ships all three plus one-click backup

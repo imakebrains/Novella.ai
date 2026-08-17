@@ -3743,3 +3743,136 @@ run."
 - CourtListener (blocked both dockets), Authors Alliance, TAA blog, Hachette press release, TechCrunch
 - Authorlytica, Cambridge/Minderoo study (no new wave), status pages for Notion/Google Docs/NovelCrafter/Campfire
 - TECHi, Pebblous (EU AI Act Article 53 coverage)
+
+# Round 32 (2026-08-17) — cadence, fifth consecutive thin/dry round
+
+Same brief as rounds 28-31: fresh reviews, feature announcements, and
+complaints for NovelCrafter, Sudowrite, Dabble, Scrivener, Campfire,
+type.ai, Obsidian-for-writers setups, and Notion writing templates,
+checked against everything already logged through round 31. Housekeeping
+was clean this time — the checkout started detached nine commits behind
+`origin/main` for an unrelated reason (a stale local `main` ref), fast-
+forwarded to match with no divergent local work at risk, unlike the
+three-round streak (29, 30, 31) that flagged actual unpushed commits.
+
+Nothing this round clears the bar for a new checklist item. Every thread
+chased either resurfaced material already logged (NovelCrafter's Jan 2026
+reasoning-model opt-in, Sudowrite's Aug 3/14 credit fixes, Scrivener still
+at 3.5.0/3.1.6, Dabble's known Reedsy score and Trustpilot complaints,
+type.ai's still-stale changelog) or turned out to be unverifiable/false on
+a second check (see Campfire below). This is now five cadence rounds in a
+row — three fully dry (28, 29, this one in substance) and two thin (30,
+31) — without a genuinely new competitive development. Two small, honest
+footnotes below; no fabricated urgency to compensate for a quiet week in
+the market.
+
+## NovelCrafter / Sudowrite
+
+NovelCrafter: still nothing past the June 11, 2026 blog post (an NSFW-model
+testing writeup, already stale by round 31's cutoff). The "thinking/
+reasoning model, opt-in for all users" detail that surfaced in search
+summaries this round traces to the same Jan 2026 "AI Thinking" release
+already logged in round 11 — a different secondary source restating old
+news, not a new rollout; no fresh dated confirmation found.
+
+Sudowrite: re-fetched the Aug 14, 2026 changelog entry directly
+(feedback.sudowrite.com/changelog/improved-draft-estimates-plus-a-bunch-of-fixes,
+already logged in round 30 for its three credit-accuracy fixes) and found
+two lines round 30 didn't quote: "Chat... read and insert more reliably"
+and a fixed cursor-jumping bug in the mobile Story Bible editor. The
+Story Bible fix is worth naming on its own — it closes the specific mobile
+defect flagged back in round 13 (Android could unexpectedly clear Story
+Bible fields). Folded into the no-outage-advantage item below as an honest
+counter-note: one bug fixed doesn't erase three status-page incidents in
+four months, but the reliability argument should lean on incident
+frequency, not overstate current mobile brokenness in a spot Sudowrite
+just patched. No entry newer than Aug 14 found on the changelog, status
+page, or releasebot.io mirror.
+
+## Dabble / Scrivener / Campfire
+
+Dabble: Trustpilot still blocks direct fetch; a Reedsy review score
+(2.5/5) and the known cross-device-sync/no-offline-storage tradeoffs
+surfaced again, nothing dated past round 30's Dabble 3.0 coverage.
+
+Scrivener: confirmed still macOS 3.5.0 (Oct 1, 2025) / Windows 3.1.6
+(Sep 3, 2025) via a second independent source — consistent with round 31,
+no Scrivener 4 date announced anywhere.
+
+Campfire: a WebSearch summary claimed an Aug 13, 2026 mobile update fixed
+an unexpected-logout bug. A direct follow-up search for that exact claim
+came back empty and instead reported the mobile app's last update as
+June 10, 2026 (still v1.3.2) — contradicting the first summary. Treating
+the Aug 13 logout-fix claim as unconfirmed/likely a search-summary error,
+not a real event; flagging so a future round doesn't cite it as fact. The
+mid-sentence-reset/cursor-jump bug tracked since round 14 still has no
+confirmed fix as of v1.3.2.
+
+## type.ai / Obsidian / Notion
+
+type.ai: no dated changelog found again; a G2/review-aggregator line
+("keeps users opening it... gets out of the way") reads as marketing
+copy, not evidence of a new release. Obsidian: the one specific thread
+that looked promising ("Two new novel-writing plugins") turned out to be
+from June 2024, not 2026 — Longform and StoryLine remain the two names
+with any real novelist following, both unchanged since round 31. Notion:
+searched specifically for complaints this round rather than template
+roundups; found only positive template reviews (Gridfiti, Notion
+Everything, "Writers Paradise") — no fresh complaint thread surfaced, so
+this remains a copy opportunity rather than a documented pain point to
+cite by name.
+
+## Industry / legal sentiment
+
+Checked both dates round 31 flagged as imminent. Neither has resolved:
+the Bartz v. Anthropic 30-day appeal window still closes Aug 19, 2026 (two
+days after this round), with class counsel confirming payments won't
+begin until at least year-end regardless of whether an appeal lands, and
+the claims portal opening only if none does. Kadrey v. Meta's mediation-
+outcome report is still due Aug 21, 2026; a docket check adds two dates
+not previously logged — non-expert discovery doesn't close until Sept 21,
+2026 and expert discovery until Nov 9, 2026 — meaning even a clean
+mediation report won't end the case, just clear one procedural step. Both
+dates now fall inside the next research cycle; next round should check
+them directly rather than re-flagging them as "coming soon" a third time.
+No new author-training survey wave, no new cloud-outage report for
+Notion, Google Docs, or any vendor beyond what's already logged.
+
+## Skills & assets scouting (light touch only)
+
+Not run as a dedicated pass this round — same as rounds 30-31, and for
+the same reason: the scheduled task's explicit brief was the eight named
+competitor/platform searches, not the standing scouting instruction. One
+incidental find while chasing an unrelated query: github.com/haowjy/
+creative-writing-skills, an Apache-2.0, individually-authored (not an AI
+content farm) set of Claude skills for novel drafting/revision/critique
+built around a "muse" orchestrator agent, 149 commits, no visible last-
+update timestamp on the repo's rendered page. Not evaluated for quality
+or added to `writing-skills/` — surfacing it for a future dedicated
+scouting round to assess properly, per that pass's own human-authored-
+preferred rule, rather than importing anything on a research-only run.
+
+## What changed in ROADMAP.md
+
+No new checklist item — a fifth consecutive round without material that
+clears the bar. Two footnotes: the no-outage-advantage item gained the
+Aug 14 Sudowrite Story Bible cursor-jump fix (a rare "they fixed one"
+data point, reported honestly) and the Campfire Aug 13 logout-fix claim
+flagged as unconfirmed rather than cited; the no-training/privacy-
+advantage item gained confirmation that both dates round 31 flagged are
+still pending, plus the Kadrey discovery-schedule dates (Sept 21, Nov 9)
+showing the case continues well past the Aug 21 mediation report either
+way.
+
+## Round 32 sources
+
+- feedback.novelcrafter.com/blog, feedback.sudowrite.com/changelog (direct fetch), releasebot.io/updates/sudowrite
+- Reedsy (Dabble review), Dabble Trustpilot (blocked)
+- literatureandlatte.com/scrivener/release-notes (cross-checked)
+- Campfire App Store/Play Store listings, justuseapp.com (Campfire problem reports)
+- type.ai, G2 (type.ai profile)
+- forum.obsidian.md (dated thread check), Obsidian Hub plugins-for-writers page
+- Notion Marketplace, Gridfiti, Notion Everything
+- Copyright Alliance, Authors Guild, TAA blog, JURIST, Authors Alliance (Bartz v. Anthropic)
+- McKool Smith AI litigation updates, CourtListener docket page (Kadrey v. Meta)
+- github.com/haowjy/creative-writing-skills
