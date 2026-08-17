@@ -15,15 +15,23 @@ This repository is **public**. For that reason:
 - Analyses may contain **brief quotations** for commentary and craft study only.
 - No personal or third-party private material is stored here.
 
+## Start here
+
+**[`MASTER-PLAN.md`](MASTER-PLAN.md)** — the synthesis of the whole deep-dive:
+diagnosis, the five convergent findings, the chapter architecture, whole-book
+architecture, positioning, binding repetition budgets, and the staged revision
+sequence. Everything else in this folder is the evidence behind it.
+
 ## Layout
 
 | Folder | Purpose |
 | --- | --- |
+| `MASTER-PLAN.md` | The synthesis and revision plan. Start here. |
 | `manuscript/` | Pointers to the Drive masters, chapter status tracking. No full text. |
-| `analysis/` | Craft analyses: the comparison book study and the Reasoning Faith audits. |
-| `research/` | Genre and craft research: how books like this earn personal connection. |
-| `voice/` | The voice/personality work: Drew's voice fingerprint and integration plan. |
-| `notes/` | Interview notes, decisions, session logs. |
+| `analysis/` | Comparison-book studies (*Occupy the Algorithm*, *The First Love Effect* — three lenses each), the two Reasoning Faith audits, and the worked Chapter 1 example. |
+| `research/` | Genre research (how apologetics books earn personal connection) and craft research (story-driven nonfiction technique), both cited. |
+| `voice/` | `reasoning-faith-voice-integration.md` — the twelve named voice moves that put personality on the page inside the book's formal register. |
+| `notes/` | The author interview, the story-inventory protocol and veiling ethics, and the critic's verification memo. |
 
 ## The current problem statement (2026-08-17)
 
