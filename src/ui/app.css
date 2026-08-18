@@ -5544,28 +5544,20 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
 
 /* Word streaming: every word is in flow from the start (layout is
    reserved — nothing reflows), fading in on a constant clock. */
-.intro-word {
+.intro-line {
   opacity: 0;
-  display: inline-block;
-  animation: intro-word 900ms var(--ease-hero, var(--ease-enter)) forwards;
+  animation: intro-line-in 560ms cubic-bezier(0.22, 0.9, 0.3, 1) forwards;
   will-change: opacity, transform, filter;
 }
-.intro-line.done .intro-word {
-  opacity: 1;
-  animation: none;
-}
-@keyframes intro-word {
-  0% {
+@keyframes intro-line-in {
+  from {
     opacity: 0;
-    transform: translateY(0.45em) scale(1.06);
-    filter: blur(14px);
+    transform: translateY(14px);
+    filter: blur(7px);
   }
-  60% {
+  to {
     opacity: 1;
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
     filter: blur(0);
   }
 }
@@ -6911,7 +6903,7 @@ body {
   .intro-carousel {
     scroll-behavior: auto;
   }
-  .intro-word {
+  .intro-line {
     animation-duration: 0ms;
   }
   .intro-stage {
@@ -6925,7 +6917,7 @@ body {
 /* ---- 9.26 the intro breathes (owner round 12) ---- */
 /* Each question is its own scene: a slow rise in, never an instant swap. */
 .intro-stage {
-  animation: intro-screen-in 600ms var(--ease-hero, var(--ease-enter));
+  animation: intro-screen-in 450ms var(--ease-hero, var(--ease-enter));
 }
 @keyframes intro-screen-in {
   from {
@@ -7028,17 +7020,17 @@ body {
 /* Answers arrive after the words settle, each control a half-beat
    behind the one before it. */
 .intro-answers {
-  animation-duration: 600ms;
-  animation-delay: 750ms;
+  animation-duration: 450ms;
+  animation-delay: 200ms;
 }
 .intro-answers > * {
   opacity: 0;
-  animation: rise-in 500ms var(--ease-hero, var(--ease-enter)) forwards;
+  animation: rise-in 450ms cubic-bezier(0.22, 0.9, 0.3, 1) forwards;
 }
-.intro-answers > *:nth-child(1) { animation-delay: 850ms; }
-.intro-answers > *:nth-child(2) { animation-delay: 1000ms; }
-.intro-answers > *:nth-child(3) { animation-delay: 1150ms; }
-.intro-answers > *:nth-child(n + 4) { animation-delay: 1300ms; }
+.intro-answers > *:nth-child(1) { animation-delay: 250ms; }
+.intro-answers > *:nth-child(2) { animation-delay: 340ms; }
+.intro-answers > *:nth-child(3) { animation-delay: 430ms; }
+.intro-answers > *:nth-child(n + 4) { animation-delay: 520ms; }
 
 /* The companion. Small, alive, out of the way. */
 .intro-cat-corner {

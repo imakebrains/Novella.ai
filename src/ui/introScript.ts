@@ -96,13 +96,13 @@ export const INTRO_SWATCHES = [
   "#b08a5a", // tobacco
 ];
 
-/* ---- timing (§3) ----
-   Constant-rate word streaming: never bursty, never jittered. The fade
-   is long and overlapping — several words are mid-arrival at once, so
-   lines flow in instead of popping (owner feedback, 2026-08-18). */
-export const WORD_MS = 90;
-export const WORD_FADE_MS = 900;
-export const LINE_GAP_MS = 600;
+/* ---- timing (§3, rebuilt round 13) ----
+   Lines arrive whole — one thought, one elegant entrance — the way a
+   keynote presents, not the way a terminal types. Word streaming read
+   as either jittery or sluggish depending on the clock; whole-line
+   flow is instantly readable at any speed. */
+export const ENTRANCE_MS = 560;
+export const LINE_GAP_MS = 240;
 export const INPUT_DELAY_MS = 500;
 
 /** The cat's minimum hold at the finale — long enough to land as a
@@ -133,11 +133,10 @@ export function wordsOf(line: string): string[] {
   return line.split(/\s+/).filter(Boolean);
 }
 
-/** How long a line takes to finish streaming, fade tail included. */
+/** How long a line's entrance takes. Every line costs one entrance —
+    length changes reading time, not arrival time. */
 export function lineDurationMs(line: string): number {
-  const n = wordsOf(line).length;
-  if (n === 0) return 0;
-  return (n - 1) * WORD_MS + WORD_FADE_MS;
+  return wordsOf(line).length === 0 ? 0 : ENTRANCE_MS;
 }
 
 /** No headline ever orphans its last word (§4.6). */

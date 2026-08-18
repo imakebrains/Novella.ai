@@ -24,8 +24,7 @@ import {
   tapAdvance,
   gerundAt,
   INTRO_GERUNDS,
-  WORD_MS,
-  WORD_FADE_MS,
+  ENTRANCE_MS,
 } from "./src/ui/introScript";
 import { cycleTab, type TabId } from "./src/ui/inspectorTabs";
 import { glowModeOf } from "./src/ui/personalize";
@@ -1002,11 +1001,11 @@ lied, and Wren had known that since she was nine.
 
 {
   // Timing: constant-rate words, fade tail included.
-  check("intro: one word lasts exactly the fade", lineDurationMs("Begin."), WORD_FADE_MS);
+  check("intro: a line costs one entrance", lineDurationMs("Begin."), ENTRANCE_MS);
   check(
-    "intro: five words pace at the word clock",
+    "intro: length changes reading time, not arrival time",
     lineDurationMs("one two three four five"),
-    4 * WORD_MS + WORD_FADE_MS,
+    ENTRANCE_MS,
   );
   check("intro: gerunds cycle in order", gerundAt(1), INTRO_GERUNDS[1]);
   check("intro: gerund cycle wraps", gerundAt(INTRO_GERUNDS.length), INTRO_GERUNDS[0]);

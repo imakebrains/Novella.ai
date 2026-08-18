@@ -5,7 +5,6 @@ import {
   INTRO_SWATCHES,
   LINE_GAP_MS,
   RETURNING_SCREEN,
-  WORD_MS,
   gerundAt,
   glueOrphans,
   inputReady,
@@ -13,7 +12,6 @@ import {
   lineFinished,
   substitute,
   tapAdvance,
-  wordsOf,
   type IntroScreen,
   type LineState,
 } from "./introScript";
@@ -22,8 +20,8 @@ import { BACKDROP_PRESETS, presetMarker, resolveBackdrop } from "./backdrops";
 import { THEMES, useTheme, type Theme } from "./useTheme";
 import { profileStore } from "../state/profile";
 import { projectStore, toBannerDataUrl, useProjects } from "../state/projects";
-import catGif from "../assets/cat-loading.gif";
-import catStill from "../assets/cat-still.avif";
+import catGif from "../assets/cat-loading.gif?inline";
+import catStill from "../assets/cat-still.avif?inline";
 import { store } from "../state/vaultStore";
 import { isTauri, storage } from "../storage";
 import { PRESETS, presetById } from "../seed/presets";
@@ -301,25 +299,15 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
 
   /* ---- rendering ---- */
 
+  /* Whole lines, whole thoughts. A line mounts once, rises in as one
+     unit, and never re-animates — the stage is top-anchored, so nothing
+     already read moves when the next line arrives. */
   const renderLine = (text: string, i: number) => {
+    if (i > line.lineIdx) return null;
     const isCurrent = i === line.lineIdx && !line.lineComplete;
-    const visible = i < line.lineIdx || line.lineComplete || i === line.lineIdx;
-    if (!visible || i > line.lineIdx) return null;
-    const words = wordsOf(glueOrphans(text));
     return (
       <p key={`${screenIdx}-${i}`} className={`intro-line ${isCurrent ? "streaming" : "done"}`}>
-        {words.map((w, j) => (
-          // The space lives OUTSIDE the span: an inline-block trims its
-          // own trailing whitespace, which once fused every word together.
-          <span key={j}>
-            <span
-              className="intro-word"
-              style={isCurrent ? { animationDelay: `${j * WORD_MS}ms` } : undefined}
-            >
-              {w}
-            </span>{" "}
-          </span>
-        ))}
+        {glueOrphans(text)}
       </p>
     );
   };
