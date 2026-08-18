@@ -6656,3 +6656,52 @@ body {
   opacity: 0;
   transition-delay: 0ms;
 }
+
+/* ---- 9.23 backdrop follow-ups (owner feedback, 2026-08-18) ---- */
+/* The resizer sat transparent between two frosted panes, so the raw
+   backdrop showed through as a bright stripe running down the seam.
+   With a backdrop on, the seam wears the same glass as its neighbors. */
+:root.has-backdrop .resizer {
+  background: color-mix(in srgb, var(--bg-app) 72%, transparent);
+  backdrop-filter: blur(10px) saturate(1.1);
+}
+:root.has-backdrop .resizer::before {
+  background: color-mix(in srgb, var(--border) 60%, transparent);
+}
+:root.has-backdrop .resizer:hover::before,
+:root.has-backdrop .resizer:focus-visible::before,
+:root.has-backdrop .resizer.dragging::before {
+  background: var(--accent);
+}
+
+/* Bundled backdrop presets in Settings — small stills, the accent ring
+   marks the one in use. */
+.ap-backdrops {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-3);
+}
+.ap-backdrop-thumb {
+  width: 96px;
+  height: 54px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  transition: transform var(--motion-quick) var(--ease-enter),
+    border-color var(--motion-quick) var(--ease-color);
+}
+.ap-backdrop-thumb:hover {
+  transform: translateY(-1px);
+}
+.ap-backdrop-thumb.on {
+  border-color: var(--accent);
+}
+
+/* The Tasks checklist hugged the pane border — give the panel the same
+   breathing room its sibling tabs get. */
+.tasks-panel {
+  padding: 0 var(--space-2) var(--space-3);
+}

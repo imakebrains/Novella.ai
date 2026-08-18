@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { resolveBackdrop } from "./backdrops";
 import {
   loadPersonalization,
   personalizationVersion,
@@ -13,7 +14,7 @@ import {
 
 export function Backdrop() {
   useSyncExternalStore(subscribePersonalization, personalizationVersion, personalizationVersion);
-  const img = loadPersonalization().bgImage;
+  const img = resolveBackdrop(loadPersonalization().bgImage);
   if (!img) return null;
   return (
     <div className="backdrop" aria-hidden>

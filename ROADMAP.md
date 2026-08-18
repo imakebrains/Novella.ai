@@ -885,6 +885,21 @@ scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
 
+- 2026-08-18 — Backdrop follow-ups (session; owner feedback on the live
+  build). The seam between panes showed the raw backdrop as a bright
+  stripe running floor to ceiling — the resizer was transparent between
+  two frosted panes; it now wears the same 72% glass + blur, with its
+  grip line softened to match. New: bundled backdrop presets — the
+  owner's alpine-trail artwork ships in src/assets and appears as a
+  thumbnail row in Settings → Backdrop (stored as "preset:alpine", ~13
+  bytes, so localStorage stays light and a release can upgrade the art
+  for everyone who picked it); custom uploads unchanged and still win.
+  Also: the Tasks checklist was hugging the pane border — the panel now
+  carries the same breathing room as its sibling tabs. Verified live:
+  preset resolves to the real asset (1672×941 loads), thumb shows the
+  accent ring when active, resizer computes glass (transition-freeze
+  workaround applied), tasks padding lands. 278 checks green, tsc clean.
+
 - 2026-08-18 — Research round 33 (autopilot; no code). Housekeeping first:
   the session started with HEAD detached at round 32's commit; a fetch of
   `origin/main` initially appeared to show 11 commits of local-only history

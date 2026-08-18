@@ -21,6 +21,7 @@ import { replayIntro } from "./WelcomeIntro";
 import { INTRO_SWATCHES } from "./introScript";
 import { tabPrefs, useTabPrefs, type TabId } from "./inspectorTabs";
 import { toBannerDataUrl } from "../state/projects";
+import { BACKDROP_PRESETS, presetMarker } from "./backdrops";
 import {
   glowModeOf,
   loadPersonalization,
@@ -339,6 +340,18 @@ function AppearanceTab() {
           Any image you love, softened behind frosted glass. It never
           competes with your words.
         </p>
+        <div className="ap-backdrops">
+          {BACKDROP_PRESETS.map((p) => (
+            <button
+              key={p.id}
+              className={`ap-backdrop-thumb ${personal.bgImage === presetMarker(p.id) ? "on" : ""}`}
+              style={{ backgroundImage: `url(${p.url})` }}
+              onClick={() => change({ bgImage: presetMarker(p.id) })}
+              aria-label={`Use the ${p.name} backdrop`}
+              data-tip={p.name}
+            />
+          ))}
+        </div>
         <div className="btn-row">
           <label className="btn-ghost ap-upload">
             {personal.bgImage ? "Change image\u2026" : "Choose an image\u2026"}
