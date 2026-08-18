@@ -22,8 +22,8 @@ import { BACKDROP_PRESETS, presetMarker, resolveBackdrop } from "./backdrops";
 import { THEMES, useTheme, type Theme } from "./useTheme";
 import { profileStore } from "../state/profile";
 import { projectStore, toBannerDataUrl, useProjects } from "../state/projects";
-import catGif from "../assets/intro-cat.gif";
-import catStill from "../assets/intro-cat-still.avif";
+import catGif from "../assets/cat-loading.gif";
+import catStill from "../assets/cat-still.avif";
 import { store } from "../state/vaultStore";
 import { isTauri, storage } from "../storage";
 import { PRESETS, presetById } from "../seed/presets";
@@ -357,6 +357,18 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
         <button className="intro-back" onClick={() => setScreenIdx((i) => Math.max(0, i - 1))}>
           ‹ Back
         </button>
+      )}
+
+      {/* The companion: once the setup starts, the cat keeps you company
+          from the corner — small during the questions, center stage at
+          the finale. Decoration, never information. */}
+      {screenIdx > 0 && !steps && !closing && (
+        <div className="intro-cat-corner" aria-hidden>
+          <picture>
+            <source srcSet={catStill} media="(prefers-reduced-motion: reduce)" />
+            <img src={catGif} alt="" />
+          </picture>
+        </div>
       )}
 
       {/* Keyed on the screen so each question arrives as its own scene —

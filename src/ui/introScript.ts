@@ -30,26 +30,26 @@ export const INTRO_SCRIPT: IntroScreen[] = [
   {
     id: "cold-open",
     lines: [
-      "Every book starts the same way. An empty page, and someone stubborn enough to fill it.",
-      "Let's set up yours.",
+      "Every great book began as a blank page and someone who refused to leave it empty.",
+      "Yours starts tonight.",
     ],
     input: "begin",
   },
   {
     id: "pen-name",
-    lines: ["First — what name goes on the title page?"],
+    lines: ["First, the name that will sit on the cover."],
     input: "name",
   },
   {
     id: "color",
-    lines: ["Good to meet you, {{name}}.", "Pick a color you'd want on the spine."],
+    lines: ["Good to meet you, {{name}}.", "Pick your color. The whole room will follow it."],
     input: "color",
   },
   {
     id: "theme",
     lines: [
-      "There it is. That's yours now — the whole app follows it.",
-      "What kind of story is pulling at you?",
+      "There it is. Yours now, everywhere you look.",
+      "What kind of story is calling to you?",
     ],
     input: "theme",
   },
@@ -57,25 +57,25 @@ export const INTRO_SCRIPT: IntroScreen[] = [
     id: "backdrop",
     lines: [
       "{{themeAck}}",
-      "Some writers like a view behind the page. Pick one, bring your own — or keep it bare.",
+      "Now set the scene. Choose a view for behind your page, or bring your own.",
     ],
     input: "backdrop",
   },
   {
     id: "ai",
     lines: [
-      "One more thing. Novella can write alongside you with a local AI — if you have one.",
+      "Novella can write alongside you, right on this machine. Private, offline, entirely yours.",
     ],
     input: "ai",
   },
   {
     id: "project",
-    lines: ["Last question. What are we opening tonight?"],
+    lines: ["The stage is set, {{name}}.", "Let's open your first book."],
     input: "preset",
   },
 ];
 
-/** The final screen swaps for writers who already have books — no
+/** The final screen swaps for writers who already have books: no
     project creation, no wizardry, just the door back in. */
 export const RETURNING_SCREEN: IntroScreen = {
   id: "returning",
@@ -100,9 +100,9 @@ export const INTRO_SWATCHES = [
    Constant-rate word streaming: never bursty, never jittered. The fade
    is long and overlapping — several words are mid-arrival at once, so
    lines flow in instead of popping (owner feedback, 2026-08-18). */
-export const WORD_MS = 70;
-export const WORD_FADE_MS = 650;
-export const LINE_GAP_MS = 500;
+export const WORD_MS = 90;
+export const WORD_FADE_MS = 900;
+export const LINE_GAP_MS = 600;
 export const INPUT_DELAY_MS = 500;
 
 /** The cat's minimum hold at the finale — long enough to land as a

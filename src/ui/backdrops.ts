@@ -1,8 +1,8 @@
 import alpine from "../assets/backdrop-alpine.webp";
-import goldenhour from "../assets/backdrop-goldenhour.webp";
-import inkmoon from "../assets/backdrop-inkmoon.webp";
-import maple from "../assets/backdrop-maple.jpg";
-import suns from "../assets/backdrop-suns.jpg";
+import goldenhour from "../assets/scene-goldenhour.webp";
+import inkmoon from "../assets/scene-inkmoon.webp";
+import maple from "../assets/scene-maple.jpg";
+import suns from "../assets/scene-suns.jpg";
 
 /* Bundled backdrops — a starting point, not a gallery.
 

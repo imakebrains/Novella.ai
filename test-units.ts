@@ -1039,6 +1039,7 @@ lied, and Wren had known that since she was nine.
   const screens = [...INTRO_SCRIPT, RETURNING_SCREEN];
   ok("intro: every screen has at least one line", screens.every((s) => s.lines.length > 0));
   ok("intro: no exclamation marks anywhere in the script", screens.every((s) => s.lines.every((l) => !l.includes("!"))));
+  ok("intro: no em dashes anywhere in the script", screens.every((s) => s.lines.every((l) => !l.includes("—"))));
   ok("intro: no marketing-enthusiasm vocabulary", screens.every((s) => s.lines.every((l) => !/excited|awesome|amazing/i.test(l))));
   check("intro: eight spine colors", INTRO_SWATCHES.length, 8);
   ok("intro: every swatch is a real hex", INTRO_SWATCHES.every((c) => /^#[0-9a-f]{6}$/i.test(c)));
