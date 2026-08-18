@@ -22,6 +22,10 @@ import {
   lineFinished,
   substitute,
   tapAdvance,
+  gerundAt,
+  INTRO_GERUNDS,
+  WORD_MS,
+  WORD_FADE_MS,
 } from "./src/ui/introScript";
 import { cycleTab, type TabId } from "./src/ui/inspectorTabs";
 import { glowModeOf } from "./src/ui/personalize";
@@ -998,8 +1002,15 @@ lied, and Wren had known that since she was nine.
 
 {
   // Timing: constant-rate words, fade tail included.
-  check("intro: one word lasts exactly the fade", lineDurationMs("Begin."), 80);
-  check("intro: five words pace at 35ms/word", lineDurationMs("one two three four five"), 4 * 35 + 80);
+  check("intro: one word lasts exactly the fade", lineDurationMs("Begin."), WORD_FADE_MS);
+  check(
+    "intro: five words pace at the word clock",
+    lineDurationMs("one two three four five"),
+    4 * WORD_MS + WORD_FADE_MS,
+  );
+  check("intro: gerunds cycle in order", gerundAt(1), INTRO_GERUNDS[1]);
+  check("intro: gerund cycle wraps", gerundAt(INTRO_GERUNDS.length), INTRO_GERUNDS[0]);
+  check("intro: gerund survives negative ticks", gerundAt(-1), INTRO_GERUNDS[INTRO_GERUNDS.length - 1]);
   check("intro: empty line takes no time", lineDurationMs("   "), 0);
 
   // The impatience ladder: tap completes the line, tap again jumps the screen.

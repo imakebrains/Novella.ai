@@ -5532,15 +5532,23 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
    reserved — nothing reflows), fading in on a constant clock. */
 .intro-word {
   opacity: 0;
-  animation: intro-word 80ms var(--ease-color) forwards;
+  display: inline-block;
+  animation: intro-word 380ms var(--ease-enter) forwards;
 }
 .intro-line.done .intro-word {
   opacity: 1;
   animation: none;
 }
 @keyframes intro-word {
+  from {
+    opacity: 0;
+    transform: translateY(0.35em);
+    filter: blur(6px);
+  }
   to {
     opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
   }
 }
 
@@ -6704,4 +6712,188 @@ body {
    breathing room its sibling tabs get. */
 .tasks-panel {
   padding: 0 var(--space-2) var(--space-3);
+}
+
+/* ---- 9.24 the intro, rounder (owner round 11) ---- */
+
+/* A chosen scene shows through the welcome itself — same promise as the
+   live accent recolor. Blurred, scrimmed toward the theme's ground. */
+.intro-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  animation: fade-in var(--motion-slow) var(--ease-color);
+}
+.intro-bg-img {
+  position: absolute;
+  inset: -3%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(18px) saturate(1.05);
+  transform: scale(1.06);
+}
+.intro-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--bg-app) 62%, transparent);
+}
+
+/* The backdrop carousel: big stills that glide, snap, and answer. */
+.intro-backdrop-pick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+}
+.intro-carousel-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-width: 0;
+}
+.intro-carousel {
+  display: flex;
+  gap: var(--space-3);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  padding: var(--space-2);
+  scrollbar-width: none;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.intro-carousel::-webkit-scrollbar {
+  display: none;
+}
+.intro-bg-card {
+  position: relative;
+  flex: none;
+  width: 240px;
+  height: 135px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-lg);
+  background-size: cover;
+  background-position: center;
+  scroll-snap-align: center;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--motion-quick) var(--ease-enter),
+    border-color var(--motion-quick) var(--ease-color),
+    box-shadow var(--motion-quick) var(--ease-enter);
+}
+.intro-bg-card:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: var(--shadow);
+}
+.intro-bg-card.on {
+  border-color: var(--accent);
+}
+.intro-bg-name {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: var(--space-3) var(--space-2) var(--space-1);
+  background: linear-gradient(transparent, rgb(0 0 0 / 0.55));
+  color: var(--fg-on-image);
+  font-size: var(--text-xs);
+  text-align: center;
+}
+.intro-bg-upload {
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--bg-raised) 55%, transparent);
+  border: 1px dashed var(--border-strong);
+}
+.intro-bg-upload .intro-bg-name {
+  background: none;
+  color: var(--fg-secondary);
+  position: static;
+  padding: 0;
+}
+.intro-bg-plus {
+  font-size: var(--text-2xl);
+  color: var(--fg-muted);
+  line-height: 1;
+}
+.intro-carousel-arrow {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--bg-raised) 70%, transparent);
+  color: var(--fg-secondary);
+  font-size: var(--text-lg);
+  cursor: pointer;
+  transition: border-color var(--motion-quick) var(--ease-color),
+    color var(--motion-quick) var(--ease-color);
+}
+.intro-carousel-arrow:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* The loading cat. The gerund rotates; the real steps below tell the truth. */
+.intro-cat-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  margin-bottom: var(--space-3);
+}
+.intro-cat {
+  height: 72px;
+  width: auto;
+}
+.intro-gerund {
+  margin: 0;
+  color: var(--fg-muted);
+  font-size: var(--text-sm);
+  animation: rise-in var(--motion-standard) var(--ease-enter);
+}
+
+/* ---- 9.25 tasks: the + ---- */
+.task-add-btn {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: var(--text-base);
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color var(--motion-quick) var(--ease-color),
+    transform var(--motion-quick) var(--ease-enter);
+}
+.task-add-btn:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+.task-add-row {
+  margin: var(--space-2) 0;
+  animation: rise-in var(--motion-quick) var(--ease-enter);
+}
+.task-add-row .field-input {
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-bg,
+  .intro-gerund,
+  .task-add-row {
+    animation: none;
+  }
+  .intro-carousel {
+    scroll-behavior: auto;
+  }
+  .intro-word {
+    animation-duration: 0ms;
+  }
 }

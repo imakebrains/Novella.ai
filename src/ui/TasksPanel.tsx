@@ -34,10 +34,53 @@ function readMode(): DoneMode {
   return raw === "bottom" || raw === "archive" ? raw : "in-place";
 }
 
+/* The + button appends a real `- [ ]` line to a real note — the active
+   one if something's open, otherwise a note called "Tasks" (created on
+   first use). No hidden task store: what this adds, the editor shows. */
+function addTaskTo(text: string): void {
+  const clean = text.trim();
+  if (!clean) return;
+  let target = store.active();
+  if (!target) {
+    target =
+      store.vault.all().find((n) => n.title === "Tasks") ?? store.createNote("note", "Tasks");
+  }
+  const body = store.vault.get(target.id)?.body ?? "";
+  const glue = body.length === 0 || body.endsWith("\n") ? "" : "\n";
+  store.setBody(target.id, `${body}${glue}- [ ] ${clean}\n`);
+}
+
+function AddTaskRow({ onClose }: { onClose: () => void }) {
+  const [text, setText] = useState("");
+  const target = store.active()?.title ?? "Tasks";
+  return (
+    <div className="task-add-row">
+      <input
+        className="field-input"
+        autoFocus
+        value={text}
+        placeholder={`Add to “${target}”…`}
+        aria-label="New task"
+        onChange={(e) => setText(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            addTaskTo(text);
+            setText("");
+            if (!e.shiftKey) onClose();
+          } else if (e.key === "Escape") {
+            onClose();
+          }
+        }}
+      />
+    </div>
+  );
+}
+
 export function TasksPanel() {
   useVaultVersion();
   const [mode, setMode] = useState<DoneMode>(readMode);
   const [archiveOpen, setArchiveOpen] = useState(false);
+  const [adding, setAdding] = useState(false);
   const all = store.allTasks();
 
   const pickMode = (m: DoneMode) => {
@@ -60,6 +103,13 @@ export function TasksPanel() {
           Type <code>- [ ] something to do</code> on its own line in any note — a chapter, a
           codex entry, anywhere — and it shows up here as a real checkbox.
         </p>
+        {adding ? (
+          <AddTaskRow onClose={() => setAdding(false)} />
+        ) : (
+          <button className="empty-cta" onClick={() => setAdding(true)}>
+            + Add one now
+          </button>
+        )}
       </div>
     );
   }
@@ -97,6 +147,15 @@ export function TasksPanel() {
         <span className="hint tasks-summary">
           {open.length} open · {done.length} done
         </span>
+        <button
+          className="task-add-btn"
+          onClick={() => setAdding((v) => !v)}
+          aria-label="Add a task"
+          aria-expanded={adding}
+          data-tip="Add a task"
+        >
+          +
+        </button>
         <div className="tasks-mode" role="radiogroup" aria-label="Where done items go">
           {MODES.map((m) => (
             <button
@@ -112,6 +171,8 @@ export function TasksPanel() {
           ))}
         </div>
       </div>
+
+      {adding && <AddTaskRow onClose={() => setAdding(false)} />}
 
       {mainGroups.length === 0 && mode === "archive" ? (
         <p className="hint">Everything's ticked and archived. Go write.</p>

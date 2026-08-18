@@ -5,6 +5,7 @@ import {
   LINE_GAP_MS,
   RETURNING_SCREEN,
   WORD_MS,
+  gerundAt,
   glueOrphans,
   inputReady,
   lineDurationMs,
@@ -16,9 +17,12 @@ import {
   type LineState,
 } from "./introScript";
 import { loadPersonalization, savePersonalization } from "./personalize";
+import { BACKDROP_PRESETS, presetMarker, resolveBackdrop } from "./backdrops";
 import { THEMES, useTheme, type Theme } from "./useTheme";
 import { profileStore } from "../state/profile";
-import { projectStore, useProjects } from "../state/projects";
+import { projectStore, toBannerDataUrl, useProjects } from "../state/projects";
+import catGif from "../assets/intro-cat.gif";
+import catStill from "../assets/intro-cat-still.avif";
 import { store } from "../state/vaultStore";
 import { isTauri, storage } from "../storage";
 import { PRESETS, presetById } from "../seed/presets";
@@ -78,9 +82,13 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
   const returning = projects.length > 0;
   const { theme, setTheme } = useTheme();
 
-  // The returning path swaps the last screen: no project creation.
+  // The returning path swaps the project screen for the door back in —
+  // selected by id, not index, so new screens don't silently drop it.
   const script = useMemo<IntroScreen[]>(
-    () => (returning ? [...INTRO_SCRIPT.slice(0, 5), RETURNING_SCREEN] : INTRO_SCRIPT),
+    () =>
+      returning
+        ? [...INTRO_SCRIPT.filter((s) => s.input !== "preset"), RETURNING_SCREEN]
+        : INTRO_SCRIPT,
     [returning],
   );
 
@@ -94,6 +102,21 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
   const [steps, setSteps] = useState<CreationStep[] | null>(null);
   const [closing, setClosing] = useState(false);
   const nameField = useRef<HTMLInputElement>(null);
+
+  /* Backdrop step: the chosen scene shows through THIS screen the moment
+     it's picked — same promise as the accent recolor. */
+  const [introBg, setIntroBg] = useState<string | null>(() =>
+    resolveBackdrop(loadPersonalization().bgImage) ?? null,
+  );
+  const carousel = useRef<HTMLDivElement>(null);
+
+  /* The loading cat cycles its vocabulary while real steps tick. */
+  const [gerundTick, setGerundTick] = useState(0);
+  useEffect(() => {
+    if (!steps) return;
+    const t = setInterval(() => setGerundTick((n) => n + 1), 900);
+    return () => clearInterval(t);
+  }, [steps]);
 
   const screen = script[screenIdx]!;
   const vars = useMemo(
@@ -174,6 +197,22 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
     // The signature moment: this very screen recolors in the same frame.
     savePersonalization({ ...loadPersonalization(), accent: hex });
     advance();
+  };
+
+  const answerBackdrop = (stored: string) => {
+    savePersonalization({ ...loadPersonalization(), bgImage: stored });
+    setIntroBg(resolveBackdrop(stored) ?? null);
+    advance();
+  };
+  const skipBackdrop = () => {
+    const p = { ...loadPersonalization() };
+    delete p.bgImage;
+    savePersonalization(p);
+    setIntroBg(null);
+    advance();
+  };
+  const scrollCarousel = (dir: -1 | 1) => {
+    carousel.current?.scrollBy({ left: dir * 264, behavior: "smooth" });
   };
 
   const previewTheme = (id: Theme) =>
@@ -286,6 +325,11 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
       role="dialog"
       aria-label="Welcome to Novella"
     >
+      {introBg && (
+        <div className="intro-bg" aria-hidden>
+          <div className="intro-bg-img" style={{ backgroundImage: `url(${introBg})` }} />
+        </div>
+      )}
       <div className="intro-glow" aria-hidden />
 
       {screenIdx > 0 && (
@@ -297,7 +341,7 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
       )}
 
       <button className="intro-later" onClick={finish}>
-        Set up later
+        Skip introduction
       </button>
 
       <div className="intro-stage">
@@ -370,6 +414,61 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
               </div>
             )}
 
+            {screen.input === "backdrop" && (
+              <div className="intro-backdrop-pick">
+                <div className="intro-carousel-wrap">
+                  <button
+                    className="intro-carousel-arrow"
+                    onClick={() => scrollCarousel(-1)}
+                    aria-label="Previous backdrops"
+                  >
+                    ‹
+                  </button>
+                  <div className="intro-carousel" ref={carousel}>
+                    {BACKDROP_PRESETS.map((p) => (
+                      <button
+                        key={p.id}
+                        className={`intro-bg-card ${
+                          loadPersonalization().bgImage === presetMarker(p.id) ? "on" : ""
+                        }`}
+                        style={{ backgroundImage: `url(${p.url})` }}
+                        onClick={() => answerBackdrop(presetMarker(p.id))}
+                      >
+                        <span className="intro-bg-name">{p.name}</span>
+                      </button>
+                    ))}
+                    <label className="intro-bg-card intro-bg-upload">
+                      <span className="intro-bg-plus" aria-hidden>
+                        +
+                      </span>
+                      <span className="intro-bg-name">Your own image</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        hidden
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          void toBannerDataUrl(file, 1600).then((url) => answerBackdrop(url));
+                          e.target.value = "";
+                        }}
+                      />
+                    </label>
+                  </div>
+                  <button
+                    className="intro-carousel-arrow"
+                    onClick={() => scrollCarousel(1)}
+                    aria-label="More backdrops"
+                  >
+                    ›
+                  </button>
+                </div>
+                <button className="intro-quiet" onClick={skipBackdrop}>
+                  Keep it bare
+                </button>
+              </div>
+            )}
+
             {screen.input === "ai" &&
               (ai === null || ai === "checking" ? (
                 <button
@@ -415,6 +514,16 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
 
         {steps && (
           <div className="intro-steps" aria-live="polite">
+            {/* The cat is decoration; the list below is the truth. */}
+            <div className="intro-cat-wrap" aria-hidden>
+              <picture>
+                <source srcSet={catStill} media="(prefers-reduced-motion: reduce)" />
+                <img src={catGif} className="intro-cat" alt="" />
+              </picture>
+              <p className="intro-gerund" key={gerundTick}>
+                {gerundAt(gerundTick)}…
+              </p>
+            </div>
             {steps.map((s, i) => (
               <p key={i} className={`intro-step ${s.done ? "done" : ""}`}>
                 <span className="intro-step-mark">{s.done ? "✓" : "·"}</span> {s.label}

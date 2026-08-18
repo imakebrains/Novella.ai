@@ -885,6 +885,31 @@ scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
 
+- 2026-08-18 — The intro, rounder (session; owner round 11). Words now
+  flow instead of popping: the streaming fade went from 80ms to a long
+  overlapping 380ms with a soft rise and unblur, so several words are
+  mid-arrival at once (reduced motion still gets everything instantly).
+  Top-right button now reads "Skip introduction". New intro screen
+  after the theme pick: a backdrop carousel — five bundled scenes
+  (Alpine trail, Golden hour, Twin suns, Ink moon, Red maple — four new
+  preset images added everywhere presets appear, Settings included),
+  an upload-your-own card, arrows, scroll-snap, and "Keep it bare" —
+  and the chosen scene shows through the welcome screen itself in the
+  same frame, blurred and scrimmed, the same live-answer promise as the
+  accent recolor. The project-creation interstitial gained the loading
+  cat: a 2KB looping gif over rotating absurd gerunds ("Promulgating…
+  Onionizing… Loading, honestly") while the REAL steps keep reporting
+  truthfully beside it; reduced motion swaps in a still. Returning-path
+  screen selection now goes by id, not slice index, so it keeps the new
+  screen. Also: a + button on the Tasks panel — appends a real `- [ ]`
+  line to the active note (or a "Tasks" note created on first use), no
+  hidden store. Verified live: carousel renders all six cards, picking
+  Ink moon stores 13 bytes and repaints the intro behind the words, cat
+  assets load, task append shows in the lens and cleans up. 281 checks
+  green; the cat interstitial's full project-creation run wasn't
+  exercised against the owner's profile — code + assets verified, one
+  human first-run watch still owed.
+
 - 2026-08-18 — Backdrop follow-ups (session; owner feedback on the live
   build). The seam between panes showed the raw backdrop as a bright
   stripe running floor to ceiling — the resizer was transparent between

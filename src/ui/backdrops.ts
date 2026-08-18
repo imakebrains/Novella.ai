@@ -1,4 +1,8 @@
 import alpine from "../assets/backdrop-alpine.webp";
+import goldenhour from "../assets/backdrop-goldenhour.webp";
+import inkmoon from "../assets/backdrop-inkmoon.webp";
+import maple from "../assets/backdrop-maple.jpg";
+import suns from "../assets/backdrop-suns.jpg";
 
 /* Bundled backdrops — a starting point, not a gallery.
 
@@ -16,6 +20,10 @@ export interface BackdropPreset {
 
 export const BACKDROP_PRESETS: BackdropPreset[] = [
   { id: "alpine", name: "Alpine trail", url: alpine },
+  { id: "goldenhour", name: "Golden hour", url: goldenhour },
+  { id: "suns", name: "Twin suns", url: suns },
+  { id: "inkmoon", name: "Ink moon", url: inkmoon },
+  { id: "maple", name: "Red maple", url: maple },
 ];
 
 const PREFIX = "preset:";

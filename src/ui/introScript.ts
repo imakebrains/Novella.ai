@@ -10,6 +10,7 @@ export type IntroInput =
   | "name" // the only free-text field
   | "color" // swatch chips
   | "theme" // genre chips, hover previews live
+  | "backdrop" // the scene carousel — presets, upload, or none
   | "ai" // the honest local-AI check
   | "preset" // first-project cards
   | "enter"; // returning writers: no project creation, just the door
@@ -53,9 +54,16 @@ export const INTRO_SCRIPT: IntroScreen[] = [
     input: "theme",
   },
   {
-    id: "ai",
+    id: "backdrop",
     lines: [
       "{{themeAck}}",
+      "Some writers like a view behind the page. Pick one, bring your own — or keep it bare.",
+    ],
+    input: "backdrop",
+  },
+  {
+    id: "ai",
+    lines: [
       "One more thing. Novella can write alongside you with a local AI — if you have one.",
     ],
     input: "ai",
@@ -89,11 +97,33 @@ export const INTRO_SWATCHES = [
 ];
 
 /* ---- timing (§3) ----
-   Constant-rate word streaming: never bursty, never jittered. */
+   Constant-rate word streaming: never bursty, never jittered. The fade
+   is long and overlapping — several words are mid-arrival at once, so
+   lines flow in instead of popping (owner feedback, 2026-08-18). */
 export const WORD_MS = 35;
-export const WORD_FADE_MS = 80;
-export const LINE_GAP_MS = 350;
+export const WORD_FADE_MS = 380;
+export const LINE_GAP_MS = 300;
 export const INPUT_DELAY_MS = 500;
+
+/* ---- the loading cat's vocabulary ----
+   Whimsy with a straight face: absurd gerunds under a giggling cat
+   while the REAL steps report honestly beside it. Rotation is pure so
+   it can be tested; the last entry admits the truth. */
+export const INTRO_GERUNDS = [
+  "Promulgating",
+  "Onionizing",
+  "Percolating",
+  "Foreshadowing",
+  "Inkwelling",
+  "Sharpening pencils",
+  "Binding the spine",
+  "Loading, honestly",
+];
+
+export function gerundAt(tick: number): string {
+  const i = ((tick % INTRO_GERUNDS.length) + INTRO_GERUNDS.length) % INTRO_GERUNDS.length;
+  return INTRO_GERUNDS[i]!;
+}
 
 export function wordsOf(line: string): string[] {
   return line.split(/\s+/).filter(Boolean);
