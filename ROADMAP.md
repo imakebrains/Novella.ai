@@ -522,6 +522,20 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       type.ai still has no dated changelog, Longform's Obsidian plugin is
       still frozen at its March 2025 release, and no NaNoWriMo-successor
       consolidation news surfaced.
+      Research round 33 (2026-08-18) ran the same four-pillar check a
+      nineteenth time (rounds 15, 17-33) and again found no match. One new
+      entrant: Laterpress (laterpress.com), an "AI-native fiction and
+      script editor" with a worldbuilding wiki (character/lore cards) and
+      a direct-publish/reader feature — but its AI is explicitly cloud (its
+      own site: "the best available models from OpenAI and Anthropic"),
+      and no task tracker or focus/sprint timer was found anywhere in its
+      feature set, comparison pages, or reviews. Fails on both the local-AI
+      and the fourth-app requirement; doesn't close the gap. Nineteen
+      dedicated rechecks with the same negative result is worth an owner
+      decision rather than a twentieth silent rerun: keep re-running this
+      exact narrow compound check every round, or retire/space it out in
+      favor of a broader "any new indie novel-app launch" sweep. Flagging
+      the choice, not making it unilaterally.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -620,7 +634,15 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       debunked a search-summary claim of an Aug 13 Campfire mobile
       logout-bug fix — a direct follow-up found no such update and the
       app still listed at v1.3.2 (June 2026); treat that claim as
-      unconfirmed if it resurfaces.
+      unconfirmed if it resurfaces. Research round 33 (2026-08-18) upgrades
+      that from unconfirmed to actively disconfirmed: the only real
+      "Campfire logout bug fixed" changelog entry findable traces to an
+      unrelated product called "ONCE — Campfire," not campfirewriting.com's
+      Campfire Write — the likely source of the round-32 false signal. The
+      iOS App Store listing confirms Campfire Write is still v1.3.2, last
+      updated June 29, 2026, changelog text only "Bugfixes and performance
+      improvements" — the mid-sentence-reset/cursor-jump bug tracked since
+      round 14 still has no confirmed fix. Treat the Aug 13 claim as dead.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent
@@ -715,6 +737,22 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       step, the case itself runs for months more. Nothing new for copy yet;
       both dates now fall inside the next research cycle, so next round
       should have real outcomes to report instead of dates to watch.
+      Research round 33 (2026-08-18) checked both dates again: still
+      pending — no Bartz appeal filed per the most recent (Aug 7) coverage,
+      with the window closing tomorrow and Class Counsel still only
+      guiding "end of August" for the claims portal with no firmer date;
+      Kadrey's mediation report is three days out with nothing filed yet.
+      Re-check after both pass. One genuinely new data point: the round-31
+      tracker-level mention of opted-out Bartz authors suing other AI
+      companies is now primary-sourced — Carreyrou et al. v. Anthropic PBC
+      et al. (N.D. Cal., docket 3:25-cv-10897, filed 2025-12-22): six
+      authors who opted out of the Bartz settlement, including Pulitzer
+      winner John Carreyrou, suing Anthropic, OpenAI, Google, Meta, xAI,
+      and Perplexity together, seeking $150,000 per work in statutory
+      damages. Verified via PacerMonitor, Justia, and Bloomberg Law rather
+      than resting on a secondary tracker. Not a new filing (Dec 2025), but
+      a second real, named lawsuit alongside Bartz/Kadrey worth having if
+      copy ever needs more than one case to cite.
 - [ ] **Say the export advantage louder** — research round 7: Sudowrite
       reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
       Novella already ships all three plus one-click backup
@@ -788,7 +826,18 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       actually is. One-line, no-risk copy fix (this is the optional
       cloud-AI path, not the local-first default, so it doesn't touch the
       thesis — just don't undersell a real model advantage to writers who
-      do opt in).
+      do opt in). Research round 33 (2026-08-18) finds NovelCrafter doing
+      writer-facing model guidance we don't: its Aug 5, 2026 blog post
+      "Claude Opus 5 for Writers" advises writers against Opus 5 for prose
+      (overwrought language, quality decay on longer output, verbatim
+      repetition of input, higher cost from its new tokenizer) and
+      recommends Opus 4.6 instead. Checked our own catalog again — we
+      don't list Opus 5 at all (`claude-opus-4-8`, `claude-opus-4-7`,
+      `claude-fable-5`, `claude-sonnet-5`, `claude-opus-4-6`,
+      `claude-sonnet-4-6`, `claude-haiku-4-5`), so the specific pitfall
+      doesn't apply — but it's a reminder that a competitor is publishing
+      real model-quality guidance as content and we aren't; the blurb-
+      quality gap this item already tracks is still the actionable piece.
 - [ ] **Scope offline grammar/spelling checking** — research round 7,
       flagged not committed: Dabble Premium (ProWritingAid) and type.ai
       both lean on live grammar checking; our Critique tab covers style
@@ -871,6 +920,44 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-08-18 — Research round 33 (autopilot; no code). Housekeeping first:
+  the session started with HEAD detached at round 32's commit; a fetch of
+  `origin/main` initially appeared to show 11 commits of local-only history
+  (rounds 28-32 plus several feature commits) — the same unpushed-commits
+  failure mode flagged in rounds 24/29/30/31 — but a *second*, real fetch
+  showed `origin/main` already matched local HEAD exactly; the first read
+  was a stale ref left over from container clone time, not an actual push
+  failure. Re-attached HEAD to `main` tracking `origin/main` and confirmed
+  clean. Worth noting for whoever next debugs this class of issue: always
+  re-fetch before trusting a cached `origin/main` ref, since a stale ref
+  can look identical to a real unpushed-commits problem. Sixth consecutive
+  thin/dry research round (28-33), but not empty this time: dispatched the
+  same four parallel research passes as prior rounds, each briefed on
+  rounds 1-32's findings and searching for material dated after round 32's
+  2026-08-17 cutoff. Four small, honest findings folded into existing
+  "Next up" items rather than a new one: (1) a previously-missed
+  NovelCrafter Aug 5, 2026 blog post advising writers against Opus 5 for
+  prose (recommends Opus 4.6 instead) — checked our own model catalog,
+  we don't list Opus 5 at all, so the specific pitfall doesn't apply, but
+  it's a reminder NovelCrafter publishes writer-facing model guidance we
+  don't — folded into the Fable-5-blurb item. (2) Carreyrou et al. v.
+  Anthropic (six Bartz opt-outs incl. Pulitzer winner John Carreyrou,
+  suing six AI companies together) converted from tracker-level mention to
+  primary-sourced via PacerMonitor/Justia/Bloomberg Law — folded into the
+  no-training/privacy item, alongside confirmation both watched litigation
+  dates (Bartz appeal closes 2026-08-19, Kadrey mediation report due
+  2026-08-21) are still pending. (3) Round 32's own "Aug 13 Campfire
+  logout fix" footnote is now actively disconfirmed, not just unconfirmed
+  — traced to an unrelated product ("ONCE — Campfire") — corrected in the
+  no-outage-advantage item. (4) The four-pillar competitive check (local
+  AI + task tracker + focus timer + worldbuilding) ran a nineteenth
+  dedicated recheck and again found no match; one new entrant, Laterpress
+  (cloud AI, no task/timer), doesn't close it — folded into the
+  four-app-bundle item along with a flagged owner decision: keep
+  re-running this exact narrow check every round, or retire/space it out.
+  Dabble/Scrivener/Campfire pass came back fully dry beyond the Campfire
+  correction above. Full notes in RESEARCH.md Round 33.
 
 - 2026-08-16 — Research round 31 (autopilot; no code). Housekeeping first:
   the session started with HEAD detached nine commits ahead of

@@ -3876,3 +3876,208 @@ way.
 - Copyright Alliance, Authors Guild, TAA blog, JURIST, Authors Alliance (Bartz v. Anthropic)
 - McKool Smith AI litigation updates, CourtListener docket page (Kadrey v. Meta)
 - github.com/haowjy/creative-writing-skills
+
+# Round 33 (2026-08-18) — cadence, sixth consecutive thin round, but not empty
+
+Same brief as rounds 28-32: fresh reviews, feature announcements, and
+complaints for NovelCrafter, Sudowrite, Dabble, Scrivener, Campfire,
+type.ai, Obsidian-for-writers setups, and Notion writing templates,
+checked against everything already logged through round 32. Dispatched
+four parallel passes (NovelCrafter/Sudowrite; Dabble/Scrivener/Campfire;
+type.ai/Obsidian/Notion/new-entrant scan; industry/legal sentiment
+including the two litigation dates round 31/32 flagged as imminent), each
+briefed on the relevant standing findings and told to search for material
+dated strictly after round 32's 2026-08-17 cutoff.
+
+**Housekeeping, resolved as a false alarm.** The session started with HEAD
+detached at round 32's own commit. An initial `git rev-parse origin/main`
+appeared to show local HEAD 11 commits ahead of `origin/main` — the same
+unpushed-commits pattern flagged in rounds 24, 29, 30, and 31 — but that
+read used a cached ref left over from container clone time. A genuine
+`git fetch origin main` immediately after showed `origin/main` already
+matched local HEAD exactly; nothing was actually unpushed this round.
+Re-attached HEAD to `main` tracking `origin/main` and confirmed clean.
+Worth a note for whoever next debugs this recurring class of issue:
+`git rev-parse origin/main` without a preceding `git fetch` can return a
+stale cached ref that looks identical to a real divergence — always fetch
+first before concluding commits are missing from the remote.
+
+This round was not fully dry, unlike three of the last five (28, 29, and
+substantively 32) — all four passes returned at least one genuinely new,
+dated, or newly-primary-sourced item, though none individually cleared the
+bar for a brand-new "Next up" checklist item; all four folded into
+existing items.
+
+## NovelCrafter / Sudowrite
+
+**New find, previously missed:** NovelCrafter published a blog post on
+2026-08-05, "Claude Opus 5 for Writers"
+(novelcrafter.com/blog/opus-5-for-writers, by Kate), with a companion
+"Novelcrafter Live" YouTube video the same week ("Is Opus 5 an upgrade for
+writers?"). The verdict: don't use Opus 5 for prose generation. Cited
+reasons — overwrought/flowery language, over-explained emotions, quality
+degradation on longer outputs, verbatim repetition of input text, a strong
+inherent "voice" that resists style guidance, and higher token cost from
+Opus 5's new tokenizer with no proportional quality gain. Opus 5 rates
+well for brainstorming, outlining, and logic-gap-spotting — just not
+drafting. NovelCrafter recommends Opus 4.6 for prose instead. This
+postdates the "last real blog post = June 11 2026" note carried since
+round 28 — the changelog itself (feedback.novelcrafter.com/changelog)
+is still stuck at March 21, 2026, so this is blog-only activity, not a
+product change. Checked our own `src/ai/models.ts` against the claim: our
+catalog lists `claude-opus-4-8`, `claude-opus-4-7`, `claude-fable-5`,
+`claude-sonnet-5`, `claude-opus-4-6`, `claude-sonnet-4-6`, and
+`claude-haiku-4-5` — no Opus 5 at all — so the specific pitfall NovelCrafter
+warns about doesn't apply to us, and the model they do recommend (Opus
+4.6) is already in our catalog. Folded into the Fable-5-blurb item as a
+reminder that a competitor is publishing real writer-facing model
+guidance as content, something we don't currently do.
+
+Sudowrite: re-checked status.sudowrite.com (all incidents still stop at
+the Aug 11 partial outage, operational since) and the changelog
+(feedback.sudowrite.com/changelog, still tops out at the Aug 14 "Improved
+Draft Estimates" entry). One minor previously-unquoted detail on the
+already-logged Aug 3 entry: the GPT-5.6 credit-cost cuts (Luna -70%,
+Terra -10%, GPT-5.5 -12%) are a straight pass-through of an OpenAI price
+cut, not a Sudowrite-initiated discount — worth knowing but not new enough
+to log as its own item. "Story Engine 3.0" and "Developer API" rumors:
+still uncorroborated by any primary source; treating both as dead per
+prior rounds' conclusion.
+
+## Dabble / Scrivener / Campfire
+
+Dabble: no blog or Trustpilot content dated after round 32. A Trustpilot
+search for "Dabble" mostly surfaces an unrelated sports-betting company
+(dabble.com.au / dabble.co.uk) — a naming collision worth remembering so
+a future round doesn't misattribute that company's reviews to the writing
+app. dabblewriter.com's own Trustpilot page shows nothing beyond the
+already-logged "deleted book / slow support" complaint.
+
+Scrivener: Literature & Latte's own Scrivener 4 forum thread
+(forum.literatureandlatte.com/t/scrivener-4/138792) still shows its most
+recent post from January 20, 2024, with L&L's standing "we don't comment
+on future product plans" line — no Scrivener 4 date anywhere, consistent
+with rounds 31-32's confirmed 3.5.0 (macOS) / 3.1.6 (Windows) versions.
+
+Campfire — the one real correction this round. Round 32 logged a
+"claimed Aug 13, 2026 mobile logout-bug fix" as unconfirmed. This round
+found the actual source: a changelog entry for logout-bug fixes belongs to
+an entirely different product, "ONCE — Campfire" (once.com/campfire/
+changelog) — not campfirewriting.com's Campfire Write at all, just a name
+collision. The iOS App Store listing for the real Campfire Write
+(apps.apple.com/us/app/campfire-write-your-book/id1626123915) confirms it
+is still v1.3.2, last updated June 29, 2026, changelog text only
+"Bugfixes and performance improvements" — no mention of logout, cursor-
+jump, or sync fixes. Also checked campfirewriting.com/learn directly:
+"Update 41" (Encyclopedia Overhaul) and "Update 42" (Custom Attributes/
+Panel Effects/Navigation) are both dated May 26, 2026, predating the
+already-logged "State of the Campfire: 2026" roadmap post and the June 10
+mobile-bug report — not new. The mid-sentence-reset/cursor-jump bug
+tracked since round 14 still has no confirmed fix. Upgraded from
+"unconfirmed" to "actively disconfirmed" in the no-outage-advantage item.
+
+## type.ai / Obsidian / Notion / new entrants
+
+type.ai: still no changelog or release-notes page found — same as every
+round since this cadence began.
+
+Obsidian: Longform still frozen at v2.1.0 (2025-03-20, no 2026 release).
+Novel Word Count, StoryLine, and Noveler show no update activity beyond
+what's already logged. WebNovel Assistant's GitHub repo shows "updated ~1
+month ago" (mid-July 2026) — no new commits since, still zero-AI.
+
+Notion: no writer complaint thread surfaced this round either. A Reddit-
+specific search returned only Gumroad template listings, several
+positively reviewed (e.g. Johan Dahlberg's $39 "Notion Novel Writing
+Template," called "the most comprehensive and thought-out" by a reviewer)
+— reinforces that the Notion angle remains an open copy opportunity, not
+a documented pain point to cite by name.
+
+**Four-pillar check, nineteenth recheck (rounds 15, 17-33):** again no
+match. One new entrant found: Laterpress (laterpress.com), an "AI-native
+fiction and script editor" — a worldbuilding wiki (character/lore cards
+across 10 categories), outlining, drafting, editing, plus a direct-
+publish/reader feature. Checked directly against the four pillars: its AI
+is explicitly cloud ("AI tools use the best available models from OpenAI
+and Anthropic," per its own site — not local), and no task tracker or
+focus/sprint timer was found in any of three separate searches (its own
+site, review sites, comparison pages). Fails both the local-AI requirement
+and the fourth-app requirement — does not close the gap. Given nineteen
+consecutive dedicated rechecks landing on the same negative result, this
+round is flagging (not deciding) whether the check should keep running at
+full frequency every round, or move to a lighter/wider "any new indie
+novel-app launch" sweep instead — see the item in ROADMAP.md for the
+framing left for the owner.
+
+## Industry / legal sentiment
+
+Checked both dates flagged as imminent by rounds 31-32 directly, as
+instructed:
+
+1. **Bartz v. Anthropic** — the 30-day appeal window on the $1.5B
+   settlement's final approval closes 2026-08-19 (tomorrow, at time of this
+   round). No appeal has been filed or reported as of the most recent
+   coverage (TAA blog, published 2026-08-07) — status is "pending, nothing
+   filed." If the window closes clean, Class Counsel still only guides "by
+   the end of August 2026" for the claims portal, no firmer date. Payments
+   go out in two tranches (~70%/~30%) through September 2027 once an
+   Effective Date is set.
+2. **Kadrey v. Meta** — the mediation-outcome report due 2026-08-21 (three
+   days out) has nothing filed yet, as expected this early. Non-expert
+   discovery still runs to Sept 21, 2026 and expert discovery to Nov 9,
+   2026 — a clean mediation report would only clear one procedural
+   checkpoint, not resolve the case.
+
+Both need a direct re-check after their respective dates pass — next
+round should have real outcomes, not more "still pending."
+
+**New, primary-sourced:** the round-31 tracker-level mention of opted-out
+Bartz authors suing other AI companies is now confirmed with primary
+sources. *Carreyrou et al. v. Anthropic PBC et al.* (N.D. Cal., docket
+3:25-cv-10897, filed 2025-12-22): six authors who opted out of the Bartz
+settlement — including Pulitzer Prize winner John Carreyrou — suing
+Anthropic, OpenAI, Google, Meta, xAI, and Perplexity together, seeking
+$150,000 per work in statutory damages. Verified via PacerMonitor, Justia,
+and Bloomberg Law (not just an aggregator). Note for future rounds: don't
+conflate this with "Doe v. Perplexity AI" (3:26-cv-02803), a separate,
+unrelated privacy/tracking suit that surfaced in the same search sweep.
+Not a new filing (it predates this cadence), but a second real, named
+multi-defendant lawsuit worth having alongside Bartz/Kadrey if copy ever
+needs more than one case to point to.
+
+EU AI Act Article 53: enforcement powers went live 2026-08-02 (before this
+round's window) and the first fines (~€47M combined across three
+companies) have already landed — but those were high-risk-system
+violations (hiring/lending/retail contexts), not GPAI-training/copyright
+related, so not directly relevant to Novella's framing. No new outage
+report for Notion, Google Docs, or any competitor dated after 2026-08-17.
+No new author-training survey wave.
+
+## What changed in ROADMAP.md
+
+No brand-new checklist item — four findings folded into existing items
+instead: (1) the NovelCrafter Opus-5-for-writers blog post, folded into
+the Fable-5-blurb item with confirmation our own catalog doesn't list
+Opus 5 at all; (2) Carreyrou v. Anthropic now primary-sourced, plus
+confirmation both watched litigation dates are still pending, folded into
+the no-training/privacy item; (3) the Campfire "Aug 13 logout fix" claim
+upgraded from unconfirmed to actively disconfirmed (traced to an unrelated
+product), correcting round 32's own footnote in the no-outage-advantage
+item; (4) the four-pillar check's nineteenth negative recheck plus the new
+Laterpress near-miss, folded into the four-app-bundle item along with a
+flagged (not decided) question about whether to keep running that specific
+check at full frequency.
+
+## Round 33 sources
+
+- novelcrafter.com/blog/opus-5-for-writers, YouTube "Novelcrafter Live" (Opus 5 review), feedback.novelcrafter.com/changelog
+- status.sudowrite.com, feedback.sudowrite.com/changelog
+- Trustpilot (Dabble, ambiguous/blocked), dabblewriter.com
+- forum.literatureandlatte.com/t/scrivener-4/138792, literatureandlatte.com/scrivener/release-notes
+- apps.apple.com (Campfire Write iOS listing), campfirewriting.com/learn, once.com/campfire/changelog
+- type.ai, Obsidian community plugin pages (Longform, Novel Word Count, StoryLine, Noveler), github.com/HatanoChihiro/obsidian-webnovel-assistant
+- Gumroad (Notion novel-writing templates), Reddit search
+- laterpress.com and its review/comparison coverage
+- blog.taaonline.net (Bartz v. Anthropic), authorsalliance.org
+- PacerMonitor, Justia, Bloomberg Law (Carreyrou et al. v. Anthropic PBC et al., 3:25-cv-10897)
+- EU AI Act Article 53 enforcement coverage
