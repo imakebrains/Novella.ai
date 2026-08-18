@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  FINALE_MS,
   INTRO_SCRIPT,
   INTRO_SWATCHES,
   LINE_GAP_MS,
@@ -179,9 +180,10 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
     markIntroSeen();
     localStorage.setItem("novella.welcomed", "1");
     setClosing(true);
-    // Let the fade finish before the unmount — the workspace is already
-    // painted underneath, so this is a reveal, not a load.
-    setTimeout(onDone, 420);
+    // Let the exit finish before the unmount — the workspace is already
+    // painted underneath, so this is a reveal, not a load. The exit is a
+    // slow zoom-and-blur; the timeout matches its CSS duration.
+    setTimeout(onDone, 820);
   }, [onDone]);
 
   /* ---- answers ---- */
@@ -199,17 +201,17 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
     advance();
   };
 
-  const answerBackdrop = (stored: string) => {
+  /* Picking a scene previews it in place — this very screen repaints —
+     and Continue confirms when the writer is done looking. */
+  const previewBackdrop = (stored: string) => {
     savePersonalization({ ...loadPersonalization(), bgImage: stored });
     setIntroBg(resolveBackdrop(stored) ?? null);
-    advance();
   };
-  const skipBackdrop = () => {
+  const clearBackdrop = () => {
     const p = { ...loadPersonalization() };
     delete p.bgImage;
     savePersonalization(p);
     setIntroBg(null);
-    advance();
   };
   const scrollCarousel = (dir: -1 | 1) => {
     carousel.current?.scrollBy({ left: dir * 264, behavior: "smooth" });
@@ -245,6 +247,7 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
      Each line checks off when its actual operation completes. If it all
      takes under a second (it will), the list holds a beat so it reads. */
   const answerPreset = async (presetId: string) => {
+    const started = performance.now();
     const preset = presetById(presetId);
     const title = "My first book";
     const themeName = THEMES.find((t) => t.id === committedTheme)?.name ?? "Ember";
@@ -286,8 +289,11 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
         setSteps(null);
         return;
       }
-      // Hold so the completed list is readable, then hand off.
-      setTimeout(finish, 700);
+      // The cat holds the stage for its full moment — real work usually
+      // finishes in under a second, so the balance is pure curtain time
+      // before the zoom-out into the workspace.
+      const elapsed = performance.now() - started;
+      setTimeout(finish, Math.max(700, FINALE_MS - elapsed));
     } catch {
       setSteps(null);
     }
@@ -303,12 +309,15 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
     return (
       <p key={`${screenIdx}-${i}`} className={`intro-line ${isCurrent ? "streaming" : "done"}`}>
         {words.map((w, j) => (
-          <span
-            key={j}
-            className="intro-word"
-            style={isCurrent ? { animationDelay: `${j * WORD_MS}ms` } : undefined}
-          >
-            {w}{" "}
+          // The space lives OUTSIDE the span: an inline-block trims its
+          // own trailing whitespace, which once fused every word together.
+          <span key={j}>
+            <span
+              className="intro-word"
+              style={isCurrent ? { animationDelay: `${j * WORD_MS}ms` } : undefined}
+            >
+              {w}
+            </span>{" "}
           </span>
         ))}
       </p>
@@ -344,7 +353,15 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
         Skip introduction
       </button>
 
-      <div className="intro-stage">
+      {screenIdx > 0 && !steps && !closing && (
+        <button className="intro-back" onClick={() => setScreenIdx((i) => Math.max(0, i - 1))}>
+          ‹ Back
+        </button>
+      )}
+
+      {/* Keyed on the screen so each question arrives as its own scene —
+          a slow rise instead of an instant swap. */}
+      <div className="intro-stage" key={screenIdx}>
         {lines.map((l, i) => renderLine(l, i))}
         {aiLine && screen.input === "ai" && ready && (
           <p className="intro-line done intro-ai-result">{glueOrphans(aiLine)}</p>
@@ -432,7 +449,7 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
                           loadPersonalization().bgImage === presetMarker(p.id) ? "on" : ""
                         }`}
                         style={{ backgroundImage: `url(${p.url})` }}
-                        onClick={() => answerBackdrop(presetMarker(p.id))}
+                        onClick={() => previewBackdrop(presetMarker(p.id))}
                       >
                         <span className="intro-bg-name">{p.name}</span>
                       </button>
@@ -449,7 +466,7 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (!file) return;
-                          void toBannerDataUrl(file, 1600).then((url) => answerBackdrop(url));
+                          void toBannerDataUrl(file, 1600).then((url) => previewBackdrop(url));
                           e.target.value = "";
                         }}
                       />
@@ -463,9 +480,14 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
                     ›
                   </button>
                 </div>
-                <button className="intro-quiet" onClick={skipBackdrop}>
-                  Keep it bare
-                </button>
+                <div className="intro-backdrop-actions">
+                  <button className="intro-quiet" onClick={clearBackdrop}>
+                    Keep it bare
+                  </button>
+                  <button className="intro-primary" onClick={advance}>
+                    Continue
+                  </button>
+                </div>
               </div>
             )}
 

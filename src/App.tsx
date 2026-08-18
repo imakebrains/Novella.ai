@@ -92,7 +92,13 @@ export default function App() {
       // The welcome runs once for everyone — returning writers see it too
       // (their projects and settings are untouched; it's presentation).
       // Settings can replay it any time.
-      if (introPending()) setIntroOpen(true);
+      // The welcome is for first arrivals. A writer with books already
+      // on the shelf goes straight to them — the intro stays reachable
+      // from Settings → About → Replay (owner round 12).
+      if (introPending()) {
+        if (projectStore.all().length === 0) setIntroOpen(true);
+        else localStorage.setItem("novella.introSeen", "1");
+      }
 
       // Resume where the writer left off. Before this, every launch loaded
       // the demo world into memory even when their real project was one

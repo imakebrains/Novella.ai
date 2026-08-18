@@ -100,10 +100,14 @@ export const INTRO_SWATCHES = [
    Constant-rate word streaming: never bursty, never jittered. The fade
    is long and overlapping — several words are mid-arrival at once, so
    lines flow in instead of popping (owner feedback, 2026-08-18). */
-export const WORD_MS = 35;
-export const WORD_FADE_MS = 380;
-export const LINE_GAP_MS = 300;
+export const WORD_MS = 70;
+export const WORD_FADE_MS = 650;
+export const LINE_GAP_MS = 500;
 export const INPUT_DELAY_MS = 500;
+
+/** The cat's minimum hold at the finale — long enough to land as a
+    moment, short enough to stay a joke. Real work runs inside it. */
+export const FINALE_MS = 5500;
 
 /* ---- the loading cat's vocabulary ----
    Whimsy with a straight face: absurd gerunds under a giggling cat
