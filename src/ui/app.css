@@ -3529,9 +3529,61 @@ body.focus-mode .cm-editor {
   font-size: var(--text-sm);
   cursor: pointer;
 }
+/* Sliders, designed — the native control looked janky next to the
+   round-9 finish (owner round 10, item 3). Track and thumb are drawn
+   by us in both engines; the thumb speaks the app's press language. */
+input[type="range"] {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 22px;
+  background: transparent;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--border-strong) 80%, transparent);
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -6px;
+  border: 2px solid var(--bg-raised);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--motion-quick) var(--ease-enter),
+    box-shadow var(--motion-quick) var(--ease-enter);
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: var(--glow-accent);
+}
+input[type="range"]:active::-webkit-slider-thumb {
+  transform: scale(0.95);
+}
+input[type="range"]::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--border-strong) 80%, transparent);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--bg-raised);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: var(--shadow-sm);
+}
+input[type="range"]:focus-visible {
+  outline: none;
+}
+input[type="range"]:focus-visible::-webkit-slider-thumb {
+  box-shadow: var(--focus-ring);
+}
 .personalize-row input[type="range"] {
   max-width: 220px;
-  accent-color: var(--accent);
 }
 .personalize-row input[type="color"] {
   width: 44px;
@@ -5453,7 +5505,14 @@ body.focus-mode .cm-editor {
   width: min(680px, calc(100% - 2 * var(--space-6)));
   display: flex;
   flex-direction: column;
+  /* Center-justified (owner round 10, item 5): the words arrive on the
+     axis of the screen, the way a title page sits. */
+  align-items: center;
+  text-align: center;
   gap: var(--space-4);
+}
+.intro-answers {
+  justify-content: center;
 }
 
 .intro-line {
@@ -5933,9 +5992,27 @@ body.focus-mode .cm-editor {
 .backdrop {
   position: fixed;
   inset: 0;
-  z-index: 0;
+  /* Behind the workspace, not over it. z-index 0 + last-in-DOM made the
+     image paint above every z-auto surface — the app "disappeared"
+     behind its own wallpaper (owner round 10, item 1). Negative z plus
+     a transparent body (below) is the standard fixed-wallpaper recipe. */
+  z-index: -1;
   pointer-events: none;
   overflow: hidden;
+}
+/* body paints --bg-app, which would sit on top of a negative-z layer.
+   With a backdrop chosen, the canvas steps aside and the glass panes
+   carry the legibility instead. */
+:root.has-backdrop body {
+  background: transparent;
+}
+/* Embedded, not competing: the image is dimmed toward the theme's own
+   ground so text surfaces never fight it. */
+.backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--bg-app) 45%, transparent);
 }
 .backdrop-img {
   position: absolute;

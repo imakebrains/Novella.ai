@@ -66,7 +66,6 @@ const THEME_ACK: Record<Theme, string> = {
   vellum: "Vellum it is. Parchment and bronze, like a found manuscript.",
   nocturne: "Nocturne it is. Deep water. Something waits under it.",
   driftwood: "Driftwood it is. Coffee-warm and unfussy.",
-  linen: "Linen it is. Morning light and a clear head.",
 };
 
 interface CreationStep {

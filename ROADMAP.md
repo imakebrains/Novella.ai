@@ -42,42 +42,6 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
 
 ## Next up
 
-- [ ] **OWNER ROUND 10 (2026-08-13) — screenshot feedback on round 9; FIX FIRST
-      next session.** The owner reviewed the system pass live and found one
-      real breakage plus four taste calls. Items 1 and 2 are bugs and are
-      CLOUD-OK; the rest are quick and taste-adjacent — do them WITH-OWNER or
-      carefully, and verify visually.
-
-      1. **BUG — backdrop paints OVER the workspace.** With a backdrop image
-         set, closing Settings leaves only the blurred image visible — the
-         whole app is behind it. Cause: `<Backdrop />` mounts after the
-         workspace in App.tsx with `.backdrop { z-index: 0 }`, so in source
-         order it wins over z-auto content; modals (high z) still show, which
-         is why the round-8 probe "verified" glass by computed style without
-         catching the stacking. Fix: `.backdrop { z-index: -1 }` (or mount it
-         first and give `.app` `position: relative; z-index: 1`), then verify
-         by DOM stacking/screenshot, not computed style alone.
-      2. **Backdrop look: "embedded, glassy, darkened."** The image should sit
-         dimmer behind the glass — add a theme-aware scrim layer over
-         `.backdrop-img` (e.g. a `::after` with `var(--scrim-image)` at ~35-45%
-         or color-mix with --bg-app) so text surfaces never fight it.
-      3. **Sliders look janky.** The Appearance range inputs (Size / Line
-         spacing) are native. Style `input[type=range]` properly:
-         `appearance: none`, thin track in `--border-strong`, accent pill
-         thumb with the press/hover language of round 9 (both -webkit- and
-         -moz- pseudo-elements).
-      4. **Ship the owner's appearance as the DEFAULT for new users** (still
-         changeable): Book serif, size 14px, line spacing 1.40, standard
-         width, rounded corners — i.e. make personalize.ts defaults match the
-         2026-08-13 screenshot rather than whatever the current fallbacks are.
-      5. **Intro should be center-justified.** The welcome/cold-open copy is
-         left-aligned; center the intro screens (text + CTA).
-      6. **Linen and Vellum read as the same theme — keep only one.** Owner's
-         words: "linen and vellum are basically the same, only keep one."
-         Keep Vellum (named in the intro/theme cards), remove or fold Linen;
-         migrate any stored `data-theme="linen"` to vellum so nobody loads a
-         dead theme.
-
 - [ ] **OWNER ROUND 5 (2026-08-12) — the type.ai comparison.** Eight changes
       the owner asked for after looking at type.ai. They deferred these to a
       working session ("we will work on this after session usage resets"), so
@@ -1059,6 +1023,26 @@ scale; nothing but use would have caught it.
   commits) — recommend whoever next touches the autopilot script make it
   always start from `git checkout main && git pull` rather than trusting
   whatever ref the container happens to have checked out.
+
+- 2026-08-14 — Owner round 10, all six items (session). The big one: the
+  backdrop image was painting OVER the workspace — z-index 0 plus
+  last-in-DOM beat every z-auto surface, so closing Settings left only
+  wallpaper. Now: `.backdrop` at z-index −1, body/html transparent under
+  `.has-backdrop` (an opaque body covers any negative-z layer), and a
+  theme-tinted 45% scrim on the image so it reads embedded and dimmed
+  behind the glass. Sliders are custom-drawn (4px track, accent thumb
+  with the app's press/hover/focus language) instead of the janky native
+  control. The owner's appearance is now the shipped default for fresh
+  installs — book serif, 14px, 1.4 spacing, standard width, rounded —
+  via a DEFAULTS merge in personalize.ts (reset lands there too, still
+  fully changeable). The intro is center-justified. Linen is retired
+  (near-twin of Vellum): theme registry and cards show four, and a
+  stored "linen" choice migrates to vellum on load. Verified live:
+  4 theme cards render, range appearance:none, defaults merge, linen
+  migration round-trips, backdrop layer chain confirmed transparent
+  rule-by-rule (computed check needed the hidden-pane transition-freeze
+  workaround; browser pane wasn't displayed, so the final eyeball on a
+  real screen is the owner's). 278 checks green, tsc clean.
 
 - 2026-08-13 — The system pass (session; owner round 9). Research first:
   an 8-agent workflow studied Craft/iA/Ulysses/Type.ai, Linear/Raycast/

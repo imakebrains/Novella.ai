@@ -286,44 +286,8 @@
   --type-prompt: #8fa8bb;
 }
 
-/* ============================================================
-   LINEN — morning light, washed cotton, terracotta
-   ============================================================ */
-:root[data-theme="linen"] {
-  --bg-app: #f3e6df;
-  --bg-pane: #faf0ea;
-  --bg-editor: #fffaf6;
-  --bg-raised: #fffaf6;
-  --bg-hover: #eddcd3;
-  --bg-active: #e3cec2;
-
-  --fg-primary: #332722;
-  --fg-secondary: #6a564c;
-  --fg-muted: #9a8579;
-
-  --border: #e5d3c9;
-  --border-strong: #c9ae9f;
-
-  --accent: #b5563a;
-  --accent-soft: rgb(181 86 58 / 0.1);
-  --accent-fg: #fffaf6;
-  --link: #9a4630;
-  --danger: #b03a2e;
-  --success: #5f7d55;
-
-  --shadow-sm: var(--shadow-light-sm);
-  --shadow: var(--shadow-light);
-  --shadow-lg: var(--shadow-light-lg);
-
-  --type-character: #b5563a;
-  --type-location: #5f7d55;
-  --type-lore: #7a5d93;
-  --type-faction: #c07040;
-  --type-object: #a08030;
-  --type-chapter: #a8556e;
-  --type-note: #85756a;
-  --type-prompt: #55738a;
-}
+/* Linen was retired 2026-08 — it read as a near-duplicate of Vellum.
+   useTheme migrates any stored "linen" choice to vellum. */
 
 /* Someone who prefers light and hasn't chosen yet gets Romantasy
    rather than the near-black default. */

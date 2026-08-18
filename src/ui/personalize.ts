@@ -43,11 +43,23 @@ const FONT_STACKS: Record<NonNullable<Personalization["proseFont"]>, string> = {
   mono: `ui-monospace, "Cascadia Code", "Consolas", monospace`,
 };
 
+/* The shipped look (owner-tuned, 2026-08): book serif at 14px with
+   1.4 spacing on a standard page. Every field is still the writer's to
+   change; these are the values a fresh install wakes up with. */
+export const DEFAULTS: Personalization = {
+  proseFont: "serif",
+  proseSize: 14,
+  leading: 1.4,
+  measure: "standard",
+  corners: "rounded",
+};
+
 export function loadPersonalization(): Personalization {
   try {
-    return JSON.parse(localStorage.getItem(KEY) ?? "{}") as Personalization;
+    const stored = JSON.parse(localStorage.getItem(KEY) ?? "{}") as Personalization;
+    return { ...DEFAULTS, ...stored };
   } catch {
-    return {};
+    return { ...DEFAULTS };
   }
 }
 
@@ -72,7 +84,9 @@ export function savePersonalization(p: Personalization): void {
 
 export function resetPersonalization(): void {
   localStorage.removeItem(KEY);
-  applyPersonalization({});
+  // Reset lands on the shipped defaults, not the raw theme values —
+  // loadPersonalization() now merges DEFAULTS under whatever is stored.
+  applyPersonalization(loadPersonalization());
   version++;
   for (const l of listeners) l();
 }

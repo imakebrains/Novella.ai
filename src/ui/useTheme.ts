@@ -1,6 +1,6 @@
 import { useCallback, useSyncExternalStore } from "react";
 
-export type Theme = "ember" | "vellum" | "nocturne" | "driftwood" | "linen";
+export type Theme = "ember" | "vellum" | "nocturne" | "driftwood";
 
 export interface ThemeInfo {
   id: Theme;
@@ -40,13 +40,6 @@ export const THEMES: ThemeInfo[] = [
     dark: true,
     swatch: ["#262220", "#38322e", "#d9a68c"],
   },
-  {
-    id: "linen",
-    name: "Linen",
-    blurb: "Morning light and washed cotton. Quiet and uncluttered.",
-    dark: false,
-    swatch: ["#f3e6df", "#fffaf6", "#b5563a"],
-  },
 ];
 
 const KEY = "novella.theme";
@@ -54,6 +47,12 @@ const VALID = new Set<string>(THEMES.map((t) => t.id));
 
 function initial(): Theme {
   const saved = localStorage.getItem(KEY);
+  // Linen retired 2026-08 (a near-twin of Vellum) — anyone who had
+  // chosen it lands on Vellum rather than a theme that no longer exists.
+  if (saved === "linen") {
+    localStorage.setItem(KEY, "vellum");
+    return "vellum";
+  }
   if (saved && VALID.has(saved)) return saved as Theme;
   // No choice yet: follow the OS, but land on a real theme rather than
   // an abstract "light mode".
