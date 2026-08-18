@@ -7,6 +7,13 @@
       "runtimeArgs": ["run", "dev"],
       "port": 5173,
       "cwd": "C:\\Users\\drewp\\Novella.ai"
+    },
+    {
+      "name": "novella-qa",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "--port", "5199"],
+      "port": 5199,
+      "cwd": "C:\\Users\\drewp\\Novella.ai"
     }
   ]
 }

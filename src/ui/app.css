@@ -5477,7 +5477,13 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
   inset: 0;
   z-index: 90;
   display: grid;
-  place-items: center;
+  /* Top-anchored, not centered: vertical centering re-centers on every
+     mount, so the first line lurched upward as each line and then the
+     answers arrived (measured 26px + 34px). Anchoring the stage to a
+     fixed optical line means content only ever grows downward — nothing
+     already read ever moves. */
+  align-items: start;
+  justify-items: center;
   background: var(--bg-app);
   overflow: hidden;
   opacity: 1;
@@ -5508,6 +5514,9 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
 .intro-stage {
   position: relative;
   width: min(680px, calc(100% - 2 * var(--space-6)));
+  /* The title-page line: every screen's first words land here, and the
+     stage grows downward from it. clamp keeps it sane on short windows. */
+  margin-top: clamp(88px, 26vh, 260px);
   display: flex;
   flex-direction: column;
   /* Center-justified (owner round 10, item 5): the words arrive on the
@@ -6958,4 +6967,15 @@ body {
 .intro-gerund {
   font-size: var(--text-base);
   font-family: var(--font-display);
+}
+
+/* ---- 9.27 the shell never scrolls (QA round) ---- */
+/* An app shell manages its own scrolling; a document scrollbar under
+   the workspace is always a bug. The culprit was subtle: [data-tip]
+   tooltip bubbles sit in layout at opacity 0, and ones near the right
+   edge stretched the document's scroll bounds — an invisible element
+   dragging a very visible scrollbar under everything. */
+html,
+body {
+  overflow: hidden;
 }
