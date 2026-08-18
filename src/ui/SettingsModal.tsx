@@ -335,6 +335,29 @@ function AppearanceTab() {
       </section>
 
       <section className="ap-section">
+        <h3 className="ap-title">Motion</h3>
+        <p className="ap-sub">
+          The little animations everywhere. "Follow system" honors your
+          OS setting; Windows machines tuned for gaming often have OS
+          animations off, which quietly stills the whole app.
+        </p>
+        <label className="personalize-row">
+          <span>Animations</span>
+          <select
+            value={personal.motion ?? "auto"}
+            onChange={(e) =>
+              change({ motion: e.target.value as Personalization["motion"] })
+            }
+            aria-label="Motion"
+          >
+            <option value="auto">Follow system (default)</option>
+            <option value="full">Full</option>
+            <option value="minimal">Minimal</option>
+          </select>
+        </label>
+      </section>
+
+      <section className="ap-section">
         <h3 className="ap-title">Backdrop</h3>
         <p className="ap-sub">
           Any image you love, softened behind frosted glass. It never

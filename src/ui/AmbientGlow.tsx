@@ -3,6 +3,7 @@ import {
   glowModeOf,
   loadPersonalization,
   personalizationVersion,
+  reducedMotion,
   subscribePersonalization,
 } from "./personalize";
 
@@ -18,8 +19,7 @@ import {
 export function AmbientGlow() {
   useSyncExternalStore(subscribePersonalization, personalizationVersion, personalizationVersion);
   const mode = glowModeOf(loadPersonalization());
-  const enabled =
-    mode !== "off" && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const enabled = mode !== "off" && !reducedMotion();
 
   const layer = useRef<HTMLDivElement>(null);
   const target = useRef({ x: window.innerWidth / 2, y: window.innerHeight * 0.4 });

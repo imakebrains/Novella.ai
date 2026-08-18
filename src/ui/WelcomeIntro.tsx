@@ -15,7 +15,7 @@ import {
   type IntroScreen,
   type LineState,
 } from "./introScript";
-import { loadPersonalization, savePersonalization } from "./personalize";
+import { loadPersonalization, reducedMotion, savePersonalization } from "./personalize";
 import { BACKDROP_PRESETS, presetMarker, resolveBackdrop } from "./backdrops";
 import { THEMES, useTheme, type Theme } from "./useTheme";
 import { profileStore } from "../state/profile";
@@ -352,10 +352,7 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
           the finale. Decoration, never information. */}
       {screenIdx > 0 && !steps && !closing && (
         <div className="intro-cat-corner" aria-hidden>
-          <picture>
-            <source srcSet={catStill} media="(prefers-reduced-motion: reduce)" />
-            <img src={catGif} alt="" />
-          </picture>
+          <img src={reducedMotion() ? catStill : catGif} alt="" />
         </div>
       )}
 
@@ -538,10 +535,7 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
           <div className="intro-steps" aria-live="polite">
             {/* The cat is decoration; the list below is the truth. */}
             <div className="intro-cat-wrap" aria-hidden>
-              <picture>
-                <source srcSet={catStill} media="(prefers-reduced-motion: reduce)" />
-                <img src={catGif} className="intro-cat" alt="" />
-              </picture>
+              <img src={reducedMotion() ? catStill : catGif} className="intro-cat" alt="" />
               <p className="intro-gerund" key={gerundTick}>
                 {gerundAt(gerundTick)}…
               </p>

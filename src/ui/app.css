@@ -6208,8 +6208,8 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reword-chip,
-  .reword-pop {
+  :root:not(.motion-full) .reword-chip,
+:root:not(.motion-full) .reword-pop {
     animation: none;
   }
 }
@@ -6519,19 +6519,19 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .spinner {
+  :root:not(.motion-full) .spinner {
     animation-duration: 1.2s; /* slow, not frozen mid-arc */
   }
-  .stream-caret::after {
+  :root:not(.motion-full) .stream-caret::after {
     animation: none;
     opacity: 1;
   }
-  .empty-state,
-  .corkboard,
-  .music-dock {
+  :root:not(.motion-full) .empty-state,
+:root:not(.motion-full) .corkboard,
+:root:not(.motion-full) .music-dock {
     animation: none;
   }
-  [data-tip]::after {
+  :root:not(.motion-full) [data-tip]::after {
     transition: none;
   }
 }
@@ -6895,21 +6895,21 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .intro-bg,
-  .intro-gerund,
-  .task-add-row {
+  :root:not(.motion-full) .intro-bg,
+:root:not(.motion-full) .intro-gerund,
+:root:not(.motion-full) .task-add-row {
     animation: none;
   }
-  .intro-carousel {
+  :root:not(.motion-full) .intro-carousel {
     scroll-behavior: auto;
   }
-  .intro-line {
+  :root:not(.motion-full) .intro-line {
     animation-duration: 0ms;
   }
-  .intro-stage {
+  :root:not(.motion-full) .intro-stage {
     animation: none;
   }
-  .intro.closing {
+  :root:not(.motion-full) .intro.closing {
     transition-duration: 0ms;
   }
 }
@@ -7050,18 +7050,118 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .intro-glow,
-  .intro-cat-corner {
+  :root:not(.motion-full) .intro-glow,
+:root:not(.motion-full) .intro-cat-corner {
     animation: none;
   }
-  .intro-line.done:first-child {
+  :root:not(.motion-full) .intro-line.done:first-child {
     animation: none;
     background-image: none;
     -webkit-text-fill-color: initial;
     color: var(--fg-primary);
   }
-  .intro-answers > * {
+  :root:not(.motion-full) .intro-answers > * {
     animation: none;
     opacity: 1;
   }
+}
+
+/* ============================================================
+   9.29 The set-piece intro (owner round 14) — stop-motion grammar.
+   The type stays smooth and legible; everything you can TOUCH pops
+   into place in discrete steps, like pieces set down on a stage.
+   The hand-drawn cat is the mascot of the whole aesthetic.
+   ============================================================ */
+
+/* Pieces are placed, not faded: a four-frame snap with an overshoot,
+   then a resting tilt — the hand of the maker left visible. */
+@keyframes pop-set {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.6) rotate(calc(var(--tilt, 0deg) - 5deg));
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(-3px) scale(1.07) rotate(calc(var(--tilt, 0deg) + 2deg));
+  }
+  80% {
+    transform: translateY(1px) scale(0.98) rotate(var(--tilt, 0deg));
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(var(--tilt, 0deg));
+  }
+}
+
+.intro-answers > * {
+  animation-name: pop-set;
+  animation-timing-function: steps(4, end);
+  animation-duration: 420ms;
+}
+
+/* Swatches drop in like paint caps pressed onto the table. */
+.intro-swatch {
+  animation: pop-set 380ms steps(4, end) both;
+}
+.intro-swatches > *:nth-child(1) { animation-delay: 80ms; }
+.intro-swatches > *:nth-child(2) { animation-delay: 150ms; }
+.intro-swatches > *:nth-child(3) { animation-delay: 220ms; }
+.intro-swatches > *:nth-child(4) { animation-delay: 290ms; }
+.intro-swatches > *:nth-child(5) { animation-delay: 360ms; }
+.intro-swatches > *:nth-child(6) { animation-delay: 430ms; }
+.intro-swatches > *:nth-child(7) { animation-delay: 500ms; }
+.intro-swatches > *:nth-child(8) { animation-delay: 570ms; }
+
+/* Cards rest at a slight pinned-photo tilt and straighten when you
+   reach for them — the wall of a working writer. */
+.intro-theme,
+.intro-bg-card {
+  --tilt: -1.4deg;
+  animation: pop-set 420ms steps(4, end) both;
+  transition: transform var(--motion-quick) var(--ease-enter),
+    border-color var(--motion-quick) var(--ease-color),
+    box-shadow var(--motion-quick) var(--ease-enter);
+}
+.intro-theme:nth-child(even),
+.intro-bg-card:nth-child(even) {
+  --tilt: 1.3deg;
+}
+.intro-theme:hover,
+.intro-bg-card:hover {
+  transform: rotate(0deg) scale(1.04) translateY(-2px);
+}
+.intro-themes > *:nth-child(1), .intro-carousel > *:nth-child(1) { animation-delay: 100ms; }
+.intro-themes > *:nth-child(2), .intro-carousel > *:nth-child(2) { animation-delay: 190ms; }
+.intro-themes > *:nth-child(3), .intro-carousel > *:nth-child(3) { animation-delay: 280ms; }
+.intro-themes > *:nth-child(4), .intro-carousel > *:nth-child(4) { animation-delay: 370ms; }
+.intro-themes > *:nth-child(n + 5), .intro-carousel > *:nth-child(n + 5) { animation-delay: 460ms; }
+
+/* The progress dots tick over in frames, like a film counter. */
+.intro-seg {
+  transition: none;
+}
+.intro-seg.on {
+  animation: seg-tick 240ms steps(3, end) both;
+}
+@keyframes seg-tick {
+  from { transform: scaleX(0.2); opacity: 0.4; }
+  to { transform: scaleX(1); opacity: 1; }
+}
+
+/* The companion arrives with the same snap it lives by. */
+.intro-cat-corner {
+  animation: pop-set 460ms steps(4, end) both, cat-bob 1.8s steps(2, end) 600ms infinite;
+}
+.intro-cat-corner img {
+  height: 76px;
+}
+
+/* Buttons press like stamps. */
+.intro-primary:active,
+.intro-quiet:active,
+.intro-swatch:active,
+.intro-theme:active,
+.intro-bg-card:active {
+  transform: scale(0.94) rotate(0deg);
+  transition-duration: 40ms;
 }

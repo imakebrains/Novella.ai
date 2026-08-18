@@ -27,6 +27,25 @@ export interface Personalization {
   /** A backdrop image (data URL, downscaled at upload). Surfaces go
       frosted-glass over it — see .has-backdrop in app.css. */
   bgImage?: string;
+  /** Motion: "auto" follows the OS reduced-motion flag, "full" plays
+      everything regardless, "minimal" strips it regardless. Windows
+      machines tuned for gaming often have OS animations off, which was
+      silently flattening the whole app for those writers. */
+  motion?: "auto" | "full" | "minimal";
+}
+
+/** Effective motion mode, OS flag included — pure given its inputs. */
+export function motionModeOf(p: Personalization): "auto" | "full" | "minimal" {
+  return p.motion === "full" || p.motion === "minimal" ? p.motion : "auto";
+}
+
+/** Should animation be suppressed right now? */
+export function reducedMotion(): boolean {
+  const mode = motionModeOf(loadPersonalization());
+  if (mode === "full") return false;
+  if (mode === "minimal") return true;
+  return typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 /** One place decides what the glow does, old flag included. */
@@ -151,6 +170,10 @@ export function applyPersonalization(p: Personalization): void {
   }
 
   document.documentElement.classList.toggle("has-backdrop", !!p.bgImage);
+
+  const motionMode = motionModeOf(p);
+  document.documentElement.classList.toggle("motion-full", motionMode === "full");
+  document.documentElement.classList.toggle("motion-minimal", motionMode === "minimal");
 
   if (p.corners === "sharp") {
     root.setProperty("--radius-sm", "3px");

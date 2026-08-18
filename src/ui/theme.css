@@ -379,19 +379,38 @@ h3 {
 /* ---- reduced motion (docs/DESIGN-INTRO.md §2) ----
    Content is never withheld: everything that would animate in is simply
    there. The intro degrades to a sequence of static screens. */
+/* The OS flag is a default, not a verdict: Settings → Appearance →
+   Motion can override it either way. Windows machines tuned for gaming
+   often have OS animations off, which silently flattened the app. */
 @media (prefers-reduced-motion: reduce) {
-  :root {
+  :root:not(.motion-full) {
     --motion-quick: 0ms;
     --motion-standard: 0ms;
     --motion-slow: 0ms;
     --motion-intro: 0ms;
     --motion-stagger: 0ms;
   }
-  *,
-  *::before,
-  *::after {
+  :root:not(.motion-full) *,
+  :root:not(.motion-full) *::before,
+  :root:not(.motion-full) *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Motion: minimal — the same stillness, chosen in the app. */
+:root.motion-minimal {
+  --motion-quick: 0ms;
+  --motion-standard: 0ms;
+  --motion-slow: 0ms;
+  --motion-intro: 0ms;
+  --motion-stagger: 0ms;
+}
+:root.motion-minimal *,
+:root.motion-minimal *::before,
+:root.motion-minimal *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
 }

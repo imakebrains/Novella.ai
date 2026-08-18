@@ -27,7 +27,7 @@ import {
   ENTRANCE_MS,
 } from "./src/ui/introScript";
 import { cycleTab, type TabId } from "./src/ui/inspectorTabs";
-import { glowModeOf } from "./src/ui/personalize";
+import { glowModeOf, motionModeOf } from "./src/ui/personalize";
 import { buildRewordRequest, cleanReword, rewordable } from "./src/ui/rewordCore";
 import { acceptsTemperature } from "./src/ai/models";
 import { parseNote, serializeNote, extractWikiLinks, Vault } from "./src/core/vault";
@@ -1064,6 +1064,9 @@ lied, and Wren had known that since she was nine.
   check("glow: old boolean reads as follow", glowModeOf({ glow: true }), "follow");
   check("glow: explicit mode wins over the old flag", glowModeOf({ glow: true, glowMode: "drift" }), "drift");
   check("glow: off stays off", glowModeOf({ glowMode: "off" }), "off");
+  check("motion: absent means follow-system", motionModeOf({}), "auto");
+  check("motion: full is explicit", motionModeOf({ motion: "full" }), "full");
+  check("motion: minimal is explicit", motionModeOf({ motion: "minimal" }), "minimal");
 }
 
 
