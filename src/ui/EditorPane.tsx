@@ -24,6 +24,7 @@ import { BeatsPanel } from "./BeatsPanel";
 import { critiqueExtension, setCritiqueKinds } from "./critiqueExtension";
 import { taskCheckboxes } from "./taskCheckboxes";
 import { moveParagraph } from "../core/paragraphs";
+import { markdownFromPaste } from "../import/pasteMarkdown";
 import { boardStore, useBoards } from "../state/boards";
 import { SLASH_TRIGGER, SLASH_INSERT, matchSlashCommands } from "./slashCommands";
 import { type IssueKind } from "../analysis/prose";
@@ -176,6 +177,14 @@ export function EditorPane() {
   const chipTimer = useRef<number | undefined>(undefined);
   const rewordOpen = useRef(false);
   rewordOpen.current = reword !== null;
+
+  /* Ctrl/Cmd+Shift+V — paste without formatting, the convention every
+     editor shares. It arms this deadline rather than handling the paste
+     itself: the keymap deliberately does NOT claim the key, so the
+     browser's own paste still fires and CodeMirror inserts the plain text
+     exactly as it always has. Reading the clipboard here instead would
+     mean an async permission prompt in the middle of a keystroke. */
+  const plainPasteUntil = useRef(0);
 
   /** Place the chip above the selection end once the selection settles. */
   const scheduleChip = (instance: EditorView) => {
@@ -352,11 +361,62 @@ export function EditorPane() {
               return true;
             },
           },
+          // Returning false is the whole trick: the flag is set, the key
+          // is left unhandled, and the native paste that follows finds
+          // the paste handler below already told to stand down.
+          {
+            key: "Mod-Shift-v",
+            run: () => {
+              plainPasteUntil.current = Date.now() + 1000;
+              return false;
+            },
+          },
           ...closeBracketsKeymap,
           ...completionKeymap,
           ...historyKeymap,
           ...defaultKeymap,
         ]),
+        /* Paste with its formatting intact. The conversion itself lives in
+           src/import/pasteMarkdown.ts; everything here is about knowing
+           when to stay out of the way.
+
+           Three cases hand the paste straight back to CodeMirror: no HTML
+           on the clipboard (the common case, and every copy made inside
+           Novella), the plain-paste escape hatch, and a conversion that
+           came back null because it could not be trusted. Only when there
+           is genuinely formatting to keep does this take over — and then
+           as a single transaction, so one Ctrl+Z takes the whole paste
+           back out. */
+        EditorView.domEventHandlers({
+          paste(event, instance) {
+            const data = event.clipboardData;
+            if (!data) return false;
+            if (Date.now() < plainPasteUntil.current) {
+              plainPasteUntil.current = 0;
+              return false;
+            }
+            const html = data.getData("text/html");
+            if (!html) return false;
+            const plain = data.getData("text/plain");
+
+            let markdown: string | null = null;
+            try {
+              markdown = markdownFromPaste(html, plain);
+            } catch {
+              // Belt and braces: a paste is never the place to throw.
+              return false;
+            }
+            if (markdown === null || markdown === plain) return false;
+
+            event.preventDefault();
+            instance.dispatch({
+              ...instance.state.replaceSelection(markdown),
+              scrollIntoView: true,
+              userEvent: "input.paste",
+            });
+            return true;
+          },
+        }),
         markdown(),
         syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
         critiqueExtension(),
