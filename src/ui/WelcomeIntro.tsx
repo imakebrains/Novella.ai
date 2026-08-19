@@ -133,6 +133,8 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
     const st = stageEl.current;
     const host = st?.parentElement;
     if (!st || !host) return;
+    // Belt and braces: one outgoing scene at a time, always.
+    host.querySelectorAll(".stage-exit-left, .stage-exit-right").forEach((n) => n.remove());
     const g = st.cloneNode(true) as HTMLElement;
     g.classList.remove("enter-right", "enter-left");
     g.classList.add(dir === "left" ? "stage-exit-left" : "stage-exit-right");
@@ -146,9 +148,10 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
 
   /* Backdrop step: the chosen scene shows through THIS screen the moment
      it's picked — same promise as the accent recolor. */
-  const [introBg, setIntroBg] = useState<string | null>(() =>
-    resolveBackdrop(loadPersonalization().bgImage) ?? null,
-  );
+  /* Starts bare on purpose: showing a previously chosen scene before the
+     writer reaches the question answers it for them. The room fills in
+     the moment they pick one. */
+  const [introBg, setIntroBg] = useState<string | null>(null);
   const carousel = useRef<HTMLDivElement>(null);
 
   /* The loading cat cycles its vocabulary while real steps tick. */
@@ -219,24 +222,20 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [skipAhead]);
 
-  const advance = () =>
-    setScreenIdx((i) => {
-      const next = Math.min(i + 1, script.length - 1);
-      if (next !== i) {
-        enterFrom.current = "right";
-        ghostStage("left");
-      }
-      return next;
-    });
-  const goBack = () =>
-    setScreenIdx((i) => {
-      const prev = Math.max(0, i - 1);
-      if (prev !== i) {
-        enterFrom.current = "left";
-        ghostStage("right");
-      }
-      return prev;
-    });
+  /* Ghosting is a SIDE EFFECT and must never live inside a state updater:
+     React deliberately double-invokes updaters in StrictMode, which
+     appended two exit clones per scene change and left text animating
+     over text. Compute the target first, act once, then set state. */
+  const travel = (dir: 1 | -1) => {
+    const from = screenIdx;
+    const to = Math.min(Math.max(from + dir, 0), script.length - 1);
+    if (to === from) return;
+    enterFrom.current = dir === 1 ? "right" : "left";
+    ghostStage(dir === 1 ? "left" : "right");
+    setScreenIdx(to);
+  };
+  const advance = () => travel(1);
+  const goBack = () => travel(-1);
 
   const finish = useCallback(() => {
     markIntroSeen();
@@ -415,15 +414,6 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
         <button className="intro-back" onClick={goBack}>
           ‹ Back
         </button>
-      )}
-
-      {/* The companion: once the setup starts, the cat keeps you company
-          from the corner — small during the questions, center stage at
-          the finale. Decoration, never information. */}
-      {screenIdx > 0 && !steps && !closing && (
-        <div className="intro-cat-corner" aria-hidden>
-          <img src={reducedMotion() ? catStill : catGif} alt="" />
-        </div>
       )}
 
       {boot !== "off" && (

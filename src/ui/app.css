@@ -7447,3 +7447,39 @@ body {
   letter-spacing: var(--tracking-caps);
   color: var(--fg-muted);
 }
+
+
+/* ---- 9.33 round 17 fixes ---- */
+
+/* Focus mode over a backdrop: the editor used to be the only glassed
+   surface, so the raw image showed above and below it as bright bands.
+   In focus the whole app carries one uniform pane of glass instead. */
+:root.has-backdrop body.focus-mode .app {
+  background: color-mix(in srgb, var(--bg-app) 76%, transparent);
+  backdrop-filter: blur(12px) saturate(1.1);
+}
+:root.has-backdrop body.focus-mode .editor,
+:root.has-backdrop body.focus-mode .editor-scroll {
+  background: transparent;
+  backdrop-filter: none;
+}
+/* The way out belongs to the page, not to a band of its own. */
+body.focus-mode .focus-exit {
+  background: none;
+  border-color: transparent;
+  backdrop-filter: none;
+}
+body.focus-mode .focus-exit:hover {
+  border-color: var(--border);
+}
+
+/* The cat: smaller, and settled further into the room. */
+.intro-boot-cat {
+  height: 96px;
+  opacity: 0.86;
+  filter: drop-shadow(0 8px 24px rgb(0 0 0 / 0.35));
+}
+.intro-steps .intro-cat {
+  height: 84px;
+  opacity: 0.86;
+}
