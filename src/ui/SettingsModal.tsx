@@ -18,6 +18,7 @@ import {
 } from "../state/updates";
 import { AgentsPanel } from "./AgentsPanel";
 import { replayIntro } from "./WelcomeIntro";
+import { openTour } from "./TourOverlay";
 import { INTRO_SWATCHES } from "./introScript";
 import { tabPrefs, useTabPrefs, type TabId } from "./inspectorTabs";
 import { toBannerDataUrl } from "../state/projects";
@@ -1187,6 +1188,24 @@ function AboutTab() {
         >
           Replay the intro
         </button>
+      </Field>
+
+      <Field label="The tour">
+
+        <button
+
+          className="btn-ghost"
+
+          data-tip="Six short clips showing how things move"
+
+          onClick={() => openTour()}
+
+        >
+
+          Show me around
+
+        </button>
+
       </Field>
       <Field label="Your data">
         <span className="about-value">

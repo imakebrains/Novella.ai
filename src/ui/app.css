@@ -8612,3 +8612,1021 @@ body:has(.stack-divider.dragging) {
   cursor: pointer;
   text-align: left;
 }
+
+/* ---- 9.44 the guided tour ---- */
+/* Six looping diagrams, each built from the app's own vocabulary rather
+   than recorded from it: a capture can't follow the writer's theme, can't
+   slow down for reduced motion, and starts lying the day a radius changes.
+
+   THE RULE EVERY CLIP IS BUILT ON: the rest state below is the FINISHED
+   state. Keyframes reach back to the start at 0% and arrive home before
+   the seam, so killing the animation leaves a correct diagram of the
+   result. That is the whole of the reduced-motion path — see the end. */
+
+.tour-backdrop {
+  z-index: 55;
+}
+.modal.tour-modal {
+  width: min(560px, 100%);
+}
+
+.tour-head {
+  gap: var(--space-3);
+}
+.tour-count {
+  margin-left: auto;
+  margin-right: var(--space-3);
+  font-family: var(--font-ui);
+  font-size: var(--text-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--fg-muted);
+}
+
+.tour-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.tour-stage {
+  position: relative;
+  width: 100%;
+  height: 252px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-editor);
+}
+
+.tour-clip {
+  /* One clock for the whole clip: every animation below runs at var(--clip),
+     so percentage keyframes stay in step and a clip is retimed from
+     tourSteps.ts rather than from here. */
+  --clip: var(--clip-ms, 4500ms);
+  position: relative;
+  width: 460px;
+  height: 252px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  font-family: var(--font-ui);
+  font-size: var(--text-2xs);
+  color: var(--fg-secondary);
+}
+
+.tour-mock {
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-pane);
+  box-shadow: var(--shadow);
+}
+
+.tour-cursor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 12px;
+  height: 18px;
+  z-index: 4;
+  color: var(--fg-primary);
+  pointer-events: none;
+  opacity: 0;
+  filter: drop-shadow(0 2px 4px rgb(0 0 0 / 0.4));
+}
+
+.tour-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  color: var(--fg-primary);
+}
+.tour-copy {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-ui);
+  color: var(--fg-secondary);
+}
+.tour-where {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--fg-muted);
+}
+.tour-text {
+  width: 100%;
+  min-height: 96px;
+}
+
+.tour-still-caption {
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-2);
+  border-left: 2px solid var(--accent);
+  font-family: var(--font-prose);
+  font-size: var(--text-xs);
+  font-style: italic;
+  color: var(--fg-secondary);
+}
+
+.tour-dots {
+  display: flex;
+  gap: 6px;
+}
+.tour-dot {
+  width: 22px;
+  height: 4px;
+  padding: 0;
+  border: none;
+  border-radius: 2px;
+  background: var(--border-strong);
+  cursor: pointer;
+  transition: background var(--motion-quick) var(--ease-color),
+    transform var(--motion-quick) var(--ease-enter);
+}
+.tour-dot:hover {
+  transform: scaleY(1.6);
+}
+.tour-dot.on {
+  background: var(--accent);
+}
+
+.tour-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--border);
+}
+.tour-recall {
+  flex: 1 1 auto;
+  margin: 0;
+  font-size: var(--text-2xs);
+}
+
+/* ---- clip: Ctrl+K ---- */
+.tour-keycaps {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.tour-key-join {
+  color: var(--fg-muted);
+}
+.tour-key {
+  min-width: 26px;
+  padding: 4px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xs);
+  background: var(--bg-raised);
+  color: var(--fg-primary);
+  font-size: var(--text-2xs);
+  text-align: center;
+  /* Shadow, not border-width — a key that changes its own height reflows
+     the row it sits in every time it is pressed. */
+  box-shadow: 0 2px 0 var(--border-strong);
+  animation: tour-key-press var(--clip) var(--ease-enter) infinite;
+}
+.tour-key[data-key="k"] {
+  animation-delay: 90ms;
+}
+@keyframes tour-key-press {
+  0%, 4% {
+    transform: translateY(0);
+    box-shadow: 0 2px 0 var(--border-strong);
+  }
+  8%, 14% {
+    transform: translateY(2px);
+    box-shadow: 0 0 0 var(--border-strong);
+  }
+  18%, 100% {
+    transform: translateY(0);
+    box-shadow: 0 2px 0 var(--border-strong);
+  }
+}
+
+.tour-mock-palette {
+  width: 340px;
+  padding: var(--space-2);
+  animation: tour-panel-in var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-panel-in {
+  0%, 8% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  16%, 92% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+}
+
+.tour-mock-input {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  height: 30px;
+  padding: 0 var(--space-2);
+  border-bottom: 1px solid var(--border);
+  color: var(--fg-primary);
+  font-size: var(--text-sm);
+}
+.tour-mock-query {
+  display: inline-flex;
+}
+.tour-mock-char {
+  animation: tour-type var(--clip) linear infinite;
+  animation-delay: calc(var(--i, 0) * 130ms);
+}
+@keyframes tour-type {
+  0%, 17% {
+    opacity: 0;
+  }
+  22%, 100% {
+    opacity: 1;
+  }
+}
+
+/* The caret is the one thing here on its own clock: a caret blinks at a
+   caret's rate, not at the clip's. */
+.tour-mock-caret {
+  width: 1px;
+  height: 15px;
+  margin-left: 1px;
+  background: var(--accent);
+  animation: tour-caret 1s steps(2, end) infinite;
+}
+@keyframes tour-caret {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+.tour-mock-rows {
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--space-1);
+}
+.tour-mock-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 26px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-xs);
+  overflow: hidden;
+  white-space: nowrap;
+}
+.tour-mock-kind {
+  color: var(--fg-muted);
+}
+.tour-mock-label {
+  color: var(--fg-primary);
+  font-size: var(--text-xs);
+}
+.tour-mock-hint {
+  margin-left: auto;
+  color: var(--fg-muted);
+  font-size: var(--text-2xs);
+}
+
+.tour-mock-row[data-match="true"] {
+  background: var(--accent-soft);
+  box-shadow: inset 2px 0 0 var(--accent);
+  animation: tour-row-pick var(--clip) var(--ease-color) infinite;
+}
+@keyframes tour-row-pick {
+  0%, 40% {
+    background: transparent;
+    box-shadow: inset 2px 0 0 transparent;
+  }
+  50%, 100% {
+    background: var(--accent-soft);
+    box-shadow: inset 2px 0 0 var(--accent);
+  }
+}
+
+.tour-mock-row[data-match="false"] {
+  height: 0;
+  opacity: 0;
+  animation: tour-row-drop var(--clip) var(--ease-enter) infinite;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+@keyframes tour-row-drop {
+  0%, 30% {
+    height: 26px;
+    opacity: 1;
+  }
+  44%, 100% {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+/* ---- clip: reorder a tab (slot pitch 80px) ---- */
+.tour-mock-strip {
+  display: flex;
+  gap: 6px;
+}
+.tour-clip-reorder .tour-mock-strip {
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-pane);
+}
+.tour-mock-tab {
+  width: 74px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  color: var(--fg-secondary);
+  font-size: var(--text-2xs);
+}
+.tour-mock-tab.on {
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  color: var(--fg-primary);
+}
+.tour-mock-tab-add {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--fg-muted);
+}
+
+/* DOM order is the FINISHED order. The keyframes start Calendar two slots
+   right of home and slide the two it passes out of its way. */
+.tour-clip-reorder .tour-mock-tab {
+  position: relative;
+}
+.tour-clip-reorder .tour-mock-tab[data-role="drag"] {
+  z-index: 2;
+  animation: tour-tab-travel var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-tab-travel {
+  0%, 14% {
+    transform: translateX(160px);
+    box-shadow: none;
+  }
+  22% {
+    transform: translateX(160px) translateY(-4px) scale(1.05) rotate(-1.5deg);
+    box-shadow: var(--shadow);
+  }
+  56% {
+    transform: translateX(0) translateY(-4px) scale(1.05) rotate(-1.5deg);
+    box-shadow: var(--shadow);
+  }
+  66%, 100% {
+    transform: translateX(0);
+    box-shadow: none;
+  }
+}
+.tour-clip-reorder .tour-mock-tab:nth-child(2),
+.tour-clip-reorder .tour-mock-tab:nth-child(3) {
+  animation: tour-tab-shuffle var(--clip) var(--ease-enter) infinite;
+}
+.tour-clip-reorder .tour-mock-tab:nth-child(3) {
+  animation-delay: 60ms;
+}
+@keyframes tour-tab-shuffle {
+  0%, 26% {
+    transform: translateX(-80px);
+  }
+  46%, 100% {
+    transform: translateX(0);
+  }
+}
+
+.tour-clip-reorder .tour-cursor {
+  animation: tour-cursor-reorder var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-cursor-reorder {
+  0% {
+    opacity: 0;
+    transform: translate(286px, 150px);
+  }
+  10% {
+    opacity: 1;
+    transform: translate(272px, 132px);
+  }
+  22% {
+    opacity: 1;
+    transform: translate(270px, 128px);
+  }
+  56% {
+    opacity: 1;
+    transform: translate(110px, 128px);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(110px, 132px);
+  }
+  84%, 100% {
+    opacity: 0;
+    transform: translate(104px, 146px);
+  }
+}
+
+/* ---- clip: stack two panels (pane origin 112,19) ---- */
+.tour-mock-pane {
+  position: relative;
+  width: 236px;
+  height: 214px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px;
+}
+.tour-mock-slot {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-editor);
+  overflow: hidden;
+}
+.tour-mock-slot-head {
+  font-size: var(--text-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--fg-muted);
+}
+.tour-mock-task {
+  height: 7px;
+  border-radius: 2px;
+  background: var(--bg-hover);
+}
+.tour-mock-task:nth-child(2) {
+  width: 88%;
+}
+.tour-mock-task:nth-child(3) {
+  width: 64%;
+}
+.tour-mock-task:nth-child(4) {
+  width: 76%;
+}
+
+.tour-mock-month {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+.tour-mock-day {
+  height: 9px;
+  border-radius: 2px;
+  background: var(--bg-hover);
+}
+.tour-mock-day[data-on="true"] {
+  background: var(--accent);
+  opacity: 0.75;
+}
+
+/* Rest = split. Tasks starts full-height and yields; Calendar starts at
+   nothing and opens into the room Tasks gave up. */
+.tour-clip-stack .tour-mock-slot[data-slot="tasks"] {
+  height: 82px;
+  animation: tour-slot-yield var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-slot-yield {
+  0%, 52% {
+    height: 164px;
+  }
+  66%, 100% {
+    height: 82px;
+  }
+}
+.tour-clip-stack .tour-mock-slot[data-slot="calendar"] {
+  height: 82px;
+  animation: tour-slot-open var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-slot-open {
+  0%, 52% {
+    height: 0;
+    opacity: 0;
+    margin-top: -6px;
+    border-color: transparent;
+  }
+  66%, 100% {
+    height: 82px;
+    opacity: 1;
+    margin-top: 0;
+    border-color: var(--border);
+  }
+}
+
+/* Absolutely positioned: a zone that exists only during the drag must cost
+   the finished diagram no layout. */
+.tour-mock-dropzone {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  height: 82px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed color-mix(in srgb, var(--accent) 60%, transparent);
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: var(--text-2xs);
+  pointer-events: none;
+  opacity: 0;
+  animation: tour-dropzone var(--clip) var(--ease-color) infinite;
+}
+@keyframes tour-dropzone {
+  0%, 26% {
+    opacity: 0;
+  }
+  34%, 50% {
+    opacity: 1;
+  }
+  60%, 100% {
+    opacity: 0;
+  }
+}
+
+/* The tab in flight starts sitting in the strip, which is what makes this
+   read as "this tab, moved" rather than "a new thing appeared", and it
+   vanishes exactly as the panel below opens — the tab BECOMES the panel. */
+.tour-drag-chip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 3;
+  width: 74px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  color: var(--fg-primary);
+  font-size: var(--text-2xs);
+  box-shadow: var(--shadow);
+  opacity: 0;
+  animation: tour-chip-travel var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-chip-travel {
+  0% {
+    opacity: 0;
+    transform: translate(198px, 25px);
+  }
+  8% {
+    opacity: 1;
+    transform: translate(198px, 25px);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(198px, 21px) scale(1.06) rotate(-2deg);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(193px, 162px) scale(1.06) rotate(-2deg);
+  }
+  58% {
+    opacity: 1;
+    transform: translate(193px, 168px) scale(1);
+  }
+  66% {
+    opacity: 0;
+    transform: translate(193px, 168px) scale(0.96);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(198px, 25px);
+  }
+}
+
+.tour-clip-stack .tour-cursor {
+  animation: tour-cursor-stack var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-cursor-stack {
+  0% {
+    opacity: 0;
+    transform: translate(240px, 14px);
+  }
+  8% {
+    opacity: 1;
+    transform: translate(232px, 34px);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(230px, 30px);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(225px, 171px);
+  }
+  62% {
+    opacity: 1;
+    transform: translate(225px, 177px);
+  }
+  76%, 100% {
+    opacity: 0;
+    transform: translate(231px, 190px);
+  }
+}
+
+/* ---- clip: the divider ---- */
+.tour-clip-resize .tour-mock-pane {
+  height: 200px;
+}
+.tour-mock-divider {
+  flex: 0 0 auto;
+  height: 9px;
+  display: grid;
+  place-items: center;
+}
+.tour-mock-grip {
+  width: 34px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--border-strong);
+  animation: tour-grip var(--clip) var(--ease-color) infinite;
+}
+@keyframes tour-grip {
+  0%, 22% {
+    width: 34px;
+    background: var(--border-strong);
+  }
+  32%, 74% {
+    width: 48px;
+    background: var(--accent);
+  }
+  86%, 100% {
+    width: 34px;
+    background: var(--border-strong);
+  }
+}
+
+/* Rest = dragged down. The two slots trade the same pixels, the way
+   resizeSlots() trades the same fraction. */
+.tour-clip-resize .tour-mock-slot[data-slot="tasks"] {
+  height: 118px;
+  animation: tour-resize-top var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-resize-top {
+  0%, 26% {
+    height: 90px;
+  }
+  62%, 100% {
+    height: 118px;
+  }
+}
+
+.tour-clip-resize .tour-mock-slot[data-slot="calendar"] {
+  height: 61px;
+  animation: tour-resize-bottom var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-resize-bottom {
+  0%, 26% {
+    height: 89px;
+  }
+  62%, 100% {
+    height: 61px;
+  }
+}
+
+.tour-clip-resize .tour-cursor {
+  animation: tour-cursor-resize var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-cursor-resize {
+  0% {
+    opacity: 0;
+    transform: translate(240px, 92px);
+  }
+  16% {
+    opacity: 1;
+    transform: translate(232px, 118px);
+  }
+  26% {
+    opacity: 1;
+    transform: translate(230px, 122px);
+  }
+  62%, 80% {
+    opacity: 1;
+    transform: translate(230px, 150px);
+  }
+  92%, 100% {
+    opacity: 0;
+    transform: translate(236px, 158px);
+  }
+}
+
+/* ---- clip: a card on the board (card pitch 100px) ---- */
+.tour-mock-board {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-pane);
+}
+.tour-mock-card {
+  --tilt: -1.2deg;
+  width: 92px;
+  height: 112px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-sm);
+  transform: rotate(var(--tilt));
+}
+.tour-mock-card:nth-child(even) {
+  --tilt: 1.4deg;
+}
+.tour-mock-card-title {
+  color: var(--fg-primary);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+}
+.tour-mock-card-line {
+  height: 5px;
+  border-radius: 2px;
+  background: var(--bg-hover);
+}
+.tour-mock-card-line:nth-child(3) {
+  width: 70%;
+}
+.tour-mock-card-meta {
+  margin-top: auto;
+  color: var(--fg-muted);
+  font-size: 9px;
+}
+
+.tour-mock-card[data-role="drag"] {
+  position: relative;
+  z-index: 2;
+  animation: tour-card-travel var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-card-travel {
+  0%, 12% {
+    transform: translateX(200px) rotate(var(--tilt));
+    box-shadow: var(--shadow-sm);
+  }
+  22% {
+    transform: translateX(200px) translateY(-8px) scale(1.05) rotate(-3deg);
+    box-shadow: var(--shadow-lg);
+  }
+  58% {
+    transform: translateX(0) translateY(-8px) scale(1.05) rotate(-3deg);
+    box-shadow: var(--shadow-lg);
+  }
+  70%, 100% {
+    transform: translateX(0) rotate(var(--tilt));
+    box-shadow: var(--shadow-sm);
+  }
+}
+.tour-mock-card[data-role="static"]:nth-child(2),
+.tour-mock-card[data-role="static"]:nth-child(3) {
+  animation: tour-card-shuffle var(--clip) var(--ease-enter) infinite;
+  animation-delay: calc(var(--i, 0) * 50ms);
+}
+@keyframes tour-card-shuffle {
+  0%, 26% {
+    transform: translateX(-100px) rotate(var(--tilt));
+  }
+  50%, 100% {
+    transform: translateX(0) rotate(var(--tilt));
+  }
+}
+
+.tour-clip-board .tour-cursor {
+  animation: tour-cursor-board var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-cursor-board {
+  0% {
+    opacity: 0;
+    transform: translate(296px, 150px);
+  }
+  12% {
+    opacity: 1;
+    transform: translate(284px, 126px);
+  }
+  22% {
+    opacity: 1;
+    transform: translate(282px, 118px);
+  }
+  58% {
+    opacity: 1;
+    transform: translate(82px, 118px);
+  }
+  72% {
+    opacity: 1;
+    transform: translate(82px, 126px);
+  }
+  86%, 100% {
+    opacity: 0;
+    transform: translate(76px, 142px);
+  }
+}
+
+/* ---- clip: reword ---- */
+/* Rest here keeps the chip and menu visible, unlike the other clips: the
+   still frame has to show the mechanism, or "one sentence, tightened" is
+   a claim with no evidence. */
+.tour-mock-reword {
+  position: relative;
+  width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--bg-editor);
+}
+.tour-mock-para {
+  margin: 0;
+  font-family: var(--font-prose);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+  color: var(--fg-secondary);
+}
+.tour-mock-run {
+  color: var(--fg-secondary);
+}
+
+/* A background-size sweep rather than a width animation: the highlight has
+   to grow across text that may wrap, and clone gives each line fragment
+   its own box to fill. */
+.tour-mock-sel,
+.tour-mock-new {
+  border-radius: 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  background-image: linear-gradient(var(--accent-soft), var(--accent-soft));
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+.tour-mock-sel {
+  color: var(--fg-primary);
+  animation: tour-select var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-select {
+  0%, 4% {
+    background-size: 0% 100%;
+  }
+  22%, 100% {
+    background-size: 100% 100%;
+  }
+}
+
+.tour-mock-reword-ui {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding-left: 60px;
+}
+.tour-mock-chip {
+  padding: 3px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xs);
+  background: var(--bg-raised);
+  color: var(--fg-primary);
+  font-size: var(--text-2xs);
+  box-shadow: var(--shadow-sm);
+  animation: tour-chip-appear var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-chip-appear {
+  0%, 22% {
+    opacity: 0;
+    transform: translateY(4px) scale(0.9);
+  }
+  30%, 100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.tour-mock-menu {
+  display: flex;
+  flex-direction: column;
+  min-width: 108px;
+  padding: 3px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-pane);
+  box-shadow: var(--shadow);
+  transform-origin: top left;
+  animation: tour-menu-open var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-menu-open {
+  0%, 38% {
+    opacity: 0;
+    transform: translateY(-4px) scaleY(0.8);
+  }
+  46%, 100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+.tour-mock-menu-item {
+  padding: 3px 7px;
+  border-radius: var(--radius-xs);
+  color: var(--fg-secondary);
+  font-size: var(--text-2xs);
+}
+.tour-mock-menu-item[data-pick="true"] {
+  background: var(--accent-soft);
+  color: var(--fg-primary);
+  animation: tour-menu-pick var(--clip) var(--ease-color) infinite;
+}
+@keyframes tour-menu-pick {
+  0%, 56% {
+    background: transparent;
+    color: var(--fg-secondary);
+  }
+  62%, 66% {
+    background: var(--accent);
+    color: var(--accent-fg);
+  }
+  72%, 100% {
+    background: var(--accent-soft);
+    color: var(--fg-primary);
+  }
+}
+
+/* The replacement is laid out from the start (opacity, not display), so the
+   panel never jumps when it lands. */
+.tour-mock-para[data-para="after"] {
+  color: var(--fg-primary);
+  animation: tour-after-in var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-after-in {
+  0%, 68% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  80%, 100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.tour-clip-reword .tour-cursor {
+  animation: tour-cursor-reword var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-cursor-reword {
+  0% {
+    opacity: 0;
+    transform: translate(120px, 84px);
+  }
+  24% {
+    opacity: 1;
+    transform: translate(118px, 108px);
+  }
+  34% {
+    opacity: 1;
+    transform: translate(116px, 112px);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(124px, 132px);
+  }
+  62% {
+    opacity: 1;
+    transform: translate(124px, 136px);
+  }
+  76%, 100% {
+    opacity: 0;
+    transform: translate(130px, 146px);
+  }
+}
+
+/* ---- reduced motion: one rule, because rest IS the finished state ---- */
+/* Deliberately NOT behind @media (prefers-reduced-motion). reducedMotion()
+   in personalize.ts already folds in the OS flag AND the writer's explicit
+   motion: "full" override; a media query here would flatten the clips for
+   people who asked for motion. The attribute is the only authority. */
+.tour-clip[data-still="true"],
+.tour-clip[data-still="true"] *,
+.tour-clip[data-still="true"] *::before,
+.tour-clip[data-still="true"] *::after {
+  animation: none !important;
+}

@@ -21,6 +21,7 @@ import type { BoardLayout } from "./ui/BoardLayoutToggle";
 import { RecoveryBanner } from "./ui/RecoveryBanner";
 import { UndoToastHost } from "./ui/UndoToastHost";
 import { TrashHost } from "./ui/TrashPanel";
+import { TourButton, TourOverlay, openTour } from "./ui/TourOverlay";
 import { AmbientGlow } from "./ui/AmbientGlow";
 import { Backdrop } from "./ui/Backdrop";
 import { WelcomeIntro, introPending, registerIntroOpener } from "./ui/WelcomeIntro";
@@ -259,6 +260,7 @@ export default function App() {
     { id: "import", label: "Import manuscript…", run: () => setImportOpen(true) },
     { id: "projects", label: "Switch project…", run: () => setProjectsOpen(true) },
     { id: "settings", label: "Open Settings", run: () => setSettingsOpen(true) },
+    { id: "tour", label: "Show me around", hint: "tour", run: () => openTour() },
     { id: "music", label: "Open music player", run: () => setMusicOpen(true) },
     { id: "theme", label: `Change theme (now: ${themeInfo.name})`, run: cycleTheme },
     { id: "left", label: leftOpen ? "Hide codex pane" : "Show codex pane", run: () => setLeftOpen((v) => !v) },
@@ -419,6 +421,7 @@ export default function App() {
           >
             <span className="theme-dot" style={{ background: themeInfo.swatch[2] }} />
           </button>
+          <TourButton />
           <button
             className="icon-btn"
             onClick={() => setSettingsOpen(true)}
@@ -535,6 +538,7 @@ export default function App() {
       {importOpen && <ImportModal onClose={() => setImportOpen(false)} />}
       {projectsOpen && <ProjectsPanel onClose={() => setProjectsOpen(false)} />}
       {introOpen && <WelcomeIntro onDone={() => setIntroOpen(false)} />}
+      {!introOpen && <TourOverlay />}
     </div>
   );
 }
