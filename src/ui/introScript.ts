@@ -109,6 +109,11 @@ export const INPUT_DELAY_MS = 500;
     moment, short enough to stay a joke. Real work runs inside it. */
 export const FINALE_MS = 5500;
 
+/** The boot: the cat opens the show. Long enough to read one absurd
+    gerund and smile, short enough that nobody reaches for Skip. A tap
+    cuts it instantly — the impatience ladder starts here. */
+export const BOOT_MS = 2400;
+
 /* ---- the loading cat's vocabulary ----
    Whimsy with a straight face: absurd gerunds under a giggling cat
    while the REAL steps report honestly beside it. Rotation is pure so

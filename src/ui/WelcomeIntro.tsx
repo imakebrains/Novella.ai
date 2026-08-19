@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  BOOT_MS,
   FINALE_MS,
   INTRO_SCRIPT,
   INTRO_SWATCHES,
@@ -102,6 +103,45 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
   const [closing, setClosing] = useState(false);
   const nameField = useRef<HTMLInputElement>(null);
 
+  /* The boot: the cat opens the show, cycling one absurd gerund, then
+     hands off to the first scene. A tap cuts it instantly. */
+  const [boot, setBoot] = useState<"on" | "leaving" | "off">("on");
+
+  /* The glow blooms once when a choice commits. Keyed remount replays it. */
+  const [bloomTick, setBloomTick] = useState(0);
+  const bloom = () => setBloomTick((n) => n + 1);
+  useEffect(() => {
+    if (boot !== "on") return;
+    const t = setTimeout(() => setBoot("leaving"), BOOT_MS);
+    return () => clearTimeout(t);
+  }, [boot]);
+  useEffect(() => {
+    if (boot !== "leaving") return;
+    const t = setTimeout(() => setBoot("off"), 520);
+    return () => clearTimeout(t);
+  }, [boot]);
+
+  /* Scene transitions with a real exit: before the screen index moves,
+     the outgoing stage is cloned as an inert ghost that plays the exit
+     animation while the new stage enters from the other side. Display
+     only — the ghost has no listeners and removes itself. */
+  const stageEl = useRef<HTMLDivElement>(null);
+  const enterFrom = useRef<"right" | "left">("right");
+  const ghostStage = (dir: "left" | "right") => {
+    const st = stageEl.current;
+    const host = st?.parentElement;
+    if (!st || !host) return;
+    const g = st.cloneNode(true) as HTMLElement;
+    g.classList.remove("enter-right", "enter-left");
+    g.classList.add(dir === "left" ? "stage-exit-left" : "stage-exit-right");
+    g.setAttribute("aria-hidden", "true");
+    g.style.pointerEvents = "none";
+    host.appendChild(g);
+    const drop = () => g.remove();
+    g.addEventListener("animationend", drop, { once: true });
+    window.setTimeout(drop, 800);
+  };
+
   /* Backdrop step: the chosen scene shows through THIS screen the moment
      it's picked — same promise as the accent recolor. */
   const [introBg, setIntroBg] = useState<string | null>(() =>
@@ -111,11 +151,12 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
 
   /* The loading cat cycles its vocabulary while real steps tick. */
   const [gerundTick, setGerundTick] = useState(0);
+  const gerundActive = !!steps || boot !== "off";
   useEffect(() => {
-    if (!steps) return;
-    const t = setInterval(() => setGerundTick((n) => n + 1), 900);
+    if (!gerundActive) return;
+    const t = setInterval(() => setGerundTick((n) => n + 1), 800);
     return () => clearInterval(t);
-  }, [steps]);
+  }, [gerundActive]);
 
   const screen = script[screenIdx]!;
   const vars = useMemo(
@@ -133,7 +174,7 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
      once complete, wait the gap and hand off to the next. Taps cut both
      short via tapAdvance — nothing is gated on the animation. */
   useEffect(() => {
-    if (closing || steps) return;
+    if (closing || steps || boot !== "off") return;
     const total = lines.length;
     if (inputReady(line, total)) return;
     const wait = line.lineComplete
@@ -141,7 +182,7 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
       : lineDurationMs(lines[line.lineIdx] ?? "");
     const t = setTimeout(() => setLine((s) => lineFinished(s, total)), wait);
     return () => clearTimeout(t);
-  }, [line, lines, closing, steps]);
+  }, [line, lines, closing, steps, boot]);
 
   // Fresh screen, fresh clock.
   useEffect(() => {
@@ -160,6 +201,10 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
   // Tap anywhere (that isn't a control) climbs the impatience ladder.
   const onSurfaceClick = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest("button, input, a, .intro-answers")) return;
+    if (boot === "on") {
+      setBoot("leaving");
+      return;
+    }
     skipAhead();
   };
   useEffect(() => {
@@ -172,7 +217,24 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [skipAhead]);
 
-  const advance = () => setScreenIdx((i) => Math.min(i + 1, script.length - 1));
+  const advance = () =>
+    setScreenIdx((i) => {
+      const next = Math.min(i + 1, script.length - 1);
+      if (next !== i) {
+        enterFrom.current = "right";
+        ghostStage("left");
+      }
+      return next;
+    });
+  const goBack = () =>
+    setScreenIdx((i) => {
+      const prev = Math.max(0, i - 1);
+      if (prev !== i) {
+        enterFrom.current = "left";
+        ghostStage("right");
+      }
+      return prev;
+    });
 
   const finish = useCallback(() => {
     markIntroSeen();
@@ -196,6 +258,7 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
     setAccent(hex);
     // The signature moment: this very screen recolors in the same frame.
     savePersonalization({ ...loadPersonalization(), accent: hex });
+    bloom();
     advance();
   };
 
@@ -222,6 +285,7 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
   const answerTheme = (id: Theme) => {
     setTheme(id);
     setCommittedTheme(id);
+    bloom();
     advance();
   };
 
@@ -327,7 +391,9 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
           <div className="intro-bg-img" style={{ backgroundImage: `url(${introBg})` }} />
         </div>
       )}
-      <div className="intro-glow" aria-hidden />
+      <div className={`intro-glow ${bloomTick > 0 ? "bloom" : ""}`} key={`glow-${bloomTick}`} aria-hidden />
+      <div className="intro-motes" aria-hidden />
+      <div className="intro-vignette" aria-hidden />
 
       {screenIdx > 0 && (
         <div className="intro-progress" aria-hidden>
@@ -342,7 +408,7 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
       </button>
 
       {screenIdx > 0 && !steps && !closing && (
-        <button className="intro-back" onClick={() => setScreenIdx((i) => Math.max(0, i - 1))}>
+        <button className="intro-back" onClick={goBack}>
           ‹ Back
         </button>
       )}
@@ -356,9 +422,24 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
         </div>
       )}
 
-      {/* Keyed on the screen so each question arrives as its own scene —
-          a slow rise instead of an instant swap. */}
-      <div className="intro-stage" key={screenIdx}>
+      {boot !== "off" && (
+        <div className={`intro-boot ${boot === "leaving" ? "leaving" : ""}`} aria-hidden>
+          <img src={reducedMotion() ? catStill : catGif} className="intro-boot-cat" alt="" />
+          <p className="intro-gerund" key={gerundTick}>
+            {gerundAt(gerundTick)}…
+          </p>
+        </div>
+      )}
+
+      {/* Keyed on the screen so each question arrives as its own scene,
+          entering from the side the story is moving toward. */}
+      <div
+        className={`intro-stage ${enterFrom.current === "right" ? "enter-right" : "enter-left"}`}
+        key={screenIdx}
+        ref={stageEl}
+        data-screen={screen.id}
+        style={boot !== "off" ? { visibility: "hidden" } : undefined}
+      >
         {lines.map((l, i) => renderLine(l, i))}
         {aiLine && screen.input === "ai" && ready && (
           <p className="intro-line done intro-ai-result">{glueOrphans(aiLine)}</p>

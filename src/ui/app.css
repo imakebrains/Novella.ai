@@ -6864,7 +6864,13 @@ body {
   margin: 0;
   color: var(--fg-muted);
   font-size: var(--text-sm);
-  animation: rise-in var(--motion-standard) var(--ease-enter);
+  animation: gerund-life 790ms var(--ease, ease) both;
+}
+@keyframes gerund-life {
+  0% { opacity: 0; transform: translateY(4px); }
+  18% { opacity: 1; transform: translateY(0); }
+  78% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-3px); }
 }
 
 /* ---- 9.25 tasks: the + ---- */
@@ -6915,21 +6921,39 @@ body {
 }
 
 /* ---- 9.26 the intro breathes (owner round 12) ---- */
-/* Each question is its own scene: a slow rise in, never an instant swap. */
+/* Scenes slide like a camera dolly: the outgoing stage exits one way
+   while the incoming enters from the other. Both live in the same grid
+   cell so they overlap during the handoff. */
 .intro-stage {
-  animation: intro-screen-in 450ms var(--ease-hero, var(--ease-enter));
+  grid-area: 1 / 1;
 }
-@keyframes intro-screen-in {
-  from {
-    opacity: 0;
-    transform: translateY(22px);
-    filter: blur(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
+/* Exit is quick and decisive; a 160ms held beat of empty stage; then a
+   long decelerating entrance: the cut, the breath, the reveal. */
+.intro-stage.enter-right {
+  animation: stage-in-right 640ms cubic-bezier(0.16, 1, 0.3, 1) 160ms both;
+}
+.intro-stage.enter-left {
+  animation: stage-in-left 640ms cubic-bezier(0.16, 1, 0.3, 1) 160ms both;
+}
+.stage-exit-left {
+  animation: stage-out-left 380ms cubic-bezier(0.55, 0, 0.85, 0.4) both !important;
+}
+.stage-exit-right {
+  animation: stage-out-right 380ms cubic-bezier(0.55, 0, 0.85, 0.4) both !important;
+}
+@keyframes stage-in-right {
+  from { opacity: 0; transform: translateX(64px) scale(1.01); filter: blur(8px); }
+  to { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); }
+}
+@keyframes stage-in-left {
+  from { opacity: 0; transform: translateX(-64px) scale(1.01); filter: blur(8px); }
+  to { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); }
+}
+@keyframes stage-out-left {
+  to { opacity: 0; transform: translateX(-72px) scale(0.98); filter: blur(6px); }
+}
+@keyframes stage-out-right {
+  to { opacity: 0; transform: translateX(72px) scale(0.98); filter: blur(6px); }
 }
 
 /* Back mirrors Skip: quiet, top corners, never in the way. */
@@ -7164,4 +7188,197 @@ body {
 .intro-bg-card:active {
   transform: scale(0.94) rotate(0deg);
   transition-duration: 40ms;
+}
+
+/* ---- 9.30 the cinematic layer (owner round 15) ---- */
+
+/* The boot: the cat opens the show, alone in the dark. */
+.intro-boot {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--space-3);
+  background: var(--bg-app);
+  animation: fade-in 400ms var(--ease, ease);
+}
+.intro-boot.leaving {
+  opacity: 0;
+  transform: scale(1.04);
+  filter: blur(6px);
+  transition: opacity 500ms var(--ease-hero, ease),
+    transform 500ms var(--ease-hero, ease),
+    filter 500ms var(--ease-hero, ease);
+  pointer-events: none;
+}
+.intro-boot-cat {
+  height: 120px;
+  width: auto;
+  animation: pop-set 480ms steps(4, end) both;
+}
+.intro-boot .intro-gerund {
+  font-size: var(--text-lg);
+}
+
+/* Atmosphere: a vignette pulls the eye center, motes drift like dust
+   in a light shaft. Pure CSS, transform/opacity only. */
+.intro-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 120% 90% at 50% 42%,
+    transparent 55%,
+    rgb(0 0 0 / 0.34) 100%
+  );
+}
+.intro-motes {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+/* Two tiled layers translated by exactly one tile height: a seamless
+   loop on the compositor, zero paint per frame. */
+.intro-motes::before,
+.intro-motes::after {
+  content: "";
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  top: 0;
+  height: calc(100% + 900px);
+  background-repeat: repeat;
+  will-change: transform;
+}
+.intro-motes::before {
+  background-image:
+    radial-gradient(2px 2px at 22% 15%, color-mix(in srgb, var(--accent) 55%, transparent), transparent 60%),
+    radial-gradient(2.5px 2.5px at 65% 62%, color-mix(in srgb, var(--accent) 38%, transparent), transparent 60%);
+  background-size: 900px 900px;
+  opacity: 0.5;
+  animation: motes-rise 48s linear infinite;
+}
+.intro-motes::after {
+  background-image:
+    radial-gradient(1.5px 1.5px at 40% 35%, color-mix(in srgb, var(--fg-primary) 40%, transparent), transparent 60%),
+    radial-gradient(1px 1px at 80% 82%, color-mix(in srgb, var(--fg-primary) 32%, transparent), transparent 60%);
+  background-size: 900px 900px;
+  opacity: 0.35;
+  animation: motes-rise 74s linear infinite;
+}
+@keyframes motes-rise {
+  from { transform: translateY(0); }
+  to { transform: translateY(-900px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:not(.motion-full) .intro-motes {
+    animation: none;
+  }
+}
+:root.motion-minimal .intro-motes {
+  animation: none;
+}
+
+
+/* ---- 9.31 cinema finishing (from docs/DESIGN-INTRO-CINEMA.md) ---- */
+
+/* The one title-card moment: the cold open headline condenses out of
+   the dark, tracking settling from letterpress-wide to book-tight. */
+.intro-stage[data-screen="cold-open"] .intro-line:first-child {
+  animation: title-condense 1200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes title-condense {
+  from {
+    opacity: 0;
+    letter-spacing: 0.22em;
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    letter-spacing: -0.01em;
+    filter: blur(0);
+  }
+}
+
+/* Spotlight, not boxes: reaching for one choice dims its siblings. */
+.intro-swatches:has(.intro-swatch:hover) .intro-swatch:not(:hover),
+.intro-themes:has(.intro-theme:hover) .intro-theme:not(:hover),
+.intro-carousel:has(.intro-bg-card:hover) .intro-bg-card:not(:hover) {
+  opacity: 0.55;
+  transition: opacity var(--motion-quick) var(--ease-color);
+}
+
+/* The glow blooms when a choice commits: the room answering. */
+.intro-glow.bloom {
+  animation: glow-bloom 900ms var(--ease-hero, ease) both;
+}
+@keyframes glow-bloom {
+  0% { transform: scale(1); opacity: 0.85; }
+  35% { transform: scale(1.35); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.85; }
+}
+
+/* The cat stands on a floor of light. Static: presence, not motion. */
+.intro-boot {
+  position: absolute;
+}
+.intro-boot::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 260px;
+  height: 70px;
+  transform: translate(-50%, 46px);
+  background: radial-gradient(
+    ellipse 50% 50% at 50% 50%,
+    color-mix(in srgb, var(--accent) 22%, transparent),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+.intro-cat-wrap {
+  position: relative;
+}
+.intro-cat-wrap::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 62px;
+  width: 220px;
+  height: 60px;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    ellipse 50% 50% at 50% 50%,
+    color-mix(in srgb, var(--accent) 20%, transparent),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* The chosen scene breathes behind everything: a 36-second Ken Burns. */
+.intro-bg-img {
+  animation: ken-burns 36s ease-in-out infinite alternate;
+}
+@keyframes ken-burns {
+  from { transform: scale(1.06); }
+  to { transform: scale(1.13) translateY(-1.2%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:not(.motion-full) .intro-bg-img,
+  :root:not(.motion-full) .intro-glow.bloom,
+  :root:not(.motion-full) .intro-stage[data-screen="cold-open"] .intro-line:first-child {
+    animation: none;
+  }
+}
+:root.motion-minimal .intro-bg-img,
+:root.motion-minimal .intro-glow.bloom {
+  animation: none;
 }

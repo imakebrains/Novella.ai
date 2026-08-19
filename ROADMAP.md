@@ -947,6 +947,29 @@ scale; nothing but use would have caught it.
   changelog, blog post, review, or forum post dated after 2026-08-18
   found for any of them. Full notes in RESEARCH.md Round 34.
 
+- 2026-08-18 — The cinematic intro (session; owner round 15). Research
+  first: a 4-agent workflow studied game character creators (Wukong,
+  Elden Ring, BG3), the most cinematic app onboardings, and 60fps CSS
+  cinema technique — synthesized into docs/DESIGN-INTRO-CINEMA.md.
+  Shipped from it: THE BOOT — the hand-drawn cat opens the show alone
+  in the dark on a floor of light, popping in stop-motion, cycling
+  absurd gerunds that now fade in AND out ("Promulgating…"), then the
+  room dissolves into the cold open (a tap cuts it instantly). Scene
+  changes became real cinema: the outgoing screen exits fast with blur
+  (380ms ghost clone), a 160ms held beat, then the next enters from the
+  travel direction with a long 640ms deceleration — Back reverses the
+  camera. Atmosphere runs continuously: deepened vignette, breathing
+  glow, drifting accent dust motes (rebuilt transform-only after the
+  spec caught a per-frame paint bug in the first draft), and a
+  36-second Ken Burns on the chosen backdrop. The cold open earns the
+  app's one title-card moment (letter-tracking condenses from
+  letterpress-wide over 1200ms). Choices spotlight on hover (siblings
+  dim), and the glow blooms when a color or theme commits. All of it
+  joins the Motion setting's guards. Verified live under forced
+  reduced-motion with motion:"full": boot/cat/gerund/pedestal/tap-skip,
+  ghost exit + 0.16s held beat + directional entrance + cleanup, bloom,
+  motes on both layers, title-condense. 285 checks green, tsc clean.
+
 - 2026-08-18 — The intro, rounder (session; owner round 11). Words now
   flow instead of popping: the streaming fade went from 80ms to a long
   overlapping 380ms with a soft rise and unblur, so several words are
