@@ -66,3 +66,35 @@ export function insertIntoEditor(text: string): boolean {
   insertFn(text);
   return true;
 }
+
+/* The prose highlighters used to be chips under the chapter title, where
+   they read as clutter over the page. They belong with the report that
+   explains them, so the Critique tab owns them now and the editor just
+   registers how to apply them. */
+type HighlightFn = (kinds: string[]) => void;
+
+let highlightFn: HighlightFn | null = null;
+let activeKinds: string[] = [];
+const kindListeners = new Set<() => void>();
+
+export function registerCritiqueHighlight(fn: HighlightFn | null): void {
+  highlightFn = fn;
+  if (fn) fn(activeKinds);
+}
+
+export function critiqueHighlights(): string[] {
+  return activeKinds;
+}
+
+export function setCritiqueHighlights(kinds: string[]): void {
+  activeKinds = kinds;
+  highlightFn?.(kinds);
+  for (const l of kindListeners) l();
+}
+
+export function subscribeCritiqueHighlights(fn: () => void): () => void {
+  kindListeners.add(fn);
+  return () => {
+    kindListeners.delete(fn);
+  };
+}

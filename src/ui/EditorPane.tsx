@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EditorState } from "@codemirror/state";
 import { EditorView, keymap, placeholder, highlightActiveLine } from "@codemirror/view";
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
@@ -14,20 +14,19 @@ import {
   type CompletionResult,
 } from "@codemirror/autocomplete";
 import { store, useVaultVersion } from "../state/vaultStore";
-import { registerEditorInsert, registerTitleFocus, focusBeatDraft } from "./editorBridge";
-import { BeatsPanel } from "./BeatsPanel";
 import {
-  critiqueExtension,
-  setCritiqueKinds,
-  ALL_KINDS,
-  KIND_EXPLAIN,
-  KIND_LABEL,
-} from "./critiqueExtension";
+  registerEditorInsert,
+  registerTitleFocus,
+  focusBeatDraft,
+  registerCritiqueHighlight,
+} from "./editorBridge";
+import { BeatsPanel } from "./BeatsPanel";
+import { critiqueExtension, setCritiqueKinds } from "./critiqueExtension";
 import { taskCheckboxes } from "./taskCheckboxes";
 import { moveParagraph } from "../core/paragraphs";
 import { boardStore, useBoards } from "../state/boards";
 import { SLASH_TRIGGER, SLASH_INSERT, matchSlashCommands } from "./slashCommands";
-import { analyseProse, type IssueKind } from "../analysis/prose";
+import { type IssueKind } from "../analysis/prose";
 import { RewordPopover } from "./RewordPopover";
 import { rewordable } from "./rewordCore";
 
@@ -249,8 +248,9 @@ export function EditorPane() {
     setReword(null);
   };
 
-  // Which inline critique markers are on. Mirrored into a ref so a newly
-  // created view can pick them up without waiting for a render.
+  // Which inline critique markers are on. Driven by the Critique tab
+  // through the editor bridge; mirrored into a ref so a newly created
+  // view can pick them up without waiting for a render.
   const [kinds, setKinds] = useState<Set<IssueKind>>(new Set());
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
   const [titleDraft, setTitleDraft] = useState<string | null>(null);
@@ -265,6 +265,11 @@ export function EditorPane() {
     });
     return () => registerTitleFocus(null);
   }, []);
+
+  useEffect(() => {
+    registerCritiqueHighlight((next) => setKinds(new Set(next as IssueKind[])));
+    return () => registerCritiqueHighlight(null);
+  }, []);
   const kindsRef = useRef(kinds);
   kindsRef.current = kinds;
 
@@ -273,19 +278,6 @@ export function EditorPane() {
       effects: setCritiqueKinds.of(kinds.size ? kinds : null),
     });
   }, [kinds]);
-
-  // Counts on the chips, so toggling one with nothing to show doesn't
-  // read as a dead button — "Sticky" with no number means all clear.
-  const activeBody = store.active()?.body ?? "";
-  const critiqueCounts = useMemo<Record<IssueKind, number>>(() => {
-    const r = analyseProse(activeBody);
-    return {
-      sticky: r.stickySentences.length,
-      adverb: r.adverbs.length,
-      passive: r.passive.length,
-      echo: r.echoes.length,
-    };
-  }, [activeBody]);
 
   /* Adopt changes made to the note from outside the editor.
 
@@ -310,14 +302,6 @@ export function EditorPane() {
       selection: { anchor: Math.min(head, body.length) },
     });
   }, [version]);
-
-  const toggleKind = (k: IssueKind) =>
-    setKinds((prev) => {
-      const next = new Set(prev);
-      if (next.has(k)) next.delete(k);
-      else next.add(k);
-      return next;
-    });
 
   const active = store.active();
   const activeId = active?.id;
@@ -494,27 +478,6 @@ export function EditorPane() {
           </div>
         </div>
         <div className="editor-meta">
-          <div
-            className="critique-toggles"
-            role="group"
-            aria-label="Prose critique highlighters"
-            title="Prose critique — each toggle highlights one habit in the text. Hover a chip for what it means; the Critique tab on the right explains findings in full."
-          >
-            {ALL_KINDS.map((k) => (
-              <button
-                key={k}
-                className={`critique-chip ${k} ${kinds.has(k) ? "on" : ""}`}
-                onClick={() => toggleKind(k)}
-                title={`${KIND_EXPLAIN[k]} Click to ${kinds.has(k) ? "hide" : "highlight"}.`}
-                aria-pressed={kinds.has(k)}
-              >
-                {KIND_LABEL[k]}
-                {critiqueCounts[k] > 0 && (
-                  <span className="critique-count">{critiqueCounts[k]}</span>
-                )}
-              </button>
-            ))}
-          </div>
           {store.isDirty(active.id) && <span className="dot-dirty" title="Unsaved changes" />}
           <span title="Words in this note">{words.toLocaleString()} words</span>
         </div>

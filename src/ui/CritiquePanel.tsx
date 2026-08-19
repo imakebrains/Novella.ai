@@ -1,6 +1,12 @@
-import { useMemo } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import { store, useVaultVersion } from "../state/vaultStore";
 import { analyseProse } from "../analysis/prose";
+import {
+  critiqueHighlights,
+  setCritiqueHighlights,
+  subscribeCritiqueHighlights,
+} from "./editorBridge";
+import { ALL_KINDS, KIND_EXPLAIN, KIND_LABEL } from "./critiqueExtension";
 
 /* The writing-quality report. Everything here is computed locally, so it
    updates as you type and costs nothing. Framed as observations rather
@@ -38,11 +44,7 @@ export function CritiquePanel() {
           <Stat label="Avg length" value={`${report.avgSentenceWords.toFixed(1)}w`} />
           <Stat label="Reading" value={readTime} />
         </div>
-        <p className="hint">
-          The small chips under the chapter title — Sticky, Adverbs, Passive,
-          Echoes — highlight these same findings inside the text as you write.
-          This tab is the full report; the chips are the in-place view.
-        </p>
+        <HighlightRow counts={report} />
       </section>
 
       <Section title="Readability">
@@ -233,4 +235,39 @@ function truncate(s: string, n: number): string {
 }
 function dedupe(list: string[]): string[] {
   return [...new Set(list.map((s) => s.toLowerCase()))];
+}
+
+/* Turning a finding on marks it inside the prose itself. This lives with
+   the report rather than over the page, so the writer opts into marks
+   while reading about them instead of meeting four chips mid-sentence. */
+function HighlightRow({ counts }: { counts: ReturnType<typeof analyseProse> }) {
+  const on = useSyncExternalStore(subscribeCritiqueHighlights, critiqueHighlights, critiqueHighlights);
+  const found: Record<string, number> = {
+    sticky: counts.stickySentences.length,
+    adverb: counts.adverbs.length,
+    passive: counts.passive.length,
+    echo: counts.echoes.length,
+  };
+  const toggle = (kind: string) =>
+    setCritiqueHighlights(on.includes(kind) ? on.filter((k) => k !== kind) : [...on, kind]);
+
+  return (
+    <>
+      <p className="hint">Mark any of these inside the text as you write.</p>
+      <div className="critique-toggles" role="group" aria-label="Highlight findings in the text">
+        {ALL_KINDS.map((k) => (
+          <button
+            key={k}
+            className={`critique-chip ${k} ${on.includes(k) ? "on" : ""}`}
+            onClick={() => toggle(k)}
+            aria-pressed={on.includes(k)}
+            data-tip={KIND_EXPLAIN[k]}
+          >
+            {KIND_LABEL[k]}
+            {found[k] ? <span className="critique-count">{found[k]}</span> : null}
+          </button>
+        ))}
+      </div>
+    </>
+  );
 }

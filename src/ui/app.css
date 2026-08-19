@@ -6521,8 +6521,10 @@ body {
   pointer-events: none;
 }
 
-/* ---- 9.14 board entrances: boards and dock arrive like the modals do ---- */
-.corkboard,
+/* ---- 9.14 the dock arrives like the modals do ---- */
+/* The board deliberately does NOT animate: Write and Board are two views
+   of the same desk, and a surface that pops on every switch turns a tab
+   change into an event. The dock is different — it genuinely arrives. */
 .music-dock {
   animation: surface-in var(--motion-standard) var(--ease-enter);
 }
