@@ -21,7 +21,7 @@
     "typecheck": "tsc --noEmit",
     "test:engine": "tsx test.ts",
     "test": "tsx test-units.ts",
-    "verify": "tsc --noEmit && tsx test.ts && tsx test-units.ts && vite build",
+    "verify": "tsc --noEmit && tsx test.ts && tsx test-units.ts && tsx test-themes.ts && tsx test-tabs.ts && tsx test-stack.ts && tsx test-trash.ts && tsx test-timers.ts && tsx test-calendar.ts && tsx test-projectpreview.ts && vite build",
     "tauri": "tauri"
   },
   "dependencies": {
