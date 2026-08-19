@@ -15,6 +15,13 @@
   background: var(--bg-pane);
   border-bottom: 1px solid var(--border);
   user-select: none;
+  /* The titlebar hosts popups that hang below it (+ New, board picker).
+     With a backdrop set it also gets backdrop-filter, which makes it a
+     STACKING CONTEXT — and a z-index:40 popup inside a context that
+     paints before the panes lands behind the workspace, visible but
+     unclickable. Owning a z-index above its siblings frees them. */
+  position: relative;
+  z-index: 20;
 }
 
 /* ---------- banners ---------- */
@@ -7381,4 +7388,62 @@ body {
 :root.motion-minimal .intro-bg-img,
 :root.motion-minimal .intro-glow.bloom {
   animation: none;
+}
+
+/* ---- 9.32 the project demonstration (owner round 16) ---- */
+/* Each project type shows the shape of the folder it would really
+   create — derived from its files, so the picture can't lie. */
+.intro-preset {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 260px;
+  padding: var(--space-3);
+  text-align: left;
+}
+.preset-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-editor);
+  font-family: var(--font-ui);
+  font-size: var(--text-2xs);
+  line-height: 1.5;
+}
+.preset-folder {
+  color: var(--fg-secondary);
+  font-weight: 600;
+}
+.preset-file {
+  color: var(--fg-muted);
+  padding-left: var(--space-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.preset-file::before {
+  content: "· ";
+  opacity: 0.6;
+}
+.preset-taste {
+  margin: var(--space-1) 0 0;
+  padding-top: var(--space-1);
+  border-top: 1px solid var(--border);
+  font-family: var(--font-prose);
+  font-size: var(--text-xs);
+  font-style: italic;
+  color: var(--fg-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.preset-summary {
+  font-family: var(--font-ui);
+  font-size: var(--text-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--fg-muted);
 }

@@ -25,7 +25,9 @@ import catGif from "../assets/cat-loading.gif?inline";
 import catStill from "../assets/cat-still.avif?inline";
 import { store } from "../state/vaultStore";
 import { isTauri, storage } from "../storage";
-import { PRESETS, presetById } from "../seed/presets";
+import { PRESETS } from "../seed/presets";
+import { previewOf, previewSummary } from "./presetPreview";
+import { starterFiles } from "../seed/storySeeds";
 import { probeSetup, type SetupReport } from "../setupProbe";
 
 /* The welcome — a separate room, not a dialog.
@@ -310,7 +312,9 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
      takes under a second (it will), the list holds a beat so it reads. */
   const answerPreset = async (presetId: string) => {
     const started = performance.now();
-    const preset = presetById(presetId);
+    // The seed is taken here, not in the generator, so the generator stays
+    // pure — and so two writers installing Novella never open the same book.
+    const files = starterFiles(Date.now(), presetId);
     const title = "My first book";
     const themeName = THEMES.find((t) => t.id === committedTheme)?.name ?? "Ember";
     const plan: CreationStep[] = [
@@ -338,7 +342,7 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
         for (let i = 2; projects.some((p) => p.path === root); i++)
           root = `web://${slug}-${i}`;
       }
-      for (const [path, contents] of preset.files) {
+      for (const [path, contents] of files) {
         await storage().write(root, path, contents);
       }
       tick(0);
@@ -591,16 +595,38 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
 
             {screen.input === "preset" && (
               <div className="intro-presets">
-                {PRESETS.map((p) => (
-                  <button
-                    key={p.id}
-                    className="preset-card intro-preset"
-                    onClick={() => void answerPreset(p.id)}
-                  >
-                    <span className="preset-name">{p.name}</span>
-                    <span className="preset-blurb">{p.blurb}</span>
-                  </button>
-                ))}
+                {PRESETS.map((p) => {
+                  // Derived from the files this preset really creates, so
+                  // the demonstration can't drift from what you get.
+                  const demo = previewOf(p);
+                  return (
+                    <button
+                      key={p.id}
+                      className="preset-card intro-preset"
+                      onClick={() => void answerPreset(p.id)}
+                    >
+                      <span className="preset-name">{p.name}</span>
+                      <span className="preset-summary">{previewSummary(demo)}</span>
+                      <span className="preset-demo">
+                        {demo.rows.map((row) => (
+                          <span key={row.folder || "root"}>
+                            {row.folder && <span className="preset-folder">{row.folder}/</span>}
+                            {row.items.map((item) => (
+                              <span key={item} className="preset-file">
+                                {item}
+                              </span>
+                            ))}
+                            {row.more > 0 && (
+                              <span className="preset-file">and {row.more} more</span>
+                            )}
+                          </span>
+                        ))}
+                        {demo.taste && <span className="preset-taste">{demo.taste}</span>}
+                      </span>
+                      <span className="preset-blurb">{p.blurb}</span>
+                    </button>
+                  );
+                })}
               </div>
             )}
 

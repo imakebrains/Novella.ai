@@ -48,6 +48,9 @@ import { weekOf } from "./src/state/planner";
 import { agentIsDue } from "./src/state/agents";
 import { compareVersions } from "./src/state/updates";
 import { defaultBanner } from "./src/seed/bannerArt";
+import { PRESETS, presetById } from "./src/seed/presets";
+import { makeStarterWorld, starterFiles } from "./src/seed/storySeeds";
+import { previewOf, previewSummary, prettyName } from "./src/ui/presetPreview";
 import { backupFilename } from "./src/export/backupName";
 import { ARC_PER_LABEL, clipLabel, LABEL_MAX_CHARS, ringPositions, webCanvasSize } from "./src/ui/webLayout";
 import { SLASH_COMMANDS, SLASH_TRIGGER, SLASH_INSERT, matchSlashCommands } from "./src/ui/slashCommands";
@@ -1105,6 +1108,108 @@ lied, and Wren had known that since she was nine.
   check("reword: prompt carries the passage", req.prompt.includes("The rain stopped."), true);
   check("reword: prompt carries context", req.prompt.includes("Before text."), true);
   check("reword: system bans wrappers", req.system.includes("ONLY the rewritten passage"), true);
+}
+
+/* ---------- randomized starter worlds ---------- */
+
+{
+  const world = (seed: number, preset = "novel") => {
+    const files = makeStarterWorld(seed, preset);
+    const notes = files.map(([path, contents]) => parseNote(path, contents));
+    const vault = new Vault();
+    for (const n of notes) vault.add(n);
+    return { files, notes, vault };
+  };
+
+  const a = world(12345);
+  const b = world(12345);
+  const c = world(12346);
+
+  check("starter: same seed is byte-identical", JSON.stringify(a.files), JSON.stringify(b.files));
+  // Two installs a millisecond apart must not get the same book.
+  ok("starter: adjacent seeds diverge", JSON.stringify(a.files) !== JSON.stringify(c.files));
+
+  ok("starter: no file is empty", a.files.every(([path, text]) => path.length > 0 && text.trim().length > 0));
+  ok(
+    "starter: every file parses as a note",
+    a.notes.every((n) => n.title.length > 0 && n.type.length > 0 && !n.body.startsWith("---")),
+  );
+  check("starter: every wiki link resolves", a.vault.danglingLinks(), []);
+
+  const chapters = a.notes.filter((n) => n.type === "chapter");
+  check("starter: two chapters, numbered in order", chapters.map((n) => n.data.order), [1, 2]);
+  ok(
+    "starter: chapters carry real prose",
+    chapters.every((n) => n.body.split(/\s+/).length >= 60),
+  );
+  check(
+    "starter: the POV field points at the protagonist",
+    chapters.every((n) => a.vault.resolveLink(String(n.data.pov).replace(/\[|\]/g, ""))?.type === "character"),
+    true,
+  );
+  check("starter: a codex to link into", a.notes.filter((n) => n.type === "character").length, 2);
+  check("starter: and somewhere for it to happen", a.notes.filter((n) => n.type === "location").length, 1);
+  check("starter: a notes file", a.notes.filter((n) => n.type === "note").length, 1);
+
+  // Every preset has to produce a working project, not just the default.
+  for (const preset of PRESETS) {
+    const w = world(777, preset.id);
+    ok(`starter: the ${preset.id} preset holds together`, w.files.length >= 6 && w.vault.danglingLinks().length === 0);
+  }
+  const series = world(777, "series");
+  ok(
+    "starter: the series preset gets its own book folder and a lore entry",
+    series.files.some(([p]) => p.startsWith("Book-1/")) &&
+      series.notes.some((n) => n.type === "lore"),
+  );
+
+  // Blank Page promises an empty first chapter; a generated story would
+  // be a broken promise, so it is the one preset left alone.
+  check(
+    "starter: Blank Page stays blank",
+    JSON.stringify(starterFiles(999, "blank")),
+    JSON.stringify(presetById("blank").files),
+  );
+  ok(
+    "starter: every other preset is randomized",
+    JSON.stringify(starterFiles(1, "novel")) !== JSON.stringify(starterFiles(2, "novel")),
+  );
+
+  // The pools are only worth having if they actually spread. Every seed
+  // its own book, and every name in the pools reachable.
+  const heroes = new Set<string>();
+  const places = new Set<string>();
+  const worlds = new Set<string>();
+  for (let i = 0; i < 300; i++) {
+    const { files, notes } = world(i * 7919);
+    worlds.add(JSON.stringify(files));
+    heroes.add(String(notes.find((n) => n.tags.includes("protagonist"))?.title));
+    places.add(String(notes.find((n) => n.type === "location")?.title));
+  }
+  check("starter: 300 seeds give 300 different books", worlds.size, 300);
+  ok("starter: the pools are drawn from broadly", heroes.size >= 15 && places.size >= 12);
+}
+
+
+/* ---------- the project demonstration ---------- */
+
+{
+  check("preview: filenames read as titles", prettyName("Manuscript/02-What-The-Archivist-Kept.md"), "What The Archivist Kept");
+  check("preview: root files have no folder", prettyName("README.md"), "README");
+  for (const p of PRESETS) {
+    const demo = previewOf(p);
+    ok(`preview: ${p.id} shows something`, demo.rows.length > 0);
+    ok(
+      `preview: ${p.id} never invents a file`,
+      demo.rows.every((r) =>
+        r.items.every((item) => p.files.some(([path]) => prettyName(path) === item)),
+      ),
+    );
+    ok(`preview: ${p.id} counts no more than it has`, demo.chapters + demo.codex <= p.files.length);
+    ok(`preview: ${p.id} summarizes in words`, previewSummary(demo).length > 0);
+  }
+  const novel = previewOf(presetById("novel"));
+  ok("preview: the novel preset shows chapters", novel.chapters > 0);
 }
 
 /* ---------- report ---------- */

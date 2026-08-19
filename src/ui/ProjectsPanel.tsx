@@ -12,6 +12,7 @@ import {
 import { isTauri, storage } from "../storage";
 import type { WebStorage } from "../storage/webStorage";
 import { PRESETS, presetById } from "../seed/presets";
+import { starterFiles } from "../seed/storySeeds";
 import { defaultBanner } from "../seed/bannerArt";
 
 /* The projects screen.
@@ -74,8 +75,10 @@ export function ProjectsPanel({ onClose }: { onClose: () => void }) {
       const title = name.replace(/[-_]+/g, " ");
 
       // Scaffold the chosen preset so the folder structure explains itself.
+      // Seeded here rather than in the generator: every project gets its own
+      // starter world instead of everyone's first book being the same one.
       await storage().grantAccess(picked);
-      for (const [path, contents] of presetById(preset).files) {
+      for (const [path, contents] of starterFiles(Date.now(), preset)) {
         await storage().write(picked, path, contents);
       }
 
@@ -116,7 +119,7 @@ export function ProjectsPanel({ onClose }: { onClose: () => void }) {
       const orphaned =
         backing.kind === "web" ? await (backing as WebStorage).rootExists(root) : false;
       if (!orphaned) {
-        for (const [path, contents] of presetById(preset).files) {
+        for (const [path, contents] of starterFiles(Date.now(), preset)) {
           await backing.write(root, path, contents);
         }
       }
