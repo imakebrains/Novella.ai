@@ -553,12 +553,12 @@ export class VaultStore {
     this.emit();
 
     if (this.root) {
-      const backing = storage();
-      const stamp = new Date().toISOString().slice(0, 16).replace(/[T:]/g, "-");
-      const name = note.path.split("/").pop() ?? "note.md";
+      // No copy is taken here: state/trash.ts is the only caller, and it
+      // has already committed the note to the retention folder before
+      // reaching this point. A second copy written here would never
+      // expire, so it would quietly grow forever.
       try {
-        await backing.write(this.root, `.novella/trash/${stamp}-${name}`, serializeNote(note));
-        await backing.remove(this.root, note.path);
+        await storage().remove(this.root, note.path);
       } catch (err) {
         this.lastError = err instanceof Error ? err.message : String(err);
         this.emit();

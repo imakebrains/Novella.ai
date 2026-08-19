@@ -20,6 +20,7 @@ import { BoardStats } from "./ui/BoardStats";
 import type { BoardLayout } from "./ui/BoardLayoutToggle";
 import { RecoveryBanner } from "./ui/RecoveryBanner";
 import { UndoToastHost } from "./ui/UndoToastHost";
+import { TrashHost } from "./ui/TrashPanel";
 import { AmbientGlow } from "./ui/AmbientGlow";
 import { Backdrop } from "./ui/Backdrop";
 import { WelcomeIntro, introPending, registerIntroOpener } from "./ui/WelcomeIntro";
@@ -517,6 +518,7 @@ export default function App() {
       <AmbientGlow />
       <MusicDock open={musicOpen} onClose={() => setMusicOpen(false)} />
       <UndoToastHost />
+      <TrashHost />
 
       {paletteOpen && (
         <CommandPalette

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { store } from "../state/vaultStore";
 import { boardStore, useBoards } from "../state/boards";
-import { deleteNoteWithUndo } from "../state/deleteNote";
+import { archiveNoteWithUndo, deleteNoteWithUndo } from "../state/deleteNote";
+import { openTrash } from "./TrashPanel";
 import { focusEditorTitle } from "./editorBridge";
 import { stripWikiLinks } from "../ai/context";
 import { saveExport } from "../export/save";
@@ -199,16 +200,42 @@ export function NoteMenu({
         </button>
       ))}
 
+      <div className="editor-menu-label">Put it away</div>
+
+      <button
+        role="menuitem"
+        className="editor-menu-item"
+        title="Files this note in the trash. It leaves the codex and the boards, keeps its place, and can be restored to exactly where it was."
+        onClick={() => {
+          void archiveNoteWithUndo(noteId);
+          onClose();
+        }}
+      >
+        Archive note
+      </button>
+
       <button
         role="menuitem"
         className="editor-menu-item danger"
-        title="Deletes this note. Undo is offered, and a copy is kept in the project's trash."
+        title="Moves this note to the trash. Undo is offered, and the copy stays there until the retention window runs out or you empty it."
         onClick={() => {
           void deleteNoteWithUndo(noteId);
           onClose();
         }}
       >
         Delete note
+      </button>
+
+      <button
+        role="menuitem"
+        className="editor-menu-item"
+        title="Everything archived or deleted, with what's left of its retention window"
+        onClick={() => {
+          openTrash();
+          onClose();
+        }}
+      >
+        Open trash…
       </button>
     </div>
   );

@@ -11,6 +11,13 @@ import { dayKey } from "./sessions";
    Intents are the WRITER'S schedule, not the book's, so they're
    app-level (localStorage), not part of any vault: your Tuesday
    plan doesn't belong inside a novel's folder.
+
+   One line per day turned out to be one line too few, so the
+   calendar now keeps a LIST per day in calendarEntries.ts. This
+   store stays: it is still the shape the week strip wants, and it
+   is the source these intents are migrated FROM. Nothing is
+   deleted here on migration — a store that eats its own data the
+   first time a new version boots is a store nobody trusts.
    ============================================================ */
 
 const KEY = "novella.planner";
@@ -45,6 +52,12 @@ export const plannerStore = {
 
   intent(day: string): string {
     return intents[day] ?? "";
+  },
+
+  /** Every intent ever written, day -> text. Read by the calendar's
+      one-time migration; a copy, so nobody mutates the store's map. */
+  all(): Record<string, string> {
+    return { ...intents };
   },
 
   setIntent(day: string, text: string): void {

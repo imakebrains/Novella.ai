@@ -710,6 +710,7 @@ const TOOL_LABELS: Record<TabId, string> = {
   continuity: "Continuity",
   goals: "Goals",
   calendar: "Calendar",
+  timer: "Timer",
   music: "Music",
 };
 

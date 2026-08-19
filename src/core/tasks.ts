@@ -59,6 +59,76 @@ export function toggleTaskAt(body: string, checkbox: number): string | null {
   return null;
 }
 
+/* ------------------------------------------------------------
+   Rewriting a single task line
+
+   The Tasks panel edits, archives and deletes tasks, and each of
+   those is really one operation: replace or cut the line the task
+   lives on, leaving every other byte of the note alone. Doing it
+   here — pure, on offsets the caller already holds — means the
+   panel never hand-rolls string surgery on a manuscript.
+
+   Every function verifies the offset still holds a task line and
+   returns null when it doesn't, for the same reason toggleTaskAt
+   does: the body can change under a rendered list, and a confident
+   guess would rewrite prose.
+   ------------------------------------------------------------ */
+
+export interface TaskLine {
+  /** Offset of the line's first character — a BodyTask's lineFrom. */
+  from: number;
+  /** Offset of the terminating newline, or the body's end. */
+  to: number;
+  /** List marker and its trailing whitespace, e.g. `"  - "`. */
+  prefix: string;
+  /** The character inside the box: `" "`, `"x"` or `"X"`. */
+  box: string;
+  text: string;
+}
+
+/** Read the task line starting at `from`, or null if there isn't one.
+
+    `expect` is the text the caller believed was there. Passing it turns a
+    stale offset into a refusal rather than an edit to the wrong task —
+    worth it for anything destructive. */
+export function taskLineAt(body: string, from: number, expect?: string): TaskLine | null {
+  if (from < 0 || from > body.length) return null;
+  // Offsets that don't land on a line start belong to a different body.
+  if (from > 0 && body[from - 1] !== "\n") return null;
+  const nl = body.indexOf("\n", from);
+  const to = nl === -1 ? body.length : nl;
+  const m = TASK_LINE.exec(body.slice(from, to));
+  if (!m) return null;
+  const text = (m[3] ?? "").trim();
+  if (expect !== undefined && expect !== text) return null;
+  return { from, to, prefix: m[1]!, box: m[2]!, text };
+}
+
+/** Rewrite a task's text, keeping its indent, marker and tick.
+
+    Newlines are flattened: a task is one line by definition, so pasting a
+    paragraph into the edit box must not split it into prose the panel can
+    no longer see. */
+export function replaceTaskTextAt(body: string, from: number, text: string): string | null {
+  const line = taskLineAt(body, from);
+  if (!line) return null;
+  const clean = text.replace(/\s+/g, " ").trim();
+  const next = `${line.prefix}[${line.box}]${clean ? ` ${clean}` : ""}`;
+  if (next === body.slice(line.from, line.to)) return body;
+  return body.slice(0, line.from) + next + body.slice(line.to);
+}
+
+/** Cut a task line out entirely, newline and all — no blank gap left
+    behind where the task used to be. */
+export function removeTaskLineAt(body: string, from: number, expect?: string): string | null {
+  const line = taskLineAt(body, from, expect);
+  if (!line) return null;
+  // The line takes its own terminating newline; the last line of a body
+  // has none, so it takes the one in front of it instead.
+  if (line.to < body.length) return body.slice(0, line.from) + body.slice(line.to + 1);
+  return body.slice(0, line.from > 0 ? line.from - 1 : 0);
+}
+
 export interface TaskProgress {
   done: number;
   total: number;

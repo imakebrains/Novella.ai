@@ -47,11 +47,17 @@ function ok(name: string, condition: boolean): void {
   }
 }
 
-/** Prefs without the ceremony. Active defaults to the first visible tab. */
+/** Prefs without the ceremony. Active defaults to the first visible tab.
+
+    Nothing is stacked here on purpose: this file is the contract for the
+    ordinary one-tool pane, and it has to keep holding now that stacking
+    exists. The stacked arrangements are asserted in test-stack.ts. */
 const prefsOf = (order: TabId[], hidden: TabId[] = [], active?: TabId): TabPrefs => ({
   order,
   hidden,
   active: active ?? order.find((t) => !hidden.includes(t))!,
+  stack: [],
+  sizes: [1],
 });
 
 /* ---------- the registry itself ---------- */
