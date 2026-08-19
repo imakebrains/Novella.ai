@@ -39,6 +39,16 @@ export function motionModeOf(p: Personalization): "auto" | "full" | "minimal" {
   return p.motion === "full" || p.motion === "minimal" ? p.motion : "auto";
 }
 
+/** True when the OS asks for stillness but the app is playing motion —
+    the one case where we owe the writer an explanation. */
+export function overridingReducedMotion(): boolean {
+  return (
+    motionModeOf(loadPersonalization()) === "full" &&
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
 /** Should animation be suppressed right now? */
 export function reducedMotion(): boolean {
   const mode = motionModeOf(loadPersonalization());
@@ -71,6 +81,18 @@ export const DEFAULTS: Personalization = {
   leading: 1.4,
   measure: "standard",
   corners: "rounded",
+  /* Animations play by default.
+
+     "auto" (follow the OS) was the old default and it silently flattened
+     the app for a large group of Windows writers: the OS "animation
+     effects" toggle is a general visual-effects/performance switch that
+     is off on countless machines whose owners never asked for stillness,
+     and when it is off the webview reports prefers-reduced-motion and
+     every transition in the app is stripped. People who genuinely need
+     reduced motion still get it in one click — Settings → Appearance →
+     Motion → Follow system — and when the OS asks for reduce while we
+     are playing full, the app says so out loud (see App.tsx). */
+  motion: "full",
 };
 
 export function loadPersonalization(): Personalization {

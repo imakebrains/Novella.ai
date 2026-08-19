@@ -29,6 +29,11 @@ import { installAgentRunner } from "./state/agentRunner";
 import { useTheme } from "./ui/useTheme";
 import { store, useVaultVersion } from "./state/vaultStore";
 import { isTauri, storage } from "./storage";
+import {
+  loadPersonalization,
+  overridingReducedMotion,
+  savePersonalization,
+} from "./ui/personalize";
 
 export default function App() {
   useVaultVersion();
@@ -351,6 +356,7 @@ export default function App() {
       </header>
 
       <RecoveryBanner />
+      <MotionNotice />
 
       {!persistent && (
         <div className="banner">
@@ -556,4 +562,41 @@ function SaveStatus({
       </span>
     );
   return null;
+}
+
+
+/* Honest disclosure: animations ship on by default, because the OS
+   "reduce motion" flag is off on countless machines whose owners never
+   asked for stillness. Anyone who DID ask deserves to be told, once,
+   that we are overriding them — and to fix it in one click. */
+function MotionNotice() {
+  const DISMISS_KEY = "novella.motionNoticeSeen";
+  const [show, setShow] = useState(
+    () => overridingReducedMotion() && localStorage.getItem(DISMISS_KEY) !== "1",
+  );
+  if (!show) return null;
+  const close = () => {
+    localStorage.setItem(DISMISS_KEY, "1");
+    setShow(false);
+  };
+  return (
+    <div className="banner">
+      <span className="banner-icon" aria-hidden>
+        ✳
+      </span>
+      Your system asks for reduced motion. Novella is playing its animations anyway.
+      <button
+        className="banner-action"
+        onClick={() => {
+          savePersonalization({ ...loadPersonalization(), motion: "auto" });
+          close();
+        }}
+      >
+        Follow my system
+      </button>
+      <button className="banner-action" onClick={close}>
+        Keep the motion
+      </button>
+    </div>
+  );
 }

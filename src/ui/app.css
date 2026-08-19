@@ -7140,7 +7140,7 @@ body {
    reach for them — the wall of a working writer. */
 .intro-theme,
 .intro-bg-card {
-  --tilt: -1.4deg;
+  --tilt: -2.2deg;
   animation: pop-set 420ms steps(4, end) both;
   transition: transform var(--motion-quick) var(--ease-enter),
     border-color var(--motion-quick) var(--ease-color),
@@ -7148,7 +7148,7 @@ body {
 }
 .intro-theme:nth-child(even),
 .intro-bg-card:nth-child(even) {
-  --tilt: 1.3deg;
+  --tilt: 2deg;
 }
 .intro-theme:hover,
 .intro-bg-card:hover {
