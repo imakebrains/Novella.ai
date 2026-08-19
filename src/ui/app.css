@@ -7483,3 +7483,22 @@ body.focus-mode .focus-exit:hover {
   height: 84px;
   opacity: 0.86;
 }
+
+/* ---- 9.34 board: cover art is a preference ---- */
+/* The cards board takes the toggle as a prop, but the grid and table
+   layouts render their own banner — one rule makes the preference mean
+   the same thing in every board layout. */
+body.board-banner-off .board-banner {
+  display: none;
+}
+/* The board is now a grid item in the workspace's centre track rather
+   than a flex child, and grid items default to min-width:auto — this
+   keeps a wide board from pushing the track open. */
+.workspace > .corkboard {
+  min-width: 0;
+}
+/* Board mode brings its own head spacing; focus mode's extra padding
+   above the editor would double it. */
+body.focus-mode .workspace.board-mode {
+  padding-top: 0;
+}

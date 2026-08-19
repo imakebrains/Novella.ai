@@ -14,13 +14,27 @@ import { SetupPanel } from "./SetupPanel";
 import { CalendarTab } from "./CalendarTab";
 import { GoalsTab } from "./GoalsTab";
 import { MusicTab } from "./MusicTab";
-import { cycleTab, tabPrefs, useTabPrefs, type TabId } from "./inspectorTabs";
+import {
+  cycleTab,
+  hiddenTabs,
+  tabPrefs,
+  useTabPrefs,
+  visibleTabs,
+  type TabId,
+  type TabPrefs,
+} from "./inspectorTabs";
 
 /* The inspector: the writer's toolbelt, arranged by the writer.
 
    Every tab can be dragged to reorder or closed outright (the + menu
    brings closed ones back). Someone who never uses Critique shouldn't
    look at it every day; someone who lives in Tasks can put it first.
+
+   Two doors onto the same tools, on purpose. The Tools button names where
+   you are and lists everywhere you could be — one click, no aim required,
+   and a wheel over it flips through them. The strip beneath it is the
+   arrangement made physical: what you keep, in your order, one click away.
+   Both read the same prefs, so neither can drift from the other.
 
    Needing the active note is per-tab: Calendar, Goals, Tasks and Music
    are project-wide and work with nothing open. */
@@ -98,9 +112,6 @@ export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => 
     }
   };
 
-  // One dropdown instead of a wrapping tab strip — owner feedback: the
-  // row of tabs read as clutter. The dropdown names where you are and
-  // lists everywhere you could be, with a one-line description each.
   return (
     <aside className="pane pane-right">
       <div className="pane-head inspector-head" ref={headRef}>
@@ -109,7 +120,9 @@ export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => 
           onClick={() => setPlusOpen((v) => !v)}
           onWheel={(e) => {
             // Scroll over the button to flip through tools without opening
-            // the menu — peek by wheel, commit by click.
+            // the menu — peek by wheel, commit by click. It walks the
+            // visible tabs in the writer's own order, so a reordered strip
+            // reorders the wheel with it.
             e.preventDefault();
             const dir = e.deltaY > 0 ? 1 : -1;
             tabPrefs.setActive(cycleTab(tab, tabPrefs.visible(), dir));
@@ -122,7 +135,7 @@ export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => 
 
         {plusOpen && (
           <div className="tool-picker-menu" role="menu">
-            {tabPrefs.visible().map((id) => (
+            {visibleTabs(prefs).map((id) => (
               <button
                 key={id}
                 role="menuitem"
@@ -141,8 +154,335 @@ export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => 
         )}
       </div>
 
-      <div className="pane-scroll">{renderTab(tab)}</div>
+      <TabStrip prefs={prefs} />
+
+      <div
+        className="pane-scroll"
+        id={PANEL_ID}
+        role="tabpanel"
+        aria-label={`${TAB_DEFS[tab].label} — ${TAB_DEFS[tab].title}`}
+      >
+        {renderTab(tab)}
+      </div>
     </aside>
+  );
+}
+
+/* ---------------- the tab strip ---------------- */
+
+/* Reorder by dragging, close with the ✕, bring closed ones back from the +.
+
+   Dragging is pointer-based rather than HTML5 drag-and-drop — the same
+   choice the corkboard made, for the same reason: a tab is itself
+   interactive (click to open, ✕ to close), and browsers refuse to start a
+   native drag from inside a button. Pointer events have no such rule, and
+   they carry touch and pen without a second code path.
+
+   Dragging is never the ONLY way to rearrange. It is unavailable to a
+   keyboard, and unkind to anyone with a tremor or a small trackpad, so
+   Alt+← / Alt+→ nudges the focused tab and the + menu spells the same
+   moves out as ordinary buttons.
+
+   The component stays thin on purpose: it turns pointers into an index and
+   hands that to inspectorTabs, which owns every rule about what an
+   arrangement may become. */
+
+const PANEL_ID = "inspector-panel";
+const DRAG_THRESHOLD_PX = 5;
+
+function TabStrip({ prefs }: { prefs: TabPrefs }) {
+  const visible = visibleTabs(prefs);
+  const hidden = hiddenTabs(prefs);
+
+  const stripRef = useRef<HTMLDivElement>(null);
+  const plusRef = useRef<HTMLDivElement>(null);
+  const [plusOpen, setPlusOpen] = useState(false);
+  const [dragId, setDragId] = useState<TabId | null>(null);
+  const [overIndex, setOverIndex] = useState<number | null>(null);
+  // How far the tab has travelled from where it was grabbed. It's
+  // translated by this so it physically follows the finger; a tab that
+  // stays pinned while you drag reads as broken.
+  const [offset, setOffset] = useState<{ x: number; y: number } | null>(null);
+
+  // Mutable drag bookkeeping lives in a ref, not state: pointermove fires
+  // far faster than React re-renders, and the first few moves of a drag
+  // would be lost waiting for state to settle.
+  const drag = useRef<{ tab: TabId; startX: number; startY: number; active: boolean } | null>(null);
+
+  const endDrag = useCallback(() => {
+    drag.current = null;
+    setDragId(null);
+    setOverIndex(null);
+    setOffset(null);
+  }, []);
+
+  // A cancelled drag must leave nothing behind — no lifted tab, no stale
+  // drop marker. Escape is the reflex people already have; pointercancel
+  // and a lost capture (the browser taking the pointer for a scroll or a
+  // system gesture) route to the same cleanup.
+  useEffect(() => {
+    if (!dragId) return;
+    const key = (e: KeyboardEvent) => {
+      if (e.key === "Escape") endDrag();
+    };
+    window.addEventListener("keydown", key);
+    return () => window.removeEventListener("keydown", key);
+  }, [dragId, endDrag]);
+
+  // Click-away and Escape close the + menu.
+  useEffect(() => {
+    if (!plusOpen) return;
+    const away = (e: MouseEvent) => {
+      if (!plusRef.current?.contains(e.target as Node)) setPlusOpen(false);
+    };
+    const key = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setPlusOpen(false);
+    };
+    window.addEventListener("mousedown", away);
+    window.addEventListener("keydown", key);
+    return () => {
+      window.removeEventListener("mousedown", away);
+      window.removeEventListener("keydown", key);
+    };
+  }, [plusOpen]);
+
+  /** Which visible slot sits under a point, hit-tested against what's
+      actually on screen. The strip wraps onto a second row in a narrow
+      pane, so arithmetic along one axis would put tabs in the wrong place;
+      rectangles can't be wrong about it. The dragged tab is skipped — it
+      travels with the cursor, so it would otherwise always be the answer. */
+  const indexAt = (x: number, y: number, skip: TabId | null): number | null => {
+    const strip = stripRef.current;
+    if (!strip) return null;
+    for (const el of strip.querySelectorAll<HTMLElement>("[data-tab-index]")) {
+      if (skip && el.dataset.tabId === skip) continue;
+      const r = el.getBoundingClientRect();
+      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
+        return Number(el.dataset.tabIndex);
+      }
+    }
+    return null;
+  };
+
+  // Moving the tool with an arrow key should move the focus ring with it,
+  // or the next keypress comes from somewhere the writer isn't looking.
+  // A frame's wait, because the tab to focus doesn't exist until React has
+  // rendered the new arrangement.
+  const focusTab = (id: TabId) => {
+    requestAnimationFrame(() =>
+      stripRef.current?.querySelector<HTMLElement>(`[data-tab-id="${id}"]`)?.focus(),
+    );
+  };
+
+  const onPointerDown = (e: React.PointerEvent<HTMLElement>, tab: TabId) => {
+    // The ✕ has its own job; a drag begun on it would fight the click.
+    if ((e.target as HTMLElement).closest("[data-no-drag]")) return;
+    if (e.button !== 0) return;
+    // Capture keeps the drag alive when the cursor outruns the tab. It can
+    // throw if the pointer is already released; a failed capture shouldn't
+    // take dragging down with it.
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      /* drag still works, just without capture */
+    }
+    drag.current = { tab, startX: e.clientX, startY: e.clientY, active: false };
+  };
+
+  const onPointerMove = (e: React.PointerEvent<HTMLElement>) => {
+    const d = drag.current;
+    if (!d) return;
+
+    if (!d.active) {
+      // A click must not become a drag, or opening a tool by tapping it
+      // would be impossible.
+      if (Math.hypot(e.clientX - d.startX, e.clientY - d.startY) < DRAG_THRESHOLD_PX) return;
+      d.active = true;
+      setDragId(d.tab);
+    }
+
+    setOffset({ x: e.clientX - d.startX, y: e.clientY - d.startY });
+    const idx = indexAt(e.clientX, e.clientY, d.tab);
+    if (idx !== null) setOverIndex(idx);
+  };
+
+  const onPointerUp = (e: React.PointerEvent<HTMLElement>, tab: TabId) => {
+    // Read the drag before releasing capture: the release fires
+    // lostpointercapture, whose handler clears this very ref.
+    const d = drag.current;
+    drag.current = null;
+
+    try {
+      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      }
+    } catch {
+      /* already released */
+    }
+
+    // Nothing on record means the press began somewhere that opted out
+    // (the ✕, or a right-click). That control answers for itself; this is
+    // not a click on the tab.
+    if (!d) return;
+
+    if (d.active) {
+      const idx = indexAt(e.clientX, e.clientY, d.tab);
+      if (idx !== null) tabPrefs.move(d.tab, idx);
+    } else {
+      tabPrefs.setActive(tab);
+    }
+    endDrag();
+  };
+
+  return (
+    <div className="pane-head tabs inspector-tabs" role="tablist" aria-label="Tools" ref={stripRef}>
+      {visible.map((id, i) => {
+        const on = prefs.active === id;
+        const dragging = dragId === id;
+        return (
+          <div
+            key={id}
+            className={`tab ${on ? "on" : ""} ${dragging ? "dragging" : ""} ${
+              overIndex === i && dragId !== null && !dragging ? "drop-target" : ""
+            }`}
+            data-tab-index={i}
+            data-tab-id={id}
+            role="tab"
+            aria-selected={on}
+            aria-controls={PANEL_ID}
+            tabIndex={0}
+            title={`${TAB_DEFS[id].title} — drag to reorder, or Alt+← / Alt+→`}
+            style={{
+              // Drag mechanics, not decoration, so they live beside the code
+              // that depends on them: without touch-action a finger drag
+              // scrolls the pane instead of moving the tab, and without the
+              // selection guard the strip highlights its own labels mid-drag.
+              touchAction: "none",
+              userSelect: "none",
+              ...(dragging && offset
+                ? { transform: `translate(${offset.x}px, ${offset.y}px)` }
+                : null),
+            }}
+            onPointerDown={(e) => onPointerDown(e, id)}
+            onPointerMove={onPointerMove}
+            onPointerUp={(e) => onPointerUp(e, id)}
+            onPointerCancel={endDrag}
+            onLostPointerCapture={endDrag}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                tabPrefs.setActive(id);
+              } else if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+                e.preventDefault();
+                const dir = e.key === "ArrowRight" ? 1 : -1;
+                // Alt rearranges, a bare arrow walks the strip. One modifier
+                // apart, so the gesture for moving a tab is a single step
+                // from the navigation everyone tries first.
+                if (e.altKey) {
+                  tabPrefs.nudge(id, dir);
+                } else {
+                  const next = cycleTab(id, visible, dir);
+                  tabPrefs.setActive(next);
+                  focusTab(next);
+                }
+              }
+            }}
+          >
+            {TAB_DEFS[id].label}
+            {/* The last tab keeps its ✕ hidden rather than disabled: a
+                control that refuses is worse than one that isn't offered. */}
+            {visible.length > 1 && (
+              <button
+                className="tab-close"
+                data-no-drag
+                aria-label={`Close ${TAB_DEFS[id].label}`}
+                title={`Close ${TAB_DEFS[id].label} — the + brings it back`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  tabPrefs.hide(id);
+                }}
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        );
+      })}
+
+      <div className="tab-plus-wrap" ref={plusRef}>
+        <button
+          className="tab tab-plus"
+          aria-expanded={plusOpen}
+          aria-haspopup="true"
+          title="Add a tool back, or rearrange the tabs"
+          onClick={() => setPlusOpen((v) => !v)}
+        >
+          +
+        </button>
+
+        {plusOpen && (
+          <div className="tab-plus-pop" aria-label="Arrange tools">
+            <p className="tab-plus-title">Add</p>
+            {hidden.length === 0 ? (
+              <p className="tab-plus-hint">Every tool is already here.</p>
+            ) : (
+              hidden.map((id) => (
+                <button
+                  key={id}
+                  title={TAB_DEFS[id].title}
+                  onClick={() => {
+                    tabPrefs.show(id);
+                    // Adding closes the menu — you asked for that tool, so
+                    // the next thing you want is to see it.
+                    setPlusOpen(false);
+                  }}
+                >
+                  <span className="tab-plus-check">+</span>
+                  {TAB_DEFS[id].label}
+                </button>
+              ))
+            )}
+
+            {/* The keyboard's route to everything the drag does. It stays
+                open while you use it: rearranging is rarely one move. */}
+            <p className="tab-plus-title">Arrange</p>
+            {visible.map((id, i) => (
+              <div className="tab-plus-row" key={id}>
+                <span className="tab-plus-name">{TAB_DEFS[id].label}</span>
+                <button
+                  className="tab-plus-move"
+                  disabled={i === 0}
+                  aria-label={`Move ${TAB_DEFS[id].label} left`}
+                  title="Move left"
+                  onClick={() => tabPrefs.nudge(id, -1)}
+                >
+                  ◀
+                </button>
+                <button
+                  className="tab-plus-move"
+                  disabled={i === visible.length - 1}
+                  aria-label={`Move ${TAB_DEFS[id].label} right`}
+                  title="Move right"
+                  onClick={() => tabPrefs.nudge(id, 1)}
+                >
+                  ▶
+                </button>
+                <button
+                  className="tab-plus-move"
+                  disabled={visible.length <= 1}
+                  aria-label={`Remove ${TAB_DEFS[id].label}`}
+                  title="Take it off the strip"
+                  onClick={() => tabPrefs.hide(id)}
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+            <p className="tab-plus-hint">Drag a tab to move it, or use these arrows.</p>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 

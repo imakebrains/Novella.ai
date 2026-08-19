@@ -145,12 +145,25 @@ export function readableOn(hex: string): string {
   return lum > 140 ? "#131113" : "#f5f0ea";
 }
 
-/** Soft wash version of the accent for backgrounds. */
-function softOf(hex: string): string {
+/** Soft wash version of the accent for backgrounds.
+    Exported so custom themes (customThemes.ts) derive --accent-soft the
+    same way rather than inventing a second, slightly different wash. */
+export function softOf(hex: string): string {
   const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
   if (!m) return "rgb(128 128 128 / 0.12)";
   const n = parseInt(m[1]!, 16);
   return `rgb(${(n >> 16) & 255} ${(n >> 8) & 255} ${n & 255} / 0.13)`;
+}
+
+/* Clearing the accent override means "fall back to the theme". For the
+   five built-ins that's automatic — removing the inline property reveals
+   the value theme.css set. A writer's own theme has no stylesheet to
+   reveal, so customThemes.ts registers a callback here that re-states its
+   accent. Registered rather than imported so this file stays the lower
+   layer and knows nothing about custom themes. */
+let accentFallback: (() => void) | null = null;
+export function setAccentFallback(fn: (() => void) | null): void {
+  accentFallback = fn;
 }
 
 export function applyPersonalization(p: Personalization): void {
@@ -164,6 +177,7 @@ export function applyPersonalization(p: Personalization): void {
     root.removeProperty("--accent");
     root.removeProperty("--accent-soft");
     root.removeProperty("--accent-fg");
+    accentFallback?.();
   }
 
   if (p.proseFont && p.proseFont !== "serif") {

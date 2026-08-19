@@ -31,10 +31,17 @@ export function Corkboard({
   onOpen,
   layout,
   setLayout,
+  bannerOn,
+  onToggleBanner,
 }: {
   onOpen: (id: string) => void;
   layout: BoardLayout;
   setLayout: (l: BoardLayout) => void;
+  /* Cover art is a mood-setter for one writer and 168px of stolen board
+     for the next, so App owns the preference and every board view reads
+     the same answer. */
+  bannerOn: boolean;
+  onToggleBanner: () => void;
 }) {
   useVaultVersion();
   const project = useActiveProject();
@@ -174,7 +181,7 @@ export function Corkboard({
 
   return (
     <main className="corkboard">
-      {project?.banner && (
+      {project?.banner && bannerOn && (
         <div
           className="board-banner"
           style={{ backgroundImage: `url(${project.banner})` }}
@@ -223,6 +230,21 @@ export function Corkboard({
             </button>
           )}
           {onManuscript && <BoardLayoutToggle layout={layout} setLayout={setLayout} />}
+          {/* Offered only when there IS cover art — a control that hides
+              nothing is a puzzle, not an option. It sits in the board
+              header rather than Settings because that's where the writer
+              is looking when the image is in the way. */}
+          {project?.banner && (
+            <button
+              className={`icon-btn board-banner-toggle ${bannerOn ? "on" : ""}`}
+              onClick={onToggleBanner}
+              aria-pressed={bannerOn}
+              aria-label={bannerOn ? "Hide cover art" : "Show cover art"}
+              data-tip={bannerOn ? "Hide the cover art" : "Show the cover art"}
+            >
+              {bannerOn ? "▣" : "▢"}
+            </button>
+          )}
         </div>
       </header>
 

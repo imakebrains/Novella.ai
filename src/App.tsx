@@ -66,6 +66,13 @@ export default function App() {
     // preference for them would strand the board on an unreachable view.
     return saved && ["cards", "grid", "table"].includes(saved) ? saved : "cards";
   });
+  // Cover art on the board. Global rather than per-project: a writer who
+  // finds a hero image distracting finds it distracting on every book, and
+  // a per-project flag would mean re-hiding it after every switch. Default
+  // on, so nobody loses art they deliberately added.
+  const [bannerOn, setBannerOn] = useState(
+    () => localStorage.getItem("novella.board.banner") !== "0",
+  );
   // Focus mode: nothing but the page. Distraction-free writing is the most
   // consistently praised feature across every competitor, and it's the one
   // that makes a feature-dense app bearable — depth on demand, calm by
@@ -212,6 +219,15 @@ export default function App() {
     localStorage.setItem("novella.boardLayout", boardLayout);
   }, [boardLayout]);
 
+  // Mirrored onto <body> the way focus mode is. The cards board takes the
+  // flag as a prop, but the grid/table/web/stats views each render their
+  // own banner; a body class reaches all of them without threading a
+  // preference through five component signatures.
+  useEffect(() => {
+    localStorage.setItem("novella.board.banner", bannerOn ? "1" : "0");
+    document.body.classList.toggle("board-banner-off", !bannerOn);
+  }, [bannerOn]);
+
   useEffect(() => {
     localStorage.setItem("novella.pane.left", leftOpen ? "1" : "0");
   }, [leftOpen]);
@@ -246,7 +262,65 @@ export default function App() {
     { id: "theme", label: `Change theme (now: ${themeInfo.name})`, run: cycleTheme },
     { id: "left", label: leftOpen ? "Hide codex pane" : "Show codex pane", run: () => setLeftOpen((v) => !v) },
     { id: "right", label: rightOpen ? "Hide inspector" : "Show inspector", run: () => setRightOpen((v) => !v) },
+    { id: "banner", label: bannerOn ? "Hide board cover art" : "Show board cover art", hint: "board", run: () => setBannerOn((v) => !v) },
   ];
+
+  // The centre of the workspace. Board and Write are two views of one
+  // room, not two rooms: whichever is showing, the Codex and Tools panes
+  // bracket it, so their titlebar toggles mean the same thing in both.
+  const center =
+    mode === "board" ? (
+      boardLayout === "grid" ? (
+        <PlotGrid
+          onOpen={(id) => {
+            store.open(id);
+            setMode("write");
+          }}
+          layout={boardLayout}
+          setLayout={setBoardLayout}
+        />
+      ) : boardLayout === "table" ? (
+        <TableView
+          onOpen={(id) => {
+            store.open(id);
+            setMode("write");
+          }}
+          layout={boardLayout}
+          setLayout={setBoardLayout}
+        />
+      ) : boardLayout === "web" ? (
+        <RelationshipWeb
+          onOpen={(id) => {
+            store.open(id);
+            setMode("write");
+          }}
+          layout={boardLayout}
+          setLayout={setBoardLayout}
+        />
+      ) : boardLayout === "stats" ? (
+        <BoardStats
+          onOpen={(id) => {
+            store.open(id);
+            setMode("write");
+          }}
+          layout={boardLayout}
+          setLayout={setBoardLayout}
+        />
+      ) : (
+        <Corkboard
+          onOpen={(id) => {
+            store.open(id);
+            setMode("write");
+          }}
+          layout={boardLayout}
+          setLayout={setBoardLayout}
+          bannerOn={bannerOn}
+          onToggleBanner={() => setBannerOn((v) => !v)}
+        />
+      )
+    ) : (
+      <EditorPane />
+    );
 
   return (
     <div className="app">
@@ -391,56 +465,8 @@ export default function App() {
         </div>
       )}
 
-      {mode === "board" ? (
-        boardLayout === "grid" ? (
-          <PlotGrid
-            onOpen={(id) => {
-              store.open(id);
-              setMode("write");
-            }}
-            layout={boardLayout}
-            setLayout={setBoardLayout}
-          />
-        ) : boardLayout === "table" ? (
-          <TableView
-            onOpen={(id) => {
-              store.open(id);
-              setMode("write");
-            }}
-            layout={boardLayout}
-            setLayout={setBoardLayout}
-          />
-        ) : boardLayout === "web" ? (
-          <RelationshipWeb
-            onOpen={(id) => {
-              store.open(id);
-              setMode("write");
-            }}
-            layout={boardLayout}
-            setLayout={setBoardLayout}
-          />
-        ) : boardLayout === "stats" ? (
-          <BoardStats
-            onOpen={(id) => {
-              store.open(id);
-              setMode("write");
-            }}
-            layout={boardLayout}
-            setLayout={setBoardLayout}
-          />
-        ) : (
-          <Corkboard
-            onOpen={(id) => {
-              store.open(id);
-              setMode("write");
-            }}
-            layout={boardLayout}
-            setLayout={setBoardLayout}
-          />
-        )
-      ) : (
       <div
-        className="workspace"
+        className={`workspace ${mode === "board" ? "board-mode" : ""}`}
         style={{
           // Focus mode is the whole point of a "just the page" view, so the
           // side panes collapse regardless of their toggles — one centered
@@ -469,7 +495,7 @@ export default function App() {
           />
         )}
 
-        <EditorPane />
+        {center}
 
         {!focus && rightOpen && (
           <Resizer
@@ -480,7 +506,6 @@ export default function App() {
         )}
         {!focus && rightOpen && <InspectorPane onShowMusicPlayer={() => setMusicOpen(true)} />}
       </div>
-      )}
 
       {focus && (
         <button className="focus-exit" onClick={() => setFocus(false)} data-tip="Leave focus mode (Esc)">
