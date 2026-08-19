@@ -4081,3 +4081,154 @@ check at full frequency.
 - blog.taaonline.net (Bartz v. Anthropic), authorsalliance.org
 - PacerMonitor, Justia, Bloomberg Law (Carreyrou et al. v. Anthropic PBC et al., 3:25-cv-10897)
 - EU AI Act Article 53 enforcement coverage
+
+# Round 34 (2026-08-19) — cadence, seventh consecutive thin round, one small find
+
+Same brief as rounds 28-33: fresh reviews, feature announcements, and
+complaints for NovelCrafter, Sudowrite, Dabble, Scrivener, Campfire,
+type.ai, Obsidian-for-writers setups, and Notion writing templates,
+checked against everything already logged through round 33. Dispatched
+four parallel passes (NovelCrafter/Sudowrite; Dabble/Scrivener/Campfire;
+type.ai/Obsidian/new-entrant scan and the four-pillar competitive check;
+industry/legal sentiment including the two litigation dates rounds 31-33
+flagged as imminent), each briefed on the relevant standing findings and
+told to search for material dated strictly after round 33's 2026-08-18
+cutoff.
+
+**Housekeeping, same recurring class of issue.** The session started with
+HEAD detached at round 33's own commit. `git fetch origin main` (done
+first this time, per round 33's own lesson) confirmed `origin/main`
+already matched local HEAD exactly — nothing unpushed, no risk. Re-
+attached HEAD to `main` tracking `origin/main` and confirmed a clean
+working tree before starting research. This is at least the sixth round
+(24, 29, 30, 31, 33, now 34) where the session began with HEAD detached
+rather than on a tracking branch; still not fixed at the container or
+script level.
+
+## NovelCrafter / Sudowrite
+
+**New, dated:** Sudowrite's changelog (feedback.sudowrite.com/changelog)
+shipped "Easier Formatting: Paragraph Spacing & Improved Copy/Paste" on
+2026-08-18. Contents: a new "Paragraph Spacing" account-level preference
+that applies consistently across projects; a toolbar button to collapse
+empty "spacer" lines at the document or project level; improved copy/
+paste specifically from Word and Google Docs that stops producing doubled
+line breaks on the way in; headings that now scale with surrounding text
+size instead of a fixed size; nested bullet lists getting proper markers
+instead of flattening; and formatting now displaying consistently between
+the live editor and the History/version view (previously these could
+diverge). Several of Sudowrite's own older feedback-board threads had
+asked for exactly this, so it reads as a backlog clear rather than a
+strategic move.
+
+Checked our own editor for the same gap: grepped `EditorPane.tsx` for any
+paste-event handling and found none — CodeMirror's default paste behavior
+runs unfiltered, so a writer pasting a chapter draft in from Word almost
+certainly inherits the same doubled-line-break mess Sudowrite just fixed.
+Filed as a new, low-priority "Next up" item (round 34) — real but not
+thesis-central, since it's pure editor mechanics rather than anything
+touching the local-AI/four-app positioning.
+
+NovelCrafter's changelog (feedback.novelcrafter.com/changelog) is still
+at its March 21, 2026 entry with nothing newer; its blog has no post past
+the already-logged Aug 5 Opus-5 piece. Sudowrite's status page shows all
+services operational as of this round with no new incident since the
+already-known Aug 11 partial outage (uptime holding 99.98%/99.97%).
+Trustpilot searches for both products turned up nothing with a verifiable
+date past mid-2026.
+
+## Dabble / Scrivener / Campfire
+
+Fully dry across all three. Dabble: no post on dabblewriter.com/blog, no
+dated Trustpilot or Reddit item (Trustpilot searches for "Dabble" mostly
+surface an unrelated betting company and were discarded). Scrivener:
+literatureandlatte.com/latest and the release-notes page show no release
+past the already-known Mac 3.5.0 (Oct 2025) / Windows 3.1.6 (Sep 2025);
+the long-running "New Lit&Lat writing app" forum thread has no post newer
+than June 27, 2026. Campfire Write: still v1.3.2 on the App Store (June
+29, 2026, "bugfixes and performance improvements"); campfirewriting.com/
+learn's "Update 42" post describes custom attributes/panel border
+effects/improved navigation that match the already-logged v1.3.1 (June
+12) release, not a new one.
+
+## type.ai / Obsidian / four-pillar check
+
+type.ai still has no dated changelog anywhere findable — type.ai/changelog
+404s, and the only substantive 2026 review coverage (Medium, Softynex,
+ToolRadar) is from April 2026 and already stale on model access. Obsidian:
+obsidianstats.com still shows Longform's last update as "5 years ago" (the
+2025-03-20 v2.1.0 freeze, unchanged); no plugin in our tracked set updated
+after 2026-08-18.
+
+**Four-pillar check, twentieth recheck (rounds 15, 17-34):** again no
+match — round 33's flag about whether to keep running this exact check
+every round is still open, unanswered by the owner, so it ran again this
+round rather than being silently retired. One newly-noticed entrant:
+NovelWriter (github.com/KudoShusak/NovelWriter), a command-line script —
+not a packaged GUI app — that drives local Ollama models (e.g.
+gpt-oss:120b) for plot/outline/prose generation, with auto-generated
+character sheets and world settings giving it partial worldbuilding. No
+task tracker, no focus/sprint timer, only 6 commits total and no activity
+dated after 2026-08-18. Ruled out on the same two grounds every prior
+near-miss has failed on. Other names that surfaced in the sweep (Epilogue,
+Dunia, Novel Mage) are already-known and already-ruled-out, not new.
+
+## Industry / legal sentiment
+
+Checked both litigation dates on the day the first came due, as instructed
+by round 33:
+
+1. **Bartz v. Anthropic** — the 30-day appeal window on the $1.5B
+   settlement's final approval closes today, 2026-08-19. As of the most
+   recent coverage (TAA blog, "When to Expect Payments — Next Steps"), no
+   appeal has been filed or reported. Status is "pending, nothing filed."
+   If the window closes clean, Class Counsel's guidance is still only
+   "by the end of August 2026" for the claims portal, no firmer date;
+   payments run in two installments (~70%/~30%) through Sept 2027 once an
+   Effective Date is set — nothing here moves that timeline.
+2. **Kadrey v. Meta** — the mediation-outcome report due 2026-08-21 (two
+   days out at time of this round) has nothing filed yet; the docket's
+   last known entry is Aug 17, 2026. Non-expert discovery still runs to
+   Sept 21, 2026 and expert discovery to Nov 9, 2026, so even a clean
+   mediation report only clears one procedural step.
+
+Both need a genuine re-check after their dates pass rather than on the
+day of — same-day coverage is structurally unlikely to carry the outcome
+yet, and checking exactly on the deadline day (as this round did for
+Bartz) mostly just re-confirms "still pending."
+
+No new author-training survey, no new named lawsuit, and no EU AI Act
+enforcement action relevant to book-training/copyright surfaced this
+round. One adjacent, non-writer-specific data point found but not filed
+as new: Notion had a run of infrastructure issues in July 2026 (search
+degradation 7/21, full outage 7/24, AI-automation freeze 7/30) — all
+predate this round's cutoff and aren't writer-app-specific, so not logged
+as a fresh reliability item, but worth knowing about if the no-outage
+item ever widens beyond the currently-named fiction-writing competitors.
+
+## What changed in ROADMAP.md
+
+One new, small "Next up" item: **Clean up paste from Word/Google Docs**,
+sourced directly from Sudowrite's Aug 18 changelog and confirmed as a real
+gap in our own `EditorPane.tsx`. Two existing items got findings folded
+in rather than new bullets: (1) the four-pillar check's twentieth negative
+recheck plus the NovelWriter near-miss, folded into the four-app-bundle
+item; (2) both litigation dates' still-pending status, folded into the
+no-training/privacy item with a note to check again after — not on — the
+deadlines. NovelCrafter, Dabble, Scrivener, Campfire, and type.ai passes
+were fully dry.
+
+## Round 34 sources
+
+- feedback.sudowrite.com/changelog, status.sudowrite.com
+- feedback.novelcrafter.com/changelog, novelcrafter.com/blog
+- Trustpilot (Dabble, Sudowrite, NovelCrafter — all inconclusive/no new dated entries)
+- dabblewriter.com/blog
+- literatureandlatte.com/latest, literatureandlatte.com/scrivener/release-notes, forum.literatureandlatte.com
+- apps.apple.com (Campfire Write iOS listing), campfirewriting.com/learn
+- type.ai (changelog 404), Medium/Softynex/ToolRadar type.ai reviews (April 2026, stale)
+- obsidianstats.com, Obsidian community plugin pages
+- github.com/KudoShusak/NovelWriter
+- blog.taaonline.net (Bartz v. Anthropic — "When to Expect Payments")
+- Kadrey v. Meta docket coverage
+- Notion status/incident coverage (July 2026, background only)

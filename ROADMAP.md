@@ -500,6 +500,16 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       exact narrow compound check every round, or retire/space it out in
       favor of a broader "any new indie novel-app launch" sweep. Flagging
       the choice, not making it unilaterally.
+      Research round 34 (2026-08-19) ran the check a twentieth time anyway
+      (the round-33 flag is still awaiting an owner decision) and again
+      found no match. One newly-noticed entrant: NovelWriter
+      (github.com/KudoShusak/NovelWriter), a command-line script (not a
+      packaged app) that drives local Ollama models for plot/outline/prose
+      generation with auto-generated character sheets and world settings —
+      partial worldbuilding, no task tracker, no focus timer, and only 6
+      commits total. Ruled out on the same two grounds as every prior
+      near-miss. Otherwise dry: type.ai has no changelog dated after
+      2026-08-18 and neither does any tracked Obsidian plugin.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -717,6 +727,15 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       than resting on a secondary tracker. Not a new filing (Dec 2025), but
       a second real, named lawsuit alongside Bartz/Kadrey worth having if
       copy ever needs more than one case to cite.
+      Research round 34 (2026-08-19) checked both watched dates on the day
+      the first one was due: the Bartz v. Anthropic 30-day appeal window
+      closes today, and as of the most recent coverage (TAA blog) no appeal
+      had been filed — status is "pending, nothing filed," with the
+      claims portal still only guided for "end of August" once the window
+      closes clean. Kadrey v. Meta's mediation-outcome report (due Aug 21)
+      also has nothing filed yet, two days out. Re-check both after the
+      dates actually pass rather than on the day of, since same-day
+      coverage is structurally unlikely to have the outcome yet.
 - [ ] **Say the export advantage louder** — research round 7: Sudowrite
       reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
       Novella already ships all three plus one-click backup
@@ -810,6 +829,19 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       native spellcheck for free before building anything — a bundled
       offline grammar engine is a real size/scope tradeoff against the
       lightweight-installer promise.
+- [ ] **Clean up paste from Word/Google Docs** — research round 34
+      (2026-08-19): Sudowrite's Aug 18, 2026 changelog shipped exactly
+      this — pasting from Word/Google Docs no longer produces doubled line
+      breaks, headings scale with the surrounding text size, nested
+      bullets get proper markers, and editor formatting now matches what
+      History shows. Grepped our own `EditorPane.tsx` for paste handling
+      and found none — CodeMirror's default paste runs unfiltered, so a
+      writer pasting a chapter draft out of Word likely inherits the same
+      doubled-line-break mess. Small and not thesis-central (pure editor
+      polish, doesn't touch AI/local/four-app positioning), so it ranks
+      below the copy-only items above; cheap once picked up — strip
+      Word's `\n\n` doubling and remap pasted headings/bullets to our
+      Markdown conventions on the paste event.
 - [ ] **Silent auto-update** — generate a Tauri updater keypair, add the
       pubkey + endpoint to `tauri.conf.json`, wire `tauri-plugin-updater`,
       and have CI attach `latest.json`. Needs a decision from the owner
@@ -884,6 +916,36 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-08-19 — Research round 34 (autopilot; no code). Housekeeping first:
+  the session started with HEAD detached at round 33's own commit (same
+  recurring class of issue flagged in rounds 24, 29, 30, 31, 33) even
+  though `origin/main` already matched local HEAD exactly — re-attached
+  HEAD to `main` tracking `origin/main`, no content at risk. Dispatched
+  the same four parallel research passes as prior rounds, each briefed on
+  rounds 1-33's findings and searching for material dated strictly after
+  round 33's 2026-08-18 cutoff. **Mostly dry, one small new item.** (1)
+  Sudowrite's Aug 18, 2026 changelog ("Easier Formatting: Paragraph
+  Spacing & Improved Copy/Paste") fixes exactly the paste-from-Word/
+  Google-Docs mess our own editor has never addressed — checked
+  `EditorPane.tsx`, confirmed no paste handling exists, CodeMirror's
+  default paste runs unfiltered — filed as a new small, low-priority
+  Next-up item (not thesis-central, pure editor polish). (2) The
+  four-pillar competitive check ran a twentieth dedicated recheck (rounds
+  15, 17-34) and again found no match; one new entrant, NovelWriter (a
+  local-Ollama CLI script, not a packaged app, no task tracker or timer),
+  ruled out and folded into the four-app-bundle item — the round-33
+  owner-decision flag on whether to keep running this exact check every
+  round is still open and unanswered. (3) Both litigation dates flagged
+  since round 31 were checked on the day the first came due: the Bartz
+  v. Anthropic 30-day appeal window closes today (2026-08-19) with no
+  appeal filed as of the latest coverage, and Kadrey v. Meta's mediation
+  report (due 2026-08-21) has nothing filed yet — folded into the
+  no-training/privacy item with a note to re-check after the dates
+  actually pass rather than on the day of. NovelCrafter, Dabble,
+  Scrivener, Campfire, and type.ai passes were all fully dry — no
+  changelog, blog post, review, or forum post dated after 2026-08-18
+  found for any of them. Full notes in RESEARCH.md Round 34.
 
 - 2026-08-18 — The intro, rounder (session; owner round 11). Words now
   flow instead of popping: the streaming fade went from 80ms to a long
