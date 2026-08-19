@@ -14,6 +14,96 @@ import { CLAUDE_MODELS, acceptsTemperature } from "../../ai/models";
    The catalog in ai/models.ts records which models accept it, and the call
    below omits it for the rest. */
 
+export interface ClaudeConfig {
+  apiKey: string;
+  model: string;
+  temperature?: number;
+}
+
+/* Same arrangement as the Ollama factory: the config arrives as a
+   getter so the plugin can read its settings late, and so the
+   connections store can hold one of these per linked account. */
+export function makeAnthropicProvider(
+  config: () => ClaudeConfig,
+  slash = "/claude",
+): StreamingAIProvider {
+  const provider: StreamingAIProvider = {
+    slash,
+
+    async generate(req) {
+      let out = "";
+      await provider.generateStream(req, (chunk) => {
+        out += chunk;
+      });
+      return out;
+    },
+
+    async generateStream(req, onChunk, signal) {
+      const cfg = config();
+      if (!cfg.apiKey) {
+        throw new Error("Add your Anthropic API key in Settings → Connections.");
+      }
+
+      const { default: Anthropic } = await import("@anthropic-ai/sdk");
+      const client = new Anthropic({
+        apiKey: cfg.apiKey,
+        // This is a desktop app using the writer's own key on their own
+        // machine — the usual "don't ship your key to browsers" hazard
+        // doesn't apply. The key never leaves this device except to
+        // Anthropic.
+        dangerouslyAllowBrowser: true,
+      });
+
+      const model = cfg.model || "claude-opus-4-8";
+      const temp =
+        Number.isFinite(cfg.temperature) && (cfg.temperature ?? 0) > 0 ? cfg.temperature : undefined;
+
+      const stream = client.messages.stream(
+        {
+          model,
+          max_tokens: req.maxTokens ?? 1024,
+          system: req.system,
+          messages: [{ role: "user", content: req.prompt }],
+          // Only sent to models that accept it — see the note above.
+          ...(temp !== undefined && acceptsTemperature(model) ? { temperature: temp } : {}),
+        },
+        { signal },
+      );
+
+      stream.on("text", (delta) => onChunk(delta));
+
+      const message = await stream.finalMessage();
+
+      // Safety classifiers can decline a request: HTTP 200, empty or
+      // partial content, stop_reason "refusal". Surfacing it beats
+      // returning an empty string and letting the writer wonder.
+      if (message.stop_reason === "refusal") {
+        throw new Error(
+          "Claude declined this request. Try rephrasing, or switch to a local model for this scene.",
+        );
+      }
+
+      return message.content
+        .filter((b): b is Extract<typeof b, { type: "text" }> => b.type === "text")
+        .map((b) => b.text)
+        .join("");
+    },
+  };
+
+  return provider;
+}
+
+/** What this key can actually reach. Used by Test connection: a real
+    model list is the only proof that a key works that doesn't cost the
+    writer a generation. Anthropic's /v1/models is free to call. */
+export async function listClaudeModels(apiKey: string): Promise<string[]> {
+  if (!apiKey) throw new Error("No API key yet — paste one above first.");
+  const { default: Anthropic } = await import("@anthropic-ai/sdk");
+  const client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
+  const page = await client.models.list({ limit: 50 });
+  return page.data.map((m) => m.id).sort();
+}
+
 export const anthropicProvider: NovellaPlugin = {
   id: "provider-anthropic",
   name: "Claude (Anthropic)",
@@ -40,68 +130,12 @@ export const anthropicProvider: NovellaPlugin = {
       return Number.isFinite(n) && n > 0 ? n : undefined;
     };
 
-    const provider: StreamingAIProvider = {
-      slash: "/claude",
-
-      async generate(req) {
-        let out = "";
-        await provider.generateStream(req, (chunk) => {
-          out += chunk;
-        });
-        return out;
-      },
-
-      async generateStream(req, onChunk, signal) {
-        const key = apiKey();
-        if (!key) throw new Error("Add your Anthropic API key in Settings → AI.");
-
-        const { default: Anthropic } = await import("@anthropic-ai/sdk");
-        const client = new Anthropic({
-          apiKey: key,
-          // This is a desktop app using the writer's own key on their own
-          // machine — the usual "don't ship your key to browsers" hazard
-          // doesn't apply. The key never leaves this device except to
-          // Anthropic.
-          dangerouslyAllowBrowser: true,
-        });
-
-        const model = modelId();
-        const temp = temperature();
-
-        const stream = client.messages.stream(
-          {
-            model,
-            max_tokens: req.maxTokens ?? 1024,
-            system: req.system,
-            messages: [{ role: "user", content: req.prompt }],
-            // Only sent to models that accept it — see the note above.
-            ...(temp !== undefined && acceptsTemperature(model)
-              ? { temperature: temp }
-              : {}),
-          },
-          { signal },
-        );
-
-        stream.on("text", (delta) => onChunk(delta));
-
-        const message = await stream.finalMessage();
-
-        // Safety classifiers can decline a request: HTTP 200, empty or
-        // partial content, stop_reason "refusal". Surfacing it beats
-        // returning an empty string and letting the writer wonder.
-        if (message.stop_reason === "refusal") {
-          throw new Error(
-            "Claude declined this request. Try rephrasing, or switch to a local model for this scene.",
-          );
-        }
-
-        return message.content
-          .filter((b): b is Extract<typeof b, { type: "text" }> => b.type === "text")
-          .map((b) => b.text)
-          .join("");
-      },
-    };
-
-    ctx.registerProvider(provider);
+    ctx.registerProvider(
+      makeAnthropicProvider(() => ({
+        apiKey: apiKey(),
+        model: modelId(),
+        temperature: temperature(),
+      })),
+    );
   },
 };

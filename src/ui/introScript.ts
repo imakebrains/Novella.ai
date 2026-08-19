@@ -11,9 +11,47 @@ export type IntroInput =
   | "color" // swatch chips
   | "theme" // genre chips, hover previews live
   | "backdrop" // the scene carousel — presets, upload, or none
+  | "show" // nothing to answer: a demonstration, and one way on
   | "ai" // the honest local-AI check
   | "preset" // first-project cards
   | "enter"; // returning writers: no project creation, just the door
+
+/* ---- the demonstration windows ----
+
+   Borrowed wholesale from the guided tour (tourSteps.ts), because the
+   tour already settled every argument this raises. Small looping
+   diagrams built from the app's own vocabulary rather than recorded
+   from it: a capture cannot follow the accent the writer picked ninety
+   seconds ago, cannot stand still for someone who asked for less
+   motion, and starts lying the day a border radius changes. A diagram
+   made of the same tokens as the room it describes ages with the room —
+   and here it does something the tour's clips cannot: it arrives
+   already wearing the choices made on the screens before it.
+
+   THE RULE, unchanged from the tour: every clip's REST state is its
+   FINISHED state, so killing the animation leaves a correct labelled
+   diagram rather than an empty box. That is the whole of the
+   reduced-motion path, and `still` is the caption that goes under it. */
+export type IntroClipId =
+  | "room" // the three panes, and where the page sits
+  | "pieces" // a chapter, a codex entry, and the link between them
+  | "local"; // a draft arriving from a model on this machine
+
+export interface IntroClip {
+  id: IntroClipId;
+  /** One loop, in milliseconds. The same three-to-six-second window the
+      tour settled on: under three and the eye cannot follow, over six
+      and a loop starts feeling like a wait. Handed to CSS as one custom
+      property so every keyframe in the clip runs on one clock. */
+  loopMs: number;
+  /** The caption under a still window. Reduced motion means no gesture
+      to watch, so the diagram shows the finished arrangement and this
+      line says what you are looking at. */
+  still: string;
+}
+
+export const CLIP_MIN_MS = 3000;
+export const CLIP_MAX_MS = 6000;
 
 export interface IntroScreen {
   id: string;
@@ -21,6 +59,12 @@ export interface IntroScreen {
       substituted at render time. */
   lines: string[];
   input: IntroInput;
+  /** A screen earns a clip when it TEACHES something. A question whose
+      own answer repaints the room (color, theme, backdrop) is already
+      its own demonstration, and "what name goes on the cover" has
+      nothing to show. Clips are rationed on purpose: the intro has to
+      stay skippable in seconds and must not become a second tour. */
+  clip?: IntroClip;
 }
 
 /* Copy rules (§3, §5): short declarative fragments, contractions, second
@@ -61,12 +105,47 @@ export const INTRO_SCRIPT: IntroScreen[] = [
     ],
     input: "backdrop",
   },
+  /* The two showing screens sit HERE, after the room has been colored,
+     themed and dressed, so the windows arrive already wearing the
+     writer's choices. Put them any earlier and they would be
+     demonstrating somebody else's app. */
+  {
+    id: "room",
+    lines: [
+      "Here is the room you'll be writing in.",
+      "Your page in the middle, your book on the left, your tools on the right.",
+    ],
+    input: "show",
+    clip: {
+      id: "room",
+      loopMs: 4600,
+      still: "The workspace: your book on the left, your page in the middle, your tools on the right.",
+    },
+  },
+  {
+    id: "pieces",
+    lines: [
+      "Your chapters hold the writing. The codex holds the people.",
+      "Write a name in double brackets and the two find each other.",
+    ],
+    input: "show",
+    clip: {
+      id: "pieces",
+      loopMs: 5200,
+      still: "A chapter naming someone, and the codex entry it reaches.",
+    },
+  },
   {
     id: "ai",
     lines: [
       "Novella can write alongside you, right on this machine. Private, offline, entirely yours.",
     ],
     input: "ai",
+    clip: {
+      id: "local",
+      loopMs: 4800,
+      still: "A line drafted inside your own machine, with nothing leaving it.",
+    },
   },
   {
     id: "project",
@@ -82,6 +161,25 @@ export const RETURNING_SCREEN: IntroScreen = {
   lines: ["{{themeAck}}", "Your books are right where you left them."],
   input: "enter",
 };
+
+/** The screens a writer actually walks, in order.
+
+    Two edits for someone who already has books, and both are selected
+    by INPUT rather than by index, so adding a screen can never silently
+    drop one of them:
+
+    · the first-project pick becomes the door back in;
+    · the showing screens go. They know what a chapter is. Demonstrating
+      the furniture to somebody standing in it is the difference between
+      an introduction and a lecture, and the tour (Hints, in the
+      titlebar) is where a replay of the demonstrations lives. */
+export function scriptFor(returning: boolean): IntroScreen[] {
+  if (!returning) return INTRO_SCRIPT;
+  return [
+    ...INTRO_SCRIPT.filter((s) => s.input !== "preset" && s.input !== "show"),
+    RETURNING_SCREEN,
+  ];
+}
 
 /* Eight spine colors. Curated, not a color wheel: each one already
    passes the readableOn() contrast math in both directions. */

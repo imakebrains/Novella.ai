@@ -1,4 +1,4 @@
-/* Assertions for the guided tour.
+/* Assertions for the hints library.
 
    Same shape as test-tabs.ts and test-stack.ts: no output unless
    something is wrong, non-zero exit when it is.
@@ -13,20 +13,45 @@
    bookmark that means two different things after a skip and after a
    finish) that goes quietly wrong behind a pointer.
 
+   Since the tour became a library there are two more things worth
+   holding down, and both of them are things a reader would be misled by
+   rather than merely inconvenienced by:
+
+     THE BINDINGS. Every `keys` string is checked against the list of
+     shortcuts that actually exist in App.tsx, EditorPane.tsx and
+     Corkboard.tsx. A tutorial that teaches Ctrl+Shift+P for a thing
+     bound to Ctrl+Shift+F is worse than a tutorial that says nothing,
+     and nothing in a hand-written step list stops that drift.
+
+     THE CONTIGUITY RULE. The sidebar groups the steps and the Next
+     button walks them; those are the same list read two ways, and they
+     only agree while the steps stay grouped in category order. Slip one
+     Writing hint in among the tools and the sidebar starts lying about
+     where Next goes.
+
    No DOM, no localStorage: readTourState and writeTourState take their
    accessors, so the round-trip is exercised against a Map here and
    against the browser in the app. */
 
 import {
   AUTO_OFFER_MS,
+  HINT_CATEGORIES,
   KEY_OFFERED,
   KEY_SEEN,
   KEY_STEP,
   TOUR_START,
   TOUR_STEPS,
+  allHints,
+  categoryLabel,
+  categoryOf,
   currentStep,
+  filterHints,
   finishTour,
+  goToHint,
   goToStep,
+  groupHints,
+  hintGroups,
+  indexOfHint,
   isFirstStep,
   isLastStep,
   markOffered,
@@ -40,7 +65,9 @@ import {
   skipTour,
   stepAt,
   stepCount,
+  stepsInCategory,
   writeTourState,
+  type CategoryId,
   type ClipId,
   type TourState,
 } from "./src/ui/tourSteps";
@@ -85,12 +112,33 @@ function fakeStore(seed: Record<string, string> = {}) {
   ok("steps: there are some", TOUR_STEPS.length > 0);
   check("steps: stepCount agrees with the list", stepCount(), TOUR_STEPS.length);
 
+  // A library, not a slideshow — but a library nobody finishes is a
+  // slideshow nobody finished either. Twelve to sixteen was the brief.
+  ok("steps: the library is 12-16 hints", TOUR_STEPS.length >= 12 && TOUR_STEPS.length <= 16);
+
   const ids = TOUR_STEPS.map((s) => s.id);
   check("steps: no id appears twice", new Set(ids).size, ids.length);
 
   // The gestures the tour was commissioned to cover. A clip quietly
   // dropped from the list is the failure this catches.
-  const required: ClipId[] = ["stack", "reorder", "palette", "reword", "board", "resize"];
+  const required: ClipId[] = [
+    "stack",
+    "reorder",
+    "palette",
+    "reword",
+    "board",
+    "resize",
+    "focus",
+    "views",
+    "tasks",
+    "timer",
+    "trash",
+    "theme",
+    "backdrop",
+    "slash",
+    "wikilink",
+    "paragraph",
+  ];
   for (const id of required) {
     ok(`steps: covers ${id}`, ids.includes(id));
   }
@@ -116,10 +164,175 @@ function fakeStore(seed: Record<string, string> = {}) {
   ok("steps: reorder is taught before stacking", ids.indexOf("reorder") < ids.indexOf("stack"));
   // Resizing a split means nothing until there is a split.
   ok("steps: stacking is taught before resizing", ids.indexOf("stack") < ids.indexOf("resize"));
-  // The tour ends on writing, not on furniture.
+  // Ctrl+K first: it is the one thing that makes the rest feel small.
+  check("steps: the palette opens the library", ids[0], "palette");
+  // The walkthrough ends on writing, not on furniture.
   check("steps: reword lands last", ids[ids.length - 1], "reword");
 
   ok("steps: the auto-offer waits a beat", AUTO_OFFER_MS > 0 && AUTO_OFFER_MS < 4000);
+}
+
+/* ---------- the bindings are real ---------- */
+
+{
+  /* Every shortcut the app actually registers, verbatim:
+       App.tsx            Ctrl+K, Ctrl+S, Ctrl+Shift+F, Esc
+       EditorPane.tsx     Alt+ArrowUp / Alt+ArrowDown, "/" on a blank
+                          line (SLASH_TRIGGER), "[[" (wikiLinkSource),
+                          Ctrl+Z via CodeMirror's historyKeymap
+       Corkboard.tsx      Left / Right on a focused card
+     Adding a hint whose `keys` isn't on this list means either the
+     shortcut is invented or this list is out of date — and either way
+     somebody has to go and look. */
+  const REAL_BINDINGS = new Set([
+    "Ctrl+K",
+    "Ctrl+S",
+    "Ctrl+Shift+F",
+    "Ctrl+Z",
+    "Esc",
+    "Alt+↑ / Alt+↓",
+    "/",
+    "[[",
+    "← / →",
+  ]);
+
+  for (const step of TOUR_STEPS) {
+    if (step.keys === null) continue;
+    ok(`keys: ${step.id} teaches a binding that exists`, REAL_BINDINGS.has(step.keys));
+    ok(`keys: ${step.id} is not blank`, step.keys.trim().length > 0);
+  }
+
+  // Spot-checked by hand against the handlers, one per source file, so a
+  // wholesale rename of the allowlist above can't pass unnoticed.
+  const keysOf = (id: ClipId) => TOUR_STEPS.find((s) => s.id === id)?.keys ?? null;
+  check("keys: the palette is Ctrl+K", keysOf("palette"), "Ctrl+K");
+  check("keys: focus mode is Ctrl+Shift+F", keysOf("focus"), "Ctrl+Shift+F");
+  check("keys: paragraphs move on Alt+arrows", keysOf("paragraph"), "Alt+↑ / Alt+↓");
+  check("keys: the insert menu is a slash", keysOf("slash"), "/");
+  check("keys: a codex link is two brackets", keysOf("wikilink"), "[[");
+  check("keys: a focused card nudges on arrows", keysOf("board"), "← / →");
+
+  // A pointer gesture must not pretend to be a shortcut. Dragging a tab
+  // has no binding, and inventing one for the sidebar's right-hand
+  // column is exactly the drift this whole block exists to stop.
+  check("keys: dragging a tab has no shortcut", keysOf("reorder"), null);
+  check("keys: dragging a divider has no shortcut", keysOf("resize"), null);
+
+  // Ctrl+Z is real, but it belongs in the sentence rather than in the
+  // column: it undoes a reword, it doesn't perform one.
+  check("keys: reword has no binding of its own", keysOf("reword"), null);
+  ok(
+    "keys: but the reword copy still names the undo",
+    (TOUR_STEPS.find((s) => s.id === "reword")?.body ?? "").includes("Ctrl+Z"),
+  );
+}
+
+/* ---------- categories ---------- */
+
+{
+  const catIds = HINT_CATEGORIES.map((c) => c.id);
+  check("categories: no id appears twice", new Set(catIds).size, catIds.length);
+
+  for (const cat of HINT_CATEGORIES) {
+    ok(`categories: ${cat.id} has a label`, cat.label.trim().length > 0);
+    ok(`categories: ${cat.id} has a blurb`, cat.blurb.trim().length > 0);
+    // A heading with nothing under it is a dead end in the sidebar.
+    ok(`categories: ${cat.id} has at least one hint`, stepsInCategory(cat.id).length > 0);
+  }
+
+  for (const step of TOUR_STEPS) {
+    ok(`categories: ${step.id} belongs to a real one`, catIds.includes(step.category));
+  }
+
+  check("categories: lookup by id", categoryOf("writing")?.label, "Writing");
+  check("categories: label by id", categoryLabel("around"), "Getting around");
+  check("categories: an unknown id has no label", categoryLabel("nope" as CategoryId), "");
+
+  // THE CONTIGUITY RULE. Walking the sidebar top to bottom has to be the
+  // same journey as pressing Next from the first hint to the last.
+  const flattened = hintGroups().flatMap((g) => g.items.map((i) => i.index));
+  check(
+    "categories: the sidebar order is the Next order",
+    flattened,
+    TOUR_STEPS.map((_, i) => i),
+  );
+
+  // Which is only true while each category's hints are one unbroken run.
+  const seen = new Set<CategoryId>();
+  let previous: CategoryId | null = null;
+  let contiguous = true;
+  for (const step of TOUR_STEPS) {
+    if (step.category !== previous) {
+      if (seen.has(step.category)) contiguous = false;
+      seen.add(step.category);
+      previous = step.category;
+    }
+  }
+  ok("categories: no category is interleaved with another", contiguous);
+}
+
+/* ---------- the library: lookup, grouping, filtering ---------- */
+
+{
+  check("hints: allHints carries every step", allHints().length, TOUR_STEPS.length);
+  check("hints: allHints carries the indexes", allHints()[3]?.index, 3);
+  check("hints: allHints is in list order", allHints()[0]?.step.id, TOUR_STEPS[0]!.id);
+
+  check("hints: indexOfHint finds one", indexOfHint("reword"), TOUR_STEPS.length - 1);
+  // An id can outlive a change to the library — an old link, a stale
+  // test — and a lookup that throws would take the panel with it.
+  check("hints: indexOfHint refuses to guess", indexOfHint("nonsense" as ClipId), -1);
+
+  const start: TourState = { ...TOUR_START };
+  check("hints: goToHint jumps by name", goToHint(start, "reword").step, TOUR_STEPS.length - 1);
+  ok("hints: an unknown id changes nothing at all", goToHint(start, "nope" as ClipId) === start);
+  ok("hints: a jump to where you are costs nothing", goToHint(start, "palette") === start);
+
+  // Grouping.
+  const groups = hintGroups();
+  check("groups: one per category", groups.length, HINT_CATEGORIES.length);
+  check(
+    "groups: every hint lands in exactly one",
+    groups.reduce((n, g) => n + g.items.length, 0),
+    TOUR_STEPS.length,
+  );
+  check("groups: the first is the first category", groups[0]?.category.id, HINT_CATEGORIES[0]!.id);
+  check("groups: an empty one is dropped", groupHints([]).length, 0);
+
+  // Filtering.
+  check("filter: an empty query is the whole list", filterHints("").length, TOUR_STEPS.length);
+  check("filter: whitespace is still empty", filterHints("   ").length, TOUR_STEPS.length);
+
+  const idsOf = (q: string) => filterHints(q).map((h) => h.step.id);
+  ok("filter: finds a hint by its title", idsOf("reword").includes("reword"));
+  ok("filter: is case-insensitive", idsOf("REWORD").includes("reword"));
+  ok("filter: reads the body too", idsOf("backlinks").includes("wikilink"));
+  ok("filter: reads where it lives", idsOf("settings").includes("backdrop"));
+  ok("filter: reads the category", idsOf("organising").includes("trash"));
+
+  // The queries the search field was actually added for.
+  ok("filter: a bare modifier lists the bound hints", idsOf("ctrl").length >= 2);
+  ok("filter: nobody types the plus", idsOf("ctrl shift").includes("focus"));
+  check("filter: ctrl+shift is only focus mode", idsOf("ctrl shift"), ["focus"]);
+  // A lone letter is asked of the bindings only. Against prose it would
+  // match "back", "block", "checkbox" and hand back half the library.
+  check("filter: a single letter reads the bindings", idsOf("ctrl k"), ["palette"]);
+  // A slash is a binding you can search for. It also brings the two
+  // either/or bindings ("← / →") with it, which is the slash they are
+  // written with — a small, honest cost of spelling pairs out.
+  ok("filter: punctuation is a binding you can search for", idsOf("/").includes("slash"));
+  check("filter: and so are two brackets", idsOf("[["), ["wikilink"]);
+
+  // Every term has to land, in any order.
+  ok("filter: terms are ANDed", idsOf("trash restore").includes("trash"));
+  check("filter: order of terms is irrelevant", idsOf("restore trash"), idsOf("trash restore"));
+  check("filter: a miss is a miss", filterHints("xyzzy").length, 0);
+  check("filter: and a miss has no groups", hintGroups("xyzzy").length, 0);
+
+  // A filtered sidebar still hands back true indexes, or clicking a
+  // searched-for hint would jump to the wrong clip.
+  const hit = filterHints("reword")[0]!;
+  check("filter: indexes survive filtering", TOUR_STEPS[hit.index]!.id, hit.step.id);
 }
 
 /* ---------- indexing ---------- */
@@ -155,7 +368,7 @@ function fakeStore(seed: Record<string, string> = {}) {
   ok("next at the end changes nothing at all", nextStep(last) === last);
   ok("prev at the start changes nothing at all", prevStep(first) === first);
 
-  // The progress dots are buttons, so any index can arrive.
+  // The sidebar rows are buttons, so any index can arrive.
   check("goToStep: clamps a wild index", goToStep(first, 99).step, TOUR_STEPS.length - 1);
   check("goToStep: clamps a negative one", goToStep(last, -3).step, 0);
   ok("goToStep: a move to where you are costs nothing", goToStep(first, 0) === first);
@@ -166,6 +379,7 @@ function fakeStore(seed: Record<string, string> = {}) {
   // Neither moving nor jumping may mark the tour seen — only leaving it.
   ok("next: does not mark it seen", !nextStep(first).seen);
   ok("goToStep: does not mark it seen", !goToStep(first, 2).seen);
+  ok("goToHint: does not mark it seen", !goToHint(first, "trash").seen);
 }
 
 /* ---------- skip, finish, replay ---------- */
@@ -275,6 +489,23 @@ function fakeStore(seed: Record<string, string> = {}) {
   ok("scenario: finished is seen", after.seen);
   ok("scenario: still no unsolicited offer", !shouldAutoOffer(after, true));
   check("scenario: a later replay starts from the top", replayTour(after).step, 0);
+}
+
+{
+  // Six weeks later. The writer isn't taking a tour, they're looking one
+  // thing up: what was the key for focus mode. Type "focus", click the
+  // one row that comes back, land on that clip — without the bookmark
+  // pretending they resumed a walkthrough they never started.
+  const settled: TourState = { step: 0, seen: true, offered: true };
+  const hits = filterHints("focus");
+  ok("scenario: the search finds it", hits.some((h) => h.step.id === "focus"));
+
+  const jumped = goToStep(settled, indexOfHint("focus"));
+  check("scenario: clicking the row lands on it", currentStep(jumped).id, "focus");
+  check("scenario: and the shortcut it reads is the real one", currentStep(jumped).keys, "Ctrl+Shift+F");
+  ok("scenario: looking something up is not un-seeing the tour", jumped.seen);
+  // Filtering the sidebar must not move the writer. Only a click does.
+  check("scenario: a search on its own changes no state", goToStep(jumped, jumped.step), jumped);
 }
 
 /* ---------- report ---------- */

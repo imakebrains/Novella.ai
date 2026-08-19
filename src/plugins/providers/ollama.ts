@@ -19,22 +19,28 @@ import type { StreamingAIProvider } from "../runtime";
 
 const HOST = "http://localhost:11434";
 
+/** Trailing slashes are the classic paste error; strip them once here
+    rather than in every caller. */
+function normalizeHost(host?: string): string {
+  return (host?.trim() || HOST).replace(/\/+$/, "");
+}
+
 export interface OllamaModel {
   name: string;
   sizeBytes: number;
 }
 
 /** Ask the local daemon what's installed. Empty list = nothing pulled yet. */
-export async function listOllamaModels(signal?: AbortSignal): Promise<OllamaModel[]> {
-  const res = await fetch(`${HOST}/api/tags`, { signal });
+export async function listOllamaModels(signal?: AbortSignal, host?: string): Promise<OllamaModel[]> {
+  const res = await fetch(`${normalizeHost(host)}/api/tags`, { signal });
   if (!res.ok) throw new Error(`Ollama returned ${res.status} listing models`);
   const data = (await res.json()) as { models?: { name: string; size: number }[] };
   return (data.models ?? []).map((m) => ({ name: m.name, sizeBytes: m.size }));
 }
 
-export async function ollamaReachable(): Promise<boolean> {
+export async function ollamaReachable(host?: string): Promise<boolean> {
   try {
-    const res = await fetch(`${HOST}/api/tags`);
+    const res = await fetch(`${normalizeHost(host)}/api/tags`);
     return res.ok;
   } catch {
     return false;
@@ -124,6 +130,100 @@ async function readError(res: Response): Promise<string> {
   return detail || `Ollama returned HTTP ${res.status}`;
 }
 
+export interface OllamaConfig {
+  host?: string;
+  model: string;
+  temperature?: number;
+}
+
+/* Build a provider from an explicit config rather than from plugin
+   settings. Two callers now: the plugin below (config read lazily from
+   its own settings, so a model chosen after enabling still takes) and
+   the connections store, which can hold several of these at once —
+   one per linked engine. The getter shape is what makes both possible. */
+export function makeOllamaProvider(
+  config: () => OllamaConfig,
+  slash = "/local",
+): StreamingAIProvider {
+  const provider: StreamingAIProvider = {
+    slash,
+
+    async generate(req) {
+      let out = "";
+      await provider.generateStream(req, (chunk) => {
+        out += chunk;
+      });
+      return out;
+    },
+
+    async generateStream(req, onChunk, signal) {
+      const cfg = config();
+      const host = normalizeHost(cfg.host);
+      const temperature =
+        Number.isFinite(cfg.temperature) && (cfg.temperature ?? 0) > 0 ? cfg.temperature : 0.8;
+
+      const res = await fetch(`${host}/api/generate`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        signal,
+        body: JSON.stringify({
+          model: cfg.model || DEFAULT_MODEL,
+          system: req.system,
+          prompt: req.prompt,
+          stream: true,
+          options: {
+            temperature,
+            num_predict: req.maxTokens ?? 600,
+          },
+        }),
+      });
+
+      if (!res.ok) throw new Error(await readError(res));
+      if (!res.body) throw new Error("Ollama sent no response body");
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let full = "";
+
+      // Ollama streams NDJSON: one JSON object per line.
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed) continue;
+          let parsed: { response?: string; error?: string; done?: boolean };
+          try {
+            parsed = JSON.parse(trimmed) as typeof parsed;
+          } catch {
+            continue; // partial line, picked up next round
+          }
+          if (parsed.error) throw new Error(parsed.error);
+          if (parsed.response) {
+            full += parsed.response;
+            onChunk(parsed.response);
+          }
+        }
+      }
+
+      return full;
+    },
+
+    estimateCost(req) {
+      // Local inference costs nothing but time.
+      return { tokens: Math.ceil((req.system.length + req.prompt.length) / 4), usd: 0 };
+    },
+  };
+
+  return provider;
+}
+
 export const ollamaStreamingProvider: NovellaPlugin = {
   id: "provider-ollama-streaming",
   name: "Local model (Ollama)",
@@ -142,77 +242,8 @@ export const ollamaStreamingProvider: NovellaPlugin = {
       return Number.isFinite(n) && n > 0 ? n : 0.8;
     };
 
-    const provider: StreamingAIProvider = {
-      slash: "/local",
-
-      async generate(req) {
-        let out = "";
-        await provider.generateStream(req, (chunk) => {
-          out += chunk;
-        });
-        return out;
-      },
-
-      async generateStream(req, onChunk, signal) {
-        const res = await fetch(`${HOST}/api/generate`, {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          signal,
-          body: JSON.stringify({
-            model: modelName(),
-            system: req.system,
-            prompt: req.prompt,
-            stream: true,
-            options: {
-              temperature: temperature(),
-              num_predict: req.maxTokens ?? 600,
-            },
-          }),
-        });
-
-        if (!res.ok) throw new Error(await readError(res));
-        if (!res.body) throw new Error("Ollama sent no response body");
-
-        const reader = res.body.getReader();
-        const decoder = new TextDecoder();
-        let buffer = "";
-        let full = "";
-
-        // Ollama streams NDJSON: one JSON object per line.
-        for (;;) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split("\n");
-          buffer = lines.pop() ?? "";
-
-          for (const line of lines) {
-            const trimmed = line.trim();
-            if (!trimmed) continue;
-            let parsed: { response?: string; error?: string; done?: boolean };
-            try {
-              parsed = JSON.parse(trimmed) as typeof parsed;
-            } catch {
-              continue; // partial line, picked up next round
-            }
-            if (parsed.error) throw new Error(parsed.error);
-            if (parsed.response) {
-              full += parsed.response;
-              onChunk(parsed.response);
-            }
-          }
-        }
-
-        return full;
-      },
-
-      estimateCost(req) {
-        // Local inference costs nothing but time.
-        return { tokens: Math.ceil((req.system.length + req.prompt.length) / 4), usd: 0 };
-      },
-    };
-
-    ctx.registerProvider(provider);
+    ctx.registerProvider(
+      makeOllamaProvider(() => ({ model: modelName(), temperature: temperature() })),
+    );
   },
 };

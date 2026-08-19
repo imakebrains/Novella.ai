@@ -56,7 +56,7 @@ export function RewordPopover({ selection, pos, onReplace, onClose }: Props) {
     const req = buildRewordRequest(instruction, selection.text, selection.before, selection.after);
     let streamed = "";
     generate(
-      { ...req, maxTokens: 1200 },
+      { ...req, maxTokens: 1200, role: "quick" },
       (chunk) => {
         streamed += chunk;
         if (!ctrl.signal.aborted) {

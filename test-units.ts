@@ -23,6 +23,9 @@ import {
   substitute,
   tapAdvance,
   gerundAt,
+  scriptFor,
+  CLIP_MIN_MS,
+  CLIP_MAX_MS,
   INTRO_GERUNDS,
   ENTRANCE_MS,
 } from "./src/ui/introScript";
@@ -1045,6 +1048,45 @@ lied, and Wren had known that since she was nine.
   ok("intro: no marketing-enthusiasm vocabulary", screens.every((s) => s.lines.every((l) => !/excited|awesome|amazing/i.test(l))));
   check("intro: eight spine colors", INTRO_SWATCHES.length, 8);
   ok("intro: every swatch is a real hex", INTRO_SWATCHES.every((c) => /^#[0-9a-f]{6}$/i.test(c)));
+
+  /* The demonstration windows. The still caption is copy like any other
+     line, so it answers to the same voice rules: it is the ONLY thing a
+     reduced-motion writer reads about the picture. */
+  const clips = screens.flatMap((s) => (s.clip ? [s.clip] : []));
+  ok("intro: the intro shows as well as asks", clips.length > 0);
+  ok(
+    "intro: every clip loops in the three-to-six-second window",
+    clips.every((c) => c.loopMs >= CLIP_MIN_MS && c.loopMs <= CLIP_MAX_MS),
+  );
+  check("intro: no clip is drawn twice", new Set(clips.map((c) => c.id)).size, clips.length);
+  ok("intro: every clip says what it is standing still", clips.every((c) => c.still.trim().length > 0));
+  ok(
+    "intro: still captions keep the script's voice",
+    clips.every((c) => !c.still.includes("!") && !c.still.includes("—")),
+  );
+
+  /* Clips are rationed: a question whose own answer repaints the room is
+     already its own demonstration, and the pen name has nothing to show.
+     This is the assertion that stops the intro becoming a second tour. */
+  const clipped = INTRO_SCRIPT.filter((s) => s.clip).map((s) => s.id);
+  check("intro: only the teaching screens carry a window", clipped, ["room", "pieces", "ai"]);
+  ok(
+    "intro: the live-answer questions stay unillustrated",
+    INTRO_SCRIPT.filter((s) => ["pen-name", "color", "theme", "backdrop", "project"].includes(s.id)).every(
+      (s) => !s.clip,
+    ),
+  );
+
+  /* Two edits for a writer who already has books, both by input rather
+     than by index, so a new screen can never silently drop one. */
+  const fresh = scriptFor(false);
+  const back = scriptFor(true);
+  check("intro: a first run walks the whole script", fresh.length, INTRO_SCRIPT.length);
+  ok("intro: returning writers end at the door", back[back.length - 1]?.id === RETURNING_SCREEN.id);
+  ok("intro: returning writers are not asked to make a first project", back.every((s) => s.input !== "preset"));
+  ok("intro: returning writers are not shown the furniture", back.every((s) => s.input !== "show"));
+  ok("intro: the honest AI check survives both paths", back.some((s) => s.input === "ai"));
+  ok("intro: the returning path is the shorter one", back.length < fresh.length);
 }
 
 

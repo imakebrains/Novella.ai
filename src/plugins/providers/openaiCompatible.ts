@@ -18,15 +18,24 @@ import type { StreamingAIProvider } from "../runtime";
    The writer supplies base URL, key and model name, so a service that
    launches next year works without waiting for us to add it. */
 
-export const PRESETS: { label: string; baseUrl: string; note: string }[] = [
-  { label: "OpenAI", baseUrl: "https://api.openai.com/v1", note: "gpt-4o, gpt-4o-mini" },
-  { label: "OpenRouter", baseUrl: "https://openrouter.ai/api/v1", note: "hundreds of models, one key" },
-  { label: "Groq", baseUrl: "https://api.groq.com/openai/v1", note: "very fast, free tier" },
-  { label: "Together", baseUrl: "https://api.together.xyz/v1", note: "open models" },
-  { label: "DeepSeek", baseUrl: "https://api.deepseek.com/v1", note: "inexpensive" },
-  { label: "Mistral", baseUrl: "https://api.mistral.ai/v1", note: "European provider" },
-  { label: "LM Studio (local)", baseUrl: "http://localhost:1234/v1", note: "no key needed" },
-  { label: "llama.cpp (local)", baseUrl: "http://localhost:8080/v1", note: "no key needed" },
+export interface Preset {
+  label: string;
+  baseUrl: string;
+  note: string;
+  /** A model that exists there, so a fresh connection can be tested
+      before the writer has picked anything. */
+  model: string;
+}
+
+export const PRESETS: Preset[] = [
+  { label: "OpenAI (ChatGPT)", baseUrl: "https://api.openai.com/v1", note: "gpt-4o, gpt-4o-mini", model: "gpt-4o-mini" },
+  { label: "OpenRouter", baseUrl: "https://openrouter.ai/api/v1", note: "hundreds of models, one key", model: "openai/gpt-4o-mini" },
+  { label: "Groq", baseUrl: "https://api.groq.com/openai/v1", note: "very fast, free tier", model: "llama-3.3-70b-versatile" },
+  { label: "Together", baseUrl: "https://api.together.xyz/v1", note: "open models", model: "meta-llama/Llama-3.3-70B-Instruct-Turbo" },
+  { label: "DeepSeek", baseUrl: "https://api.deepseek.com/v1", note: "inexpensive", model: "deepseek-chat" },
+  { label: "Mistral", baseUrl: "https://api.mistral.ai/v1", note: "European provider", model: "mistral-large-latest" },
+  { label: "LM Studio (local)", baseUrl: "http://localhost:1234/v1", note: "no key needed", model: "local-model" },
+  { label: "llama.cpp (local)", baseUrl: "http://localhost:8080/v1", note: "no key needed", model: "local-model" },
 ];
 
 async function readError(res: Response): Promise<string> {
@@ -63,8 +72,7 @@ export const openAICompatibleProvider: NovellaPlugin = {
   ],
 
   onEnable(ctx) {
-    const baseUrl = () =>
-      (ctx.settings.get<string>("baseUrl") || "https://api.openai.com/v1").replace(/\/+$/, "");
+    const baseUrl = () => ctx.settings.get<string>("baseUrl") || "https://api.openai.com/v1";
     const model = () => ctx.settings.get<string>("model") || "gpt-4o-mini";
     const key = () => ctx.settings.get<string>("apiKey") || "";
     const temperature = () => {
@@ -73,92 +81,120 @@ export const openAICompatibleProvider: NovellaPlugin = {
       return Number.isFinite(n) && n > 0 ? n : 0.8;
     };
 
-    const provider: StreamingAIProvider = {
-      slash: "/custom",
-
-      async generate(req) {
-        let out = "";
-        await provider.generateStream(req, (chunk) => {
-          out += chunk;
-        });
-        return out;
-      },
-
-      async generateStream(req, onChunk, signal) {
-        const url = baseUrl();
-        const isLocal = /^https?:\/\/(localhost|127\.0\.0\.1)/i.test(url);
-        if (!isLocal && !url.startsWith("https://")) {
-          throw new Error(
-            "Refusing to send your writing and API key over plain HTTP. Use an https:// endpoint.",
-          );
-        }
-
-        const headers: Record<string, string> = { "content-type": "application/json" };
-        const k = key();
-        if (k) headers.authorization = `Bearer ${k}`;
-
-        const res = await fetch(`${url}/chat/completions`, {
-          method: "POST",
-          headers,
-          signal,
-          body: JSON.stringify({
-            model: model(),
-            stream: true,
-            temperature: temperature(),
-            max_tokens: req.maxTokens ?? 600,
-            messages: [
-              { role: "system", content: req.system },
-              { role: "user", content: req.prompt },
-            ],
-          }),
-        });
-
-        if (!res.ok) throw new Error(await readError(res));
-        if (!res.body) throw new Error("Provider sent no response body");
-
-        const reader = res.body.getReader();
-        const decoder = new TextDecoder();
-        let buffer = "";
-        let full = "";
-
-        // Server-sent events: "data: {json}\n\n", terminated by "data: [DONE]".
-        for (;;) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split("\n");
-          buffer = lines.pop() ?? "";
-
-          for (const line of lines) {
-            const trimmed = line.trim();
-            if (!trimmed.startsWith("data:")) continue;
-            const payload = trimmed.slice(5).trim();
-            if (payload === "[DONE]") continue;
-
-            let parsed: { choices?: { delta?: { content?: string } }[]; error?: { message?: string } };
-            try {
-              parsed = JSON.parse(payload) as typeof parsed;
-            } catch {
-              continue;
-            }
-            if (parsed.error) throw new Error(parsed.error.message ?? "Provider error");
-
-            const piece = parsed.choices?.[0]?.delta?.content;
-            if (piece) {
-              full += piece;
-              onChunk(piece);
-            }
-          }
-        }
-
-        return full;
-      },
-    };
-
-    ctx.registerProvider(provider);
+    ctx.registerProvider(
+      makeOpenAICompatibleProvider(() => ({
+        baseUrl: baseUrl(),
+        apiKey: key(),
+        model: model(),
+        temperature: temperature(),
+      })),
+    );
   },
 };
+
+export interface OpenAIConfig {
+  baseUrl: string;
+  apiKey: string;
+  model: string;
+  temperature?: number;
+}
+
+/* One factory, any number of live connections. The plugin above reads
+   its config from its own settings; the connections store builds one of
+   these per linked service, which is how a writer can have OpenAI and
+   OpenRouter and a local LM Studio on at the same time. */
+export function makeOpenAICompatibleProvider(
+  config: () => OpenAIConfig,
+  slash = "/custom",
+): StreamingAIProvider {
+  const provider: StreamingAIProvider = {
+    slash,
+
+    async generate(req) {
+      let out = "";
+      await provider.generateStream(req, (chunk) => {
+        out += chunk;
+      });
+      return out;
+    },
+
+    async generateStream(req, onChunk, signal) {
+      const cfg = config();
+      const url = (cfg.baseUrl || "https://api.openai.com/v1").replace(/\/+$/, "");
+      const isLocal = /^https?:\/\/(localhost|127\.0\.0\.1)/i.test(url);
+      if (!isLocal && !url.startsWith("https://")) {
+        throw new Error(
+          "Refusing to send your writing and API key over plain HTTP. Use an https:// endpoint.",
+        );
+      }
+
+      const headers: Record<string, string> = { "content-type": "application/json" };
+      if (cfg.apiKey) headers.authorization = `Bearer ${cfg.apiKey}`;
+
+      const temperature =
+        Number.isFinite(cfg.temperature) && (cfg.temperature ?? 0) > 0 ? cfg.temperature : 0.8;
+
+      const res = await fetch(`${url}/chat/completions`, {
+        method: "POST",
+        headers,
+        signal,
+        body: JSON.stringify({
+          model: cfg.model || "gpt-4o-mini",
+          stream: true,
+          temperature,
+          max_tokens: req.maxTokens ?? 600,
+          messages: [
+            { role: "system", content: req.system },
+            { role: "user", content: req.prompt },
+          ],
+        }),
+      });
+
+      if (!res.ok) throw new Error(await readError(res));
+      if (!res.body) throw new Error("Provider sent no response body");
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let full = "";
+
+      // Server-sent events: "data: {json}\n\n", terminated by "data: [DONE]".
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith("data:")) continue;
+          const payload = trimmed.slice(5).trim();
+          if (payload === "[DONE]") continue;
+
+          let parsed: { choices?: { delta?: { content?: string } }[]; error?: { message?: string } };
+          try {
+            parsed = JSON.parse(payload) as typeof parsed;
+          } catch {
+            continue;
+          }
+          if (parsed.error) throw new Error(parsed.error.message ?? "Provider error");
+
+          const piece = parsed.choices?.[0]?.delta?.content;
+          if (piece) {
+            full += piece;
+            onChunk(piece);
+          }
+        }
+      }
+
+      return full;
+    },
+  };
+
+  return provider;
+}
 
 /** Ask an OpenAI-compatible endpoint what models it offers. */
 export async function listRemoteModels(baseUrl: string, apiKey: string): Promise<string[]> {

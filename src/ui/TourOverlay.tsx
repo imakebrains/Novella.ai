@@ -1,13 +1,14 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { reducedMotion } from "./personalize";
 import { REWORD_STYLES } from "./rewordCore";
+import { SLASH_COMMANDS } from "./slashCommands";
 import { introPending } from "./WelcomeIntro";
 import {
   AUTO_OFFER_MS,
-  TOUR_STEPS,
   currentStep,
   finishTour,
   goToStep,
+  hintGroups,
   isFirstStep,
   isLastStep,
   loadTourState,
@@ -19,14 +20,15 @@ import {
   saveTourState,
   shouldAutoOffer,
   skipTour,
+  type ClipId,
   type TourState,
   type TourStep,
 } from "./tourSteps";
 
 /* ============================================================
-   The tour — six gestures, shown rather than described.
+   The hints library — sixteen gestures, shown rather than described.
 
-   Each step carries a small looping diagram built from the app's own
+   Each hint carries a small looping diagram built from the app's own
    vocabulary: mock panes, mock tabs, index cards, key caps. Not a
    screen recording. A recording is a photograph of one afternoon —
    it can't follow the writer's theme or accent, it can't be slowed
@@ -44,8 +46,17 @@ import {
    still-frame markup anywhere below.
 
    The elements that only exist mid-gesture — the travelling tab, the
-   drop zone, the cursor — are the exception, and they are invisible at
-   rest for the same reason: after the drop, there is no drop zone.
+   drop zone, the context menu, the cursor — are the exception, and
+   they are invisible at rest for the same reason: after the drop,
+   there is no drop zone.
+
+   TWO WAYS THROUGH IT. Next and Back still walk the list from the
+   top, which is what a writer on their first morning wants. The
+   sidebar is for the other visit: the one six weeks later where the
+   question is "what was the key for focus mode" and pressing Next
+   eleven times is not an answer. Both read the same list in the same
+   order — see the contiguity rule in tourSteps.ts — so the sidebar is
+   a table of contents rather than a second, competing arrangement.
    ============================================================ */
 
 /* Settings and the titlebar button reopen the tour without owning the
@@ -70,7 +81,7 @@ export function TourButton() {
     <button
       className="icon-btn labeled tour-btn"
       onClick={() => openTour()}
-      data-tip="A short tour of how things move"
+      data-tip="Every hint, and a short tour of how things move"
       aria-label="Show me around"
     >
       ? <span>Hints</span>
@@ -81,7 +92,14 @@ export function TourButton() {
 export function TourOverlay() {
   const [state, setState] = useState<TourState>(() => loadTourState());
   const [open, setOpen] = useState(false);
+  /* The filter is deliberately NOT persisted and NOT part of TourState.
+     It's a way of looking at the list for the next thirty seconds, not a
+     preference — reopening Hints to yesterday's search term would be a
+     small haunting. */
+  const [query, setQuery] = useState("");
   const shell = useRef<HTMLDivElement>(null);
+  const search = useRef<HTMLInputElement>(null);
+  const currentRow = useRef<HTMLButtonElement>(null);
 
   /* Effects below run once and must not close over a stale snapshot; a
      ref rather than a dependency, because re-registering the opener or
@@ -118,6 +136,7 @@ export function TourOverlay() {
   useEffect(() => {
     registerTourOpener(() => {
       commit(replayTour(latest.current));
+      setQuery("");
       setOpen(true);
     });
     return () => registerTourOpener(null);
@@ -139,16 +158,27 @@ export function TourOverlay() {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
+      /* The search field is a text input inside a panel whose arrow keys
+         change the page. Left and right have to belong to the caret while
+         the writer is typing, or the field is unusable. */
+      const typing = e.target === search.current;
+
       if (e.key === "Escape") {
         // Capture phase and stopPropagation together: App's own window
         // listener reads Escape as "leave focus mode", and one keypress
         // must not both close this and change the room behind it.
         e.stopPropagation();
+        // Escape backs out one layer at a time: a live filter first, the
+        // panel only once the list is whole again.
+        if (typing && search.current?.value) {
+          setQuery("");
+          return;
+        }
         close();
-      } else if (e.key === "ArrowRight") {
+      } else if (e.key === "ArrowRight" && !typing) {
         e.preventDefault();
         commit(nextStep(latest.current));
-      } else if (e.key === "ArrowLeft") {
+      } else if (e.key === "ArrowLeft" && !typing) {
         e.preventDefault();
         commit(prevStep(latest.current));
       } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
@@ -166,6 +196,16 @@ export function TourOverlay() {
   useEffect(() => {
     if (open) shell.current?.focus();
   }, [open]);
+
+  /* Next can walk the current hint off the bottom of a sixteen-row
+     sidebar. Nudging it back into view — nearest, so a row already on
+     screen never scrolls — keeps "where am I" answerable at a glance. */
+  useEffect(() => {
+    if (!open) return;
+    currentRow.current?.scrollIntoView({ block: "nearest" });
+  }, [open, state.step, query]);
+
+  const groups = useMemo(() => hintGroups(query), [query]);
 
   if (!open) return null;
 
@@ -192,32 +232,70 @@ export function TourOverlay() {
         </header>
 
         <div className="modal-body tour-body">
-          {/* Keyed on the step so each clip mounts fresh and starts its
-              loop from the top rather than joining the previous one
-              mid-gesture. */}
-          <div className="tour-stage" key={step.id}>
-            <Clip step={step} still={still} />
-          </div>
+          {/* The library. A nav rather than a tablist: these are sixteen
+              destinations in a scrolling list, and a screen reader that
+              announces "tab 12 of 16" is describing a widget nobody
+              built. */}
+          <nav className="tour-sidebar" aria-label="All hints">
+            <input
+              ref={search}
+              className="tour-search"
+              type="search"
+              value={query}
+              placeholder="Search hints…"
+              aria-label="Search hints"
+              onChange={(e) => setQuery(e.target.value)}
+            />
 
-          <div className="tour-text" aria-live="polite">
-            <h3 className="tour-title">{step.title}</h3>
-            <p className="tour-copy">{step.body}</p>
-            <p className="tour-where">{step.where}</p>
-            {still && <p className="tour-still-caption">{step.still}</p>}
-          </div>
-
-          <div className="tour-dots" role="tablist" aria-label="Tour steps">
-            {TOUR_STEPS.map((s, i) => (
-              <button
-                key={s.id}
-                role="tab"
-                className={`tour-dot ${i === state.step ? "on" : ""}`}
-                aria-selected={i === state.step}
-                aria-label={s.title}
-                title={s.title}
-                onClick={() => commit(goToStep(state, i))}
-              />
+            {groups.map((group) => (
+              <div className="tour-group" key={group.category.id}>
+                <h4 className="tour-group-head" title={group.category.blurb}>
+                  {group.category.label}
+                </h4>
+                {group.items.map(({ step: hint, index }) => {
+                  const on = index === state.step;
+                  return (
+                    <button
+                      key={hint.id}
+                      ref={on ? currentRow : undefined}
+                      className={`tour-hint ${on ? "on" : ""}`}
+                      aria-current={on ? "true" : undefined}
+                      title={hint.where}
+                      onClick={() => commit(goToStep(state, index))}
+                    >
+                      <span className="tour-hint-name">{hint.title}</span>
+                      {hint.keys && <span className="tour-hint-keys">{hint.keys}</span>}
+                    </button>
+                  );
+                })}
+              </div>
             ))}
+
+            {groups.length === 0 && (
+              <p className="tour-no-match">
+                Nothing here matches that. The hints cover moving things, the
+                editor, the board and the look of the place.
+              </p>
+            )}
+          </nav>
+
+          <div className="tour-main">
+            {/* Keyed on the step so each clip mounts fresh and starts its
+                loop from the top rather than joining the previous one
+                mid-gesture. */}
+            <div className="tour-stage" key={step.id}>
+              <Clip step={step} still={still} />
+            </div>
+
+            <div className="tour-text" aria-live="polite">
+              <h3 className="tour-title">
+                {step.title}
+                {step.keys && <span className="tour-keys">{step.keys}</span>}
+              </h3>
+              <p className="tour-copy">{step.body}</p>
+              <p className="tour-where">{step.where}</p>
+              {still && <p className="tour-still-caption">{step.still}</p>}
+            </div>
           </div>
         </div>
 
@@ -272,7 +350,31 @@ function vars(v: Record<string, string | number>): React.CSSProperties {
   return v as React.CSSProperties;
 }
 
+/* A record rather than a run of `step.id === "x" && <XClip/>` lines. At
+   six clips the chain was fine; at sixteen it was a wall, and — the real
+   reason — a Record keyed by ClipId means adding a hint without drawing
+   it is a compile error rather than a blank stage in front of a writer. */
+const CLIPS: Record<ClipId, () => React.ReactElement> = {
+  palette: PaletteClip,
+  focus: FocusClip,
+  views: ViewsClip,
+  reorder: ReorderClip,
+  stack: StackClip,
+  resize: ResizeClip,
+  tasks: TasksClip,
+  timer: TimerClip,
+  board: BoardClip,
+  trash: TrashClip,
+  theme: ThemeClip,
+  backdrop: BackdropClip,
+  slash: SlashClip,
+  wikilink: WikiLinkClip,
+  paragraph: ParagraphClip,
+  reword: RewordClip,
+};
+
 function Clip({ step, still }: { step: TourStep; still: boolean }) {
+  const Draw = CLIPS[step.id];
   return (
     <div
       className={`tour-clip tour-clip-${step.id}`}
@@ -280,12 +382,7 @@ function Clip({ step, still }: { step: TourStep; still: boolean }) {
       style={vars({ "--clip-ms": `${step.loopMs}ms` })}
       aria-hidden
     >
-      {step.id === "palette" && <PaletteClip />}
-      {step.id === "reorder" && <ReorderClip />}
-      {step.id === "stack" && <StackClip />}
-      {step.id === "resize" && <ResizeClip />}
-      {step.id === "board" && <BoardClip />}
-      {step.id === "reword" && <RewordClip />}
+      <Draw />
     </div>
   );
 }
@@ -304,6 +401,18 @@ function TourCursor() {
         strokeLinejoin="round"
       />
     </svg>
+  );
+}
+
+/** A run of prose, as bars. Used wherever a clip needs "there are words
+    here" without asking the reader to actually read them. */
+function MockLines({ count }: { count: number }) {
+  return (
+    <>
+      {Array.from({ length: count }, (_, i) => (
+        <span className="tour-mock-line" key={i} style={vars({ "--i": i })} />
+      ))}
+    </>
   );
 }
 
@@ -365,11 +474,122 @@ function PaletteClip() {
   );
 }
 
-/* ---------- 2. reorder a tab ---------- */
+/* ---------- 2. focus mode ---------- */
+
+/* Rest is focus mode itself: rails gone, chrome faded, page at its full
+   measure. The clip runs the shortcut and then takes the room away — so
+   the still frame is the state the shortcut leaves you in, which is the
+   only frame worth showing to someone who asked for no motion. */
+function FocusClip() {
+  return (
+    <>
+      <div className="tour-keycaps">
+        <span className="tour-key" data-key="ctrl">
+          Ctrl
+        </span>
+        <span className="tour-key-join">+</span>
+        <span className="tour-key" data-key="shift">
+          Shift
+        </span>
+        <span className="tour-key-join">+</span>
+        <span className="tour-key" data-key="f">
+          F
+        </span>
+      </div>
+
+      <div className="tour-mock tour-mock-room">
+        <div className="tour-mock-chrome">
+          <span className="tour-mock-chrome-dot" />
+          <span className="tour-mock-chrome-bar" />
+          <span className="tour-mock-chrome-bar" />
+        </div>
+        <div className="tour-mock-room-body">
+          <div className="tour-mock-rail" data-side="left" />
+          <div className="tour-mock-page">
+            <MockLines count={6} />
+          </div>
+          <div className="tour-mock-rail" data-side="right" />
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ---------- 3. three views of the board ---------- */
+
+/* Three layers stacked in the same box, crossfading. Same box on purpose:
+   the lesson is that these are three shapes of ONE set of chapters, and a
+   stage that resized between them would be arguing the opposite. */
+const VIEW_TABS: { id: string; label: string }[] = [
+  { id: "cards", label: "Cards" },
+  { id: "grid", label: "Grid" },
+  { id: "table", label: "Table" },
+];
+
+const VIEW_ROWS: { title: string; words: string }[] = [
+  { title: "Chapter One", words: "2,006" },
+  { title: "Chapter Two", words: "1,712" },
+  { title: "Chapter Three", words: "1,240" },
+  { title: "Chapter Four", words: "890" },
+];
+
+function ViewsClip() {
+  return (
+    <div className="tour-mock tour-mock-views">
+      <div className="tour-mock-seg">
+        {VIEW_TABS.map((tab, i) => (
+          <span
+            className="tour-mock-seg-btn"
+            key={tab.id}
+            data-view={tab.id}
+            style={vars({ "--i": i })}
+          >
+            {tab.label}
+          </span>
+        ))}
+      </div>
+
+      <div className="tour-mock-view-body">
+        <div className="tour-mock-view" data-view="cards">
+          {VIEW_ROWS.slice(0, 3).map((row, i) => (
+            <span className="tour-mock-minicard" key={row.title} style={vars({ "--i": i })}>
+              <span className="tour-mock-minicard-title">{row.title}</span>
+              <span className="tour-mock-line" />
+              <span className="tour-mock-line" />
+            </span>
+          ))}
+        </div>
+
+        <div className="tour-mock-view" data-view="grid">
+          {Array.from({ length: 24 }, (_, i) => (
+            <span
+              className="tour-mock-cell"
+              key={i}
+              data-on={i % 7 === 3 || i % 11 === 5 ? "true" : undefined}
+              style={vars({ "--i": i })}
+            />
+          ))}
+        </div>
+
+        <div className="tour-mock-view" data-view="table">
+          {VIEW_ROWS.map((row, i) => (
+            <span className="tour-mock-trow" key={row.title} style={vars({ "--i": i })}>
+              <span className="tour-mock-tcell">{row.title}</span>
+              <span className="tour-mock-tbar" />
+              <span className="tour-mock-tnum">{row.words}</span>
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- 4. reorder a tab ---------- */
 
 /* DOM order is the FINISHED order — Calendar already at the front. The
    keyframes start it two slots to the right and slide the two it passes
-   out of its way. Same trick in the board clip below. */
+   out of its way. Same trick in the board and paragraph clips below. */
 const STRIP_TABS = ["Calendar", "Links", "Tasks", "History"];
 
 function ReorderClip() {
@@ -392,7 +612,7 @@ function ReorderClip() {
   );
 }
 
-/* ---------- 3. stack two panels ---------- */
+/* ---------- 5. stack two panels ---------- */
 
 function StackClip() {
   return (
@@ -433,7 +653,7 @@ function StackClip() {
   );
 }
 
-/* ---------- 4. the divider ---------- */
+/* ---------- 6. the divider ---------- */
 
 function ResizeClip() {
   return (
@@ -464,7 +684,99 @@ function ResizeClip() {
   );
 }
 
-/* ---------- 5. a card on the board ---------- */
+/* ---------- 7. the tasks panel ---------- */
+
+/* Two halves, and the whole lesson is that they are the same thing: the
+   panel above, the Markdown line below. The tick lands in both at once,
+   because in the app there is only one of them to land in. */
+const TASK_ROWS: { text: string; where: string; tick?: boolean }[] = [
+  { text: "Ask the ferryman's name", where: "Chapter Two", tick: true },
+  { text: "Cut the prologue in half", where: "Notes" },
+  { text: "Decide what Elowen knows", where: "Chapter Nine" },
+];
+
+function TasksClip() {
+  return (
+    <>
+      <div className="tour-mock tour-mock-tasks">
+        <span className="tour-mock-slot-head">Tasks</span>
+        {TASK_ROWS.map((row, i) => (
+          <span
+            className="tour-mock-todo"
+            key={row.text}
+            data-role={row.tick ? "tick" : "static"}
+            style={vars({ "--i": i })}
+          >
+            <span className="tour-mock-check" />
+            <span className="tour-mock-todo-text">{row.text}</span>
+            <span className="tour-mock-todo-where">{row.where}</span>
+          </span>
+        ))}
+      </div>
+
+      <div className="tour-mock tour-mock-source">
+        <span className="tour-mock-source-head">Chapter Two.md</span>
+        <span className="tour-mock-source-line">
+          <span className="tour-mock-source-mark">
+            {"- ["}
+            <span className="tour-mock-source-x">x</span>
+            {"]"}
+          </span>
+          <span className="tour-mock-source-text">Ask the ferryman's name</span>
+        </span>
+      </div>
+
+      <TourCursor />
+    </>
+  );
+}
+
+/* ---------- 8. the timer ---------- */
+
+/* Four ticks, stacked, one visible at a time — the last one is the rest
+   state, which is why it is the only one styled visible by default. The
+   CSS slices the loop into quarters, so this array staying four long is
+   part of the contract with 9.44. */
+const TIMER_TICKS = ["25:00", "24:59", "24:58", "24:57"];
+
+function TimerClip() {
+  return (
+    <div className="tour-mock tour-mock-timer">
+      <span className="tour-mock-slot-head">Timer</span>
+
+      <div className="tour-mock-face">
+        {TIMER_TICKS.map((tick, i) => (
+          <span
+            className="tour-mock-tick"
+            key={tick}
+            data-last={i === TIMER_TICKS.length - 1 ? "true" : undefined}
+            style={vars({ "--i": i })}
+          >
+            {tick}
+          </span>
+        ))}
+      </div>
+
+      <div className="tour-mock-timer-bar">
+        <span className="tour-mock-timer-fill" />
+      </div>
+
+      <div className="tour-mock-timer-btns">
+        <span className="tour-mock-timer-btn" data-role="run">
+          Pause
+        </span>
+        <span className="tour-mock-timer-btn">Reset</span>
+      </div>
+
+      {/* Always present, at rest and in motion: "the other clock is still
+          set" is the actual lesson, and a line that appeared only at the
+          end would teach that it starts when the countdown finishes. */}
+      <span className="tour-mock-timer-foot">Alarm set — 3:00 PM</span>
+    </div>
+  );
+}
+
+/* ---------- 9. a card on the board ---------- */
 
 const BOARD_CARDS = [
   { title: "Chapter Three", meta: "1,240" },
@@ -496,7 +808,276 @@ function BoardClip() {
   );
 }
 
-/* ---------- 6. reword ---------- */
+/* ---------- 10. the trash ---------- */
+
+/* Rest is the deleted state, not the restored one — deliberately. The
+   thing a frightened writer needs to see is where the chapter went and
+   that there is a button marked Restore next to it; a still frame of the
+   note back in the codex would be a picture of nothing having happened. */
+const TRASH_LIST = ["Chapter Eight", "Chapter Nine", "Chapter Ten"];
+
+function TrashClip() {
+  return (
+    <>
+      <div className="tour-mock tour-mock-trash">
+        <div className="tour-mock-trash-list">
+          <span className="tour-mock-slot-head">Codex</span>
+          {TRASH_LIST.map((title, i) => (
+            <span
+              className="tour-mock-list-row"
+              key={title}
+              data-role={title === "Chapter Nine" ? "gone" : "static"}
+              style={vars({ "--i": i })}
+            >
+              {title}
+            </span>
+          ))}
+        </div>
+
+        <div className="tour-mock-trash-pane">
+          <span className="tour-mock-slot-head">Trash</span>
+          <div className="tour-mock-trash-row">
+            <span className="tour-mock-trash-name">Chapter Nine</span>
+            <span className="tour-mock-trash-left">29 days left</span>
+            <span className="tour-mock-trash-btns">
+              <span className="tour-mock-trash-btn" data-role="restore">
+                Restore
+              </span>
+              <span className="tour-mock-trash-btn" data-role="danger">
+                Delete forever
+              </span>
+            </span>
+          </div>
+        </div>
+
+        {/* Gone at rest, like the drop zone: after the click there is no
+            menu. It is here at all because "right-click" is half the
+            lesson and a diagram of a vanished note doesn't say it. */}
+        <div className="tour-mock-ctx">
+          <span className="tour-mock-ctx-item">Archive note</span>
+          <span className="tour-mock-ctx-item" data-pick="true">
+            Delete note
+          </span>
+          <span className="tour-mock-ctx-item">Open trash…</span>
+        </div>
+      </div>
+      <TourCursor />
+    </>
+  );
+}
+
+/* ---------- 11. a theme of your own ---------- */
+
+/* The five colors are the five that customThemes.ts actually asks for,
+   in its order. The chips are drawn from the live tokens rather than from
+   hex, so this clip is wearing whatever theme the writer is already in —
+   which is the argument the clip is making. */
+const THEME_SLOTS = [
+  { id: "window", label: "Window" },
+  { id: "panes", label: "Panes" },
+  { id: "page", label: "Page" },
+  { id: "text", label: "Text" },
+  { id: "accent", label: "Accent" },
+];
+
+function ThemeClip() {
+  return (
+    <div className="tour-mock tour-mock-theme">
+      <div className="tour-mock-skin">
+        <div className="tour-mock-skin-bar">
+          <span className="tour-mock-skin-dot" />
+          <span className="tour-mock-skin-name" />
+          <span className="tour-mock-skin-pill" />
+        </div>
+        <div className="tour-mock-skin-body">
+          <div className="tour-mock-skin-rail" />
+          <div className="tour-mock-skin-page">
+            <MockLines count={4} />
+          </div>
+        </div>
+      </div>
+
+      <div className="tour-mock-swatches">
+        {THEME_SLOTS.map((slot, i) => (
+          <span
+            className="tour-mock-swatch"
+            key={slot.id}
+            data-slot={slot.id}
+            style={vars({ "--i": i })}
+          >
+            <span className="tour-mock-swatch-chip" />
+            <span className="tour-mock-swatch-label">{slot.label}</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- 12. the backdrop ---------- */
+
+/* The "photograph" is a gradient, not an image. A bundled asset would
+   have to be shipped twice and would stop matching the day the presets
+   change; a gradient built from the theme's own tokens can't go stale and
+   costs nothing to load. The lesson is the dim control anyway. */
+function BackdropClip() {
+  return (
+    <div className="tour-mock tour-mock-scene">
+      <div className="tour-mock-backdrop" />
+      <div className="tour-mock-scene-body">
+        <div className="tour-mock-glass" data-pane="left" />
+        <div className="tour-mock-glass" data-pane="page">
+          <MockLines count={5} />
+        </div>
+        <div className="tour-mock-glass" data-pane="right" />
+      </div>
+      <div className="tour-mock-slider">
+        <span className="tour-mock-slider-label">Dim</span>
+        <span className="tour-mock-slider-track">
+          <span className="tour-mock-slider-fill" />
+          <span className="tour-mock-knob" />
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- 13. the slash menu ---------- */
+
+/* The menu comes from the real command list rather than being retyped,
+   so it can't drift from the menu it demonstrates. Four fit; the app
+   offers six. Rest keeps the menu open, as in the reword clip: "the task
+   line it left behind" is a claim that needs the mechanism in frame. */
+const SLASH_PICKS = SLASH_COMMANDS.slice(0, 4);
+
+function SlashClip() {
+  return (
+    <>
+      <div className="tour-mock tour-mock-slash">
+        <p className="tour-mock-para">
+          <span className="tour-mock-run">She counted what the crossing would cost.</span>
+        </p>
+
+        <p className="tour-mock-slashline">
+          <span className="tour-mock-slash-char">/</span>
+          <span className="tour-mock-caret" />
+        </p>
+
+        <div className="tour-mock-menu">
+          {SLASH_PICKS.map((cmd, i) => (
+            <span
+              className="tour-mock-menu-item"
+              key={cmd.id}
+              data-pick={i === 0 ? "true" : undefined}
+              style={vars({ "--i": i })}
+            >
+              {cmd.label}
+              <span className="tour-mock-menu-hint">{cmd.hint}</span>
+            </span>
+          ))}
+        </div>
+
+        <p className="tour-mock-para" data-para="after">
+          <span className="tour-mock-todo-line">
+            <span className="tour-mock-check" />
+            <span className="tour-mock-todo-text">Ask the ferryman's name</span>
+          </span>
+        </p>
+      </div>
+      <TourCursor />
+    </>
+  );
+}
+
+/* ---------- 14. wiki links ---------- */
+
+/* Rest closes the menu here, unlike the slash clip: the brackets in the
+   prose ARE the mechanism, so the still frame still says how it was done.
+   What has to survive instead is the backlink underneath — the half of
+   the feature nobody discovers on their own. */
+const CODEX_HITS = ["Elowen Vance", "Elowen's ward", "Ferry House"];
+
+function WikiLinkClip() {
+  return (
+    <>
+      <div className="tour-mock tour-mock-wiki">
+        <p className="tour-mock-para">
+          <span className="tour-mock-run">The ferryman would not look at </span>
+          <span className="tour-mock-link">
+            [[<span className="tour-mock-link-name">Elowen Vance</span>]]
+          </span>
+          <span className="tour-mock-run">, not once in the crossing.</span>
+        </p>
+
+        <div className="tour-mock-menu" data-menu="wiki">
+          {CODEX_HITS.map((name, i) => (
+            <span
+              className="tour-mock-menu-item"
+              key={name}
+              data-pick={i === 0 ? "true" : undefined}
+              style={vars({ "--i": i })}
+            >
+              {name}
+            </span>
+          ))}
+        </div>
+
+        <div className="tour-mock-links">
+          <span className="tour-mock-links-head">Backlinks · Elowen Vance</span>
+          <span className="tour-mock-link-row">
+            Chapter Nine
+            <span className="tour-mock-link-count">1</span>
+          </span>
+        </div>
+      </div>
+      <TourCursor />
+    </>
+  );
+}
+
+/* ---------- 15. move a paragraph ---------- */
+
+/* Vertical twin of the tab drag: DOM order is the finished order, and the
+   keyframes start the moved paragraph one slot lower with its neighbour
+   one slot higher. The caret rides along, because "the cursor is still in
+   it" is the difference between this and cut-and-paste. */
+const PARA_BLOCKS: { role: "static" | "move"; lines: number }[] = [
+  { role: "static", lines: 2 },
+  { role: "move", lines: 2 },
+  { role: "static", lines: 2 },
+];
+
+function ParagraphClip() {
+  return (
+    <>
+      <div className="tour-keycaps">
+        <span className="tour-key" data-key="alt">
+          Alt
+        </span>
+        <span className="tour-key-join">+</span>
+        <span className="tour-key" data-key="up">
+          ↑
+        </span>
+      </div>
+
+      <div className="tour-mock tour-mock-blocks">
+        {PARA_BLOCKS.map((block, i) => (
+          <span
+            className="tour-mock-block"
+            key={i}
+            data-role={block.role}
+            style={vars({ "--i": i })}
+          >
+            <MockLines count={block.lines} />
+            {block.role === "move" && <span className="tour-mock-block-caret" />}
+          </span>
+        ))}
+      </div>
+    </>
+  );
+}
+
+/* ---------- 16. reword ---------- */
 
 /* The menu is taken from the real style list rather than retyped, so the
    demonstration can't drift from the menu it demonstrates. Three fit;

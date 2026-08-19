@@ -104,7 +104,7 @@ export function BeatsPanel() {
       const built = buildFromTemplate(EXPAND_TEMPLATE, active, referenced, { beat });
 
       await generate(
-        { system: built.system, prompt: built.prompt, maxTokens: 500 },
+        { system: built.system, prompt: built.prompt, maxTokens: 500, role: "drafting" },
         (chunk) => setOutput((o) => (o ? { ...o, text: o.text + chunk } : o)),
         controller.signal,
       );

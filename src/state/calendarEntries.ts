@@ -37,7 +37,8 @@ export interface EntryLabel {
 /* The plot board's hues, named. Muted enough to tint a day cell
    without shouting over five themes. Entries store the label's ID
    rather than its hex, so restyling the palette later reskins every
-   existing entry instead of freezing today's colors into storage. */
+   existing entry instead of freezing today's colors into storage —
+   and so does a writer renaming or recoloring one of these six. */
 export const ENTRY_LABELS: EntryLabel[] = [
   { id: "draft", name: "Draft", color: "#c8794e" },
   { id: "revise", name: "Revise", color: "#6f8faf" },
@@ -54,20 +55,393 @@ export interface CalendarEntry {
   text: string;
   /** "HH:MM" wall time. Absent means "sometime this day". */
   time?: string;
-  /** An ENTRY_LABELS id, or absent for unlabeled. */
+  /** A label id — one of the six above, or one of the writer's own. */
   label?: string;
   /** Epoch ms. Ordering untimed entries by when they were written keeps
       a day's list from reshuffling itself under the writer's cursor. */
   created: number;
 }
 
-export function labelById(id: string | undefined): EntryLabel | undefined {
+/* ============================================================
+   The label book — six shipped, the rest the writer's
+
+   Six was never going to be right for everyone. A novelist who works
+   in POVs, or in beats, or in "waiting on the editor" has a vocabulary
+   we can't guess at, so the shipped six became a FLOOR rather than a
+   fence: rename them, recolor them, archive the ones you don't use,
+   add your own.
+
+   The book stores PATCHES, not a replacement list. A record whose id
+   matches a built-in layers a name, a color or an archived flag over
+   the shipped one; a record with a fresh id is a label of the writer's
+   own. Two things follow from that shape, and they are the whole
+   reason for it:
+
+     - an EMPTY book resolves to exactly the six we always shipped, so
+       a writer upgrading into this feature sees no change at all;
+     - un-editing a built-in means deleting a record rather than
+       remembering what our own default used to be, so retuning the
+       shipped palette still reaches everyone who never touched it.
+
+   Everything down to the STORAGE line is pure over its arguments.
+   ============================================================ */
+
+/** Long enough for "First-pass revision", short enough to sit in a
+    menu row without wrapping. */
+export const LABEL_NAME_MAX = 24;
+
+/** The ceiling on the whole book, the six built-ins included. This is a
+    color code read at a glance across 42 day cells: past a couple of
+    dozen hues nobody can tell one dot from another, and the picker
+    stops being a menu and becomes a scroll. */
+export const MAX_LABELS = 24;
+
+/** The writer's own ids carry a prefix, so any id can be classified
+    without a lookup — including one left behind in an entry. */
+export const CUSTOM_LABEL_PREFIX = "lbl";
+
+export interface StoredLabel {
+  id: string;
+  /** Both absent on a built-in patch that only archives. */
+  name?: string;
+  color?: string;
+  archived?: boolean;
+  /** Epoch ms. Orders the writer's own labels beneath the built-ins. */
+  created?: number;
+}
+
+export interface LabelBook {
+  v: 1;
+  labels: StoredLabel[];
+}
+
+/** A label as everything downstream sees it: the shipped six with any
+    patch applied, then the writer's own in the order they made them. */
+export interface ResolvedLabel extends EntryLabel {
+  builtin: boolean;
+  /** Archived labels are not offered for new entries but still
+      RESOLVE, which is the whole mechanism keeping old entries
+      rendering exactly as they did. */
+  archived: boolean;
+  /** A built-in the writer has renamed or recolored — the only state
+      in which "Reset" is worth offering. */
+  edited: boolean;
+}
+
+export function emptyLabelBook(): LabelBook {
+  return { v: 1, labels: [] };
+}
+
+const LABEL_HEX = /^#?([0-9a-f]{6}|[0-9a-f]{3})$/i;
+
+/** "#ABC" / "aabbcc" / "#AABBCC" → "#aabbcc"; null when it isn't a
+    color at all. Shorthand is accepted because writers paste hexes
+    from wherever they found them.
+
+    Six lines restated rather than imported from customThemes: that
+    module is ui and this one is state, and reaching upward to validate
+    a string would drag the theme engine — DOM writes included — into
+    every test that touches a calendar. */
+export function normalizeLabelHex(input: string): string | null {
+  const m = LABEL_HEX.exec((input ?? "").trim());
+  if (!m) return null;
+  const hex = m[1]!.toLowerCase();
+  if (hex.length === 6) return `#${hex}`;
+  return `#${hex[0]}${hex[0]}${hex[1]}${hex[1]}${hex[2]}${hex[2]}`;
+}
+
+export function isBuiltinLabelId(id: string): boolean {
+  return ENTRY_LABELS.some((l) => l.id === id);
+}
+
+let labelSeq = 0;
+
+/** Clock and counter injected so the id scheme is testable, and
+    prefixed so a writer's label can never collide with a built-in. */
+export function makeLabelId(now = Date.now(), n = labelSeq++): string {
+  return `${CUSTOM_LABEL_PREFIX}${now.toString(36)}${n.toString(36)}`;
+}
+
+/** Built-ins first and in their shipped order, then the writer's own
+    oldest first. Order is fixed rather than alphabetical because the
+    picker is muscle memory: Draft is the top item forever. */
+export function resolveLabels(book: LabelBook): ResolvedLabel[] {
+  const rows = Array.isArray(book.labels) ? book.labels : [];
+  const patch = new Map<string, StoredLabel>();
+  for (const rec of rows) if (rec && typeof rec.id === "string") patch.set(rec.id, rec);
+
+  const out: ResolvedLabel[] = ENTRY_LABELS.map((base) => {
+    const rec = patch.get(base.id);
+    const name = (rec?.name ?? "").trim() || base.name;
+    const color = normalizeLabelHex(rec?.color ?? "") ?? base.color;
+    return {
+      id: base.id,
+      name,
+      color,
+      builtin: true,
+      archived: rec?.archived === true,
+      edited: name !== base.name || color !== base.color,
+    };
+  });
+
+  const own = rows
+    .filter((rec) => rec && typeof rec.id === "string" && !isBuiltinLabelId(rec.id))
+    // A label of the writer's own is nothing without a name and a hue,
+    // so a half-written record is dropped rather than rendered blank.
+    .filter((rec) => (rec.name ?? "").trim().length > 0 && normalizeLabelHex(rec.color ?? "") !== null)
+    .sort((a, b) => (a.created ?? 0) - (b.created ?? 0) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+
+  for (const rec of own) {
+    out.push({
+      id: rec.id,
+      name: (rec.name ?? "").trim(),
+      color: normalizeLabelHex(rec.color ?? "")!,
+      builtin: false,
+      archived: rec.archived === true,
+      edited: false,
+    });
+  }
+  return out;
+}
+
+/** What the picker offers for a new entry. */
+export function offeredLabels(labels: ResolvedLabel[]): ResolvedLabel[] {
+  return labels.filter((l) => !l.archived);
+}
+
+/** What the picker offers for an entry that already has a label:
+    everything on offer, plus the one this row is wearing even if it's
+    archived. Hiding the label a row visibly carries would read as the
+    app having quietly lost it. */
+export function labelChoices(labels: ResolvedLabel[], current?: string): ResolvedLabel[] {
+  return labels.filter((l) => !l.archived || l.id === current);
+}
+
+/** Hard problems with a draft. An empty list means it can be saved.
+    The cap is only checked when CREATING: a writer already at the
+    ceiling must still be able to rename what they have. */
+export function validateLabel(
+  draft: { name: string; color: string },
+  labels: ResolvedLabel[],
+  id?: string,
+): string[] {
+  const problems: string[] = [];
+  const name = (draft.name ?? "").trim();
+  if (name.length === 0) problems.push("Give the label a name.");
+  if (name.length > LABEL_NAME_MAX) {
+    problems.push(`Label names stop at ${LABEL_NAME_MAX} characters.`);
+  }
+  if (!normalizeLabelHex(draft.color ?? "")) problems.push("That isn't a color.");
+  // Two labels with one name is a color code you can't read back.
+  if (name && labels.some((l) => l.id !== id && l.name.trim().toLowerCase() === name.toLowerCase())) {
+    problems.push("You already have a label with that name.");
+  }
+  if (!id && labels.length >= MAX_LABELS) {
+    problems.push(`${MAX_LABELS} labels is as many as a month grid can stay readable with.`);
+  }
+  return problems;
+}
+
+/** Upsert or drop one record by id. Every operation below goes through
+    here, which is why none of them can leave two records for one label. */
+function withLabelRecord(
+  book: LabelBook,
+  id: string,
+  change: (rec: StoredLabel | undefined) => StoredLabel | null,
+): LabelBook {
+  const next = change(book.labels.find((r) => r.id === id));
+  const rest = book.labels.filter((r) => r.id !== id);
+  return { v: 1, labels: next ? [...rest, next] : rest };
+}
+
+/** Add a label of the writer's own. Refuses rather than storing junk —
+    run validateLabel first when you want to say why. */
+export function addLabel(
+  book: LabelBook,
+  draft: { name: string; color: string },
+  id = makeLabelId(),
+  created = Date.now(),
+): LabelBook {
+  const name = (draft.name ?? "").trim().slice(0, LABEL_NAME_MAX);
+  const color = normalizeLabelHex(draft.color ?? "");
+  if (!name || !color) return book;
+  if (isBuiltinLabelId(id) || book.labels.some((r) => r.id === id)) return book;
+  if (resolveLabels(book).length >= MAX_LABELS) return book;
+  return { v: 1, labels: [...book.labels, { id, name, color, created }] };
+}
+
+/** Rename and/or recolor — built-ins included.
+
+    Built-ins are patched rather than replaced, and a patch that ends up
+    saying nothing is thrown away: rename Draft back to "Draft" and the
+    record disappears, putting the label back under our palette. */
+export function editLabel(
+  book: LabelBook,
+  id: string,
+  patch: { name?: string; color?: string },
+): LabelBook {
+  const shipped = ENTRY_LABELS.find((l) => l.id === id);
+  return withLabelRecord(book, id, (rec) => {
+    if (!rec && !shipped) return null;
+    const name =
+      patch.name !== undefined
+        ? patch.name.trim().slice(0, LABEL_NAME_MAX)
+        : ((rec?.name ?? "").trim() || (shipped?.name ?? ""));
+    const color =
+      (patch.color !== undefined ? normalizeLabelHex(patch.color) : null) ??
+      normalizeLabelHex(rec?.color ?? "") ??
+      shipped?.color ??
+      null;
+    // An unnamed or uncolored edit is a refusal, not a wipe.
+    if (!name || !color) return rec ?? null;
+    const archived = rec?.archived === true;
+    if (shipped && name === shipped.name && color === shipped.color && !archived) return null;
+    const next: StoredLabel = { id, name, color };
+    if (archived) next.archived = true;
+    if (rec?.created !== undefined) next.created = rec.created;
+    return next;
+  });
+}
+
+/** Archive, or bring back.
+
+    THE RULE: archiving touches the book and never the entries. The
+    label stops being offered for new entries; every entry already
+    wearing it keeps its name and its hue, because an archived label
+    still resolves. That is the difference between retiring a word from
+    your vocabulary and going back through the diary to cross it out. */
+export function setLabelArchived(book: LabelBook, id: string, archived: boolean): LabelBook {
+  const shipped = ENTRY_LABELS.find((l) => l.id === id);
+  return withLabelRecord(book, id, (rec) => {
+    if (!rec && !shipped) return null;
+    if (archived) return { ...(rec ?? { id }), id, archived: true };
+    if (!rec) return null;
+    // Un-archiving a built-in whose record existed only to archive it
+    // leaves no record at all, which is the un-edited state.
+    const next: StoredLabel = { id };
+    if (rec.name) next.name = rec.name;
+    if (rec.color) next.color = rec.color;
+    if (rec.created !== undefined) next.created = rec.created;
+    if (!next.name && !next.color) return null;
+    return next;
+  });
+}
+
+/** Put a built-in back the way it shipped — name, color, unarchived. A
+    no-op on a label of the writer's own, which has no default to
+    return to and would just vanish. */
+export function resetLabel(book: LabelBook, id: string): LabelBook {
+  if (!isBuiltinLabelId(id)) return book;
+  return { v: 1, labels: book.labels.filter((r) => r.id !== id) };
+}
+
+/** Delete a label of the writer's own.
+
+    Built-in ids are compiled into the app, so "deleting" one would only
+    have it reappear on the next launch — an archive that lies about
+    itself. The manager offers Archive there instead, and this refuses.
+
+    Deleting does not by itself clean up the entries; see
+    clearLabelFrom, which the store always runs in the same breath. */
+export function deleteLabel(book: LabelBook, id: string): LabelBook {
+  if (isBuiltinLabelId(id)) return book;
+  if (!book.labels.some((r) => r.id === id)) return book;
+  return { v: 1, labels: book.labels.filter((r) => r.id !== id) };
+}
+
+/** Take one label off every entry wearing it. Returns the SAME array
+    when nothing did, so a caller can skip a write and a repaint. */
+export function clearLabelFrom(entries: CalendarEntry[], id: string): CalendarEntry[] {
+  if (!entries.some((e) => e.label === id)) return entries;
+  return entries.map((e) => {
+    if (e.label !== id) return e;
+    const next: CalendarEntry = { ...e };
+    delete next.label;
+    return next;
+  });
+}
+
+/** How many entries wear this label. The number the manager shows
+    before it lets anybody delete anything. */
+export function countLabelUse(entries: CalendarEntry[], id: string): number {
+  return entries.filter((e) => e.label === id).length;
+}
+
+/** The backstop for an id nothing can resolve — a book hand-edited in
+    devtools, or a label deleted in another tab while this one held
+    stale entries. Such an entry already renders as unlabeled; this
+    makes the storage agree with the screen, so the ghost can't come
+    back to life if that id is ever reused. */
+export function pruneMissingLabels(
+  entries: CalendarEntry[],
+  labels: EntryLabel[],
+): CalendarEntry[] {
+  const known = new Set(labels.map((l) => l.id));
+  if (!entries.some((e) => e.label !== undefined && !known.has(e.label))) return entries;
+  return entries.map((e) => {
+    if (e.label === undefined || known.has(e.label)) return e;
+    const next: CalendarEntry = { ...e };
+    delete next.label;
+    return next;
+  });
+}
+
+/** localStorage is hand-editable and outlives app versions, so what
+    comes back out of it is a stranger until proven otherwise. */
+export function sanitizeLabelBook(raw: unknown): LabelBook {
+  const rows = raw && typeof raw === "object" ? (raw as { labels?: unknown }).labels : null;
+  if (!Array.isArray(rows)) return emptyLabelBook();
+
+  const seen = new Set<string>();
+  const out: StoredLabel[] = [];
+  for (const row of rows) {
+    if (!row || typeof row !== "object") continue;
+    const r = row as Record<string, unknown>;
+    const id = typeof r["id"] === "string" ? r["id"] : "";
+    if (!id || seen.has(id)) continue;
+
+    const name = typeof r["name"] === "string" ? r["name"].trim().slice(0, LABEL_NAME_MAX) : "";
+    const color = typeof r["color"] === "string" ? normalizeLabelHex(r["color"]) : null;
+    const builtin = isBuiltinLabelId(id);
+    if (!builtin && (!name || !color)) continue;
+
+    const rec: StoredLabel = { id };
+    if (name) rec.name = name;
+    if (color) rec.color = color;
+    if (r["archived"] === true) rec.archived = true;
+    rec.created = typeof r["created"] === "number" ? r["created"] : 0;
+    // A built-in record that patches nothing is noise.
+    if (builtin && !rec.name && !rec.color && !rec.archived) continue;
+
+    seen.add(id);
+    out.push(rec);
+  }
+  return { v: 1, labels: out };
+}
+
+/* ---------- resolving one entry's label (pure over a list) ---------- */
+
+export function findLabel<T extends EntryLabel>(labels: T[], id: string | undefined): T | undefined {
   if (!id) return undefined;
-  return ENTRY_LABELS.find((l) => l.id === id);
+  return labels.find((l) => l.id === id);
+}
+
+export function labelColor(labels: EntryLabel[], id: string | undefined): string | null {
+  return findLabel(labels, id)?.color ?? null;
+}
+
+/* The four callers below take no label list. They read the writer's
+   live book instead, so a rename or a recolor repaints the grid, the
+   dots and the day panel without anything threading a palette through
+   six components. The list-taking versions above are what the tests
+   drive. */
+
+export function labelById(id: string | undefined): ResolvedLabel | undefined {
+  return findLabel(currentLabels(), id);
 }
 
 export function entryColor(entry: CalendarEntry): string | null {
-  return labelById(entry.label)?.color ?? null;
+  return labelColor(currentLabels(), entry.label);
 }
 
 /* ---------- date maths (pure) ---------- */
@@ -210,9 +584,9 @@ export function groupByDay(list: CalendarEntry[]): Record<string, CalendarEntry[
 /** The wash of color a day cell gets: the first labeled entry's hue,
     or null when the day has content but nothing labeled (which still
     earns a mark, just the neutral one). */
-export function dayTint(entries: CalendarEntry[]): string | null {
+export function tintOf(labels: EntryLabel[], entries: CalendarEntry[]): string | null {
   for (const e of sortEntries(entries)) {
-    const color = entryColor(e);
+    const color = labelColor(labels, e.label);
     if (color) return color;
   }
   return null;
@@ -221,14 +595,22 @@ export function dayTint(entries: CalendarEntry[]): string | null {
 /** Up to `max` distinct dots for a day. `null` stands for an unlabeled
     entry — the caller paints those in the theme's accent, so "has
     something planned" reads even with no labels in use at all. */
-export function dayDots(entries: CalendarEntry[], max = 3): (string | null)[] {
+export function dotsOf(labels: EntryLabel[], entries: CalendarEntry[], max = 3): (string | null)[] {
   const seen: (string | null)[] = [];
   for (const e of sortEntries(entries)) {
-    const color = entryColor(e);
+    const color = labelColor(labels, e.label);
     if (!seen.some((s) => s === color)) seen.push(color);
     if (seen.length >= max) break;
   }
   return seen;
+}
+
+export function dayTint(entries: CalendarEntry[]): string | null {
+  return tintOf(currentLabels(), entries);
+}
+
+export function dayDots(entries: CalendarEntry[], max = 3): (string | null)[] {
+  return dotsOf(currentLabels(), entries, max);
 }
 
 export function makeEntry(
@@ -283,6 +665,7 @@ export function migrateIntents(
 
 const ENTRIES_KEY = "novella.calendar";
 const FEEDS_KEY = "novella.calendarFeeds";
+const LABELS_KEY = "novella.calendarLabels";
 
 interface StoredEntries {
   v: 1;
@@ -345,7 +728,12 @@ function ensureLoaded(): void {
   // never touches localStorage until something actually asks for data.
   if (entriesReady) return;
   entriesReady = true;
-  entries = readEntries().entries;
+  const loaded = readEntries().entries;
+  // One sweep for label ids nothing resolves, so an entry can never be
+  // left pointing at a label that isn't there. Returns the same array
+  // when there's nothing to fix, which is the ordinary case.
+  entries = pruneMissingLabels(loaded, currentLabels());
+  if (entries !== loaded) writeEntries({ v: 1, entries, migrated: true });
 }
 
 function emit(): void {
@@ -419,6 +807,137 @@ export const calendarStore = {
 };
 
 export function useCalendarEntries(): number {
+  return useSyncExternalStore(calendarStore.subscribe, calendarStore.getVersion, calendarStore.getVersion);
+}
+
+/* ============================================================
+   Storage — the label book
+
+   Its own key beside the entries rather than inside them. Labels are
+   the writer's vocabulary and entries are their diary: a corrupt diary
+   shouldn't cost them the vocabulary, and a book we fail to parse
+   shouldn't take a year of planning with it.
+   ============================================================ */
+
+let labelBook: LabelBook = emptyLabelBook();
+let resolvedLabels: ResolvedLabel[] = resolveLabels(labelBook);
+let labelsReady = false;
+
+function ensureLabels(): void {
+  if (labelsReady) return;
+  labelsReady = true;
+  try {
+    const raw = localStorage.getItem(LABELS_KEY);
+    labelBook = raw ? sanitizeLabelBook(JSON.parse(raw)) : emptyLabelBook();
+  } catch {
+    /* No key yet, bad JSON, or no localStorage at all (a unit test in
+       Node): the six shipped labels are a perfectly good place to be. */
+    labelBook = emptyLabelBook();
+  }
+  resolvedLabels = resolveLabels(labelBook);
+}
+
+/** The labels as everything on screen sees them, archived included.
+    Resolved once per write rather than per render — the month grid
+    asks 42 times a paint. */
+export function currentLabels(): ResolvedLabel[] {
+  ensureLabels();
+  return resolvedLabels;
+}
+
+function persistLabels(next: LabelBook): void {
+  labelBook = next;
+  resolvedLabels = resolveLabels(next);
+  try {
+    localStorage.setItem(LABELS_KEY, JSON.stringify(next));
+  } catch {
+    /* Same bargain as everything else on this tab: best effort. */
+  }
+  emit();
+}
+
+export const labelStore = {
+  /** Everything, archived included — what RENDERS. */
+  all(): ResolvedLabel[] {
+    return currentLabels();
+  },
+
+  /** What the picker offers for a new entry. */
+  offered(): ResolvedLabel[] {
+    return offeredLabels(currentLabels());
+  },
+
+  byId(id: string | undefined): ResolvedLabel | undefined {
+    return findLabel(currentLabels(), id);
+  },
+
+  useCount(id: string): number {
+    ensureLoaded();
+    return countLabelUse(entries, id);
+  },
+
+  /** Returns the new label, or null when the book refused it (the cap,
+      or a name and color that never made it past validateLabel). */
+  add(name: string, color: string): ResolvedLabel | null {
+    ensureLabels();
+    const id = makeLabelId();
+    const next = addLabel(labelBook, { name, color }, id);
+    if (next === labelBook) return null;
+    persistLabels(next);
+    return findLabel(resolvedLabels, id) ?? null;
+  },
+
+  edit(id: string, patch: { name?: string; color?: string }): void {
+    ensureLabels();
+    persistLabels(editLabel(labelBook, id, patch));
+  },
+
+  archive(id: string): void {
+    ensureLabels();
+    persistLabels(setLabelArchived(labelBook, id, true));
+  },
+
+  restore(id: string): void {
+    ensureLabels();
+    persistLabels(setLabelArchived(labelBook, id, false));
+  },
+
+  reset(id: string): void {
+    ensureLabels();
+    persistLabels(resetLabel(labelBook, id));
+  },
+
+  /** Delete a label of the writer's own AND take it off every entry
+      that wore it, in one step. The two halves are never apart: an
+      entry pointing at a label that no longer exists is precisely the
+      state this feature is not allowed to create. */
+  remove(id: string): void {
+    ensureLabels();
+    ensureLoaded();
+    const next = deleteLabel(labelBook, id);
+    if (next === labelBook) return;
+    const cleared = clearLabelFrom(entries, id);
+    if (cleared !== entries) {
+      entries = cleared;
+      writeEntries({ v: 1, entries, migrated: true });
+    }
+    persistLabels(next);
+  },
+
+  /** Take a label off every entry without retiring the label itself —
+      the way back for a writer who color-coded a month by mistake. */
+  unlabelAll(id: string): void {
+    ensureLoaded();
+    const cleared = clearLabelFrom(entries, id);
+    if (cleared === entries) return;
+    entries = cleared;
+    persist();
+  },
+};
+
+/** Labels ride the entries' version counter: a rename has to repaint
+    the grid, the dots and the day panel, and all three read that. */
+export function useCalendarLabels(): number {
   return useSyncExternalStore(calendarStore.subscribe, calendarStore.getVersion, calendarStore.getVersion);
 }
 

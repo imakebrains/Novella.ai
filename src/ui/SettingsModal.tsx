@@ -5,8 +5,38 @@ import { SetupPanel } from "./SetupPanel";
 import { THEMES, useCustomThemes, useTheme } from "./useTheme";
 import { useProfile } from "../state/profile";
 import { SessionSummary } from "./GoalMeter";
-import { activeProviderSlash, setActiveProvider } from "../ai/generate";
-import { PRESETS, listRemoteModels } from "../plugins/providers/openaiCompatible";
+import { PRESETS } from "../plugins/providers/openaiCompatible";
+import {
+  ROLES,
+  describeChain,
+  defaultDraft,
+  healthLabel,
+  keyPageFor,
+  keyWarning,
+  kindInfo,
+  resolveRole,
+  validateDraft,
+  PROVIDER_KINDS,
+  type Connection,
+  type ProviderKind,
+} from "../ai/roles";
+import {
+  addConnection,
+  baseUrlOf,
+  connections,
+  hasKey,
+  healthOf,
+  modelOf,
+  probeOf,
+  ready,
+  removeConnection,
+  routing,
+  setKey,
+  setRole,
+  testConnection,
+  updateConnection,
+  useConnections,
+} from "../plugins/providers/connections";
 import { useMusic } from "../state/music";
 import { isTauri } from "../storage";
 import {
@@ -782,76 +812,462 @@ function ShortcutsTab() {
 
 /* ---------------- connections ---------------- */
 
-/* One place for everything Novella talks to: AI models, music, the update
-   channel — and honest placeholders for what isn't wired yet. The card
-   grid answers "what's connected?" at a glance; details live below. */
+/* One place for everything Novella talks to: AI accounts, music, the
+   update channel. Each AI card opens the whole of connecting it — what
+   you need, where to get it, somewhere to paste it, and a test that
+   reports what actually happened.
+
+   The thing this screen refuses to do: draw a "Sign in with Google"
+   button. Anthropic and OpenAI grant access through API keys, not
+   OAuth, and Ollama grants it by being installed. A pretty button that
+   couldn't work would be the worst thing on the page. */
 
 function ConnectionsTab() {
   usePluginVersion();
+  useConnections();
   const { url: musicUrl } = useMusic();
-  const active = activeProviderSlash();
 
-  const cards: { name: string; detail: string; on: boolean; note?: string }[] = [
-    {
-      name: "Local AI (Ollama)",
-      detail: pluginHost.isActive("provider-ollama-streaming")
-        ? active === "/local"
-          ? "Connected · writing model"
-          : "Connected"
-        : "Off",
-      on: pluginHost.isActive("provider-ollama-streaming"),
-    },
-    {
-      name: "Claude",
-      detail: pluginHost.isActive("provider-anthropic")
-        ? active === "/claude"
-          ? "Connected · writing model"
-          : "Connected"
-        : "Not linked",
-      on: pluginHost.isActive("provider-anthropic"),
-    },
-    {
-      name: "ChatGPT & compatible",
-      detail: pluginHost.isActive("provider-openai-compatible")
-        ? active === "/custom"
-          ? "Connected · writing model"
-          : "Connected"
-        : "Not linked",
-      on: pluginHost.isActive("provider-openai-compatible"),
-    },
-    {
-      name: "Music",
-      detail: musicUrl ? "Playlist saved with this project" : "None — set one in the ♪ dock",
-      on: !!musicUrl,
-    },
-    {
-      name: "GitHub updates",
-      detail: updateRepo() ? updateRepo() : "No repository set",
-      on: !!updateRepo(),
-    },
-    {
-      name: "Google account",
-      detail: "Arrives with sync — nothing to link yet",
-      on: false,
-      note: "planned",
-    },
-  ];
+  const list = connections();
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [picking, setPicking] = useState(false);
+
+  /* Two things happen on arrival: saved keys come back from the OS
+     keychain, and anything that already has what it needs gets tested.
+     Both are cheap — listing models costs no tokens — and both mean the
+     cards say something true before anyone clicks. */
+  useEffect(() => {
+    let live = true;
+    void ready().then(() => {
+      if (!live) return;
+      for (const conn of connections()) {
+        if (probeOf(conn.id).reachable === null && healthOf(conn) !== "needs-key") {
+          void testConnection(conn);
+        }
+      }
+    });
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  const open = list.find((c) => c.id === openId);
 
   return (
     <>
-      <div className="connection-cards">
-        {cards.map((c) => (
-          <div key={c.name} className={`connection-card ${c.on ? "on" : ""}`}>
-            <span className={`connection-dot ${c.on ? "on" : ""} ${c.note ? "planned" : ""}`} />
-            <span className="connection-name">{c.name}</span>
-            <span className="connection-detail">{c.detail}</span>
+      <section className="ap-section">
+        <h3 className="ap-title">Your AI connections</h3>
+        <p className="ap-sub">
+          Link as many as you like and give each one a job below. Claude and ChatGPT
+          hand out API keys rather than sign-ins — there is no "connect with Google" for
+          either, so this walks you to the exact page instead. The local one needs no
+          account at all.
+        </p>
+
+        <div className="connection-cards">
+          {list.map((conn) => {
+            const health = healthOf(conn);
+            const live = health === "ready" || health === "untested";
+            return (
+              <button
+                key={conn.id}
+                className={`connection-card ${live ? "on" : ""} ${
+                  health === "unreachable" ? "warn" : ""
+                } ${openId === conn.id ? "picked" : ""}`}
+                onClick={() => {
+                  setPicking(false);
+                  setOpenId(openId === conn.id ? null : conn.id);
+                }}
+                aria-expanded={openId === conn.id}
+              >
+                <span
+                  className={`connection-dot ${live ? "on" : ""} ${
+                    health === "unreachable" ? "warn" : ""
+                  }`}
+                />
+                <span className="connection-name">{conn.label}</span>
+                <span className="connection-detail">
+                  {healthLabel(health)} · {modelOf(conn)}
+                </span>
+              </button>
+            );
+          })}
+
+          <button
+            className="connection-card add"
+            onClick={() => {
+              setOpenId(null);
+              setPicking((v) => !v);
+            }}
+            aria-expanded={picking}
+          >
+            <span className="connection-dot" />
+            <span className="connection-name">Add a connection</span>
+            <span className="connection-detail">Another account, or a second local engine</span>
+          </button>
+        </div>
+
+        {picking && (
+          <KindPicker
+            onPick={(kind) => {
+              const conn = addConnection(defaultDraft(kind, connections()));
+              setPicking(false);
+              setOpenId(conn.id);
+            }}
+            onCancel={() => setPicking(false)}
+          />
+        )}
+
+        {open && <ConnectionPanel key={open.id} conn={open} onClose={() => setOpenId(null)} />}
+      </section>
+
+      <RolesSection />
+
+      <section className="ap-section">
+        <h3 className="ap-title">Local AI</h3>
+        <p className="ap-sub">
+          The engine behind every local connection. Installing it here is the whole
+          setup — no terminal, no account, no bill.
+        </p>
+        <SetupPanel />
+      </section>
+
+      <section className="ap-section">
+        <h3 className="ap-title">Everything else</h3>
+        <div className="connection-cards">
+          <div className={`connection-card ${musicUrl ? "on" : ""}`}>
+            <span className={`connection-dot ${musicUrl ? "on" : ""}`} />
+            <span className="connection-name">Music</span>
+            <span className="connection-detail">
+              {musicUrl ? "Playlist saved with this project" : "None — set one in the ♪ dock"}
+            </span>
           </div>
-        ))}
-      </div>
+          <div className={`connection-card ${updateRepo() ? "on" : ""}`}>
+            <span className={`connection-dot ${updateRepo() ? "on" : ""}`} />
+            <span className="connection-name">GitHub updates</span>
+            <span className="connection-detail">{updateRepo() || "No repository set"}</span>
+          </div>
+          <div className="connection-card">
+            <span className="connection-dot planned" />
+            <span className="connection-name">Google account</span>
+            <span className="connection-detail">
+              Not built — the calendar can subscribe to an ICS link today
+            </span>
+          </div>
+        </div>
+      </section>
 
       <UpdatesSection />
-      <ProvidersSection />
+
+      <p className="hint modal-footnote">
+        {isTauri()
+          ? "API keys go straight to your operating system's credential manager — Windows Credential Manager, macOS Keychain — never into a file Novella writes, never into your book's folder, and never anywhere but the provider they belong to."
+          : "This is the browser build, which has nowhere safe to keep a key, so keys last until you close the tab and are never written to disk. The desktop app stores them in your OS credential manager."}
+      </p>
     </>
+  );
+}
+
+/* ---------------- adding one ---------------- */
+
+function KindPicker({
+  onPick,
+  onCancel,
+}: {
+  onPick: (kind: ProviderKind) => void;
+  onCancel: () => void;
+}) {
+  return (
+    <div className="conn-panel">
+      <div className="radio-list">
+        {PROVIDER_KINDS.map((info) => (
+          <button key={info.kind} className="radio-row" onClick={() => onPick(info.kind)}>
+            <span className="radio-text">
+              <span className="radio-label">{info.label}</span>
+              <span className="radio-detail">
+                {info.blurb} — {info.costNote}
+              </span>
+            </span>
+          </button>
+        ))}
+      </div>
+      <div className="btn-row">
+        <button className="btn-ghost" onClick={onCancel}>
+          Never mind
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- one connection, end to end ---------------- */
+
+/* Everything a writer needs in one place and in order: what this is,
+   where the key comes from, the field to paste it, the test, the model.
+   No step sends them to another tab, and no step fails silently. */
+
+function ConnectionPanel({ conn, onClose }: { conn: Connection; onClose: () => void }) {
+  const info = kindInfo(conn.kind);
+  const [label, setLabel] = useState(conn.label);
+  const [model, setModel] = useState(() => modelOf(conn));
+  const [url, setUrl] = useState(() => baseUrlOf(conn));
+  const [pasted, setPasted] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState<{ ok: boolean; text: string } | null>(null);
+  const [models, setModels] = useState<string[]>([]);
+  const [confirmRemove, setConfirmRemove] = useState(false);
+
+  const others = connections().filter((c) => c.id !== conn.id);
+  const problems = validateDraft({ kind: conn.kind, label, model, baseUrl: url }, others);
+  const warning = keyWarning(conn.kind, pasted);
+  const page = keyPageFor(conn.kind, url);
+  const saved = hasKey(conn.id);
+  const lastError = probeOf(conn.id).detail;
+
+  const runTest = async () => {
+    setBusy(true);
+    setResult(null);
+    const fresh = connections().find((c) => c.id === conn.id) ?? conn;
+    const outcome = await testConnection(fresh);
+    setModels(outcome.models);
+    setResult({ ok: outcome.ok, text: outcome.detail });
+    setBusy(false);
+  };
+
+  const saveKey = async () => {
+    setKey(conn.id, pasted);
+    setPasted("");
+    await runTest();
+  };
+
+  return (
+    <div className="conn-panel">
+      <Field label="Name">
+        <input
+          className="field-input"
+          value={label}
+          onChange={(e) => {
+            setLabel(e.target.value);
+            updateConnection(conn.id, { label: e.target.value });
+          }}
+          aria-label="Connection name"
+          placeholder="What you'll call it"
+        />
+      </Field>
+
+      <ol className="conn-steps">
+        <li className="conn-step">{info.signInNote}</li>
+        {info.requiresKey && page && (
+          <li className="conn-step">
+            <a className="btn-ghost" href={page.url} target="_blank" rel="noreferrer">
+              Open {page.who}'s key page ↗
+            </a>{" "}
+            — create a key there and copy it. Novella can't create one for you; it's
+            issued against your account, not ours.
+          </li>
+        )}
+        <li className="conn-step">
+          {info.requiresKey
+            ? "Paste it below, then press Save key and test. A list of models coming back is proof it works — and it costs nothing."
+            : "Press Test connection. It asks the local engine what models you have installed."}
+        </li>
+      </ol>
+
+      {info.requiresKey && (
+        <>
+          <Field label="API key">
+            <input
+              className="field-input"
+              type="password"
+              value={pasted}
+              placeholder={saved ? "A key is saved — paste a new one to replace it" : info.keyLabel}
+              onChange={(e) => setPasted(e.target.value)}
+              autoComplete="off"
+              spellCheck={false}
+              aria-label="API key"
+            />
+          </Field>
+          <p className="hint">
+            {saved ? "A key is saved for this connection. " : "No key saved yet. "}
+            {isTauri()
+              ? "It lives in your OS credential manager and is sent only to this provider."
+              : "It lives in memory until this tab closes — the browser has nowhere safe to keep it."}
+          </p>
+        </>
+      )}
+      {warning && <p className="hint probe-bad">{warning}</p>}
+
+      {conn.kind === "openai" && (
+        <Field label="Service">
+          <select
+            className="select bare"
+            value={PRESETS.find((p) => p.baseUrl === url)?.baseUrl ?? ""}
+            onChange={(e) => {
+              const preset = PRESETS.find((p) => p.baseUrl === e.target.value);
+              if (!preset) return;
+              setUrl(preset.baseUrl);
+              setModel(preset.model);
+              updateConnection(conn.id, { baseUrl: preset.baseUrl, model: preset.model });
+              setResult(null);
+            }}
+            aria-label="Service"
+          >
+            <option value="">Choose a service…</option>
+            {PRESETS.map((p) => (
+              <option key={p.baseUrl} value={p.baseUrl}>
+                {p.label} — {p.note}
+              </option>
+            ))}
+          </select>
+        </Field>
+      )}
+
+      {conn.kind !== "anthropic" && (
+        <Field label="Address">
+          <input
+            className="field-input"
+            value={url}
+            onChange={(e) => {
+              setUrl(e.target.value);
+              updateConnection(conn.id, { baseUrl: e.target.value });
+              setResult(null);
+            }}
+            placeholder={info.defaultBaseUrl}
+            aria-label="Endpoint address"
+          />
+        </Field>
+      )}
+
+      <Field label="Model">
+        <input
+          className="field-input"
+          value={model}
+          onChange={(e) => {
+            setModel(e.target.value);
+            updateConnection(conn.id, { model: e.target.value });
+          }}
+          placeholder={info.defaultModel}
+          aria-label="Model"
+        />
+      </Field>
+
+      {models.length > 0 && (
+        <div className="chips">
+          {models.slice(0, 24).map((m) => (
+            <button
+              key={m}
+              className={`chip ${m === model ? "on" : ""}`}
+              onClick={() => {
+                setModel(m);
+                updateConnection(conn.id, { model: m });
+              }}
+              title="Use this model"
+            >
+              {m}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {problems.map((p) => (
+        <p key={p} className="hint probe-bad">
+          {p}
+        </p>
+      ))}
+
+      <div className="btn-row">
+        {info.requiresKey && pasted.trim() ? (
+          <button className="btn-primary" onClick={() => void saveKey()} disabled={busy}>
+            Save key and test
+          </button>
+        ) : (
+          <button className="btn-primary" onClick={() => void runTest()} disabled={busy}>
+            {busy ? "Checking…" : "Test connection"}
+          </button>
+        )}
+        <button className="btn-ghost" onClick={onClose}>
+          Done
+        </button>
+        {confirmRemove ? (
+          <>
+            <button
+              className="btn-ghost danger"
+              onClick={() => {
+                removeConnection(conn.id);
+                onClose();
+              }}
+            >
+              Remove for good
+            </button>
+            <button className="btn-ghost" onClick={() => setConfirmRemove(false)}>
+              Keep it
+            </button>
+          </>
+        ) : (
+          <button className="btn-ghost danger" onClick={() => setConfirmRemove(true)}>
+            Remove
+          </button>
+        )}
+      </div>
+
+      {result && <p className={`hint ${result.ok ? "probe-ok" : "probe-bad"}`}>{result.text}</p>}
+      {/* What the last real attempt hit, whether it was a test or a
+          generation that failed while someone was writing. */}
+      {!result && !busy && lastError && <p className="hint probe-bad">{lastError}</p>}
+    </div>
+  );
+}
+
+/* ---------------- who does what ---------------- */
+
+function RolesSection() {
+  useConnections();
+  const list = connections();
+  const route = routing();
+
+  return (
+    <section className="ap-section">
+      <h3 className="ap-title">Who does what</h3>
+      <p className="ap-sub">
+        Different jobs suit different models. Send drafting to the one that writes best,
+        ideas to the one that's free, research to whichever you trust with facts. Every
+        job has a fallback order, so a sleeping laptop or a spent account costs you a
+        moment, not a scene.
+      </p>
+
+      {list.length === 0 ? (
+        <p className="hint">Connect something above and the jobs appear here.</p>
+      ) : (
+        <div className="role-list">
+          {ROLES.map((role) => {
+            const resolved = resolveRole(role.id, route, list, probeOf);
+            return (
+              <div key={role.id} className="role-row">
+                <span className="role-meta">
+                  <span className="role-name">{role.label}</span>
+                  <span className="role-blurb">{role.blurb}</span>
+                </span>
+                <select
+                  className="select bare"
+                  value={route[role.id] ?? ""}
+                  onChange={(e) => setRole(role.id, e.target.value)}
+                  aria-label={`Which connection handles ${role.label}`}
+                >
+                  <option value="">
+                    {role.id === "drafting" ? "Whichever works" : "Same as Drafting"}
+                  </option>
+                  {list.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.label}
+                    </option>
+                  ))}
+                </select>
+                <span className="role-chain">Order: {describeChain(resolved)}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -921,154 +1337,6 @@ function UpdatesSection() {
   );
 }
 
-function ProvidersSection() {
-  const providers = pluginHost.providers();
-  const [active, setActive] = useState(activeProviderSlash());
-  const [probe, setProbe] = useState<{ kind: "busy" | "ok" | "bad"; text: string } | null>(null);
-  const [models, setModels] = useState<string[] | null>(null);
-
-  const custom = pluginHost.list().find((p) => p.id === "provider-openai-compatible");
-  const customSettings = pluginHost.settingsFor("provider-openai-compatible");
-
-  const testCustom = async () => {
-    setProbe({ kind: "busy", text: "Checking…" });
-    setModels(null);
-    try {
-      const found = await listRemoteModels(
-        String(customSettings.get("baseUrl") ?? "https://api.openai.com/v1"),
-        String(customSettings.get("apiKey") ?? ""),
-      );
-      setModels(found);
-      setProbe({ kind: "ok", text: `Connected · ${found.length} models available` });
-    } catch (err) {
-      setProbe({ kind: "bad", text: err instanceof Error ? err.message : String(err) });
-    }
-  };
-
-  return (
-    <>
-      <section className="ap-section">
-        <h3 className="ap-title">Local AI</h3>
-        <SetupPanel />
-      </section>
-
-      <section className="ap-section">
-        <h3 className="ap-title">Which model writes</h3>
-        {providers.length === 0 ? (
-          <p className="hint">No providers are on. Enable one under Plugins.</p>
-        ) : (
-          <div className="radio-list">
-            {providers.map(({ slash, pluginId }) => {
-              const plugin = pluginHost.list().find((p) => p.id === pluginId);
-              return (
-                <label key={slash} className={`radio-row ${active === slash ? "on" : ""}`}>
-                  <input
-                    type="radio"
-                    name="active-provider"
-                    checked={active === slash}
-                    onChange={() => {
-                      setActiveProvider(slash);
-                      setActive(slash);
-                    }}
-                  />
-                  <span className="radio-text">
-                    <span className="radio-label">{plugin?.name ?? slash}</span>
-                    <span className="radio-detail">{slash}</span>
-                  </span>
-                </label>
-              );
-            })}
-          </div>
-        )}
-      </section>
-
-      {custom && (
-        <section className="ap-section">
-          <h3 className="ap-title">Custom endpoint</h3>
-          <p className="ap-sub">
-            Anything speaking the OpenAI API works — OpenRouter, Groq, DeepSeek, LM Studio,
-            or a service that doesn't exist yet.
-          </p>
-
-          {/* The toggle lives here, next to the settings it governs. Making
-              people find it on another tab before their endpoint could be
-              selected above was a trap. */}
-          <div className="setting">
-            <label className="setting-label">Enabled</label>
-            <label className="switch">
-              <input
-                type="checkbox"
-                checked={pluginHost.isActive(custom.id)}
-                onChange={(e) => {
-                  if (e.target.checked) void pluginHost.enable(custom.id);
-                  else pluginHost.disable(custom.id);
-                }}
-              />
-              <span className="switch-track" />
-            </label>
-          </div>
-
-          <Field label="Preset">
-            <select
-              className="select bare"
-              defaultValue=""
-              onChange={(e) => {
-                const preset = PRESETS.find((p) => p.baseUrl === e.target.value);
-                if (preset) customSettings.set("baseUrl", preset.baseUrl);
-              }}
-            >
-              <option value="">Choose a service…</option>
-              {PRESETS.map((p) => (
-                <option key={p.baseUrl} value={p.baseUrl}>
-                  {p.label} — {p.note}
-                </option>
-              ))}
-            </select>
-          </Field>
-
-          {custom.settingsSchema?.map((f) => (
-            <SettingRow key={f.key} pluginId={custom.id} field={f} fieldInput />
-          ))}
-
-          <div className="btn-row">
-            <button className="btn-ghost" onClick={() => void testCustom()}>
-              Test connection
-            </button>
-          </div>
-          {probe && (
-            <p
-              className={`hint${
-                probe.kind === "ok" ? " probe-ok" : probe.kind === "bad" ? " probe-bad" : ""
-              }`}
-            >
-              {probe.text}
-            </p>
-          )}
-          {models && models.length > 0 && (
-            <div className="chips">
-              {models.slice(0, 24).map((m) => (
-                <button
-                  key={m}
-                  className="chip"
-                  onClick={() => customSettings.set("model", m)}
-                  title="Use this model"
-                >
-                  {m}
-                </button>
-              ))}
-            </div>
-          )}
-        </section>
-      )}
-
-      <p className="hint modal-footnote">
-        API keys are held in memory for this session only and never written to disk. That
-        means re-entering them each launch until OS keychain storage lands.
-      </p>
-    </>
-  );
-}
-
 /* ---------------- plugins ---------------- */
 
 const CATEGORY_LABEL: Record<string, string> = {
@@ -1100,6 +1368,11 @@ function PluginsTab() {
         endpoint. Google accounts, Drive and Dropbox arrive with the sync backend:
         they need server-side pieces we haven't built yet, and a fake "link" button
         would only pretend otherwise.
+      </p>
+      <p className="hint">
+        The three AI rows below are the old single-provider path, kept as a floor under
+        the new one. Your keys, models and who-does-what live on{" "}
+        <strong>Connections</strong> now — these switches don't turn a connection off.
       </p>
 
       {[...byCategory.entries()].map(([category, list]) => (

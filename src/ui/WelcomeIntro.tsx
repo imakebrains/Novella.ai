@@ -2,17 +2,17 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   BOOT_MS,
   FINALE_MS,
-  INTRO_SCRIPT,
   INTRO_SWATCHES,
   LINE_GAP_MS,
-  RETURNING_SCREEN,
   gerundAt,
   glueOrphans,
   inputReady,
   lineDurationMs,
   lineFinished,
+  scriptFor,
   substitute,
   tapAdvance,
+  type IntroClip,
   type IntroScreen,
   type LineState,
 } from "./introScript";
@@ -42,7 +42,12 @@ import { probeSetup, type SetupReport } from "../setupProbe";
    The impatience ladder is load-bearing: one tap completes the streaming
    line, another completes the screen, and "Set up later" (top right)
    exits to working defaults from any point. A returning writer can be
-   through in seconds. */
+   through in seconds.
+
+   Two screens SHOW rather than ask, in the guided tour's language: a
+   small looping window built from the app's own vocabulary, set under
+   the copy the way the tour sets one beside its lesson. See the clips
+   at the bottom of this file, and the one rule they all obey. */
 
 const SEEN_KEY = "novella.introSeen";
 
@@ -84,15 +89,10 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
   const returning = projects.length > 0;
   const { theme, setTheme } = useTheme();
 
-  // The returning path swaps the project screen for the door back in —
-  // selected by id, not index, so new screens don't silently drop it.
-  const script = useMemo<IntroScreen[]>(
-    () =>
-      returning
-        ? [...INTRO_SCRIPT.filter((s) => s.input !== "preset"), RETURNING_SCREEN]
-        : INTRO_SCRIPT,
-    [returning],
-  );
+  // The returning path swaps the project screen for the door back in and
+  // drops the showing screens. The rule lives in introScript.ts, where it
+  // can be asserted without a DOM.
+  const script = useMemo<IntroScreen[]>(() => scriptFor(returning), [returning]);
 
   const [screenIdx, setScreenIdx] = useState(0);
   const [line, setLine] = useState<LineState>({ lineIdx: 0, lineComplete: false });
@@ -173,6 +173,11 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
     [screen, vars],
   );
   const ready = inputReady(line, lines.length) && !steps;
+  /* One flag decides whether the windows play or stand still, read at
+     render the way the tour reads it. reducedMotion() already folds in
+     the OS preference AND the writer's explicit override, so there is no
+     second authority here to disagree with it. */
+  const still = reducedMotion();
 
   /* ---- the line clock ----
      One timeout per state: while a line streams, wait out its duration;
@@ -435,6 +440,22 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
         style={boot !== "off" ? { visibility: "hidden" } : undefined}
       >
         {lines.map((l, i) => renderLine(l, i))}
+
+        {/* The window arrives once the copy has landed, alongside the
+            answers, never during the streaming: the stage grows
+            downward, and a window mounted between two lines would shove
+            the sentence still being read.
+
+            It is a scene, not a prop, so it dissolves in the way the
+            stage itself does rather than taking the stop-motion snap
+            that belongs to things you can touch. */}
+        {screen.clip && ready && (
+          <div className="intro-demo">
+            <IntroWindow clip={screen.clip} still={still} />
+            {still && <p className="intro-clip-caption">{screen.clip.still}</p>}
+          </div>
+        )}
+
         {aiLine && screen.input === "ai" && ready && (
           <p className="intro-line done intro-ai-result">{glueOrphans(aiLine)}</p>
         )}
@@ -444,6 +465,15 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
             {screen.input === "begin" && (
               <button className="intro-primary" onClick={advance}>
                 Begin
+              </button>
+            )}
+
+            {/* A showing screen asks nothing, so it offers one way on.
+                The window keeps looping behind the press for as long as
+                the writer wants to watch it. */}
+            {screen.input === "show" && (
+              <button className="intro-primary" onClick={advance}>
+                Continue
               </button>
             )}
 
@@ -644,6 +674,202 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
             ))}
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   The demonstration windows.
+
+   Same construction as the guided tour's clips (TourOverlay.tsx), for
+   the same reasons, and deliberately not a screen recording: a capture
+   is a photograph of one afternoon. It cannot follow the accent the
+   writer picked ninety seconds ago, cannot repaint itself when they
+   hover a theme, cannot stand still for someone who asked for less
+   motion, and starts lying the day a border radius changes. A diagram
+   made of the same tokens as the room it describes ages with the room —
+   and here it does something the tour's clips cannot: it arrives
+   already wearing the choices made on the screens before it. The
+   intro's whole argument is that Novella listens; these windows are
+   that argument in miniature.
+
+   THE RULE, unchanged: the rest state of every clip is its FINISHED
+   state. Nothing is styled where the gesture starts; everything is
+   styled where the gesture leaves it, and the keyframes reach back to
+   the beginning at 0%. Kill the animations — which is exactly what
+   reduced motion does — and what is left is a correct, labelled diagram
+   instead of an empty box. That is why there is no separate still-frame
+   markup below, only a caption.
+
+   The pieces that exist only mid-gesture (the thread being drawn, the
+   spark leaving the model) are the exception, and they are invisible at
+   rest for the same reason: once the link is made, there is no
+   travelling spark.
+
+   Every window is aria-hidden. The lesson lives in the scripted lines,
+   which have to teach on their own for anyone who never sees the
+   picture; a pile of unlabelled divs announced one at a time would be
+   noise, not access.
+   ============================================================ */
+
+/** CSS custom properties are the one thing a style object cannot be
+    typed for — React.CSSProperties has no index signature, so a `--x`
+    key is a type error however true it is. One cast, in one place. */
+function cssVars(v: Record<string, string | number>): React.CSSProperties {
+  return v as React.CSSProperties;
+}
+
+function IntroWindow({ clip, still }: { clip: IntroClip; still: boolean }) {
+  return (
+    <div
+      className={`intro-clip intro-clip-${clip.id}`}
+      data-still={still ? "true" : undefined}
+      /* One clock per window: every keyframe inside runs at var(--clip),
+         so percentage keyframes stay in step with each other and
+         retiming a demonstration is one number in introScript.ts. */
+      style={cssVars({ "--clip-ms": `${clip.loopMs}ms` })}
+      aria-hidden
+    >
+      {clip.id === "room" && <RoomClip />}
+      {clip.id === "pieces" && <PiecesClip />}
+      {clip.id === "local" && <LocalClip />}
+    </div>
+  );
+}
+
+/* ---------- 1. the room ---------- */
+
+/* The real shape of the workspace: CodexPane on the left, the editor in
+   the middle, InspectorPane on the right — the grid in App.tsx, drawn
+   small. The shelf names the two folders every preset really creates,
+   Manuscript and Codex, so the picture matches the folder the writer is
+   about to be handed. */
+const ROOM_SHELF: { label: string; head?: true; on?: true }[] = [
+  { label: "Manuscript", head: true },
+  { label: "Chapter One", on: true },
+  { label: "Chapter Two" },
+  { label: "Codex", head: true },
+  { label: "The Stranger" },
+];
+
+function RoomClip() {
+  return (
+    <div className="intro-mock intro-mock-room">
+      <div className="intro-mock-titlebar">
+        <span className="intro-mock-brand">◈</span>
+        <span className="intro-mock-view" data-on="true">
+          Write
+        </span>
+        <span className="intro-mock-view">Board</span>
+      </div>
+
+      <div className="intro-mock-room-body">
+        <div className="intro-mock-col" data-col="shelf">
+          {ROOM_SHELF.map((row) =>
+            row.head ? (
+              /* The tour's own caption class: an uppercase panel label is
+                 the same object in both places, so it stays one style. */
+              <span className="tour-mock-slot-head" key={row.label}>
+                {row.label}
+              </span>
+            ) : (
+              <span
+                className="intro-mock-item"
+                key={row.label}
+                data-on={row.on ? "true" : undefined}
+              >
+                {row.label}
+              </span>
+            ),
+          )}
+        </div>
+
+        <div className="intro-mock-col" data-col="page">
+          <span className="intro-mock-page-title">Chapter One</span>
+          {[0, 1, 2, 3].map((i) => (
+            <span className="intro-mock-line" key={i} style={cssVars({ "--i": i })} />
+          ))}
+          <span className="intro-mock-row-last">
+            <span className="intro-mock-line" data-last="true" style={cssVars({ "--i": 4 })} />
+            <span className="intro-mock-caret" />
+          </span>
+        </div>
+
+        <div className="intro-mock-col" data-col="tools">
+          <span className="tour-mock-slot-head">Tools</span>
+          {[0, 1, 2].map((i) => (
+            <span className="tour-mock-task" key={i} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- 2. a chapter and a codex entry ---------- */
+
+/* The link is written the way the app really parses it — [[Name]], see
+   extractWikiLinks in core/vault.ts — and the entry it reaches carries
+   the same "character" kind the preset sheets are born with. A
+   demonstration that misspells its own syntax teaches the wrong thing. */
+function PiecesClip() {
+  return (
+    /* No .intro-mock frame around this one: the two cards ARE the
+       objects, and the space between them is the lesson. */
+    <div className="intro-mock-pieces">
+      <div className="intro-mock-sheet">
+        <span className="intro-mock-sheet-head">Manuscript / Chapter One</span>
+        <p className="intro-mock-prose">
+          <span className="tour-mock-run">The lamp guttered when </span>
+          <span className="intro-mock-link">[[The Stranger]]</span>
+          <span className="tour-mock-run"> came in from the rain.</span>
+        </p>
+        <span className="tour-mock-card-line" />
+        <span className="tour-mock-card-line" />
+      </div>
+
+      {/* Exists only while the link is being made, so it is invisible at
+          rest and draws itself left to right during the loop. */}
+      <span className="intro-mock-thread" />
+
+      <div className="intro-mock-entry">
+        <span className="intro-mock-entry-kind">Character</span>
+        <span className="intro-mock-entry-name">The Stranger</span>
+        <span className="tour-mock-card-line" />
+        <span className="tour-mock-card-line" />
+        <span className="intro-mock-entry-meta">Codex / Characters</span>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- 3. a model on this machine ---------- */
+
+/* The boundary is the whole point: the page, the model and the draft it
+   proposed are all inside one dashed edge labelled with the machine.
+   Nothing here claims a model is installed — the copy says "can", and
+   the honest check on this same screen is what answers that. */
+function LocalClip() {
+  return (
+    /* The dashed edge is its own frame, so no .intro-mock here either. */
+    <div className="intro-mock-local">
+      <span className="intro-mock-machine-label">This machine</span>
+
+      <div className="intro-mock-sheet">
+        <span className="intro-mock-sheet-head">Manuscript / Chapter Two</span>
+        <p className="intro-mock-prose">
+          <span className="tour-mock-run">She had been walking since the bridge, </span>
+          <span className="intro-mock-draft">and the town never once looked back.</span>
+        </p>
+        <span className="tour-mock-card-line" />
+      </div>
+
+      <div className="intro-mock-machine-foot">
+        <span className="intro-mock-model">Local model</span>
+        {/* Travels from the model into the sentence and stops there:
+            everything this window shows stays inside the dashed edge. */}
+        <span className="intro-mock-spark" />
       </div>
     </div>
   );

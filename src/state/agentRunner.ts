@@ -103,6 +103,7 @@ export async function runAgent(agent: Agent): Promise<boolean> {
         "You are a working assistant for a novelist, running unattended. Be specific, quote briefly, and keep to the task. Plain Markdown. No preamble, no sign-off.",
       prompt: `${agent.instructions}\n\n---\n\nMATERIAL:\n\n${context || "(the project is empty so far)"}`,
       maxTokens: 900,
+      role: "critique",
     });
     writeReport(agent, output);
     agentStore.update(agent.id, { lastRunAt: Date.now(), lastStatus: "ok", lastError: null });

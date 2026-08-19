@@ -6882,31 +6882,6 @@ body {
 }
 
 /* ---- 9.25 tasks: the + ---- */
-.task-add-btn {
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
-  border-radius: 50%;
-  background: var(--accent-soft);
-  color: var(--accent);
-  font-size: var(--text-base);
-  line-height: 1;
-  cursor: pointer;
-  transition: border-color var(--motion-quick) var(--ease-color),
-    transform var(--motion-quick) var(--ease-enter);
-}
-.task-add-btn:hover {
-  border-color: var(--accent);
-  transform: translateY(-1px);
-}
-.task-add-row {
-  margin: var(--space-2) 0;
-  animation: rise-in var(--motion-quick) var(--ease-enter);
-}
-.task-add-row .field-input {
-  width: 100%;
-}
 
 @media (prefers-reduced-motion: reduce) {
   :root:not(.motion-full) .intro-bg,
@@ -8149,16 +8124,6 @@ body:has(.stack-divider.dragging) {
   padding-top: var(--space-2);
   border-top: 1px solid var(--border-soft);
 }
-.task-add-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-}
-.task-add-row .field-input {
-  flex: 1;
-  min-width: 0;
-  width: auto;
-}
 .task-add-send {
   flex: none;
 }
@@ -8750,27 +8715,6 @@ body:has(.stack-divider.dragging) {
   color: var(--fg-secondary);
 }
 
-.tour-dots {
-  display: flex;
-  gap: 6px;
-}
-.tour-dot {
-  width: 22px;
-  height: 4px;
-  padding: 0;
-  border: none;
-  border-radius: 2px;
-  background: var(--border-strong);
-  cursor: pointer;
-  transition: background var(--motion-quick) var(--ease-color),
-    transform var(--motion-quick) var(--ease-enter);
-}
-.tour-dot:hover {
-  transform: scaleY(1.6);
-}
-.tour-dot.on {
-  background: var(--accent);
-}
 
 .tour-foot {
   display: flex;
@@ -9660,3 +9604,1182 @@ body:has(.stack-divider.dragging) {
 .codex-fold[aria-pressed="true"] {
   color: var(--accent);
 }
+
+/* ---- 9.46 the tool header spans its pane ---- */
+/* The current tool's name is the pane's title, so it should read like one:
+   full width, centred, and it follows the pane as you drag it wider —
+   which lines it up with the tab strip sitting under it. */
+.inspector-head {
+  display: flex;
+}
+.tool-picker-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+}
+.tool-picker-btn {
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: center;
+  padding: var(--space-1) var(--space-3);
+}
+/* The caret rides at the end rather than pushing the name off centre. */
+.tool-picker-btn .picker-caret {
+  position: absolute;
+  right: var(--space-3);
+}
+.tool-picker-btn {
+  position: relative;
+}
+
+/* ---- 9.47 calendar labels: the writer's own vocabulary ---- */
+.cal-label-note {
+  margin-left: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--fg-muted);
+}
+/* "Edit labels…" is a different KIND of thing from picking a label, so it
+   sits under a rule rather than in the run of them. */
+.cal-label-edit {
+  margin-top: var(--space-05);
+  padding-top: var(--space-1);
+  border-top: 1px solid var(--border-soft);
+  border-radius: 0;
+  color: var(--fg-secondary);
+}
+.cal-label-empty {
+  padding: var(--space-2);
+  font-size: var(--text-xs);
+}
+.cal-day-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.cal-labels-open {
+  margin-left: auto;
+  font-size: var(--text-sm);
+  color: var(--fg-muted);
+}
+.cal-labels-modal {
+  width: min(640px, 100%);
+}
+.cal-label-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.cal-label-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+/* Archived rows stay legible — you have to read what you retired to
+   decide whether to bring it back. */
+.cal-label-row.archived {
+  opacity: 0.7;
+}
+.cal-label-color {
+  width: 44px;
+  height: 28px;
+  flex: none;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+}
+.cal-label-name {
+  flex: 1 1 10rem;
+  min-width: 8rem;
+  font-size: var(--text-sm);
+}
+.cal-label-chip {
+  flex: none;
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-xs);
+}
+.cal-label-uses {
+  flex: none;
+  min-width: 5.5rem;
+  font-size: var(--text-xs);
+  color: var(--fg-muted);
+  font-family: var(--font-ui);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.cal-label-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-left: auto;
+}
+.cal-label-actions .btn-ghost {
+  font-size: var(--text-xs);
+}
+/* Full width so a complaint never squeezes the row it belongs to. */
+.cal-label-problem {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--danger);
+}
+.cal-label-new {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+.cal-label-group {
+  margin: var(--space-4) 0 var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--fg-secondary);
+}
+
+
+/* ---- 9.48 connections: cards that open, and who does what ---- */
+/* The cards are buttons now — clicking one opens its connect flow rather
+   than leaving a writer to guess where the key goes. */
+button.connection-card {
+  font: inherit;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+}
+.connection-card.picked {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  opacity: 1;
+}
+.connection-card.warn {
+  opacity: 1;
+  border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
+}
+.connection-dot.warn {
+  background: var(--danger);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--danger) 55%, transparent);
+}
+.connection-card.add {
+  border-style: dashed;
+  opacity: 1;
+}
+.connection-card.add .connection-dot {
+  background: var(--accent);
+}
+
+.conn-panel {
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-raised);
+  padding: var(--space-3);
+  margin-bottom: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.conn-steps {
+  margin: 0;
+  padding-left: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.conn-step {
+  font-size: var(--text-xs);
+  color: var(--fg-secondary);
+  line-height: 1.6;
+}
+.conn-step .btn-ghost {
+  display: inline-flex;
+  text-decoration: none;
+  vertical-align: baseline;
+}
+
+.role-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.role-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-app);
+}
+.role-meta {
+  display: flex;
+  flex-direction: column;
+}
+.role-name {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  color: var(--fg-primary);
+}
+.role-blurb {
+  font-size: var(--text-xs);
+  color: var(--fg-muted);
+}
+/* The fallback chain is shown, not hidden: a silent substitution is the
+   thing writers cannot forgive. */
+.role-chain {
+  grid-column: 1 / -1;
+  font-size: var(--text-2xs);
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+}
+
+button.chip {
+  font: inherit;
+  cursor: pointer;
+}
+.chip.on {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+button.radio-row {
+  font: inherit;
+  text-align: left;
+  width: 100%;
+}
+
+
+/* ---- 9.49 tasks: headers, and an add line that is just a line ---- */
+/* Adding a task should feel like typing one, so the field is flush,
+   always open, and carries no box of its own. */
+.task-add-line {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.task-add-mark {
+  flex: none;
+  width: 18px;
+  text-align: center;
+  color: var(--fg-muted);
+  font-size: var(--text-sm);
+  line-height: 1;
+}
+.task-add-input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  color: var(--fg-primary);
+  font: inherit;
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+.task-add-input::placeholder {
+  color: var(--fg-muted);
+  opacity: 0.6;
+}
+.task-add-input:focus {
+  outline: none;
+  box-shadow: none;
+  border-bottom: 1px solid var(--accent);
+}
+/* The arrow earns its space only once there is something to send. */
+.task-add-line .task-add-send:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.task-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+}
+.task-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.task-header-text {
+  flex: 1;
+  min-width: 0;
+  cursor: text;
+  color: var(--fg-secondary);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  border-radius: var(--radius-xs);
+}
+.task-header:hover .task-header-text {
+  background: color-mix(in srgb, var(--fg-primary) 5%, transparent);
+}
+.task-header.all-done .task-header-text {
+  color: var(--fg-muted);
+}
+.task-header-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  color: var(--fg-primary);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+.task-header-input:focus {
+  outline: none;
+  border-bottom: 1px solid var(--accent);
+}
+.task-header-count {
+  flex: none;
+  color: var(--fg-muted);
+  font-size: var(--text-xs);
+}
+/* Destructive: out of the way until the row is under the cursor, but
+   reachable by keyboard and pinned open once armed. */
+.task-header-remove {
+  flex: none;
+  opacity: 0;
+  padding: 0 var(--space-1);
+}
+.task-header:hover .task-header-remove,
+.task-header-remove:focus-visible,
+.task-header-remove.armed {
+  opacity: 1;
+}
+.task-header-add {
+  align-self: flex-start;
+  margin-top: var(--space-1);
+  color: var(--fg-muted);
+  font-size: var(--text-xs);
+}
+/* A header the file has not seen yet — it is written with its first task. */
+.task-header-new .task-header-text {
+  border-left: 2px dashed var(--border-strong);
+  padding-left: var(--space-1);
+}
+
+.tasks-mode-field {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.tasks-mode-label {
+  white-space: nowrap;
+}
+
+/* ---- 9.50 side-docking: panels beside, not only below ---- */
+/* The vertical twin of .stack-divider. Same rules, rotated. */
+.col-divider {
+  position: relative;
+  width: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  outline: none;
+  cursor: col-resize;
+}
+.col-divider::before {
+  content: "";
+  position: absolute;
+  inset: 0 4px;
+  background: var(--border);
+  transition: background var(--motion-quick) var(--ease);
+}
+.col-divider:hover::before,
+.col-divider:focus-visible::before,
+.col-divider.dragging::before {
+  background: var(--accent);
+}
+.col-grip {
+  position: relative;
+  width: 3px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--border-strong);
+  opacity: 0;
+  transition: opacity var(--motion-quick) var(--ease);
+}
+.col-divider:hover .col-grip,
+.col-divider:focus-visible .col-grip,
+.col-divider.dragging .col-grip {
+  opacity: 1;
+  background: var(--accent);
+}
+body:has(.col-divider.dragging) {
+  user-select: none;
+  cursor: col-resize;
+}
+
+/* The side bands are narrow columns, so their label turns to fit. */
+.tool-dropzone.side {
+  margin: var(--space-2) 4px;
+}
+.tool-dropzone.side .tool-dropzone-label {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  white-space: nowrap;
+}
+/* Which row a sideways drop would join. */
+.tool-row.drop-target {
+  box-shadow: inset 0 0 0 1px var(--accent);
+  background: var(--accent-soft);
+}
+/* Panel headers now carry five controls; they must never wrap. */
+.slot-head {
+  flex-wrap: nowrap;
+}
+.tab-plus-row {
+  flex-wrap: wrap;
+}
+
+/* ---- 9.51 the hints library ---- */
+/* Two columns, and the right one never moves. The stage keeps its exact
+   size at every hint: a clip that resized as you moved between entries
+   would make sixteen hints feel like sixteen panels. */
+.modal.tour-modal { width: min(860px, 100%); }
+.tour-body {
+  display: grid;
+  grid-template-columns: 244px minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+.tour-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-height: 392px;
+  padding-right: var(--space-2);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-right: 1px solid var(--border);
+}
+.tour-search {
+  position: sticky; top: 0; z-index: 1;
+  margin-bottom: var(--space-2);
+  padding: 5px var(--space-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  color: var(--fg-primary);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+}
+.tour-search::placeholder { color: var(--fg-muted); }
+.tour-search:focus { outline: none; border-color: var(--accent); }
+.tour-group { display: flex; flex-direction: column; gap: 2px; margin-bottom: var(--space-2); }
+.tour-group-head {
+  margin: var(--space-1) 0 2px;
+  font-family: var(--font-ui);
+  font-size: var(--text-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--fg-muted);
+}
+.tour-hint {
+  display: flex; align-items: baseline; gap: var(--space-2);
+  width: 100%; padding: 5px var(--space-2);
+  border: none; border-radius: var(--radius-sm);
+  background: transparent; color: var(--fg-secondary);
+  font-family: var(--font-ui); font-size: var(--text-xs);
+  text-align: left; cursor: pointer;
+  transition: background var(--motion-quick) var(--ease-color),
+    color var(--motion-quick) var(--ease-color);
+}
+.tour-hint:hover { background: var(--bg-hover); color: var(--fg-primary); }
+.tour-hint.on {
+  background: var(--accent-soft);
+  color: var(--fg-primary);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+.tour-hint-name { flex: 1 1 auto; }
+.tour-hint-keys { flex: 0 0 auto; white-space: nowrap; color: var(--fg-muted); font-size: var(--text-2xs); }
+.tour-hint.on .tour-hint-keys { color: var(--accent); }
+.tour-no-match {
+  margin: var(--space-3) var(--space-2);
+  color: var(--fg-muted);
+  font-size: var(--text-xs);
+  line-height: var(--leading-ui);
+}
+.tour-main {
+  display: flex; flex-direction: column; align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.tour-title { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+.tour-keys {
+  padding: 2px 7px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xs);
+  background: var(--bg-raised);
+  color: var(--fg-secondary);
+  font-family: var(--font-ui);
+  font-size: var(--text-2xs);
+  box-shadow: 0 1px 0 var(--border-strong);
+}
+/* Bodies are longer now; the footer must not walk up and down. */
+.tour-text { min-height: 128px; }
+
+/* ---- shared clip pieces ---- */
+.tour-mock-line { height: 5px; border-radius: 2px; background: var(--bg-hover); }
+.tour-mock-line:nth-child(even) { width: 82%; }
+.tour-mock-line:last-child { width: 58%; }
+.tour-key[data-key="shift"] { animation-delay: 70ms; }
+.tour-key[data-key="f"] { animation-delay: 140ms; }
+.tour-key[data-key="up"] { animation-delay: 90ms; }
+.tour-mock-check {
+  flex: 0 0 auto;
+  width: 11px; height: 11px;
+  border: 1px solid var(--border-strong);
+  border-radius: 3px;
+  background: var(--bg-editor);
+}
+
+/* ---- clip: focus ---- */
+/* Rest IS focus mode: rails at zero width, chrome collapsed, page wide. */
+.tour-mock-room { width: 400px; height: 176px; display: flex; flex-direction: column; overflow: hidden; }
+.tour-mock-chrome {
+  flex: 0 0 auto;
+  height: 0; opacity: 0; overflow: hidden;
+  display: flex; align-items: center; gap: var(--space-2);
+  padding: 0 var(--space-2);
+  border-bottom: 1px solid transparent;
+  animation: tour-chrome-go var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-chrome-go {
+  0%, 34% { height: 22px; opacity: 1; border-bottom-color: var(--border); }
+  46%, 100% { height: 0; opacity: 0; border-bottom-color: transparent; }
+}
+.tour-mock-chrome-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+.tour-mock-chrome-bar { width: 30px; height: 5px; border-radius: 2px; background: var(--bg-hover); }
+.tour-mock-room-body { flex: 1 1 auto; display: flex; gap: 0; padding: var(--space-2); min-height: 0; }
+.tour-mock-rail {
+  flex: 0 0 auto;
+  width: 0; opacity: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: var(--bg-pane);
+  animation: tour-rail-go var(--clip) var(--ease-enter) infinite;
+}
+.tour-mock-rail[data-side="right"] { animation-delay: 60ms; }
+@keyframes tour-rail-go {
+  0%, 34% { width: 64px; opacity: 1; border-color: var(--border); }
+  46%, 100% { width: 0; opacity: 0; border-color: transparent; }
+}
+.tour-mock-page {
+  flex: 1 1 auto; min-width: 0;
+  margin: 0 6px;
+  display: flex; flex-direction: column; gap: 7px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-editor);
+}
+
+/* ---- clip: views ---- */
+.tour-mock-views { width: 400px; height: 200px; display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-2); }
+.tour-mock-seg {
+  align-self: flex-end;
+  display: flex; gap: 2px; padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+}
+.tour-mock-seg-btn { padding: 3px 10px; border-radius: var(--radius-xs); color: var(--fg-muted); font-size: var(--text-2xs); }
+.tour-mock-seg-btn[data-view="cards"] { animation: tour-seg-a var(--clip) steps(1, end) infinite; }
+.tour-mock-seg-btn[data-view="grid"] { animation: tour-seg-b var(--clip) steps(1, end) infinite; }
+.tour-mock-seg-btn[data-view="table"] { background: var(--accent-soft); color: var(--fg-primary); animation: tour-seg-c var(--clip) steps(1, end) infinite; }
+@keyframes tour-seg-a { 0%,30%{background:var(--accent-soft);color:var(--fg-primary);} 31%,100%{background:transparent;color:var(--fg-muted);} }
+@keyframes tour-seg-b { 0%,30%{background:transparent;color:var(--fg-muted);} 31%,62%{background:var(--accent-soft);color:var(--fg-primary);} 63%,100%{background:transparent;color:var(--fg-muted);} }
+@keyframes tour-seg-c { 0%,62%{background:transparent;color:var(--fg-muted);} 63%,100%{background:var(--accent-soft);color:var(--fg-primary);} }
+.tour-mock-view-body { position: relative; flex: 1 1 auto; min-height: 0; }
+.tour-mock-view { position: absolute; inset: 0; opacity: 0; }
+.tour-mock-view[data-view="cards"] { display: flex; gap: 8px; animation: tour-view-a var(--clip) var(--ease-color) infinite; }
+.tour-mock-view[data-view="grid"] { display: grid; grid-template-columns: repeat(8, 1fr); grid-auto-rows: 1fr; gap: 5px; animation: tour-view-b var(--clip) var(--ease-color) infinite; }
+.tour-mock-view[data-view="table"] { display: flex; flex-direction: column; gap: 5px; opacity: 1; animation: tour-view-c var(--clip) var(--ease-color) infinite; }
+@keyframes tour-view-a { 0%,26%{opacity:1;} 34%,100%{opacity:0;} }
+@keyframes tour-view-b { 0%,32%{opacity:0;} 38%,58%{opacity:1;} 64%,100%{opacity:0;} }
+@keyframes tour-view-c { 0%,58%{opacity:0;} 66%,100%{opacity:1;} }
+.tour-mock-minicard {
+  flex: 1 1 0;
+  display: flex; flex-direction: column; gap: 5px;
+  padding: 7px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+}
+.tour-mock-minicard-title { color: var(--fg-primary); font-size: var(--text-2xs); font-weight: 600; }
+.tour-mock-cell { border-radius: 2px; background: var(--bg-hover); }
+.tour-mock-cell[data-on="true"] { background: var(--accent); opacity: 0.7; }
+.tour-mock-trow { display: flex; align-items: center; gap: var(--space-2); height: 24px; padding: 0 var(--space-2); border-radius: var(--radius-xs); background: var(--bg-raised); }
+.tour-mock-tcell { width: 96px; color: var(--fg-primary); font-size: var(--text-2xs); }
+.tour-mock-tbar { flex: 1 1 auto; height: 5px; border-radius: 2px; background: var(--bg-hover); }
+.tour-mock-tnum { color: var(--fg-muted); font-size: 9px; }
+
+/* ---- clip: tasks ---- */
+/* Rest = ticked, in the panel AND in the file: that identity is the
+   lesson, so both land on the same beat. */
+.tour-mock-tasks { width: 340px; display: flex; flex-direction: column; gap: 5px; padding: var(--space-2); }
+.tour-mock-todo { display: flex; align-items: center; gap: var(--space-2); height: 22px; padding: 0 var(--space-1); border-radius: var(--radius-xs); }
+.tour-mock-todo-text { flex: 1 1 auto; color: var(--fg-primary); font-size: var(--text-2xs); }
+.tour-mock-todo-where { color: var(--fg-muted); font-size: 9px; }
+.tour-clip-tasks .tour-mock-todo[data-role="tick"] .tour-mock-check {
+  border-color: var(--accent); background: var(--accent);
+  animation: tour-check-fill var(--clip) var(--ease-color) infinite;
+}
+@keyframes tour-check-fill {
+  0%, 52% { border-color: var(--border-strong); background: var(--bg-editor); }
+  60%, 100% { border-color: var(--accent); background: var(--accent); }
+}
+.tour-clip-tasks .tour-mock-todo[data-role="tick"] .tour-mock-check::after {
+  content: "\2713";
+  display: block; margin-top: -3px;
+  color: var(--accent-fg); font-size: 9px; line-height: 1; text-align: center;
+  animation: tour-check-mark var(--clip) steps(1, end) infinite;
+}
+@keyframes tour-check-mark { 0%,56%{opacity:0;} 60%,100%{opacity:1;} }
+.tour-clip-tasks .tour-mock-todo[data-role="tick"] .tour-mock-todo-text {
+  color: var(--fg-muted);
+  text-decoration: line-through;
+  text-decoration-color: currentColor;
+  animation: tour-todo-done var(--clip) var(--ease-color) infinite;
+}
+@keyframes tour-todo-done {
+  0%, 56% { color: var(--fg-primary); text-decoration-color: transparent; }
+  70%, 100% { color: var(--fg-muted); text-decoration-color: currentColor; }
+}
+.tour-mock-source { width: 340px; display: flex; flex-direction: column; gap: 4px; padding: var(--space-2); background: var(--bg-editor); }
+.tour-mock-source-head { font-size: 9px; text-transform: uppercase; letter-spacing: var(--tracking-caps); color: var(--fg-muted); }
+.tour-mock-source-line { display: flex; align-items: baseline; gap: var(--space-2); font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--fg-secondary); }
+.tour-mock-source-mark { color: var(--accent); }
+.tour-mock-source-x { display: inline-block; width: 1ch; text-align: center; animation: tour-source-x var(--clip) steps(1, end) infinite; }
+@keyframes tour-source-x { 0%,56%{opacity:0;} 60%,100%{opacity:1;} }
+.tour-clip-tasks .tour-cursor { animation: tour-cursor-tasks var(--clip) var(--ease-enter) infinite; }
+@keyframes tour-cursor-tasks {
+  0% { opacity: 0; transform: translate(150px, 26px); }
+  22% { opacity: 1; transform: translate(66px, 48px); }
+  50% { opacity: 1; transform: translate(63px, 44px); }
+  58% { opacity: 1; transform: translate(63px, 47px); }
+  74%, 100% { opacity: 0; transform: translate(70px, 58px); }
+}
+
+/* ---- clip: timer ---- */
+.tour-mock-timer { width: 240px; display: flex; flex-direction: column; align-items: center; gap: var(--space-2); padding: var(--space-3); }
+.tour-mock-face { position: relative; width: 100%; height: 42px; }
+.tour-mock-tick {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  font-family: var(--font-display); font-size: 34px;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-primary);
+  opacity: 0;
+  animation: tour-tick var(--clip) steps(1, end) infinite;
+  animation-delay: calc(var(--i, 0) * var(--clip) / 4);
+}
+@keyframes tour-tick { 0%,24%{opacity:1;} 25%,100%{opacity:0;} }
+.tour-mock-tick[data-last="true"] { opacity: 1; animation-name: tour-tick-last; animation-delay: 0ms; }
+@keyframes tour-tick-last { 0%,74%{opacity:0;} 75%,100%{opacity:1;} }
+.tour-mock-timer-bar { width: 100%; height: 4px; border-radius: 2px; background: var(--bg-hover); overflow: hidden; }
+.tour-mock-timer-fill { display: block; height: 100%; width: 82%; background: var(--accent); animation: tour-timer-drain var(--clip) linear infinite; }
+@keyframes tour-timer-drain { 0% { width: 100%; } 100% { width: 82%; } }
+.tour-mock-timer-btns { display: flex; gap: var(--space-2); }
+.tour-mock-timer-btn { padding: 3px 10px; border: 1px solid var(--border-strong); border-radius: var(--radius-xs); background: var(--bg-raised); color: var(--fg-secondary); font-size: var(--text-2xs); }
+.tour-mock-timer-btn[data-role="run"] { border-color: color-mix(in srgb, var(--accent) 45%, transparent); background: var(--accent-soft); color: var(--fg-primary); }
+/* Present at rest and in motion: the alarm was already set. It pulses
+   rather than arrives, or the clip would teach that it starts when the
+   countdown ends. */
+.tour-mock-timer-foot {
+  width: 100%; margin-top: var(--space-1); padding-top: var(--space-2);
+  border-top: 1px solid var(--border);
+  text-align: center; color: var(--fg-muted); font-size: var(--text-2xs);
+  animation: tour-alarm-note var(--clip) var(--ease-color) infinite;
+}
+@keyframes tour-alarm-note { 0%,78%{color:var(--fg-muted);} 86%{color:var(--accent);} 94%,100%{color:var(--fg-muted);} }
+
+/* ---- clip: trash ---- */
+/* Rest is the DELETED state, not the restored one: what a frightened
+   writer needs to see is where it went and the button marked Restore. */
+.tour-mock-trash { position: relative; width: 420px; height: 190px; display: flex; gap: var(--space-3); padding: var(--space-3); }
+.tour-mock-trash-list,
+.tour-mock-trash-pane {
+  flex: 1 1 0;
+  display: flex; flex-direction: column; gap: 5px;
+  padding: var(--space-2);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--bg-editor);
+}
+.tour-mock-list-row { height: 22px; display: flex; align-items: center; padding: 0 var(--space-2); border-radius: var(--radius-xs); background: var(--bg-raised); color: var(--fg-primary); font-size: var(--text-2xs); overflow: hidden; }
+.tour-mock-list-row[data-role="gone"] { height: 0; opacity: 0; margin-top: -5px; animation: tour-row-leave var(--clip) var(--ease-enter) infinite; }
+@keyframes tour-row-leave {
+  0%, 44% { height: 22px; opacity: 1; margin-top: 0; }
+  56%, 100% { height: 0; opacity: 0; margin-top: -5px; }
+}
+.tour-mock-trash-row {
+  display: flex; flex-direction: column; gap: 4px; padding: var(--space-2);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  animation: tour-trash-land var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-trash-land {
+  0%, 52% { opacity: 0; transform: translateY(-6px) scale(0.96); }
+  62%, 100% { opacity: 1; transform: none; }
+}
+.tour-mock-trash-name { color: var(--fg-primary); font-size: var(--text-2xs); font-weight: 600; }
+.tour-mock-trash-left { color: var(--fg-muted); font-size: 9px; }
+.tour-mock-trash-btns { display: flex; gap: 4px; margin-top: 2px; }
+.tour-mock-trash-btn { padding: 2px 6px; border: 1px solid var(--border-strong); border-radius: var(--radius-xs); color: var(--fg-secondary); font-size: 9px; }
+.tour-mock-trash-btn[data-role="restore"] { border-color: color-mix(in srgb, var(--accent) 45%, transparent); background: var(--accent-soft); color: var(--fg-primary); }
+.tour-mock-trash-btn[data-role="danger"] { color: var(--danger); }
+.tour-mock-ctx {
+  position: absolute; left: 96px; top: 62px; z-index: 3;
+  display: flex; flex-direction: column; min-width: 104px; padding: 3px;
+  border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+  background: var(--bg-pane); box-shadow: var(--shadow);
+  transform-origin: top left; opacity: 0;
+  animation: tour-ctx var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-ctx {
+  0%, 14% { opacity: 0; transform: scale(0.94); }
+  22%, 44% { opacity: 1; transform: none; }
+  52%, 100% { opacity: 0; transform: none; }
+}
+.tour-mock-ctx-item { padding: 3px 7px; border-radius: var(--radius-xs); color: var(--fg-secondary); font-size: 9px; }
+.tour-mock-ctx-item[data-pick="true"] { animation: tour-ctx-pick var(--clip) var(--ease-color) infinite; }
+@keyframes tour-ctx-pick {
+  0%, 36% { background: transparent; color: var(--fg-secondary); }
+  42%, 48% { background: var(--accent); color: var(--accent-fg); }
+  54%, 100% { background: transparent; color: var(--fg-secondary); }
+}
+.tour-clip-trash .tour-cursor { animation: tour-cursor-trash var(--clip) var(--ease-enter) infinite; }
+@keyframes tour-cursor-trash {
+  0% { opacity: 0; transform: translate(60px, 40px); }
+  12% { opacity: 1; transform: translate(88px, 58px); }
+  36% { opacity: 1; transform: translate(118px, 88px); }
+  48% { opacity: 1; transform: translate(118px, 91px); }
+  64%, 100% { opacity: 0; transform: translate(126px, 100px); }
+}
+
+/* ---- clip: theme ---- */
+.tour-mock-theme { width: 380px; display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-3); }
+.tour-mock-skin { height: 120px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-app); }
+.tour-mock-skin-bar { display: flex; align-items: center; gap: var(--space-2); height: 22px; padding: 0 var(--space-2); border-bottom: 1px solid var(--border); background: var(--bg-pane); }
+.tour-mock-skin-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: tour-skin-accent var(--clip) var(--ease-color) infinite; }
+.tour-mock-skin-name { width: 56px; height: 5px; border-radius: 2px; background: var(--bg-hover); }
+.tour-mock-skin-pill {
+  margin-left: auto; width: 34px; height: 12px; border-radius: 6px;
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent);
+  animation: tour-skin-pill var(--clip) var(--ease-color) infinite;
+}
+@keyframes tour-skin-accent { 0%,46%{background:var(--border-strong);} 62%,100%{background:var(--accent);} }
+@keyframes tour-skin-pill {
+  0%, 46% { background: var(--bg-hover); box-shadow: inset 0 0 0 1px var(--border-strong); }
+  62%, 100% { background: var(--accent-soft); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent); }
+}
+.tour-mock-skin-body { flex: 1 1 auto; display: flex; min-height: 0; }
+.tour-mock-skin-rail { flex: 0 0 auto; width: 58px; border-right: 1px solid var(--border); background: var(--bg-pane); }
+.tour-mock-skin-page { flex: 1 1 auto; display: flex; flex-direction: column; gap: 7px; padding: var(--space-2) var(--space-3); background: var(--bg-editor); }
+.tour-mock-swatches { display: flex; gap: var(--space-2); }
+.tour-mock-swatch {
+  flex: 1 1 0; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  animation: tour-swatch-in var(--clip) var(--ease-enter) infinite;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+@keyframes tour-swatch-in { 0%,10%{opacity:0;transform:translateY(4px);} 26%,100%{opacity:1;transform:none;} }
+.tour-mock-swatch-chip { width: 100%; height: 16px; border: 1px solid var(--border-strong); border-radius: var(--radius-xs); }
+.tour-mock-swatch[data-slot="window"] .tour-mock-swatch-chip { background: var(--bg-app); }
+.tour-mock-swatch[data-slot="panes"] .tour-mock-swatch-chip { background: var(--bg-pane); }
+.tour-mock-swatch[data-slot="page"] .tour-mock-swatch-chip { background: var(--bg-editor); }
+.tour-mock-swatch[data-slot="text"] .tour-mock-swatch-chip { background: var(--fg-primary); }
+.tour-mock-swatch[data-slot="accent"] .tour-mock-swatch-chip { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+.tour-mock-swatch-label { color: var(--fg-muted); font-size: 9px; }
+
+/* ---- clip: backdrop ---- */
+/* The "photograph" is a gradient built from the theme's own tokens. An
+   asset would ship twice and stop matching the presets the day they
+   change; this cannot go stale. */
+.tour-mock-scene { position: relative; width: 400px; height: 200px; display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3); overflow: hidden; background: var(--bg-app); }
+.tour-mock-backdrop {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(120% 80% at 22% 18%, color-mix(in srgb, var(--accent) 55%, transparent), transparent 62%),
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--accent) 22%, var(--bg-app)) 0%,
+      var(--bg-app) 58%,
+      color-mix(in srgb, var(--fg-primary) 12%, var(--bg-app)) 100%);
+  animation: tour-backdrop-in var(--clip) var(--ease-color) infinite;
+}
+@keyframes tour-backdrop-in { 0%,16%{opacity:0;} 34%,100%{opacity:1;} }
+.tour-mock-scene-body { position: relative; z-index: 1; flex: 1 1 auto; display: flex; gap: var(--space-2); min-height: 0; }
+.tour-mock-glass {
+  border: 1px solid color-mix(in srgb, var(--border-strong) 70%, transparent);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--bg-pane) 72%, transparent);
+  animation: tour-glass var(--clip) var(--ease-color) infinite;
+}
+@keyframes tour-glass { 0%,16%{background:var(--bg-pane);} 40%,100%{background:color-mix(in srgb, var(--bg-pane) 72%, transparent);} }
+.tour-mock-glass[data-pane="left"],
+.tour-mock-glass[data-pane="right"] { flex: 0 0 54px; }
+.tour-mock-glass[data-pane="page"] {
+  flex: 1 1 auto; display: flex; flex-direction: column; gap: 7px;
+  padding: var(--space-2) var(--space-3);
+  background: color-mix(in srgb, var(--bg-editor) 78%, transparent);
+  animation-name: tour-glass-page;
+}
+@keyframes tour-glass-page { 0%,16%{background:var(--bg-editor);} 40%,100%{background:color-mix(in srgb, var(--bg-editor) 78%, transparent);} }
+.tour-mock-slider { position: relative; z-index: 1; display: flex; align-items: center; gap: var(--space-2); }
+.tour-mock-slider-label { color: var(--fg-secondary); font-size: var(--text-2xs); text-transform: uppercase; letter-spacing: var(--tracking-caps); }
+.tour-mock-slider-track { position: relative; flex: 1 1 auto; height: 4px; border-radius: 2px; background: var(--bg-hover); }
+.tour-mock-slider-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 62%; border-radius: 2px; background: var(--accent); animation: tour-dim-fill var(--clip) var(--ease-enter) infinite; }
+@keyframes tour-dim-fill { 0%,44%{width:12%;} 66%,100%{width:62%;} }
+.tour-mock-knob {
+  position: absolute; top: 50%; left: 62%;
+  width: 10px; height: 10px; margin: -5px 0 0 -5px;
+  border-radius: 50%; background: var(--accent);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.35);
+  animation: tour-dim-knob var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-dim-knob { 0%,44%{left:12%;} 66%,100%{left:62%;} }
+
+/* ---- clip: slash ---- */
+.tour-mock-slash { position: relative; width: 400px; display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3); background: var(--bg-editor); }
+.tour-mock-slashline { margin: 0; min-height: 18px; display: flex; align-items: center; gap: 1px; font-family: var(--font-prose); font-size: var(--text-xs); color: var(--fg-primary); }
+.tour-mock-slash-char { color: var(--accent); animation: tour-slash-type var(--clip) steps(1, end) infinite; }
+@keyframes tour-slash-type { 0%,8%{opacity:0;} 12%,100%{opacity:1;} }
+.tour-clip-slash .tour-mock-menu { min-width: 208px; margin-left: var(--space-3); }
+.tour-clip-slash .tour-mock-menu-item { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); }
+.tour-mock-menu-hint { color: var(--fg-muted); font-size: 9px; }
+.tour-mock-todo-line { display: flex; align-items: center; gap: var(--space-2); font-family: var(--font-prose); font-size: var(--text-xs); }
+.tour-clip-slash .tour-cursor { animation: tour-cursor-slash var(--clip) var(--ease-enter) infinite; }
+@keyframes tour-cursor-slash {
+  0% { opacity: 0; transform: translate(120px, 64px); }
+  30% { opacity: 1; transform: translate(116px, 96px); }
+  56% { opacity: 1; transform: translate(112px, 112px); }
+  64% { opacity: 1; transform: translate(112px, 115px); }
+  78%, 100% { opacity: 0; transform: translate(118px, 124px); }
+}
+
+/* ---- clip: wikilink ---- */
+.tour-mock-wiki { position: relative; width: 400px; display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3); background: var(--bg-editor); }
+.tour-mock-link { padding: 0 1px; border-radius: 2px; background: var(--accent-soft); color: var(--accent); font-family: var(--font-prose); }
+/* Opacity, not width: at 0% the line reads "[[]]", which is exactly what
+   closeBrackets leaves behind, and nothing reflows. */
+.tour-mock-link-name { color: var(--fg-primary); animation: tour-wiki-name var(--clip) var(--ease-color) infinite; }
+@keyframes tour-wiki-name { 0%,34%{opacity:0;} 48%,100%{opacity:1;} }
+/* Must come AFTER the .tour-mock-menu shorthand above: overrides the name only. */
+.tour-mock-menu[data-menu="wiki"] { align-self: flex-start; margin-left: 140px; min-width: 128px; opacity: 0; animation-name: tour-wiki-menu; }
+@keyframes tour-wiki-menu {
+  0%, 14% { opacity: 0; transform: translateY(-4px) scaleY(0.8); }
+  24%, 52% { opacity: 1; transform: none; }
+  62%, 100% { opacity: 0; transform: none; }
+}
+.tour-mock-links {
+  display: flex; flex-direction: column; gap: 4px;
+  margin-top: var(--space-2); padding: var(--space-2);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--bg-pane);
+  animation: tour-links-in var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-links-in { 0%,62%{opacity:0;transform:translateY(-4px);} 74%,100%{opacity:1;transform:none;} }
+.tour-mock-links-head { font-size: 9px; text-transform: uppercase; letter-spacing: var(--tracking-caps); color: var(--fg-muted); }
+.tour-mock-link-row { display: flex; align-items: center; justify-content: space-between; padding: 3px var(--space-1); border-radius: var(--radius-xs); background: var(--bg-raised); color: var(--fg-primary); font-size: var(--text-2xs); }
+.tour-mock-link-count { padding: 0 5px; border-radius: 7px; background: var(--accent-soft); color: var(--accent); font-size: 9px; }
+.tour-clip-wikilink .tour-cursor { animation: tour-cursor-wiki var(--clip) var(--ease-enter) infinite; }
+@keyframes tour-cursor-wiki {
+  0% { opacity: 0; transform: translate(180px, 40px); }
+  24% { opacity: 1; transform: translate(168px, 74px); }
+  42% { opacity: 1; transform: translate(166px, 78px); }
+  50% { opacity: 1; transform: translate(166px, 81px); }
+  70%, 100% { opacity: 0; transform: translate(172px, 92px); }
+}
+
+/* ---- clip: paragraph ---- */
+/* Vertical twin of the tab drag. Slot pitch is 34 + 8 = 42px, and DOM
+   order is the finished order. */
+.tour-mock-blocks { width: 340px; display: flex; flex-direction: column; gap: 8px; padding: var(--space-3); background: var(--bg-editor); }
+.tour-mock-block { position: relative; height: 34px; display: flex; flex-direction: column; gap: 6px; padding: 6px var(--space-2); border-radius: var(--radius-xs); }
+.tour-mock-block[data-role="move"] {
+  z-index: 2;
+  background: var(--accent-soft);
+  box-shadow: inset 2px 0 0 var(--accent);
+  animation: tour-block-travel var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-block-travel {
+  0%, 16% { transform: translateY(42px); box-shadow: inset 2px 0 0 var(--accent); }
+  26% { transform: translateY(42px) scale(1.02); box-shadow: inset 2px 0 0 var(--accent), var(--shadow); }
+  60% { transform: translateY(0) scale(1.02); box-shadow: inset 2px 0 0 var(--accent), var(--shadow); }
+  70%, 100% { transform: translateY(0); box-shadow: inset 2px 0 0 var(--accent); }
+}
+.tour-mock-block[data-role="static"]:nth-child(3) { animation: tour-block-yield var(--clip) var(--ease-enter) infinite; }
+@keyframes tour-block-yield { 0%,30%{transform:translateY(-42px);} 54%,100%{transform:translateY(0);} }
+.tour-mock-block-caret { position: absolute; left: var(--space-2); top: 6px; width: 2px; height: 12px; background: var(--accent); animation: tour-caret 1s steps(2, end) infinite; }
+
+/* ---- 9.52 the intro's demonstration windows ---- */
+/* Three little looping windows, built the way the tour's clips are built
+   (9.44/9.51) and for the same reasons — but these arrive already wearing
+   the accent and theme chosen two screens earlier, which is the intro's
+   whole argument made visible.
+
+   THE RULE IS 9.44's RULE: the rest state below is the FINISHED state.
+   Keyframes reach back to the start at 0% and arrive home before the seam,
+   so killing the animation leaves a correct diagram. Pieces that exist only
+   mid-gesture (the thread, the spark) are invisible at rest instead. */
+.intro-demo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  /* A scene, not a prop: it dissolves the way the stage does rather than
+     taking the stop-motion snap that belongs to touchable things. */
+  animation: intro-demo-in 520ms cubic-bezier(0.16, 1, 0.3, 1) 120ms both;
+}
+@keyframes intro-demo-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.99); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+.intro-clip {
+  --clip: var(--clip-ms, 4600ms);
+  position: relative;
+  width: 420px;
+  max-width: 100%;
+  height: 188px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-editor);
+  box-shadow: var(--shadow-sm);
+  font-family: var(--font-ui);
+  font-size: 9px;
+  line-height: 1.4;
+  /* The stage centres its type; a window does not. */
+  text-align: left;
+  color: var(--fg-secondary);
+}
+.intro-clip-caption {
+  margin: 0;
+  max-width: 420px;
+  padding-left: var(--space-2);
+  border-left: 2px solid var(--accent);
+  font-family: var(--font-prose);
+  font-size: var(--text-xs);
+  font-style: italic;
+  text-align: left;
+  color: var(--fg-secondary);
+}
+.intro-mock {
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-pane);
+  box-shadow: var(--shadow-sm);
+}
+.intro-clip .tour-mock-slot-head { font-size: 8px; }
+
+/* ---- clip: the room ---- */
+.intro-mock-room { width: 392px; height: 164px; display: flex; flex-direction: column; overflow: hidden; }
+.intro-mock-titlebar {
+  flex: 0 0 auto;
+  display: flex; align-items: center; gap: 6px;
+  height: 22px; padding: 0 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-raised);
+}
+.intro-mock-brand { color: var(--accent); }
+.intro-mock-view { padding: 2px 6px; border-radius: var(--radius-xs); color: var(--fg-muted); }
+.intro-mock-view[data-on="true"] { background: var(--accent-soft); color: var(--fg-primary); }
+.intro-mock-room-body { flex: 1 1 auto; display: flex; min-height: 0; }
+.intro-mock-col { display: flex; flex-direction: column; gap: 5px; padding: 7px; min-width: 0; overflow: hidden; }
+/* The panes trade width with the page, the way the real grid does — not a
+   slide over the top of it. */
+.intro-mock-col[data-col="shelf"] { flex: 0 0 96px; background: var(--bg-pane); animation: intro-room-shelf var(--clip) var(--ease-enter) infinite; }
+.intro-mock-col[data-col="page"] { flex: 1 1 auto; border-left: 1px solid var(--border); border-right: 1px solid var(--border); background: var(--bg-editor); }
+.intro-mock-col[data-col="tools"] { flex: 0 0 78px; background: var(--bg-pane); animation: intro-room-tools var(--clip) var(--ease-enter) infinite; }
+@keyframes intro-room-shelf {
+  0%, 6% { flex-basis: 0; opacity: 0; padding-left: 0; padding-right: 0; }
+  22%, 100% { flex-basis: 96px; opacity: 1; padding-left: 7px; padding-right: 7px; }
+}
+@keyframes intro-room-tools {
+  0%, 10% { flex-basis: 0; opacity: 0; padding-left: 0; padding-right: 0; }
+  26%, 100% { flex-basis: 78px; opacity: 1; padding-left: 7px; padding-right: 7px; }
+}
+.intro-mock-item { padding: 2px 5px; border-radius: var(--radius-xs); color: var(--fg-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.intro-mock-item[data-on="true"] { background: var(--accent-soft); color: var(--fg-primary); }
+.intro-mock-page-title { font-family: var(--font-display); font-size: 11px; color: var(--fg-primary); }
+.intro-mock-line {
+  height: 5px; border-radius: 2px; background: var(--bg-hover);
+  /* backwards fill so the delay shows the 0% frame, not the rest frame. */
+  animation: intro-room-write var(--clip) var(--ease-enter) infinite backwards;
+  animation-delay: calc(var(--i, 0) * 90ms);
+}
+.intro-mock-col[data-col="page"] .intro-mock-line:nth-child(3) { width: 92%; }
+.intro-mock-col[data-col="page"] .intro-mock-line:nth-child(4) { width: 84%; }
+.intro-mock-col[data-col="page"] .intro-mock-line:nth-child(5) { width: 95%; }
+.intro-mock-line[data-last="true"] { width: 46%; }
+@keyframes intro-room-write {
+  0%, 26% { opacity: 0; transform: translateY(3px); }
+  40%, 100% { opacity: 1; transform: none; }
+}
+.intro-mock-row-last { display: flex; align-items: center; gap: 3px; }
+/* A caret blinks at a caret's rate, not the clip's — 9.44's exception. */
+.intro-mock-caret { width: 1px; height: 9px; background: var(--accent); animation: tour-caret 1s steps(2, end) infinite; }
+
+/* ---- clip: a chapter and the entry it names ---- */
+/* No frame around this one: the two cards are the objects and the space
+   between them is the lesson. */
+.intro-mock-pieces { position: relative; display: flex; align-items: center; width: 400px; }
+.intro-mock-sheet {
+  flex: 0 0 auto;
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-editor);
+  box-shadow: var(--shadow-sm);
+}
+.intro-clip-pieces .intro-mock-sheet { width: 226px; }
+.intro-mock-sheet-head { font-size: 8px; text-transform: uppercase; letter-spacing: var(--tracking-caps); color: var(--fg-muted); }
+.intro-mock-prose { margin: 0; font-family: var(--font-prose); font-size: 10px; line-height: 1.6; color: var(--fg-secondary); }
+.intro-mock-link,
+.intro-mock-draft {
+  border-radius: 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  background-image: linear-gradient(var(--accent-soft), var(--accent-soft));
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  color: var(--fg-primary);
+}
+.intro-mock-link { animation: intro-link-light var(--clip) var(--ease-enter) infinite; }
+@keyframes intro-link-light {
+  0%, 8% { background-size: 0% 100%; color: var(--fg-secondary); }
+  24%, 100% { background-size: 100% 100%; color: var(--fg-primary); }
+}
+/* Exists only while the link is being made: invisible at rest, the same
+   rule the tour's drop zone obeys. */
+.intro-mock-thread {
+  position: relative; flex: 1 1 auto; height: 2px; margin: 0 6px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 30%, transparent));
+  transform-origin: left center;
+  animation: intro-thread-draw var(--clip) var(--ease-enter) infinite;
+}
+@keyframes intro-thread-draw {
+  0%, 28% { transform: scaleX(0); opacity: 0; }
+  46%, 100% { transform: scaleX(1); opacity: 1; }
+}
+.intro-mock-thread::after {
+  content: "";
+  position: absolute; right: -2px; top: -2px;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+  animation: intro-thread-dot var(--clip) linear infinite;
+}
+@keyframes intro-thread-dot { 0%, 44% { opacity: 0; } 52%, 100% { opacity: 1; } }
+.intro-mock-entry {
+  flex: 0 0 auto; width: 128px;
+  display: flex; flex-direction: column; gap: 5px;
+  padding: 9px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border-strong));
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow);
+  animation: intro-entry-open var(--clip) var(--ease-enter) infinite;
+}
+@keyframes intro-entry-open {
+  0%, 46% { opacity: 0; transform: translateX(10px) scale(0.94); }
+  62%, 100% { opacity: 1; transform: none; }
+}
+.intro-mock-entry-kind { font-size: 8px; text-transform: uppercase; letter-spacing: var(--tracking-caps); color: var(--accent); }
+.intro-mock-entry-name { font-family: var(--font-display); font-size: 12px; color: var(--fg-primary); }
+.intro-mock-entry-meta { margin-top: 2px; font-size: 8px; color: var(--fg-muted); }
+
+/* ---- clip: a model on this machine ---- */
+/* The dashed edge IS the frame: page, model and draft all sit inside it,
+   and nothing in the window ever crosses it. */
+.intro-mock-local {
+  position: relative; width: 340px;
+  display: flex; flex-direction: column; gap: 9px;
+  padding: 13px 11px 11px;
+  border: 1px dashed color-mix(in srgb, var(--accent) 50%, transparent);
+  border-radius: var(--radius-md);
+  background: var(--bg-pane);
+}
+.intro-mock-machine-label {
+  position: absolute; top: -6px; left: 12px;
+  padding: 0 5px;
+  background: var(--bg-editor);
+  font-size: 8px; text-transform: uppercase;
+  letter-spacing: var(--tracking-caps); color: var(--fg-muted);
+}
+.intro-clip-local .intro-mock-sheet { width: auto; }
+.intro-mock-draft { animation: intro-draft-arrive var(--clip) var(--ease-enter) infinite; }
+@keyframes intro-draft-arrive {
+  0%, 40% { opacity: 0; background-size: 0% 100%; }
+  56% { opacity: 1; }
+  62%, 100% { opacity: 1; background-size: 100% 100%; }
+}
+.intro-mock-machine-foot { position: relative; display: flex; align-items: center; gap: 6px; }
+.intro-mock-model {
+  padding: 3px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xs);
+  background: var(--bg-raised);
+  color: var(--fg-secondary);
+  animation: intro-model-work var(--clip) var(--ease-color) infinite;
+}
+/* Rest is the QUIET chip: the model has done its bit and gone back to
+   waiting, which is also the honest picture of a local model. */
+@keyframes intro-model-work {
+  0%, 14% { background: var(--bg-raised); border-color: var(--border-strong); color: var(--fg-secondary); }
+  22%, 46% { background: var(--accent-soft); border-color: var(--accent); color: var(--fg-primary); }
+  64%, 100% { background: var(--bg-raised); border-color: var(--border-strong); color: var(--fg-secondary); }
+}
+.intro-mock-spark {
+  position: absolute; left: 34px; top: 6px;
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
+  opacity: 0;
+  animation: intro-spark var(--clip) var(--ease-enter) infinite;
+}
+@keyframes intro-spark {
+  0%, 24% { opacity: 0; transform: translate(0, 0) scale(0.6); }
+  30% { opacity: 1; transform: translate(6px, -6px) scale(1); }
+  44% { opacity: 1; transform: translate(74px, -40px) scale(1); }
+  52%, 100% { opacity: 0; transform: translate(96px, -48px) scale(0.5); }
+}
+
+/* ---- a dying scene stops playing ---- */
+/* The ghost clone carries a full copy of the window; two clips running
+   through a 380ms exit is the one place this section could cost a frame.
+   (Device 1, docs/DESIGN-INTRO-CINEMA.md — specified, never added.) */
+.stage-exit-left *,
+.stage-exit-right * {
+  animation-play-state: paused;
+}
+
+/* ---- reduced motion: one rule, because rest IS the finished state ---- */
+.intro-clip[data-still="true"],
+.intro-clip[data-still="true"] *,
+.intro-clip[data-still="true"] *::before,
+.intro-clip[data-still="true"] *::after {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root:not(.motion-full) .intro-demo { animation: none; }
+}
+:root.motion-minimal .intro-demo { animation: none; }

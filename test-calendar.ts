@@ -8,27 +8,51 @@
 
 import {
   ENTRY_LABELS,
+  LABEL_NAME_MAX,
+  MAX_LABELS,
+  addLabel,
   addMonths,
+  clearLabelFrom,
   compareEntries,
+  countLabelUse,
   dateOf,
   dayDots,
   dayTint,
+  deleteLabel,
+  dotsOf,
+  editLabel,
+  emptyLabelBook,
   entryColor,
+  findLabel,
   formatTime,
   groupByDay,
+  isBuiltinLabelId,
   isSameMonth,
   labelById,
+  labelChoices,
+  labelColor,
   makeEntry,
+  makeLabelId,
   migrateIntents,
   monthAnchor,
   monthGrid,
   monthNames,
+  normalizeLabelHex,
   normalizeTime,
+  offeredLabels,
+  pruneMissingLabels,
   removeEntryFrom,
+  resetLabel,
+  resolveLabels,
+  sanitizeLabelBook,
+  setLabelArchived,
   sortEntries,
+  tintOf,
   upsertEntry,
+  validateLabel,
   yearOptions,
   type CalendarEntry,
+  type LabelBook,
 } from "./src/state/calendarEntries";
 import {
   expandOccurrences,
@@ -237,6 +261,320 @@ const mk = (id: string, day: string, text: string, created: number, time?: strin
   check("makeEntry: omits an empty time", Object.hasOwn(mk("a", "2026-08-19", "x", 1), "time"), false);
   check("makeEntry: omits an empty label", Object.hasOwn(mk("a", "2026-08-19", "x", 1), "label"), false);
   check("makeEntry: keeps a real time", mk("a", "2026-08-19", "x", 1, "08:00").time, "08:00");
+}
+
+/* ---------- the label book ----------
+
+   The rule these all circle: an entry stores a label ID, so nothing a
+   writer does to the book is allowed to leave an entry pointing at a
+   label that doesn't resolve. */
+
+const shipped = (id: string) => ENTRY_LABELS.find((l) => l.id === id)!;
+const bare = (l: { id: string; name: string; color: string }) => ({
+  id: l.id,
+  name: l.name,
+  color: l.color,
+});
+const book = (...labels: LabelBook["labels"]): LabelBook => ({ v: 1, labels });
+
+/* ---- migration: the writer who upgrades into this feature ---- */
+
+{
+  const fresh = resolveLabels(emptyLabelBook());
+  check(
+    "migrate labels: an empty book is exactly the shipped six",
+    fresh.map(bare),
+    ENTRY_LABELS.map(bare),
+  );
+  check("migrate labels: nothing arrives archived", fresh.filter((l) => l.archived).length, 0);
+  check("migrate labels: nothing arrives edited", fresh.filter((l) => l.edited).length, 0);
+  check("migrate labels: all six read as built in", fresh.filter((l) => l.builtin).length, 6);
+
+  // The entry a writer labelled last year still paints the same hue.
+  const old = mk("a", "2026-08-19", "Chapter four", 100, undefined, "draft");
+  check("migrate labels: an old entry keeps its color", labelColor(fresh, old.label), shipped("draft").color);
+  check("migrate labels: an old entry keeps its tint", tintOf(fresh, [old]), shipped("draft").color);
+
+  // A book that never parsed is the same as no book at all.
+  check("migrate labels: junk in storage falls back to the six", resolveLabels(sanitizeLabelBook("nope")).length, 6);
+  check("migrate labels: null falls back too", sanitizeLabelBook(null).labels.length, 0);
+}
+
+/* ---- colors and ids ---- */
+
+{
+  check("label hex: six digits", normalizeLabelHex("#C8794E"), "#c8794e");
+  check("label hex: no hash", normalizeLabelHex("c8794e"), "#c8794e");
+  check("label hex: shorthand expands", normalizeLabelHex("#abc"), "#aabbcc");
+  check("label hex: whitespace is trimmed", normalizeLabelHex("  #abc  "), "#aabbcc");
+  check("label hex: words are not a color", normalizeLabelHex("blue"), null);
+  check("label hex: five digits is not a color", normalizeLabelHex("#12345"), null);
+  check("label hex: empty is not a color", normalizeLabelHex(""), null);
+
+  ok("label ids: built-ins are recognised", isBuiltinLabelId("draft"));
+  ok("label ids: a custom id is not a built-in", !isBuiltinLabelId(makeLabelId(1000, 0)));
+  ok("label ids: prefixed", makeLabelId(1000, 0).startsWith("lbl"));
+  ok("label ids: the counter keeps them apart", makeLabelId(1000, 0) !== makeLabelId(1000, 1));
+}
+
+/* ---- creating ---- */
+
+{
+  const one = addLabel(emptyLabelBook(), { name: "Beats", color: "#abc" }, "lbl1", 500);
+  check("add: stored as one record", one.labels.length, 1);
+  check("add: color is normalised on the way in", one.labels[0]!.color, "#aabbcc");
+  check("add: name is trimmed", addLabel(emptyLabelBook(), { name: "  Beats  ", color: "#abc" }, "lbl1").labels[0]!.name, "Beats");
+
+  const resolved = resolveLabels(one);
+  check("add: appears after the built-ins", resolved.length, 7);
+  check("add: lands last", resolved[6]!.id, "lbl1");
+  check("add: reads as the writer's own", resolved[6]!.builtin, false);
+  check("add: is offered immediately", offeredLabels(resolved).length, 7);
+
+  check("add: a nameless label is refused", addLabel(emptyLabelBook(), { name: "  ", color: "#abc" }).labels.length, 0);
+  check("add: a colorless label is refused", addLabel(emptyLabelBook(), { name: "Beats", color: "nope" }).labels.length, 0);
+  check("add: a built-in id is refused", addLabel(emptyLabelBook(), { name: "X", color: "#abc" }, "draft").labels.length, 0);
+  check("add: a duplicate id is refused", addLabel(one, { name: "Other", color: "#abc" }, "lbl1").labels.length, 1);
+  check("add: long names are clamped", addLabel(emptyLabelBook(), { name: "x".repeat(80), color: "#abc" }, "lbl1").labels[0]!.name!.length, LABEL_NAME_MAX);
+
+  // Two dozen is the ceiling, built-ins included.
+  let full = emptyLabelBook();
+  for (let i = 0; i < 40; i++) full = addLabel(full, { name: `L${i}`, color: "#abc" }, `lbl${i}`, i);
+  check("add: the book caps out", resolveLabels(full).length, MAX_LABELS);
+  check("add: refuses past the cap", addLabel(full, { name: "One more", color: "#abc" }, "lblx").labels.length, MAX_LABELS - 6);
+
+  // Order is creation order, not array order — a book written back in a
+  // different sequence still reads the same way.
+  const shuffled = book(
+    { id: "b", name: "Second", color: "#111111", created: 200 },
+    { id: "a", name: "First", color: "#222222", created: 100 },
+  );
+  check("add: the writer's own are oldest first", resolveLabels(shuffled).slice(6).map((l) => l.id), ["a", "b"]);
+}
+
+/* ---- renaming and recoloring ---- */
+
+{
+  const renamed = editLabel(emptyLabelBook(), "draft", { name: "Drafting" });
+  check("rename: a built-in is patched, not replaced", renamed.labels.length, 1);
+  check("rename: the new name resolves", resolveLabels(renamed)[0]!.name, "Drafting");
+  check("rename: the shipped color survives", resolveLabels(renamed)[0]!.color, shipped("draft").color);
+  check("rename: it reads as edited", resolveLabels(renamed)[0]!.edited, true);
+  check("rename: it is still a built-in", resolveLabels(renamed)[0]!.builtin, true);
+  check("rename: the other five are untouched", resolveLabels(renamed).slice(1).map(bare), ENTRY_LABELS.slice(1).map(bare));
+
+  // Renaming a built-in back to its own name leaves NO record, which is
+  // what puts the label back under our palette next time we retune it.
+  check("rename: back to shipped drops the patch", editLabel(renamed, "draft", { name: "Draft" }).labels.length, 0);
+
+  const recolored = editLabel(emptyLabelBook(), "rest", { color: "#123456" });
+  check("recolor: a built-in takes a new hue", findLabel(resolveLabels(recolored), "rest")!.color, "#123456");
+  check("recolor: its name is untouched", findLabel(resolveLabels(recolored), "rest")!.name, shipped("rest").name);
+  check("recolor: back to shipped drops the patch", editLabel(recolored, "rest", { color: shipped("rest").color }).labels.length, 0);
+  check("recolor: shorthand is normalised", editLabel(emptyLabelBook(), "rest", { color: "#abc" }).labels[0]!.color, "#aabbcc");
+
+  const both = editLabel(renamed, "draft", { color: "#000000" });
+  check("edit: name and color layer on one record", both.labels.length, 1);
+  check("edit: the rename survives a recolor", resolveLabels(both)[0]!.name, "Drafting");
+
+  const own = addLabel(emptyLabelBook(), { name: "Beats", color: "#abc" }, "lbl1", 500);
+  const ownRenamed = editLabel(own, "lbl1", { name: "Beat sheet" });
+  check("edit: a custom label renames", findLabel(resolveLabels(ownRenamed), "lbl1")!.name, "Beat sheet");
+  check("edit: its creation time survives", ownRenamed.labels[0]!.created, 500);
+  check("edit: a custom label never reads as edited", findLabel(resolveLabels(ownRenamed), "lbl1")!.edited, false);
+
+  // A refusal keeps what was there rather than wiping the label.
+  check("edit: an empty name is refused", findLabel(resolveLabels(editLabel(own, "lbl1", { name: "   " })), "lbl1")!.name, "Beats");
+  check("edit: a junk color is refused", findLabel(resolveLabels(editLabel(own, "lbl1", { color: "nope" })), "lbl1")!.color, "#aabbcc");
+  check("edit: an id nobody knows changes nothing", editLabel(own, "ghost", { name: "X" }).labels.length, 1);
+
+  // An entry stores the id, so a recolor reaches every entry already on it.
+  const entry = mk("a", "2026-08-19", "Chapter four", 100, undefined, "rest");
+  check("edit: recoloring repaints old entries", tintOf(resolveLabels(recolored), [entry]), "#123456");
+}
+
+/* ---- archiving: the book changes, the entries do not ---- */
+
+{
+  const gone = setLabelArchived(emptyLabelBook(), "admin", true);
+  const labels = resolveLabels(gone);
+  const entry = mk("a", "2026-08-19", "Invoices", 100, undefined, "admin");
+
+  check("archive: still resolves", findLabel(labels, "admin")!.name, shipped("admin").name);
+  check("archive: keeps its hue", findLabel(labels, "admin")!.color, shipped("admin").color);
+  check("archive: an old entry still paints", tintOf(labels, [entry]), shipped("admin").color);
+  check("archive: an old entry still dots", dotsOf(labels, [entry]), [shipped("admin").color]);
+  check("archive: off the offer list", offeredLabels(labels).map((l) => l.id).includes("admin"), false);
+  check("archive: five left on offer", offeredLabels(labels).length, 5);
+  check("archive: the entries are untouched", entry.label, "admin");
+
+  // The picker still shows the label a row is already wearing.
+  check("archive: offered to the row that wears it", labelChoices(labels, "admin").map((l) => l.id).includes("admin"), true);
+  check("archive: hidden from a row that doesn't", labelChoices(labels, "draft").map((l) => l.id).includes("admin"), false);
+  check("archive: hidden from an unlabeled row", labelChoices(labels, undefined).length, 5);
+
+  check("archive: restoring puts it back", offeredLabels(resolveLabels(setLabelArchived(gone, "admin", false))).length, 6);
+  check("archive: restoring a built-in leaves no patch", setLabelArchived(gone, "admin", false).labels.length, 0);
+
+  // Archiving a renamed built-in keeps the rename through the round trip.
+  const renamedThenGone = setLabelArchived(editLabel(emptyLabelBook(), "admin", { name: "Paperwork" }), "admin", true);
+  check("archive: a rename survives archiving", findLabel(resolveLabels(renamedThenGone), "admin")!.name, "Paperwork");
+  check("archive: and survives restoring", findLabel(resolveLabels(setLabelArchived(renamedThenGone, "admin", false)), "admin")!.name, "Paperwork");
+  check("archive: restoring an edited built-in keeps the patch", setLabelArchived(renamedThenGone, "admin", false).labels.length, 1);
+
+  const own = setLabelArchived(addLabel(emptyLabelBook(), { name: "Beats", color: "#abc" }, "lbl1", 5), "lbl1", true);
+  check("archive: a custom label keeps its name", findLabel(resolveLabels(own), "lbl1")!.name, "Beats");
+  check("archive: a custom label keeps its color", findLabel(resolveLabels(own), "lbl1")!.color, "#aabbcc");
+  check("archive: an id nobody knows changes nothing", setLabelArchived(emptyLabelBook(), "ghost", true).labels.length, 0);
+}
+
+/* ---- resetting a built-in ---- */
+
+{
+  const edited = editLabel(editLabel(emptyLabelBook(), "draft", { name: "Drafting" }), "revise", { color: "#111111" });
+  const reset = resetLabel(edited, "draft");
+  check("reset: drops that one patch", reset.labels.length, 1);
+  check("reset: the name comes back", resolveLabels(reset)[0]!.name, shipped("draft").name);
+  check("reset: the color comes back", resolveLabels(reset)[0]!.color, shipped("draft").color);
+  check("reset: it stops reading as edited", resolveLabels(reset)[0]!.edited, false);
+  check("reset: the other patch survives", findLabel(resolveLabels(reset), "revise")!.color, "#111111");
+
+  const own = addLabel(emptyLabelBook(), { name: "Beats", color: "#abc" }, "lbl1", 5);
+  check("reset: a custom label has nothing to reset to", resetLabel(own, "lbl1").labels.length, 1);
+}
+
+/* ---- deleting, and what happens to the entries ---- */
+
+{
+  const own = addLabel(emptyLabelBook(), { name: "Beats", color: "#abc" }, "lbl1", 5);
+  check("delete: the record goes", deleteLabel(own, "lbl1").labels.length, 0);
+  check("delete: and it stops resolving", findLabel(resolveLabels(deleteLabel(own, "lbl1")), "lbl1"), undefined);
+  check("delete: back to the six", resolveLabels(deleteLabel(own, "lbl1")).length, 6);
+
+  // Built-in ids are compiled in, so deleting one would only have it
+  // reappear on the next launch. Archive is the honest answer there.
+  const archived = setLabelArchived(emptyLabelBook(), "draft", true);
+  check("delete: a built-in is refused", deleteLabel(archived, "draft").labels.length, 1);
+  ok("delete: a built-in is refused by identity", deleteLabel(archived, "draft") === archived);
+  ok("delete: an unknown id is a no-op", deleteLabel(own, "ghost") === own);
+
+  const list: CalendarEntry[] = [
+    mk("a", "2026-08-19", "One", 100, undefined, "lbl1"),
+    mk("b", "2026-08-19", "Two", 200, undefined, "draft"),
+    mk("c", "2026-08-19", "Three", 300),
+  ];
+  check("delete: counts what is at stake first", countLabelUse(list, "lbl1"), 1);
+  check("delete: counts nothing for an unused label", countLabelUse(list, "rest"), 0);
+
+  const cleared = clearLabelFrom(list, "lbl1");
+  check("delete: the entry survives, the label doesn't", cleared.map((e) => e.text), ["One", "Two", "Three"]);
+  check("delete: the label is gone from the entry", Object.hasOwn(cleared[0]!, "label"), false);
+  check("delete: other labels are left alone", cleared[1]!.label, "draft");
+  check("delete: the original list is untouched", list[0]!.label, "lbl1");
+  ok("delete: nothing to clear returns the same list", clearLabelFrom(list, "rest") === list);
+
+  // The pair together is the guarantee: no label left, no entry pointing
+  // at one. An entry that lost its label renders as unlabeled, never broken.
+  const after = resolveLabels(deleteLabel(own, "lbl1"));
+  check("delete: the freed entry has no color", labelColor(after, cleared[0]!.label), null);
+  check("delete: and no tint of its own", tintOf(after, [cleared[0]!]), null);
+}
+
+/* ---- the backstop: an id nothing resolves ---- */
+
+{
+  const labels = resolveLabels(emptyLabelBook());
+  const list: CalendarEntry[] = [
+    mk("a", "2026-08-19", "One", 100, undefined, "ghost"),
+    mk("b", "2026-08-19", "Two", 200, undefined, "draft"),
+    mk("c", "2026-08-19", "Three", 300),
+  ];
+  const pruned = pruneMissingLabels(list, labels);
+  check("prune: the ghost id is dropped", Object.hasOwn(pruned[0]!, "label"), false);
+  check("prune: a real label survives", pruned[1]!.label, "draft");
+  check("prune: an unlabeled entry is untouched", Object.hasOwn(pruned[2]!, "label"), false);
+  check("prune: no entries are lost", pruned.length, 3);
+  ok("prune: a clean list comes back unchanged", pruneMissingLabels(pruned, labels) === pruned);
+  ok("prune: an empty list is fine", pruneMissingLabels([], labels).length === 0);
+
+  // Until it is pruned, an unresolvable id renders as no label at all —
+  // never as a broken or invisible one.
+  check("prune: an unknown id has no color meanwhile", labelColor(labels, "ghost"), null);
+  check("prune: and contributes the neutral dot", dotsOf(labels, [list[0]!]), [null]);
+}
+
+/* ---- validation ---- */
+
+{
+  const labels = resolveLabels(addLabel(emptyLabelBook(), { name: "Beats", color: "#abc" }, "lbl1", 5));
+
+  check("validate: a good label has no problems", validateLabel({ name: "Outline", color: "#abc" }, labels), []);
+  check("validate: a nameless label", validateLabel({ name: "  ", color: "#abc" }, labels).length, 1);
+  check("validate: a name too long", validateLabel({ name: "x".repeat(LABEL_NAME_MAX + 1), color: "#abc" }, labels).length, 1);
+  check("validate: a name exactly at the cap is fine", validateLabel({ name: "x".repeat(LABEL_NAME_MAX), color: "#abc" }, labels), []);
+  check("validate: a junk color", validateLabel({ name: "Outline", color: "puce" }, labels).length, 1);
+  check("validate: a duplicate name", validateLabel({ name: "beats", color: "#abc" }, labels).length, 1);
+  check("validate: a duplicate of a built-in", validateLabel({ name: "Draft", color: "#abc" }, labels).length, 1);
+  check("validate: renaming a label to itself is allowed", validateLabel({ name: "Beats", color: "#abc" }, labels, "lbl1"), []);
+
+  let full = emptyLabelBook();
+  for (let i = 0; i < 18; i++) full = addLabel(full, { name: `L${i}`, color: "#abc" }, `lbl${i}`, i);
+  const capped = resolveLabels(full);
+  check("validate: the cap blocks a new label", validateLabel({ name: "One more", color: "#abc" }, capped).length, 1);
+  check("validate: but never blocks a rename", validateLabel({ name: "Renamed", color: "#abc" }, capped, "lbl0"), []);
+}
+
+/* ---- reading a book back out of storage ---- */
+
+{
+  check("sanitize: a built-in patch survives", sanitizeLabelBook({ labels: [{ id: "draft", name: "Drafting" }] }).labels.length, 1);
+  check("sanitize: colors are normalised", sanitizeLabelBook({ labels: [{ id: "draft", color: "#ABC" }] }).labels[0]!.color, "#aabbcc");
+  check("sanitize: a built-in patch that says nothing is dropped", sanitizeLabelBook({ labels: [{ id: "draft" }] }).labels.length, 0);
+  check("sanitize: an archive-only patch is kept", sanitizeLabelBook({ labels: [{ id: "draft", archived: true }] }).labels.length, 1);
+  check("sanitize: a nameless custom label is dropped", sanitizeLabelBook({ labels: [{ id: "lbl1", color: "#abc" }] }).labels.length, 0);
+  check("sanitize: a colorless custom label is dropped", sanitizeLabelBook({ labels: [{ id: "lbl1", name: "Beats" }] }).labels.length, 0);
+  check("sanitize: a junk color drops the custom label", sanitizeLabelBook({ labels: [{ id: "lbl1", name: "Beats", color: "puce" }] }).labels.length, 0);
+  check("sanitize: long names are clamped", sanitizeLabelBook({ labels: [{ id: "lbl1", name: "x".repeat(90), color: "#abc" }] }).labels[0]!.name!.length, LABEL_NAME_MAX);
+  check("sanitize: an idless row is dropped", sanitizeLabelBook({ labels: [{ name: "Beats", color: "#abc" }] }).labels.length, 0);
+  check("sanitize: a non-object row is dropped", sanitizeLabelBook({ labels: [42, null, "x"] }).labels.length, 0);
+  check("sanitize: no labels array at all", sanitizeLabelBook({ v: 1 }).labels.length, 0);
+  check("sanitize: a bare array is not a book", sanitizeLabelBook([{ id: "draft", name: "X" }]).labels.length, 0);
+  check(
+    "sanitize: a duplicated id keeps the first",
+    sanitizeLabelBook({ labels: [{ id: "draft", name: "A" }, { id: "draft", name: "B" }] }).labels[0]!.name,
+    "A",
+  );
+  check(
+    "sanitize: a missing created time becomes zero",
+    sanitizeLabelBook({ labels: [{ id: "lbl1", name: "Beats", color: "#abc" }] }).labels[0]!.created,
+    0,
+  );
+  check(
+    "sanitize: a real book round-trips",
+    sanitizeLabelBook(JSON.parse(JSON.stringify(addLabel(emptyLabelBook(), { name: "Beats", color: "#abc" }, "lbl1", 7)))).labels,
+    [{ id: "lbl1", name: "Beats", color: "#aabbcc", created: 7 }],
+  );
+}
+
+/* ---- the grid, painted from a writer's own book ---- */
+
+{
+  const custom = addLabel(
+    editLabel(emptyLabelBook(), "draft", { color: "#ff0000" }),
+    { name: "Beats", color: "#00ff00" },
+    "lbl1",
+    5,
+  );
+  const labels = resolveLabels(custom);
+  const a = mk("a", "2026-08-19", "One", 100, undefined, "draft");
+  const b = mk("b", "2026-08-19", "Two", 200, undefined, "lbl1");
+  const c = mk("c", "2026-08-19", "Three", 300);
+
+  check("grid: a recolored built-in tints the day", tintOf(labels, [a, b]), "#ff0000");
+  check("grid: a new label dots the day", dotsOf(labels, [b, c]), ["#00ff00", null]);
+  check("grid: dots stay capped at three", dotsOf(labels, [a, b, c], 2), ["#ff0000", "#00ff00"]);
+  check("grid: an empty day is still empty", tintOf(labels, []), null);
+  check("grid: the same label twice is one dot", dotsOf(labels, [b, mk("d", "2026-08-19", "Four", 400, undefined, "lbl1")]), ["#00ff00"]);
 }
 
 /* ---------- migrating the old one-line intents ---------- */

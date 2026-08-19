@@ -6,7 +6,6 @@ import {
   useState,
   type CSSProperties,
   type ReactNode,
-  type RefObject,
 } from "react";
 import { store, useVaultVersion } from "../state/vaultStore";
 import { pluginHost, usePluginVersion } from "../plugins/runtime";
@@ -24,17 +23,23 @@ import { CalendarTab } from "./CalendarTab";
 import { GoalsTab } from "./GoalsTab";
 import { MusicTab } from "./MusicTab";
 import {
-  canStack,
-  canStackTab,
+  MAX_SLOTS,
+  canMovePanelTo,
+  canSplit,
+  canSplitTab,
+  colShares,
   cycleTab,
   hiddenTabs,
-  paneSlots,
-  slotSizes,
+  paneRows,
+  panelTools,
+  rowShares,
   tabPrefs,
+  tabbedRow,
   useTabPrefs,
   visibleTabs,
   type TabId,
   type TabPrefs,
+  type Where,
 } from "./inspectorTabs";
 
 /* The inspector: the writer's toolbelt, arranged by the writer.
@@ -49,10 +54,18 @@ import {
    arrangement made physical: what you keep, in your order, one click away.
    Both read the same prefs, so neither can drift from the other.
 
-   A tool can also be pulled out of the strip and pinned open beneath the
-   one already showing — tasks above the calendar, both on screen, neither
-   costing a click. Three panels at most, split by draggable dividers, and
-   every rule about what may sit where lives in inspectorTabs.
+   A tool can also be pulled out of the strip and opened in a panel of its
+   own — dropped on the band along the bottom it takes a row under
+   everything, dropped on the band down either side it takes a column
+   beside what's already there. Tasks above the calendar, or tasks beside
+   it: both on screen, neither costing a click. Three panels at most,
+   divided by draggable splitters, and every rule about what may sit where
+   lives in inspectorTabs.
+
+   All of it is still one pane. The Tools button shows and hides the whole
+   arrangement at once, because the split happens inside the inspector
+   rather than by adding panes to the workspace — there is nothing here
+   App.tsx has to know about.
 
    Needing the active note is per-tab: Calendar, Goals, Tasks and Music
    are project-wide and work with nothing open. */
@@ -82,16 +95,63 @@ export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => 
   // The Tools dropdown. The strip's + menu is its own state inside
   // TabStrip — two menus, two names, so neither can close the other.
   const [menuOpen, setMenuOpen] = useState(false);
-  // What the strip is dragging, reported upward so the pane can offer a
-  // place to drop it. The drop zone has to live down here, over the panels
-  // — the strip can't render something below itself.
-  const [drag, setDrag] = useState<DragReport>({ tab: null, overDrop: false });
+  // What the strip is dragging and where it would land, reported upward so
+  // the pane can offer somewhere to drop it. The bands have to live down
+  // here, around the panels — the strip can't render anything outside
+  // itself.
+  const [drag, setDrag] = useState<DragReport>({ tab: null, spot: null });
   const headRef = useRef<HTMLDivElement>(null);
-  const dropRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const belowRef = useRef<HTMLDivElement>(null);
+  const leftRef = useRef<HTMLDivElement>(null);
+  const rightRef = useRef<HTMLDivElement>(null);
   const active = store.active();
   const tab = prefs.active;
-  const slots = paneSlots(prefs);
-  const sizes = slotSizes(prefs);
+  const rows = paneRows(prefs);
+  const heights = rowShares(prefs);
+  const single = rows.length === 1 && rows[0]!.length === 1;
+
+  /** Which row is under a point.
+
+      Asked by the side bands, which run the height of the pane: dropping
+      beside the calendar and dropping beside the tools are different
+      moves, and the only thing that tells them apart is how far down the
+      band the finger was. Rectangles rather than arithmetic, for the same
+      reason the strip hit-tests its tabs that way — the rows are already
+      on screen and can't be wrong about where they are. Off either end
+      clamps to the nearest row instead of refusing: a drop a few pixels
+      above the first row means the first row. */
+  const rowAt = useCallback((y: number): number => {
+    const grid = gridRef.current;
+    if (!grid) return 0;
+    const cells = [...grid.querySelectorAll<HTMLElement>("[data-row-index]")];
+    for (const el of cells) {
+      const r = el.getBoundingClientRect();
+      if (y >= r.top && y <= r.bottom) return Number(el.dataset.rowIndex);
+    }
+    if (cells.length === 0) return 0;
+    return y < cells[0]!.getBoundingClientRect().top ? 0 : cells.length - 1;
+  }, []);
+
+  /** Which band, if any, the pointer is over — the whole of "where would
+      this land?" in one answer, so the strip never has to know how the
+      pane is put together. Sides win over the bottom band where they meet,
+      which is why the bottom band is inset to their width: a corner that
+      could mean two things would mean neither. */
+  const hitDrop = useCallback(
+    (x: number, y: number): Where | null => {
+      const inside = (el: HTMLElement | null): boolean => {
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+      };
+      if (inside(leftRef.current)) return { side: "left", row: rowAt(y) };
+      if (inside(rightRef.current)) return { side: "right", row: rowAt(y) };
+      if (inside(belowRef.current)) return { side: "below" };
+      return null;
+    },
+    [rowAt],
+  );
 
   // Click-away and Escape close the tool menu.
   useEffect(() => {
@@ -186,89 +246,166 @@ export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => 
         )}
       </div>
 
-      <TabStrip prefs={prefs} dropRef={dropRef} onDrag={setDrag} />
+      <TabStrip prefs={prefs} hitDrop={hitDrop} onDrag={setDrag} />
 
-      {/* One tool is the ordinary case and renders exactly as it always
-          did — stacking is additive, and the unstacked pane shouldn't pay
-          a wrapper for a feature it isn't using. */}
-      {slots.length === 1 ? (
-        <div
-          className="pane-scroll"
-          id={PANEL_ID}
-          role="tabpanel"
-          aria-label={`${TAB_DEFS[tab].label} — ${TAB_DEFS[tab].title}`}
-        >
-          {renderTab(tab)}
-        </div>
-      ) : (
-        <div className="tool-stack" style={STACK_STYLE}>
-          {slots.map((id, i) => (
-            <Fragment key={id}>
-              {i > 0 && (
-                <StackDivider
-                  index={i - 1}
-                  above={TAB_DEFS[slots[i - 1]!].label}
-                  below={TAB_DEFS[id].label}
-                />
-              )}
-              {/* flexGrow carries the split ratio, so it's the one style
-                  that can't live in the stylesheet. */}
-              <div className="tool-slot" style={{ ...SLOT_STYLE, flexGrow: sizes[i] }}>
-                {i > 0 && <SlotHead id={id} at={i - 1} of={prefs.stack.length} />}
+      {/* The bands are positioned against this, so the pane never depends
+          on anything outside itself being a positioning context. */}
+      <div className="tool-area" style={AREA_STYLE}>
+        {/* One tool is the ordinary case and renders exactly as it always
+            did — splitting is additive, and the whole pane shouldn't pay a
+            wrapper for a feature it isn't using. */}
+        {single ? (
+          <div
+            className="pane-scroll"
+            id={PANEL_ID}
+            role="tabpanel"
+            aria-label={`${TAB_DEFS[tab].label} — ${TAB_DEFS[tab].title}`}
+          >
+            {renderTab(tab)}
+          </div>
+        ) : (
+          <div className="tool-grid" style={GRID_STYLE} ref={gridRef}>
+            {rows.map((row, r) => (
+              // Rows are keyed by position, not by what's in them: the
+              // tabbed cell's tool changes every time the strip switches,
+              // and a key that moved with it would tear down the panels
+              // beside it — losing whatever state they were holding — for
+              // a click that shouldn't touch them. The cells inside carry
+              // their tool's id, which is what identity means here.
+              <Fragment key={r}>
+                {r > 0 && (
+                  <SplitDivider
+                    axis="row"
+                    index={r - 1}
+                    first={TAB_DEFS[rows[r - 1]![0]!].label}
+                    second={TAB_DEFS[row[0]!].label}
+                  />
+                )}
+                {/* flexGrow carries the split ratio, so it's the one style
+                    that can't live in the stylesheet. */}
                 <div
-                  // Slot 0 stays the panel the tabs point at, markup and
-                  // all; the pinned ones are regions of their own.
-                  className={i === 0 ? "pane-scroll" : "slot-body"}
-                  id={i === 0 ? PANEL_ID : undefined}
-                  role={i === 0 ? "tabpanel" : "region"}
-                  aria-label={`${TAB_DEFS[id].label} — ${TAB_DEFS[id].title}`}
-                  style={SLOT_BODY_STYLE}
+                  className={`tool-row ${
+                    drag.spot && drag.spot.side !== "below" && drag.spot.row === r
+                      ? "drop-target"
+                      : ""
+                  }`}
+                  data-row-index={r}
+                  style={{ ...ROW_STYLE, flexGrow: heights[r] }}
                 >
-                  {renderTab(id)}
+                  {row.map((id, c) => {
+                    const widths = colShares(prefs, r);
+                    const tabbed = id === tab && r === tabbedRow(prefs);
+                    return (
+                      <Fragment key={id}>
+                        {c > 0 && (
+                          <SplitDivider
+                            axis="col"
+                            row={r}
+                            index={c - 1}
+                            first={TAB_DEFS[row[c - 1]!].label}
+                            second={TAB_DEFS[id].label}
+                          />
+                        )}
+                        <div className="tool-slot" style={{ ...SLOT_STYLE, flexGrow: widths[c] }}>
+                          {!tabbed && <SlotHead id={id} prefs={prefs} />}
+                          <div
+                            // The tabbed cell stays the panel the tabs
+                            // point at, markup and all; the others are
+                            // regions of their own.
+                            className={tabbed ? "pane-scroll" : "slot-body"}
+                            id={tabbed ? PANEL_ID : undefined}
+                            role={tabbed ? "tabpanel" : "region"}
+                            aria-label={`${TAB_DEFS[id].label} — ${TAB_DEFS[id].title}`}
+                            style={SLOT_BODY_STYLE}
+                          >
+                            {renderTab(id)}
+                          </div>
+                        </div>
+                      </Fragment>
+                    );
+                  })}
                 </div>
-              </div>
-            </Fragment>
-          ))}
-        </div>
-      )}
+              </Fragment>
+            ))}
+          </div>
+        )}
 
-      {/* Only while a tab is actually in the air, and only when there's
-          room for it to land — a drop zone that would refuse the drop is
-          worse than no drop zone. Hidden from assistive tech because the
-          + menu is the route that doesn't need a pointer. */}
-      {drag.tab && canStackTab(prefs, drag.tab) && (
-        <div
-          ref={dropRef}
-          className={`tool-dropzone ${drag.overDrop ? "over" : ""}`}
-          style={DROPZONE_STYLE}
-          aria-hidden
-        >
-          <span className="tool-dropzone-label">
-            Drop to open {TAB_DEFS[drag.tab].label} below
-          </span>
-        </div>
-      )}
+        {/* Only while a tab is actually in the air, and only when there's
+            room for it to land — a band that would refuse the drop is
+            worse than no band. Hidden from assistive tech because the +
+            menu is the route that doesn't need a pointer. */}
+        {drag.tab && canSplitTab(prefs, drag.tab) && (
+          <>
+            <div
+              ref={leftRef}
+              className={`tool-dropzone side left ${drag.spot?.side === "left" ? "over" : ""}`}
+              style={LEFT_BAND_STYLE}
+              aria-hidden
+            >
+              <span className="tool-dropzone-label">Open {TAB_DEFS[drag.tab].label} here</span>
+            </div>
+            <div
+              ref={rightRef}
+              className={`tool-dropzone side right ${drag.spot?.side === "right" ? "over" : ""}`}
+              style={RIGHT_BAND_STYLE}
+              aria-hidden
+            >
+              <span className="tool-dropzone-label">Open {TAB_DEFS[drag.tab].label} here</span>
+            </div>
+            <div
+              ref={belowRef}
+              className={`tool-dropzone below ${drag.spot?.side === "below" ? "over" : ""}`}
+              style={BELOW_BAND_STYLE}
+              aria-hidden
+            >
+              <span className="tool-dropzone-label">
+                Drop to open {TAB_DEFS[drag.tab].label} below
+              </span>
+            </div>
+          </>
+        )}
+      </div>
     </aside>
   );
 }
 
-/* ---------------- the stack ---------------- */
+/* ---------------- the split ---------------- */
 
 /* Layout mechanics live inline; appearance lives in the stylesheet.
 
    The split is a set of proportions, and proportions only hold if the
-   column, the slots and their scrollers agree about flex and min-height —
-   miss `min-height: 0` on one of them and a long list stops the panel
-   above it from ever shrinking. Rules that load-bearing shouldn't be
-   editable by accident from a stylesheet, and the pane has to work the
-   moment it renders, styled or not. Everything else — borders, colour,
-   the grip — is the stylesheet's. */
+   grid, the rows, the cells and their scrollers agree about flex and the
+   min-height / min-width that lets a flex child shrink — miss one of them
+   and a long list stops the panel beside or above it from ever shrinking.
+   Rules that load-bearing shouldn't be editable by accident from a
+   stylesheet, and the pane has to work the moment it renders, styled or
+   not. Everything else — borders, colour, the grip, the dashed band — is
+   the stylesheet's. */
 
-const STACK_STYLE: CSSProperties = {
+// The bands hang off this, so they can be laid over the panels without
+// pushing them around mid-drag and without the pane needing a positioned
+// ancestor it doesn't control.
+const AREA_STYLE: CSSProperties = {
+  position: "relative",
   display: "flex",
   flexDirection: "column",
   flex: "1 1 auto",
   minHeight: 0,
+};
+
+const GRID_STYLE: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  flex: "1 1 auto",
+  minHeight: 0,
+};
+
+const ROW_STYLE: CSSProperties = {
+  display: "flex",
+  flexDirection: "row",
+  flexBasis: 0,
+  minHeight: 0,
+  minWidth: 0,
 };
 
 const SLOT_STYLE: CSSProperties = {
@@ -276,6 +413,7 @@ const SLOT_STYLE: CSSProperties = {
   flexDirection: "column",
   flexBasis: 0,
   minHeight: 0,
+  minWidth: 0,
   overflow: "hidden",
 };
 
@@ -283,42 +421,100 @@ const SLOT_BODY_STYLE: CSSProperties = { flex: "1 1 auto", minHeight: 0, overflo
 
 const SLOT_HEAD_STYLE: CSSProperties = { flex: "0 0 auto" };
 
-// A floor, not a size: the stylesheet can make either taller, but neither
-// may end up too small to hit. Nothing else here is a pointer target that
-// only exists for a moment.
-const DIVIDER_STYLE: CSSProperties = {
+// A floor, not a size: the stylesheet can make either divider fatter, but
+// neither may end up too small to hit. Nothing else here is a pointer
+// target that only exists for a moment.
+const ROW_DIVIDER_STYLE: CSSProperties = {
   flex: "0 0 auto",
   minHeight: 8,
   cursor: "row-resize",
   touchAction: "none",
 };
 
-const DROPZONE_STYLE: CSSProperties = { flex: "0 0 auto", minHeight: 44 };
+const COL_DIVIDER_STYLE: CSSProperties = {
+  flex: "0 0 auto",
+  minWidth: 8,
+  cursor: "col-resize",
+  touchAction: "none",
+};
 
-function SlotHead({ id, at, of }: { id: TabId; at: number; of: number }) {
+/* The bands are overlaid rather than laid out. A band that took up space
+   would squeeze the panels every time a drag began, and the pane would
+   reflow under the writer's hand at exactly the moment they were aiming.
+
+   Sized in clamp() so they stay a real target in a 180px pane and don't
+   swallow a 560px one, and the bottom band is inset by the side bands'
+   width so no point on screen belongs to two of them. pointer-events are
+   off: the drag has the pointer captured on the tab, and hit-testing is
+   done against these rectangles by hand. */
+const BAND_W = "clamp(40px, 20%, 90px)";
+const BAND: CSSProperties = {
+  position: "absolute",
+  zIndex: 4,
+  pointerEvents: "none",
+  overflow: "hidden",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+const LEFT_BAND_STYLE: CSSProperties = { ...BAND, left: 0, top: 0, bottom: 0, width: BAND_W };
+const RIGHT_BAND_STYLE: CSSProperties = { ...BAND, right: 0, top: 0, bottom: 0, width: BAND_W };
+const BELOW_BAND_STYLE: CSSProperties = {
+  ...BAND,
+  left: BAND_W,
+  right: BAND_W,
+  bottom: 0,
+  height: "clamp(44px, 26%, 120px)",
+};
+
+/** A panel's own small header: what it is, and everything you can do to it
+    without a pointer. */
+function SlotHead({ id, prefs }: { id: TabId; prefs: TabPrefs }) {
   const label = TAB_DEFS[id].label;
+  const panels = panelTools(prefs);
+  const at = panels.indexOf(id);
   return (
     <div className="slot-head" style={SLOT_HEAD_STYLE}>
       <span className="slot-name" title={TAB_DEFS[id].title}>
         {label}
       </span>
-      {/* Ordinary buttons, so the whole of stacking is reachable without a
-          pointer: reorder the panels, close one, done. */}
+      {/* Ordinary buttons, so the whole of splitting is reachable without a
+          pointer: swap the panels around, send one beside the tools or
+          into a row of its own, close it. */}
       <button
         className="slot-btn"
-        disabled={at === 0}
-        aria-label={`Move the ${label} panel up`}
-        title="Move this panel up"
-        onClick={() => tabPrefs.moveStacked(id, -1)}
+        disabled={at <= 0}
+        aria-label={`Move the ${label} panel earlier`}
+        title="Swap with the panel before this one"
+        onClick={() => tabPrefs.movePanel(id, -1)}
       >
-        ▲
+        ◀
       </button>
       <button
         className="slot-btn"
-        disabled={at === of - 1}
-        aria-label={`Move the ${label} panel down`}
-        title="Move this panel down"
-        onClick={() => tabPrefs.moveStacked(id, 1)}
+        disabled={at < 0 || at === panels.length - 1}
+        aria-label={`Move the ${label} panel later`}
+        title="Swap with the panel after this one"
+        onClick={() => tabPrefs.movePanel(id, 1)}
+      >
+        ▶
+      </button>
+      <button
+        className="slot-btn"
+        disabled={!canMovePanelTo(prefs, id, { side: "right" })}
+        aria-label={`Put the ${label} panel beside the tools`}
+        title="Put this panel beside the tabbed tool"
+        onClick={() => tabPrefs.movePanelTo(id, { side: "right" })}
+      >
+        ▐
+      </button>
+      <button
+        className="slot-btn"
+        disabled={!canMovePanelTo(prefs, id, { side: "below" })}
+        aria-label={`Give the ${label} panel a row of its own`}
+        title="Give this panel a row of its own, under everything"
+        onClick={() => tabPrefs.movePanelTo(id, { side: "below" })}
       >
         ▼
       </button>
@@ -326,7 +522,7 @@ function SlotHead({ id, at, of }: { id: TabId; at: number; of: number }) {
         className="slot-btn"
         aria-label={`Close the ${label} panel`}
         title={`Close this panel — ${label} goes back to the tabs`}
-        onClick={() => tabPrefs.unstack(id)}
+        onClick={() => tabPrefs.closePanel(id)}
       >
         ✕
       </button>
@@ -334,20 +530,44 @@ function SlotHead({ id, at, of }: { id: TabId; at: number; of: number }) {
   );
 }
 
-/* The horizontal twin of Resizer: same pointer-capture shape, same
+/* The in-pane twin of Resizer: same pointer-capture shape, same
    incremental deltas, same keyboard fallback because a hairline is not an
-   accessible control. It can't be Resizer itself — that one reads clientX
-   and reports pixels, and a split held in pixels would drift the moment
-   the pane was widened. This one reports a fraction of the column, which
-   is what the prefs store. */
+   accessible control. It can't be Resizer itself — that one reports
+   pixels, and a split held in pixels would drift the moment the pane was
+   widened. This one reports a fraction of the run it divides, which is
+   what the prefs store.
 
-function StackDivider({ index, above, below }: { index: number; above: string; below: string }) {
+   One component for both axes rather than two nearly-identical ones: the
+   only real differences are which coordinate moves, which measurement
+   turns it into a fraction, and which pair of arrow keys does it from the
+   keyboard. */
+
+function SplitDivider({
+  axis,
+  row = 0,
+  index,
+  first,
+  second,
+}: {
+  axis: "row" | "col";
+  /** Which row's columns this divides. Ignored on the row axis. */
+  row?: number;
+  index: number;
+  first: string;
+  second: string;
+}) {
   // Dragging is a ref for the same reason it is in Resizer: state wouldn't
   // be true until React re-rendered, and the opening frames of the drag
   // arrive before that. State is kept only for the styling hook.
   const dragging = useRef(false);
   const [dragStyle, setDragStyle] = useState(false);
-  const lastY = useRef(0);
+  const last = useRef(0);
+  const vertical = axis === "col";
+
+  const drag = (delta: number) => {
+    if (vertical) tabPrefs.resizeCols(row, index, delta);
+    else tabPrefs.resizeRows(index, delta);
+  };
 
   const stop = (e: React.PointerEvent<HTMLDivElement>) => {
     // Capture must always come back, whichever way the drag ended — a lost
@@ -365,12 +585,12 @@ function StackDivider({ index, above, below }: { index: number; above: string; b
 
   return (
     <div
-      className={`stack-divider ${dragStyle ? "dragging" : ""}`}
+      className={`${vertical ? "col-divider" : "stack-divider"} ${dragStyle ? "dragging" : ""}`}
       role="separator"
-      aria-orientation="horizontal"
-      aria-label={`Resize the ${above} and ${below} panels`}
+      aria-orientation={vertical ? "vertical" : "horizontal"}
+      aria-label={`Resize the ${first} and ${second} panels`}
       tabIndex={0}
-      style={DIVIDER_STYLE}
+      style={vertical ? COL_DIVIDER_STYLE : ROW_DIVIDER_STYLE}
       title="Drag to resize · double-click to even them up"
       onPointerDown={(e) => {
         if (e.button !== 0) return;
@@ -379,20 +599,22 @@ function StackDivider({ index, above, below }: { index: number; above: string; b
         } catch {
           /* the drag still works, just without capture */
         }
-        lastY.current = e.clientY;
+        last.current = vertical ? e.clientX : e.clientY;
         dragging.current = true;
         setDragStyle(true);
       }}
       onPointerMove={(e) => {
         if (!dragging.current) return;
-        // The column's own height turns pixels into the fraction the prefs
-        // keep. Measured per move rather than cached: the pane is resizable
-        // from the side while this drag is happening.
-        const height = e.currentTarget.parentElement?.getBoundingClientRect().height ?? 0;
-        if (height <= 0) return;
-        const dy = e.clientY - lastY.current;
-        lastY.current = e.clientY;
-        tabPrefs.resize(index, dy / height);
+        // The run's own size turns pixels into the fraction the prefs keep.
+        // Measured per move rather than cached: the pane is resizable from
+        // the side while this drag is happening.
+        const box = e.currentTarget.parentElement?.getBoundingClientRect();
+        const span = (vertical ? box?.width : box?.height) ?? 0;
+        if (span <= 0) return;
+        const now = vertical ? e.clientX : e.clientY;
+        const d = now - last.current;
+        last.current = now;
+        drag(d / span);
       }}
       onPointerUp={stop}
       onPointerCancel={stop}
@@ -400,19 +622,21 @@ function StackDivider({ index, above, below }: { index: number; above: string; b
       onDoubleClick={() => tabPrefs.evenSlots()}
       onKeyDown={(e) => {
         const step = e.shiftKey ? 0.1 : 0.03;
-        if (e.key === "ArrowUp") {
+        const back = vertical ? "ArrowLeft" : "ArrowUp";
+        const on = vertical ? "ArrowRight" : "ArrowDown";
+        if (e.key === back) {
           e.preventDefault();
-          tabPrefs.resize(index, -step);
-        } else if (e.key === "ArrowDown") {
+          drag(-step);
+        } else if (e.key === on) {
           e.preventDefault();
-          tabPrefs.resize(index, step);
+          drag(step);
         } else if (e.key === "Enter") {
           e.preventDefault();
           tabPrefs.evenSlots();
         }
       }}
     >
-      <span className="stack-grip" />
+      <span className={vertical ? "col-grip" : "stack-grip"} />
     </div>
   );
 }
@@ -429,46 +653,63 @@ function StackDivider({ index, above, below }: { index: number; above: string; b
 
    Dragging is never the ONLY way to rearrange. It is unavailable to a
    keyboard, and unkind to anyone with a tremor or a small trackpad, so
-   Alt+← / Alt+→ nudges the focused tab and the + menu spells the same
-   moves out as ordinary buttons.
+   Alt+← / Alt+→ nudges the focused tab, Alt+↓ opens it below,
+   Alt+Shift+← / Alt+Shift+→ opens it beside, and the + menu spells every
+   one of those out as ordinary buttons.
 
-   A tab dragged clear of the strip and onto the pane below leaves the
-   strip altogether and becomes a panel of its own. Same gesture, two
-   destinations, told apart by where it lands.
+   A tab dragged clear of the strip and onto one of the bands around the
+   panels leaves the strip altogether and becomes a panel of its own —
+   under everything from the bottom band, beside a row from either side
+   band. One gesture, four destinations, told apart by where it lands.
 
-   The component stays thin on purpose: it turns pointers into an index and
-   hands that to inspectorTabs, which owns every rule about what an
-   arrangement may become. */
+   The component stays thin on purpose: it turns pointers into an index or
+   a landing spot and hands that to inspectorTabs, which owns every rule
+   about what an arrangement may become. */
 
 const PANEL_ID = "inspector-panel";
 const DRAG_THRESHOLD_PX = 5;
 
-/** What the strip is dragging, for the pane that has to draw somewhere to
-    drop it. */
-type DragReport = { tab: TabId | null; overDrop: boolean };
+/** What the strip is dragging and where it would land, for the pane that
+    has to draw the bands. */
+type DragReport = { tab: TabId | null; spot: Where | null };
+
+/** A landing spot as one comparable string, so "the pointer is still over
+    the same band" doesn't count as a change. Without it every pointermove
+    would hand the pane a fresh object and re-render the whole pane. */
+const spotKey = (spot: Where | null): string =>
+  spot ? (spot.side === "below" ? "below" : `${spot.side}:${spot.row ?? 0}`) : "";
+
+/** Why a split button is offered, or why it isn't. A disabled control that
+    doesn't say why reads as a bug. */
+function splitTitle(prefs: TabPrefs, id: TabId, room: boolean, where: string): string {
+  if (id === prefs.active) return "This tool is already the one on show";
+  if (!room) return `${MAX_SLOTS} panels at once is the limit — close one first`;
+  return `Open ${where} — keep it on screen in its own panel`;
+}
 
 function TabStrip({
   prefs,
-  dropRef,
+  hitDrop,
   onDrag,
 }: {
   prefs: TabPrefs;
-  /** The pane's drop zone, hit-tested here. A ref rather than a lookup by
-      id: the strip should be able to find it without knowing the DOM it
-      lives in. */
-  dropRef: RefObject<HTMLDivElement | null>;
+  /** Where a drop at this point would land, answered by the pane. The
+      strip shouldn't have to know how the pane is put together, and the
+      pane is the only thing that knows where its bands and rows are. */
+  hitDrop: (x: number, y: number) => Where | null;
   onDrag: (report: DragReport) => void;
 }) {
   const visible = visibleTabs(prefs);
   const hidden = hiddenTabs(prefs);
-  const room = canStack(prefs);
+  const panels = panelTools(prefs);
+  const room = canSplit(prefs);
 
   const stripRef = useRef<HTMLDivElement>(null);
   const plusRef = useRef<HTMLDivElement>(null);
   const [plusOpen, setPlusOpen] = useState(false);
   const [dragId, setDragId] = useState<TabId | null>(null);
   const [overIndex, setOverIndex] = useState<number | null>(null);
-  const [overDrop, setOverDrop] = useState(false);
+  const [spot, setSpot] = useState<Where | null>(null);
   // How far the tab has travelled from where it was grabbed. It's
   // translated by this so it physically follows the finger; a tab that
   // stays pinned while you drag reads as broken.
@@ -483,17 +724,17 @@ function TabStrip({
     drag.current = null;
     setDragId(null);
     setOverIndex(null);
-    setOverDrop(false);
+    setSpot(null);
     setOffset(null);
   }, []);
 
-  // The pane draws the drop zone, so it has to be told a drag is happening
-  // and whether the pointer is over it. Reported from an effect rather than
+  // The pane draws the bands, so it has to be told a drag is happening and
+  // which band the pointer is over. Reported from an effect rather than
   // from the pointer handlers so the two states can't disagree — including
   // the one that matters, the drag ending.
   useEffect(() => {
-    onDrag({ tab: dragId, overDrop });
-  }, [dragId, overDrop, onDrag]);
+    onDrag({ tab: dragId, spot });
+  }, [dragId, spot, onDrag]);
 
   // A cancelled drag must leave nothing behind — no lifted tab, no stale
   // drop marker. Escape is the reflex people already have; pointercancel
@@ -543,16 +784,6 @@ function TabStrip({
     return null;
   };
 
-  /** Is the pointer over the pane's drop zone? Rectangles again, for the
-      same reason: the dragged tab travels under the cursor, so asking the
-      document what's at the point would always answer "the tab". */
-  const onDropZone = (x: number, y: number): boolean => {
-    const el = dropRef.current;
-    if (!el) return false;
-    const r = el.getBoundingClientRect();
-    return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
-  };
-
   // Moving the tool with an arrow key should move the focus ring with it,
   // or the next keypress comes from somewhere the writer isn't looking.
   // A frame's wait, because the tab to focus doesn't exist until React has
@@ -591,12 +822,15 @@ function TabStrip({
     }
 
     setOffset({ x: e.clientX - d.startX, y: e.clientY - d.startY });
-    const onDrop = onDropZone(e.clientX, e.clientY);
-    setOverDrop(onDrop);
-    // Over the drop zone the strip's own marker stands down: one drag can
-    // only have one destination, and showing both would promise a move
-    // that isn't the one about to happen.
-    if (onDrop) {
+    const landing = hitDrop(e.clientX, e.clientY);
+    // Same band as the last move is not a change. Keeping the old object
+    // means the pane isn't re-rendered sixty times a second for a pointer
+    // that hasn't left the band it was already over.
+    setSpot((prev) => (spotKey(prev) === spotKey(landing) ? prev : landing));
+    // Over a band the strip's own marker stands down: one drag can only
+    // have one destination, and showing both would promise a move that
+    // isn't the one about to happen.
+    if (landing) {
       setOverIndex(null);
       return;
     }
@@ -624,12 +858,13 @@ function TabStrip({
     if (!d) return;
 
     if (d.active) {
-      // Dropped on the pane: the tool leaves the strip and gets a panel.
-      // Dropped on another tab: an ordinary reorder. Dropped anywhere else
-      // (off the edge, on the editor): nothing, and the arrangement is
-      // exactly as it was.
-      if (onDropZone(e.clientX, e.clientY)) {
-        tabPrefs.stack(d.tab);
+      // Dropped on a band: the tool leaves the strip and gets a panel,
+      // below or beside depending which band caught it. Dropped on another
+      // tab: an ordinary reorder. Dropped anywhere else (off the edge, on
+      // the editor): nothing, and the arrangement is exactly as it was.
+      const landing = hitDrop(e.clientX, e.clientY);
+      if (landing) {
+        tabPrefs.split(d.tab, landing);
       } else {
         const idx = indexAt(e.clientX, e.clientY, d.tab);
         if (idx !== null) tabPrefs.move(d.tab, idx);
@@ -657,7 +892,7 @@ function TabStrip({
             aria-selected={on}
             aria-controls={PANEL_ID}
             tabIndex={0}
-            title={`${TAB_DEFS[id].title} — drag to reorder, or Alt+← / Alt+→. Drag it onto the panel below (or Alt+↓) to keep it open there.`}
+            title={`${TAB_DEFS[id].title} — drag to reorder, or Alt+← / Alt+→. Drag it onto the band below (Alt+↓) or down either side (Alt+Shift+← / Alt+Shift+→) to keep it open in a panel of its own.`}
             style={{
               // Drag mechanics, not decoration, so they live beside the code
               // that depends on them: without touch-action a finger drag
@@ -683,8 +918,12 @@ function TabStrip({
                 const dir = e.key === "ArrowRight" ? 1 : -1;
                 // Alt rearranges, a bare arrow walks the strip. One modifier
                 // apart, so the gesture for moving a tab is a single step
-                // from the navigation everyone tries first.
-                if (e.altKey) {
+                // from the navigation everyone tries first. Add Shift and
+                // the tool goes sideways out of the strip altogether — the
+                // side band said as a keypress.
+                if (e.altKey && e.shiftKey) {
+                  tabPrefs.split(id, { side: dir === 1 ? "right" : "left" });
+                } else if (e.altKey) {
                   tabPrefs.nudge(id, dir);
                 } else {
                   const next = cycleTab(id, visible, dir);
@@ -693,10 +932,10 @@ function TabStrip({
                 }
               } else if (e.key === "ArrowDown" && e.altKey) {
                 // Alt+↓ sends the tool downward into a panel, which is the
-                // drag said as a keypress — and the reason the drag is
-                // never the only way to split the pane.
+                // bottom band said as a keypress — and the reason the drag
+                // is never the only way to split the pane.
                 e.preventDefault();
-                tabPrefs.stack(id);
+                tabPrefs.split(id);
               }
             }}
           >
@@ -779,20 +1018,33 @@ function TabStrip({
                 >
                   ▶
                 </button>
-                {/* The discoverable half of stacking: the drop zone only
-                    exists mid-drag, so nobody finds it by looking. */}
+                {/* The discoverable half of splitting: the bands only exist
+                    mid-drag, so nobody finds them by looking. One button
+                    per destination, in the shape of the destination. */}
                 <button
                   className="tab-plus-move"
-                  disabled={!canStackTab(prefs, id)}
+                  disabled={!canSplitTab(prefs, id)}
+                  aria-label={`Open ${TAB_DEFS[id].label} beside, on the left`}
+                  title={splitTitle(prefs, id, room, "on the left")}
+                  onClick={() => tabPrefs.split(id, { side: "left" })}
+                >
+                  ▌
+                </button>
+                <button
+                  className="tab-plus-move"
+                  disabled={!canSplitTab(prefs, id)}
+                  aria-label={`Open ${TAB_DEFS[id].label} beside, on the right`}
+                  title={splitTitle(prefs, id, room, "on the right")}
+                  onClick={() => tabPrefs.split(id, { side: "right" })}
+                >
+                  ▐
+                </button>
+                <button
+                  className="tab-plus-move"
+                  disabled={!canSplitTab(prefs, id)}
                   aria-label={`Open ${TAB_DEFS[id].label} below, in its own panel`}
-                  title={
-                    id === prefs.active
-                      ? "This tool is already the one on show"
-                      : room
-                        ? "Open below — keep it on screen in its own panel"
-                        : "Three panels at once is the limit — close one first"
-                  }
-                  onClick={() => tabPrefs.stack(id)}
+                  title={splitTitle(prefs, id, room, "below")}
+                  onClick={() => tabPrefs.split(id)}
                 >
                   ▼
                 </button>
@@ -808,34 +1060,53 @@ function TabStrip({
               </div>
             ))}
             <p className="tab-plus-hint">
-              Drag a tab to move it, or use these arrows. ▼ keeps a tool open in a panel of its
-              own — drag one onto the pane for the same thing.
+              Drag a tab to move it, or use these arrows. ▌ ▐ ▼ keep a tool open in a panel of its
+              own — beside, or underneath — and dragging a tab onto the bands around the pane does
+              the same thing.
             </p>
 
-            {/* Stacked tools have left the strip, so the Arrange rows above
-                can't reach them. Their panel headers can, but only if you
-                can point at one. */}
-            {prefs.stack.length > 0 && (
+            {/* Tools in panels have left the strip, so the Arrange rows
+                above can't reach them. Their panel headers can, but only if
+                you can point at one. */}
+            {panels.length > 0 && (
               <>
-                <p className="tab-plus-title">Open below</p>
-                {prefs.stack.map((id, i) => (
+                <p className="tab-plus-title">Panels</p>
+                {panels.map((id, i) => (
                   <div className="tab-plus-row" key={id}>
                     <span className="tab-plus-name">{TAB_DEFS[id].label}</span>
                     <button
                       className="tab-plus-move"
                       disabled={i === 0}
-                      aria-label={`Move the ${TAB_DEFS[id].label} panel up`}
-                      title="Move this panel up"
-                      onClick={() => tabPrefs.moveStacked(id, -1)}
+                      aria-label={`Move the ${TAB_DEFS[id].label} panel earlier`}
+                      title="Swap with the panel before this one"
+                      onClick={() => tabPrefs.movePanel(id, -1)}
                     >
-                      ▲
+                      ◀
                     </button>
                     <button
                       className="tab-plus-move"
-                      disabled={i === prefs.stack.length - 1}
-                      aria-label={`Move the ${TAB_DEFS[id].label} panel down`}
-                      title="Move this panel down"
-                      onClick={() => tabPrefs.moveStacked(id, 1)}
+                      disabled={i === panels.length - 1}
+                      aria-label={`Move the ${TAB_DEFS[id].label} panel later`}
+                      title="Swap with the panel after this one"
+                      onClick={() => tabPrefs.movePanel(id, 1)}
+                    >
+                      ▶
+                    </button>
+                    <button
+                      className="tab-plus-move"
+                      disabled={!canMovePanelTo(prefs, id, { side: "right" })}
+                      aria-label={`Put the ${TAB_DEFS[id].label} panel beside the tools`}
+                      title="Put this panel beside the tabbed tool"
+                      onClick={() => tabPrefs.movePanelTo(id, { side: "right" })}
+                    >
+                      ▐
+                    </button>
+                    <button
+                      className="tab-plus-move"
+                      disabled={!canMovePanelTo(prefs, id, { side: "below" })}
+                      aria-label={`Give the ${TAB_DEFS[id].label} panel a row of its own`}
+                      title="Give this panel a row of its own, under everything"
+                      onClick={() => tabPrefs.movePanelTo(id, { side: "below" })}
                     >
                       ▼
                     </button>
@@ -843,7 +1114,7 @@ function TabStrip({
                       className="tab-plus-move"
                       aria-label={`Close the ${TAB_DEFS[id].label} panel`}
                       title="Close this panel — the tool goes back to the tabs"
-                      onClick={() => tabPrefs.unstack(id)}
+                      onClick={() => tabPrefs.closePanel(id)}
                     >
                       ✕
                     </button>

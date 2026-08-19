@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useProfile } from "../state/profile";
 import { dayKey, useSessions, wordsOn } from "../state/sessions";
 import {
-  ENTRY_LABELS,
+  LABEL_NAME_MAX,
+  MAX_LABELS,
   addMonths,
   calendarStore,
   dateOf,
@@ -14,15 +15,21 @@ import {
   groupByDay,
   isSameMonth,
   labelById,
+  labelChoices,
+  labelStore,
   monthAnchor,
   monthGrid,
   monthNames,
+  normalizeLabelHex,
   normalizeTime,
   useCalendarEntries,
+  validateLabel,
   yearOptions,
   type CalendarEntry,
   type CalendarFeed,
+  type ResolvedLabel,
 } from "../state/calendarEntries";
+import { bestOn } from "./customThemes";
 import { expandOccurrences, type IcsOccurrence } from "../state/icsFeed";
 
 /* A real calendar.
@@ -148,6 +155,7 @@ function EntryRow({
   labelling,
   onToggleLabels,
   onCloseLabels,
+  onEditLabels,
 }: {
   entry: CalendarEntry;
   autoFocus: boolean;
@@ -157,6 +165,7 @@ function EntryRow({
   labelling: boolean;
   onToggleLabels: () => void;
   onCloseLabels: () => void;
+  onEditLabels: () => void;
 }) {
   const [time, setTime] = useState(entry.time ?? "");
 
@@ -171,6 +180,10 @@ function EntryRow({
 
   const label = labelById(entry.label);
   const color = entryColor(entry);
+  /* An archived label is off the menu, EXCEPT on a row already wearing
+     it — hiding the label a row visibly carries would read as the app
+     having quietly lost it. */
+  const choices = labelChoices(labelStore.all(), entry.label);
 
   return (
     <li
@@ -193,7 +206,12 @@ function EntryRow({
 
       {labelling && (
         <div className="menu-pop cal-label-menu" role="menu" aria-label="Entry label">
-          {ENTRY_LABELS.map((l) => (
+          {choices.length === 0 && (
+            <div className="empty-state cal-label-empty">
+              <p className="empty-line">Every label is archived.</p>
+            </div>
+          )}
+          {choices.map((l) => (
             <button
               key={l.id}
               role="menuitem"
@@ -205,6 +223,7 @@ function EntryRow({
             >
               <span className="cal-label-dot" style={{ background: l.color }} />
               {l.name}
+              {l.archived && <span className="cal-label-note">archived</span>}
               {entry.label === l.id && <span className="cal-label-check">✓</span>}
             </button>
           ))}
@@ -218,6 +237,11 @@ function EntryRow({
           >
             <span className="cal-label-dot none" />
             No label
+            {entry.label === undefined && <span className="cal-label-check">✓</span>}
+          </button>
+          <button role="menuitem" className="menu-item cal-label-edit" onClick={onEditLabels}>
+            <span className="cal-label-dot none" />
+            Edit labels…
           </button>
         </div>
       )}
@@ -253,6 +277,295 @@ function EntryRow({
         ×
       </button>
     </li>
+  );
+}
+
+/* ---------- managing the labels themselves ---------- */
+
+/* Two clicks instead of a confirm() dialog — the pattern the trash and
+   history panels use, and the only one available here anyway: confirm()
+   is suppressed in this webview. The armed state disarms itself so a
+   button left hot can't fire on a stray click ten minutes later. */
+function ArmedButton({
+  className,
+  label,
+  armedLabel,
+  tip,
+  onFire,
+}: {
+  className: string;
+  label: string;
+  armedLabel: string;
+  tip: string;
+  onFire: () => void;
+}) {
+  const [armed, setArmed] = useState(false);
+
+  useEffect(() => {
+    if (!armed) return;
+    const t = window.setTimeout(() => setArmed(false), 4000);
+    return () => window.clearTimeout(t);
+  }, [armed]);
+
+  return (
+    <button
+      className={`${className} ${armed ? "armed" : ""}`}
+      data-tip={tip}
+      onClick={() => {
+        if (!armed) {
+          setArmed(true);
+          return;
+        }
+        setArmed(false);
+        onFire();
+      }}
+    >
+      {armed ? armedLabel : label}
+    </button>
+  );
+}
+
+/* Hues the shipped six don't already own, so "Add" never opens on a
+   near-duplicate of a label three rows up. */
+const SPARE_LABEL_COLORS = [
+  "#7f8fa6",
+  "#c58f4e",
+  "#5f9e6e",
+  "#a56ea0",
+  "#4e8fa8",
+  "#b06a5a",
+  "#8a8f4e",
+  "#6a6fa8",
+];
+
+function nextSpareColor(taken: string[]): string {
+  const used = new Set(taken.map((c) => c.toLowerCase()));
+  return SPARE_LABEL_COLORS.find((c) => !used.has(c)) ?? "#8a8f96";
+}
+
+function LabelRow({ label, uses }: { label: ResolvedLabel; uses: number }) {
+  const [name, setName] = useState(label.name);
+  const [problem, setProblem] = useState<string | null>(null);
+
+  // The store is the truth; a rename made anywhere else has to land here.
+  useEffect(() => {
+    setName(label.name);
+  }, [label.name]);
+
+  /* Names commit on leaving the field, not per keystroke: halfway
+     through typing "Rev" the name is a duplicate of nothing and an
+     empty name is refused, and validating every keystroke would mean
+     rejecting the writer mid-word. Colors commit immediately, because
+     a color input can't produce an invalid value. */
+  const commitName = () => {
+    const trimmed = name.trim();
+    if (trimmed === label.name) {
+      setProblem(null);
+      return;
+    }
+    const problems = validateLabel({ name: trimmed, color: label.color }, labelStore.all(), label.id);
+    if (problems.length > 0) {
+      setProblem(problems[0] ?? null);
+      setName(label.name);
+      return;
+    }
+    setProblem(null);
+    labelStore.edit(label.id, { name: trimmed });
+  };
+
+  return (
+    <li className={`cal-label-row ${label.archived ? "archived" : ""}`}>
+      <input
+        type="color"
+        className="cal-label-color"
+        value={label.color}
+        onChange={(e) => labelStore.edit(label.id, { color: e.target.value })}
+        aria-label={`Color for ${label.name}`}
+        data-tip="Recolors every entry already carrying this label"
+      />
+
+      <input
+        className="field-input cal-label-name"
+        value={name}
+        maxLength={LABEL_NAME_MAX}
+        onChange={(e) => setName(e.target.value)}
+        onBlur={commitName}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") commitName();
+          if (e.key === "Escape") setName(label.name);
+        }}
+        aria-label={`Name for ${label.name}`}
+      />
+
+      {/* The name on its own color, with ink chosen by contrast rather
+          than by hope — a writer is allowed a bad color, but not an
+          unreadable chip. */}
+      <span
+        className="chip cal-label-chip"
+        style={{ background: label.color, color: bestOn(label.color) }}
+      >
+        {label.name}
+      </span>
+
+      <span className="cal-label-uses">
+        {uses === 0 ? "unused" : `${uses} ${uses === 1 ? "entry" : "entries"}`}
+        {label.builtin && <span className="cal-label-note">built in</span>}
+      </span>
+
+      <div className="cal-label-actions">
+        {label.archived ? (
+          <button
+            className="btn-ghost"
+            onClick={() => labelStore.restore(label.id)}
+            data-tip="Offer it for new entries again"
+          >
+            Restore
+          </button>
+        ) : (
+          <button
+            className="btn-ghost"
+            onClick={() => labelStore.archive(label.id)}
+            data-tip="Stops being offered for new entries. Entries already using it keep its name and color."
+          >
+            Archive
+          </button>
+        )}
+
+        {label.builtin && label.edited && (
+          <button
+            className="btn-ghost"
+            onClick={() => labelStore.reset(label.id)}
+            data-tip="Back to the name and color Novella ships with"
+          >
+            Reset
+          </button>
+        )}
+
+        {!label.builtin && (
+          <ArmedButton
+            className="btn-ghost danger"
+            label="Delete"
+            armedLabel={uses > 0 ? `Delete and unlabel ${uses}? Click again` : "Really delete? Click again"}
+            tip={
+              uses > 0
+                ? `Deletes the label and takes it off ${uses} ${uses === 1 ? "entry" : "entries"}. The entries stay — they just lose their color.`
+                : "Nothing is using this label."
+            }
+            onFire={() => labelStore.remove(label.id)}
+          />
+        )}
+      </div>
+
+      {problem && <p className="hint cal-label-problem">{problem}</p>}
+    </li>
+  );
+}
+
+function LabelManager({ version, onClose }: { version: number; onClose: () => void }) {
+  useDismiss(".modal", onClose, true);
+
+  // `version` exists to re-read the stores when they change; the lists
+  // themselves are the stores', not copies.
+  const labels = useMemo(() => labelStore.all(), [version]);
+
+  /* One pass over the entries for every count, rather than asking each
+     of two dozen rows to filter the whole list itself. */
+  const uses = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const e of calendarStore.all()) {
+      if (e.label) counts[e.label] = (counts[e.label] ?? 0) + 1;
+    }
+    return counts;
+  }, [version]);
+
+  const [name, setName] = useState("");
+  const [color, setColor] = useState(() => nextSpareColor(labelStore.all().map((l) => l.color)));
+
+  const live = labels.filter((l) => !l.archived);
+  const archived = labels.filter((l) => l.archived);
+  const problems = validateLabel({ name, color }, labels);
+  const blocked = problems.length > 0;
+
+  const add = () => {
+    if (blocked) return;
+    if (!labelStore.add(name.trim(), color)) return;
+    setName("");
+    setColor(nextSpareColor([...labels.map((l) => l.color), color]));
+  };
+
+  return (
+    <div className="modal-backdrop">
+      <div className="modal cal-labels-modal" role="dialog" aria-modal="true" aria-label="Calendar labels">
+        <div className="modal-head">
+          <h2>Labels</h2>
+          <button className="icon-btn" onClick={onClose} aria-label="Close labels">
+            ×
+          </button>
+        </div>
+
+        <div className="modal-body">
+          <ul className="cal-label-rows">
+            {live.map((l) => (
+              <LabelRow key={l.id} label={l} uses={uses[l.id] ?? 0} />
+            ))}
+          </ul>
+
+          <div className="cal-label-new">
+            <input
+              type="color"
+              className="cal-label-color"
+              value={normalizeLabelHex(color) ?? "#8a8f96"}
+              onChange={(e) => setColor(e.target.value)}
+              aria-label="New label color"
+            />
+            <input
+              className="field-input cal-label-name"
+              value={name}
+              maxLength={LABEL_NAME_MAX}
+              placeholder="New label…"
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") add();
+              }}
+              aria-label="New label name"
+            />
+            <button className="btn-primary" disabled={blocked} onClick={add}>
+              Add
+            </button>
+          </div>
+
+          {/* Silent while the field is untouched: "Give the label a
+              name" on a form nobody has typed in yet is nagging. */}
+          {name.trim().length > 0 && problems.length > 0 && (
+            <p className="hint cal-label-problem">{problems[0]}</p>
+          )}
+          {labels.length >= MAX_LABELS && (
+            <p className="hint">
+              {MAX_LABELS} labels is the cap. Archive one you've stopped using to make room.
+            </p>
+          )}
+
+          {archived.length > 0 && (
+            <>
+              <h3 className="cal-label-group">Archived</h3>
+              <ul className="cal-label-rows">
+                {archived.map((l) => (
+                  <LabelRow key={l.id} label={l} uses={uses[l.id] ?? 0} />
+                ))}
+              </ul>
+            </>
+          )}
+
+          <p className="hint modal-footnote">
+            Archiving retires a label without touching a single entry: the days that already carry
+            it keep its name and its color, it just stops being offered for new ones. Deleting is
+            only for labels you made yourself — the six Novella ships with are built into the app,
+            so “deleting” one would only bring it back on the next launch. Labels are yours, not the
+            book's: they follow you into every project on this machine.
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -447,9 +760,16 @@ export function CalendarTab() {
   const [picking, setPicking] = useState(false);
   const [focusId, setFocusId] = useState<string | null>(null);
   const [labelFor, setLabelFor] = useState<string | null>(null);
+  const [managingLabels, setManagingLabels] = useState(false);
 
   const closeLabels = useCallback(() => setLabelFor(null), []);
   useDismiss(".cal-label-menu, .cal-label-swatch", closeLabels, labelFor !== null);
+
+  const editLabels = useCallback(() => {
+    setLabelFor(null);
+    setManagingLabels(true);
+  }, []);
+  const closeManager = useCallback(() => setManagingLabels(false), []);
 
   const goal = profile.dailyGoal;
   const today = dayKey(now);
@@ -631,6 +951,7 @@ export function CalendarTab() {
                 labelling={labelFor === e.id}
                 onToggleLabels={() => setLabelFor((v) => (v === e.id ? null : e.id))}
                 onCloseLabels={closeLabels}
+                onEditLabels={editLabels}
               />
             ))}
 
@@ -656,12 +977,26 @@ export function CalendarTab() {
           </ul>
         )}
 
-        <button className="btn-ghost cal-add" onClick={addEntry}>
-          + Add to this day
-        </button>
+        {/* The picker's "Edit labels…" is the natural route in, but it
+            only exists once a day has an entry to click. This is the
+            way in from a day that's still empty. */}
+        <div className="cal-day-actions">
+          <button className="btn-ghost cal-add" onClick={addEntry}>
+            + Add to this day
+          </button>
+          <button
+            className="btn-ghost cal-labels-open"
+            onClick={editLabels}
+            data-tip="Rename, recolor, archive or add your own labels"
+          >
+            Labels…
+          </button>
+        </div>
       </div>
 
       <FeedsSection version={version} />
+
+      {managingLabels && <LabelManager version={version} onClose={closeManager} />}
     </div>
   );
 }
