@@ -1,132 +1,134 @@
-# Novella — session handoff (rewritten 2026-08-18)
+# Novella — session handoff (rewritten 2026-08-19)
 
-Paste-in context for a fresh Claude session. Everything decided, shipped, and
-pending, compressed. The repo itself is the deep record: ROADMAP.md (backlog +
-dated log of every run), RESEARCH.md (competitor-research rounds),
-AUTOPILOT.md (how the cloud routine behaves), docs/DESIGN-INTRO.md (intro +
-motion spec), docs/DESIGN-SYSTEM.md (the design-system source of truth from
-the 8-agent research workflow), PLAN-sync.md (sync design awaiting owner
-decisions), SECURITY.md (audit).
+Paste-in context for a fresh Claude session. Everything decided, shipped and
+pending, compressed. Deeper record lives in the repo: ROADMAP.md (backlog +
+dated log), RESEARCH.md (34 competitor rounds), AUTOPILOT.md (cloud routine),
+docs/DESIGN-SYSTEM.md (the design source of truth), docs/DESIGN-INTRO.md and
+docs/DESIGN-INTRO-CINEMA.md (intro + motion specs), PLAN-sync.md, SECURITY.md.
 
 ## What this is
 
 **Novella** — a local-first writing app meant to beat NovelCrafter, Notion,
 Dabble, Scrivener and Sudowrite at the whole job: writing + worldbuilding +
-tasks + tracking in one place, offline, no API key, no per-word cost.
-Tauri v2 + React 19 + TS + Vite 6 + CodeMirror 6. The book is a folder of
-Markdown with YAML frontmatter; `src/core/vault.ts` is the protected Phase-1
-engine (**never rewrite it**). Storage adapters: Tauri (real folders),
-IndexedDB (web), memory (fallback) behind one interface in `src/storage/`.
+tasks + tracking, offline, no API key, no per-word cost. Tauri v2 + React 19 +
+TS + Vite 6 + CodeMirror 6. A book is a folder of Markdown with YAML
+frontmatter; `src/core/vault.ts` is the protected Phase-1 engine (**never
+rewrite it**). Storage adapters (Tauri / IndexedDB / memory) sit behind one
+interface in `src/storage/`.
 
 - Repo: https://github.com/imakebrains/Novella.ai — public, **Apache-2.0**
-  (LICENSE + NOTICE: code free for anything incl. plugins/forks; the *name*
-  Novella is reserved). Owner: imakebrains / drewpmedia@gmail.com ("Drew").
+  (code free to fork; the *name* Novella is reserved). Owner: imakebrains /
+  drewpmedia@gmail.com ("Drew").
 - Local clone: `C:\Users\drewp\Novella.ai` (NOT the OneDrive cwd).
-- **v0.2.0 released** (tag → release.yml → Win .exe/.msi + macOS .dmg,
-  unsigned, SmartScreen notes in release notes). In-app updater reads these.
-  Main is ~15 commits past the tag — v0.3.0 is ripe when the owner says go.
-- Web build: `npm run build:web`, pages.yml ready.
-  **NEEDS OWNER (free): Settings → Pages → Source = GitHub Actions.**
+- **v0.2.0 is the last tag**; main is far ahead (~30 commits). Owner said
+  version numbers are not a priority — do not tag without being asked.
+- A Windows zip built from main lives at
+  `C:\Users\drewp\Downloads\Novella-win64-2026-08-18.zip` (portable exe +
+  NSIS installer + MSI + README).
 
-## THE machine fact (read this before touching motion)
+## THE TWO FACTS THAT COST FIVE ROUNDS — read before touching motion or UI
 
-**The owner's Windows has OS animation effects OFF**
-(SPI_GETCLIENTAREAANIMATION = false, confirmed 2026-08-18). Their webview
-reports `prefers-reduced-motion: reduce`, and the app's kill switch stripped
-every animation — the owner reviewed three rounds of motion work without
-seeing any of it ("janky and cheap" = the motionless fallback). Now there is
-**Settings → Appearance → Motion: Follow system / Full / Minimal**
-(`motion` in `novella.personalize`, root classes `motion-full` /
-`motion-minimal`; every `@media (prefers-reduced-motion)` block is guarded
-`:root:not(.motion-full)`). The owner should run **Full**. When verifying
-motion in the Claude pane (which also forces reduce), set
-`motion: "full"` first — it defeats both.
+1. **The owner's Windows has OS animation effects OFF**
+   (SPI_GETCLIENTAREAANIMATION = false). Their webview therefore reports
+   `prefers-reduced-motion: reduce`. For five rounds the app's kill switch
+   silently stripped every animation shipped, and the owner reviewed a
+   motionless app while being told it was cinematic. **Motion now defaults to
+   "full"** (`DEFAULTS.motion` in personalize.ts); Settings → Appearance →
+   Motion offers Follow system / Full / Minimal, every
+   `@media (prefers-reduced-motion)` block is guarded
+   `:root:not(.motion-full)`, and a dismissible banner discloses the override
+   when the OS asked for stillness.
+2. **The Claude browser pane and the Tauri WebView2 app keep SEPARATE
+   localStorage even on the same origin (localhost:5173).** Setting a
+   preference in a pane probe proves NOTHING about the real app. To read the
+   app's true state, parse its leveldb log under LOCALAPPDATA:
+   `ai.novella.app` / `EBWebView` / `Default` / `Local Storage` / `leveldb` /
+   `000003.log` (decode latin-1, regex the key).
 
-## The gate (every change)
+## The gate
 
-`npx tsc --noEmit` clean · `npx tsx test-units.ts` green (285 checks) ·
-`npm run verify` green · UI verified LIVE in the browser where one exists —
-and never claim live verification without it. Pure logic gets unit tests.
-Exit codes read bare, never through a pipe. Probe traps, hard-won:
+`npm run verify` now runs **all ten suites** plus tsc and a production build —
+it had drifted to only two suites while ~870 assertions went unwatched by CI.
+Current: **1,299 assertions green**.
 
-- The pane shares the owner's profile. Stash/restore
-  `novella.personalize` (NOT "personalization"), `novella.introSeen`,
-  `novella.theme`, `novella.welcomed`. Clean up probe artifacts.
-- Hidden pane = no compositing: screenshots time out, `elementFromPoint`
-  dies at 0×0, and **transitions freeze at their start value** — suppress
-  transitions (`el.style.transition = "none"`) before reading computed
-  styles, or they report stale mid-flight values.
-- Stacking bugs are invisible to computed-style checks — verify z-order
-  by elimination (hide layers, re-measure scrollWidth) or real pixels.
-- Vite dep imports from probes (`/node_modules/.vite/deps/X.js`) create a
-  SECOND module instance — state-keyed APIs (CM `undo`) silently fail.
-  Drive real DOM events instead.
+test.ts (engine tour) · test-units.ts 324 · test-themes.ts 151 · test-tabs.ts 78 ·
+test-stack.ts 139 · test-trash.ts 106 · test-timers.ts 136 · test-calendar.ts 171 ·
+test-projectpreview.ts 86 · test-tour.ts 108
+
+Rules: exit codes read bare, never through a pipe. Pure logic gets unit tests.
+UI verified live where a browser exists; never claim live verification without
+it. **Never fake AI, accounts or progress**; anything needing owner money/keys/
+settings is flagged NEEDS OWNER, never simulated.
+
+## Probe traps (all learned the hard way)
+
+- Hidden pane = no compositing: screenshots time out, `elementFromPoint` dies at
+  0×0, and **transitions freeze at their start value** — suppress transitions
+  before reading computed styles.
+- Stacking bugs are invisible to computed-style checks. Verify z-order by
+  elimination (hide layers, re-measure) or real pixels.
+- Importing `/node_modules/.vite/deps/X.js` in a probe creates a SECOND module
+  instance; state-keyed APIs silently fail. Drive real DOM events instead.
+- Long `await` chains in `javascript_tool` get collected — assign results to
+  `window.__x` and read them in a second call.
 - Data URLs cannot go in `srcset` (commas). Pick sources in JS.
-- Bash-tool heredocs eat one backslash level — use Write/Edit for
-  files containing escape sequences.
-- Port 5173 is hard-wired (tauri devUrl + strictPort + CSP). The pane's
-  preview server fights the owner's `tauri dev` for it — a `novella-qa`
-  launch config (port 5199) exists but the pane tool has been seen
-  starting the wrong entry; check which port actually bound.
-- Closing the Tauri window kills its vite too — "the app broke" is
-  usually "the server under it is gone." Relaunch detached:
-  `Start-Process cmd -ArgumentList "/c","npm run tauri dev"`.
-- WebView2 caches dev-URL fetch failures; renaming the file busts it.
-  Intro/backdrop art is now `?inline` (data URLs in the bundle) and
-  cannot blank again.
+- Bash heredocs eat one backslash level — use Write/Edit for files with escapes.
+- Port 5173 is hard-wired (tauri devUrl + strictPort + CSP). A `novella-qa`
+  launch entry exists but the pane tool has been seen starting the wrong one —
+  check which port actually bound. Closing the Tauri window kills its vite;
+  relaunch detached with `Start-Process cmd -ArgumentList "/c","npm run tauri dev"`.
+- WebView2 caches dev-URL fetch failures forever. Intro/backdrop art is
+  imported `?inline` (data URLs in the bundle) so it cannot blank again.
+- **Never `git add -A` while subagents are writing** — it commits their
+  half-finished files.
 
-## Shipped since the last handoff (rounds 9–14, all on main)
+## Shipped this session (2026-08-18 → 19)
 
-- **The system pass** (docs/DESIGN-SYSTEM.md): layered theme-tinted
-  shadows, focus rings everywhere, pill scrollbars, press states,
-  designed tooltips (`data-tip`), spinner + stream-caret loading
-  language, tabular numerals, empty-state primitive (glyph + line +
-  real CTA) across eight panels, Settings Profile/Connections on the
-  ap-section pattern, command palette finished, six real bugs fixed.
-- **Reword in place** (Type.ai ask): select prose → chip → five voices +
-  free-form → streamed rewrite → Replace at exact bounds → Ctrl+Z undoes.
-  Verified end-to-end against local llama3.1. `src/ui/rewordCore.ts` pure.
-- **Backdrops**: upload OR five bundled presets (stored as `preset:<id>`
-  markers, ~13 bytes; `resolveBackdrop()` maps to inlined data URLs).
-  z-index −1 under a transparent shell, theme scrim, glassed resizer.
-- **The intro, five rounds of owner taste**: whole-line "bubble flow"
-  entrances (ENTRANCE_MS 560), top-anchored stage (zero layout jumps —
-  measured), warm em-dash-free copy (both unit-tested invariants),
-  ‹ Back, "Skip introduction", backdrop carousel (preview on pick,
-  Continue confirms), stop-motion set-piece grammar (steps(4) pop-set,
-  tilted cards that straighten on hover, film-counter progress dots),
-  the hand-drawn cat as corner companion + finale mascot (FINALE_MS
-  5500 over real steps + absurd gerunds), zoom-blur exit. Returning
-  writers skip the intro on launch entirely.
-- **Tasks panel**: + button appends real `- [ ]` lines to the active
-  note (or a "Tasks" note). Tools-menu chips, wheel-cycling Tools button.
-- **Shell hygiene**: html/body overflow hidden (phantom tooltip boxes
-  were dragging a document scrollbar), titlebar fits.
+Intro/cinema: boot cat + gerunds, exit+enter scene transitions with a held
+beat, vignette + drifting motes + Ken Burns, title-card tracking, spotlight
+hover, glow bloom, stop-motion set pieces, Back button, Skip, backdrop
+carousel (preview then Continue), centered cat. **The text-overlay bug was a
+side effect inside a React state updater** — StrictMode double-invokes those,
+so every scene spawned two ghosts.
 
-## Current owner state / voice
+Features: reword-in-place (five voices, streams, Ctrl+Z undoes) · five bundled
+backdrops + upload, glass surfaces · randomized starter worlds (8.3M casts,
+seeded/deterministic) · project preview slideshow (reads ≤4 files) · custom
+themes (named, described, 28 derived tokens, contrast floor) + saved accent
+swatches · arrangeable tool tabs (drag, +, keyboard) · **stacked tool panels**
+(up to 3, draggable divider) · calendar rebuilt (month/year picker, colorized
+days, expandable day, many entries, **ICS subscription — real, credential-free**)
+· timer + alarm tab · **trash with 7/30-day retention**, restore, armed empty ·
+board cover-art toggle + Codex/Tools on the board · task edit-in-place, bottom
++, submit arrow, right-click archive/delete · **the guided tour** (six looping
+CSS diagram clips, rest state = finished state).
 
-Drew iterates by screenshot, wants "premium like Apple/Lingrow," pushes
-until it FEELS right, and forgives everything except pretending. Honesty
-rules stand: never fake AI/accounts/progress; NEEDS OWNER for anything
-requiring money/keys/settings; never claim live verification without it.
-The last sessions were entirely intro-feel iteration — expect more taste
-rounds; motion tuning lives in introScript.ts constants + app.css 9.2x
-blocks.
+## Owner voice
 
-## Pending
+Drew iterates by screenshot and pushes until it FEELS right; he forgives
+everything except pretending. He wants premium (Apple/Lingrow), playful where
+it earns it (the cat), and full customizability. Say plainly when something
+needs him.
 
-- Owner has NOT yet confirmed the motion-full experience looks right
-  (they'd literally never seen the animations before this fix).
-- OWNER ROUND 5 list (type.ai): interactive calendar (CLOUD-OK core),
-  Board/Write split (WITH-OWNER), open-book logo (WITH-OWNER), document
-  Chat panel, "Style me". Reword-inline is DONE.
-- Plan phases: C responsive/mobile + PWA, D Obsidian-storage safety
-  (atomic writes, mtime don't-clobber, conflict-copy detection),
-  E open-source hygiene (ci.yml, README rewrite, CONTRIBUTING,
-  tsconfig include test-units.ts, ubuntu-22.04 runner).
-- DESIGN-SYSTEM.md §3.10 consolidation sweeps (menus → .menu-pop, 11
-  inputs → .field-input, segmented controls) still open.
-- NEEDS OWNER: Pages source setting (free), signing certs (money,
-  optional), PLAN-sync decisions, private vulnerability reporting (free).
-- Known open: phantom dirty flag on Tauri startup (task #13), Echoes
-  detector too strict.
+## Pending / next
+
+- **Not yet seen by the owner:** the tour, the calendar tidy-up, task
+  edit-in-place, stacked panels beyond a first look. Cursor keyframes in the
+  tour clips were computed, not eyeballed — expect pixel nudges.
+- Google account linking: **NEEDS OWNER** (OAuth credentials, a Google Cloud
+  project). ICS subscription ships as the honest credential-free path. Google's
+  ICS endpoint sends no CORS header, so URL subscribe may fail in the webview —
+  a paste-the-.ics fallback exists; making URL subscribe reliable needs
+  `@tauri-apps/plugin-http` (Cargo + capabilities).
+- Task archive currently appends to `Archive/Tasks.md`; the seam
+  (`stashArchivedTask` in TasksPanel.tsx) is the single place to repoint at
+  `state/trash.ts`, which is note-granular and would need a line-shaped entry.
+- Owner round 5 leftovers: interactive calendar Google sync, Board/Write split,
+  open-book logo, document-bound chat panel, "Style me".
+- Plan phases C (responsive/mobile + PWA), D (Obsidian-storage safety: atomic
+  writes, mtime don't-clobber, conflict-copy detection), E (open-source
+  hygiene: ci.yml, README rewrite, CONTRIBUTING).
+- DESIGN-SYSTEM.md §3.10 consolidation sweeps still open.
+- NEEDS OWNER (free): Pages source = GitHub Actions; private vulnerability
+  reporting. NEEDS OWNER (money, optional): code-signing certs.
+- Known open: phantom dirty flag on Tauri startup; Echoes detector too strict.
