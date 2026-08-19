@@ -8166,10 +8166,27 @@ body:has(.stack-divider.dragging) {
   opacity: 0.4;
   cursor: default;
 }
+/* Editing a task should feel like editing the line you were reading, not
+   filling in a form: the field borrows the row's own type and sits flush,
+   so the whole task stays visible and nothing shifts when it opens. */
 .task-edit-input {
   flex: 1;
   min-width: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  color: var(--fg-primary);
+  font: inherit;
   font-size: var(--text-sm);
+  line-height: 1.45;
+}
+.task-edit-input:focus {
+  outline: none;
+  border: none;
+  box-shadow: none;
+  /* One quiet underline is all the "you are editing" a line needs. */
+  border-bottom: 1px solid var(--accent);
 }
 /* The text is the edit affordance, so it has to look touchable. */
 .task-text {
@@ -8548,4 +8565,50 @@ body:has(.stack-divider.dragging) {
   flex: 1;
   min-width: 0;
   font-size: var(--text-xs);
+}
+
+
+/* ---- 9.43 calendar tidy-up ---- */
+/* Five sections stacked with equal weight read as clutter in a 330px
+   pane. The month is the subject; everything else steps back. */
+.calendar-tab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+}
+.cal-clock {
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border-soft);
+}
+.cal-grid {
+  gap: var(--space-05);
+}
+/* The chosen day is the second subject, so it gets the one raised
+   surface in the tab and the rest stays flat. */
+.cal-day-panel {
+  padding: var(--space-2);
+  background: var(--bg-raised);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+}
+/* Subscribing is setup, not daily work: closed, it is one quiet line. */
+.cal-feeds-shut {
+  border-top: 1px solid var(--border-soft);
+  padding-top: var(--space-2);
+}
+.cal-feeds-toggle {
+  align-self: flex-start;
+  font-size: var(--text-xs);
+  color: var(--fg-muted);
+}
+.cal-feeds-toggle:hover {
+  color: var(--fg-primary);
+}
+.cal-feeds-toggle-open {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
 }

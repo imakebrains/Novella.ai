@@ -351,8 +351,21 @@ function FeedRow({ feed }: { feed: CalendarFeed }) {
   );
 }
 
+const FEEDS_OPEN_KEY = "novella.calendar.feedsOpen";
+
 function FeedsSection({ version }: { version: number }) {
   const [url, setUrl] = useState("");
+  /* Subscribing is a once-a-year errand; the month is the daily view.
+     Closed by default unless a writer has feeds, and the choice sticks. */
+  const [open, setOpen] = useState(
+    () => localStorage.getItem(FEEDS_OPEN_KEY) === "1" || feedStore.list().length > 0,
+  );
+  const toggleOpen = () => {
+    setOpen((v) => {
+      localStorage.setItem(FEEDS_OPEN_KEY, v ? "0" : "1");
+      return !v;
+    });
+  };
   // `version` only exists to re-read the store when it changes; the list
   // itself is the store's, not a copy.
   const feeds = useMemo(() => feedStore.list(), [version]);
@@ -365,10 +378,24 @@ function FeedsSection({ version }: { version: number }) {
     await feedStore.refresh(feed.id);
   };
 
+  const count = feeds.length;
+
+  if (!open) {
+    return (
+      <section className="cal-feeds cal-feeds-shut">
+        <button className="btn-ghost cal-feeds-toggle" onClick={toggleOpen}>
+          {count ? `Subscribed calendars (${count})` : "Subscribe to a calendar\u2026"}
+        </button>
+      </section>
+    );
+  }
+
   return (
     <section className="cal-feeds">
       <div className="cal-feeds-head">
-        <h3 className="cal-feeds-title">Subscribed calendars</h3>
+        <button className="cal-feeds-title cal-feeds-toggle-open" onClick={toggleOpen}>
+          Subscribed calendars
+        </button>
         {feeds.length > 0 && (
           <button
             className="icon-btn"
