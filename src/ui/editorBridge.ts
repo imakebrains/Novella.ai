@@ -6,6 +6,7 @@
    note *changes*, so the new text would not appear until you navigated
    away and back. The editor registers its own insert function here. */
 
+import type { EditorView } from "@codemirror/view";
 import { snapshotById } from "../state/history";
 import { store } from "../state/vaultStore";
 
@@ -96,5 +97,34 @@ export function subscribeCritiqueHighlights(fn: () => void): () => void {
   kindListeners.add(fn);
   return () => {
     kindListeners.delete(fn);
+  };
+}
+
+/* The format bar needs the opposite of an insert: before it can light up
+   "Bold" it has to read the document, and before it can toggle anything
+   it has to know the selection. So this one hands over the live view
+   rather than a function — the bar does its own reading and dispatching,
+   and the bridge stays a phone book instead of turning into an editor.
+
+   It is observable because the view is thrown away and rebuilt whenever a
+   different note opens, and a toolbar still pointing at a destroyed view
+   is a row of buttons that quietly do nothing. */
+let formatView: EditorView | null = null;
+const formatListeners = new Set<() => void>();
+
+export function registerFormatTarget(view: EditorView | null): void {
+  if (formatView === view) return;
+  formatView = view;
+  for (const l of formatListeners) l();
+}
+
+export function formatTarget(): EditorView | null {
+  return formatView;
+}
+
+export function subscribeFormatTarget(fn: () => void): () => void {
+  formatListeners.add(fn);
+  return () => {
+    formatListeners.delete(fn);
   };
 }

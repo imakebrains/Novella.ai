@@ -19,6 +19,7 @@ import {
   registerTitleFocus,
   focusBeatDraft,
   registerCritiqueHighlight,
+  registerFormatTarget,
 } from "./editorBridge";
 import { BeatsPanel } from "./BeatsPanel";
 import { critiqueExtension, setCritiqueKinds } from "./critiqueExtension";
@@ -29,6 +30,7 @@ import { boardStore, useBoards } from "../state/boards";
 import { SLASH_TRIGGER, SLASH_INSERT, matchSlashCommands } from "./slashCommands";
 import { type IssueKind } from "../analysis/prose";
 import { RewordPopover } from "./RewordPopover";
+import { FormatBar } from "./FormatBar";
 import { rewordable } from "./rewordCore";
 
 /* Autocomplete inside [[ ]]. Sourced from the live vault every
@@ -438,6 +440,7 @@ export function EditorPane() {
 
     const instance = new EditorView({ state, parent });
     view.current = instance;
+    registerFormatTarget(instance);
     instance.focus();
 
     // Re-apply the critique toggles to the fresh view.
@@ -471,6 +474,7 @@ export function EditorPane() {
 
     return () => {
       registerEditorInsert(null);
+      registerFormatTarget(null);
       window.clearTimeout(chipTimer.current);
       setRewordChip(null);
       setReword(null);
@@ -542,6 +546,7 @@ export function EditorPane() {
           <span title="Words in this note">{words.toLocaleString()} words</span>
         </div>
       </header>
+      <FormatBar />
       {active.type === "chapter" || active.type === "scene" ? <BeatsPanel /> : null}
       <div
         className="editor-surface"

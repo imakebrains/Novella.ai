@@ -10783,3 +10783,211 @@ body:has(.col-divider.dragging) {
   :root:not(.motion-full) .intro-demo { animation: none; }
 }
 :root.motion-minimal .intro-demo { animation: none; }
+
+/* ---- 9.53 the format bar ---- */
+/* Permanently in the layout and never animated in or out: a bar that
+   appears on selection pushes the page down while you are reading it.
+   It dims when idle instead — present enough to find on day one, quiet
+   enough to forget by day one hundred. */
+.format-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding: var(--space-1) var(--space-5);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-app);
+  transition: opacity var(--motion-quick) var(--ease-color);
+}
+.format-bar[data-idle="true"] {
+  opacity: 0.5;
+}
+.format-bar:hover,
+.format-bar:focus-within {
+  opacity: 1;
+}
+.fb-sep {
+  flex: 0 0 auto;
+  width: 1px;
+  height: 16px;
+  margin: 0 var(--space-1);
+  background: var(--border);
+}
+.fb-anchor {
+  position: relative;
+  display: inline-flex;
+}
+.fb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-width: 26px;
+  height: 24px;
+  padding: 0 var(--space-1);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--fg-secondary);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--motion-quick) var(--ease-color),
+    color var(--motion-quick) var(--ease-color);
+}
+.fb-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--fg-primary);
+}
+.fb-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.fb-btn[aria-pressed="true"] {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.fb-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+.fb-btn b,
+.fb-btn i,
+.fb-btn s {
+  font-size: var(--text-base);
+  line-height: 1;
+}
+.fb-btn i {
+  padding-right: 2px;
+}
+.fb-glyph {
+  font-size: var(--text-base);
+  line-height: 1;
+}
+.fb-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+.fb-quote {
+  font-size: var(--text-lg);
+  line-height: 0.6;
+  transform: translateY(3px);
+}
+.fb-icon {
+  display: block;
+  width: 15px;
+  height: 15px;
+}
+/* Fixed width: the label changes as you move through the chapter, and
+   nothing may change width while working. */
+.fb-style {
+  min-width: 64px;
+  gap: var(--space-1);
+  justify-content: space-between;
+  padding: 0 var(--space-2);
+}
+.fb-style-name {
+  font-size: var(--text-xs);
+}
+.fb-caret {
+  font-size: var(--text-2xs);
+  opacity: 0.7;
+}
+.fb-pop {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  z-index: 45;
+  min-width: 168px;
+  padding: var(--space-1);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+  animation: rise-in var(--motion-quick) var(--ease-enter);
+}
+.fb-pop-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--fg-secondary);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  text-align: left;
+  cursor: pointer;
+}
+.fb-pop-item:hover {
+  background: var(--bg-hover);
+  color: var(--fg-primary);
+}
+.fb-pop-item[aria-checked="true"] {
+  color: var(--accent);
+}
+/* The menu shows what each level IS — a manuscript's Title is one hash. */
+.fb-pop-name {
+  font-family: var(--font-display);
+}
+.fb-h0 {
+  font-family: var(--font-ui);
+}
+.fb-h1 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+.fb-h2 {
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+.fb-h3 {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.fb-h4 {
+  font-size: var(--text-sm);
+}
+.fb-pop-marks {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  color: var(--fg-muted);
+}
+.fb-link-pop {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 260px;
+}
+.fb-link-input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-app);
+  color: var(--fg-primary);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+}
+.fb-link-input:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+}
+.fb-link-go {
+  flex: 0 0 auto;
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--accent-fg);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
