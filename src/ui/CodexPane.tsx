@@ -65,17 +65,39 @@ export function CodexPane({
 
   const dangling = store.vault.danglingLinks();
 
+  /* Which groups have anything to show right now — the fold-all button
+     should only ever claim to act on what is on screen. */
+  const filledTypes = GROUPS.map((g) => g.type).filter(
+    (type) => sortForType(type, visible(store.vault.byType(type))).length > 0,
+  );
+  const allFolded = filledTypes.length > 0 && filledTypes.every((t) => collapsed.has(t));
+
+  const persist = (next: Set<string>) => {
+    try {
+      localStorage.setItem(COLLAPSE_KEY, JSON.stringify([...next]));
+    } catch {
+      /* remembering folds is a nicety */
+    }
+    return next;
+  };
+
+  const foldAll = () => {
+    // Folded already? The same button opens everything back up, because a
+    // control that only works once sends you hunting for its opposite.
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (allFolded) filledTypes.forEach((t) => next.delete(t));
+      else filledTypes.forEach((t) => next.add(t));
+      return persist(next);
+    });
+  };
+
   const toggle = (type: string) => {
     setCollapsed((prev) => {
       const next = new Set(prev);
       if (next.has(type)) next.delete(type);
       else next.add(type);
-      try {
-        localStorage.setItem(COLLAPSE_KEY, JSON.stringify([...next]));
-      } catch {
-        /* remembering folds is a nicety */
-      }
-      return next;
+      return persist(next);
     });
   };
 
@@ -89,6 +111,15 @@ export function CodexPane({
           {project?.name ?? "Project"}
         </span>
         <span className="count">{store.vault.all().length}</span>
+        <button
+          className="icon-btn codex-fold"
+          onClick={foldAll}
+          aria-pressed={allFolded}
+          data-tip={allFolded ? "Open every group" : "Collapse every group"}
+          aria-label={allFolded ? "Open every group" : "Collapse every group"}
+        >
+          {allFolded ? "\u00BB" : "\u00AB"}
+        </button>
         <button
           className="pane-word-btn"
           onClick={() => openQuickCreate()}

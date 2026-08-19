@@ -8361,12 +8361,28 @@ body:has(.stack-divider.dragging) {
   background: var(--accent-soft);
   border-color: var(--accent);
 }
+/* Years read as one strip you scroll along, not a four-wide block that
+   competes with the months above it — a year is a single step sideways. */
 .cal-picker-years {
-  max-height: 132px;
-  overflow-y: auto;
+  display: flex;
+  grid-template-columns: none;
+  gap: var(--space-1);
+  max-height: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
   margin-top: var(--space-1);
-  padding-top: var(--space-1);
+  padding-top: var(--space-2);
   border-top: 1px solid var(--border-soft);
+}
+.cal-picker-years::-webkit-scrollbar {
+  display: none;
+}
+.cal-picker-year {
+  flex: 0 0 auto;
+  scroll-snap-align: center;
+  padding: var(--space-1) var(--space-2);
 }
 .cal-picker-today {
   justify-content: center;
@@ -9629,4 +9645,18 @@ body:has(.stack-divider.dragging) {
 .tour-clip[data-still="true"] *::before,
 .tour-clip[data-still="true"] *::after {
   animation: none !important;
+}
+
+
+/* ---- 9.45 fold the whole shelf ---- */
+/* A long codex is a lot of scrolling to fold one group at a time, and a
+   button that only folds would send you hunting for its opposite — so
+   this one does both, and says which it will do. */
+.codex-fold {
+  flex: none;
+  font-size: var(--text-sm);
+  line-height: 1;
+}
+.codex-fold[aria-pressed="true"] {
+  color: var(--accent);
 }
