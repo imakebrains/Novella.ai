@@ -65,13 +65,6 @@ export function CodexPane({
 
   const dangling = store.vault.danglingLinks();
 
-  /* Which groups have anything to show right now — the fold-all button
-     should only ever claim to act on what is on screen. */
-  const filledTypes = GROUPS.map((g) => g.type).filter(
-    (type) => sortForType(type, visible(store.vault.byType(type))).length > 0,
-  );
-  const allFolded = filledTypes.length > 0 && filledTypes.every((t) => collapsed.has(t));
-
   const persist = (next: Set<string>) => {
     try {
       localStorage.setItem(COLLAPSE_KEY, JSON.stringify([...next]));
@@ -103,6 +96,14 @@ export function CodexPane({
 
   const visible = (notes: Note[]) =>
     matches ? notes.filter((n) => matches.has(n.id)) : notes;
+
+  /* Declared AFTER `visible`, deliberately: this calls it, and a const arrow
+     function is in the temporal dead zone until its own line. Reading it from
+     above threw on first render and took the whole pane down. */
+  const filledTypes = GROUPS.map((g) => g.type).filter(
+    (type) => sortForType(type, visible(store.vault.byType(type))).length > 0,
+  );
+  const allFolded = filledTypes.length > 0 && filledTypes.every((t) => collapsed.has(t));
 
   return (
     <nav className="pane pane-left">

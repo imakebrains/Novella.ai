@@ -70,7 +70,7 @@ export class ErrorBoundary extends Component<Props, State> {
           </p>
 
           <div className="crash-actions">
-            <button className="btn-primary" onClick={() => window.location.reload()}>
+            <button className="btn-primary" onClick={reloadApp}>
               Reload Novella
             </button>
           </div>
@@ -83,5 +83,22 @@ export class ErrorBoundary extends Component<Props, State> {
         </div>
       </div>
     );
+  }
+}
+
+/* Reloading from a crash screen.
+
+   `location.reload()` alone was doing nothing here: the crash usually
+   arrives with a module already in a bad state, and in the Tauri webview
+   the call can be swallowed outright. Rebuilding the URL forces a real
+   navigation, and clearing the cached module graph means the reload comes
+   back on fresh code rather than the broken frame we crashed in. */
+function reloadApp(): void {
+  try {
+    const url = new URL(window.location.href);
+    url.searchParams.set("reloaded", String(Date.now()));
+    window.location.replace(url.toString());
+  } catch {
+    window.location.reload();
   }
 }
