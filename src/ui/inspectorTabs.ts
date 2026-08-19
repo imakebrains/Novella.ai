@@ -127,6 +127,10 @@ export function nudgeTab(prefs: TabPrefs, tab: TabId, dir: -1 | 1): TabPrefs {
     didn't want to look at. */
 export function addTab(prefs: TabPrefs, tab: TabId): TabPrefs {
   if (!ALL_TABS.includes(tab)) return prefs;
+  // Already there and already open: nothing to do. Worth the line because
+  // the Tools dropdown calls this on every pick, and without it choosing
+  // the tab you're already on would write to storage for no reason.
+  if (prefs.order.includes(tab) && !prefs.hidden.includes(tab) && prefs.active === tab) return prefs;
   const order = prefs.order.includes(tab) ? prefs.order : [...prefs.order, tab];
   return { order, hidden: prefs.hidden.filter((t) => t !== tab), active: tab };
 }

@@ -5729,11 +5729,13 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
 .intro-theme.on {
   border-color: var(--accent);
 }
-.intro-theme-dots {
+.intro-theme-dots,
+.ap-theme-dots {
   display: inline-flex;
   gap: 3px;
 }
-.intro-theme-dots i {
+.intro-theme-dots i,
+.ap-theme-dots i {
   width: 10px;
   height: 10px;
   border-radius: 50%;
@@ -7501,4 +7503,423 @@ body.board-banner-off .board-banner {
    above the editor would double it. */
 body.focus-mode .workspace.board-mode {
   padding-top: 0;
+}
+
+
+/* ---- 9.35 the tool strip: arrange your own tools ---- */
+/* The strip wraps once a writer keeps enough tools, so it cannot inherit
+   the fixed pane-head height. */
+.inspector-tabs {
+  height: auto;
+  min-height: 34px;
+  padding-block: 3px;
+  cursor: grab;
+}
+/* Two stacked heads would draw two hairlines; the strip is the lower of
+   the pair, so the one above it stands down. */
+.inspector-head {
+  border-bottom: none;
+}
+
+/* Dragging: the transform tracks the pointer inline, so nothing here may
+   transition it — a transition on a per-frame transform lags the finger. */
+.inspector-tabs .tab.dragging {
+  position: relative;
+  z-index: 5;
+  cursor: grabbing;
+  opacity: 0.85;
+  box-shadow: var(--shadow-lg);
+}
+.inspector-tabs .tab.drop-target {
+  background: var(--accent-soft);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+.inspector-tabs .tab-plus {
+  cursor: pointer;
+}
+
+/* A close button that only exists on hover is unreachable by keyboard. */
+.tab-close:focus-visible,
+.inspector-tabs .tab:focus-visible .tab-close {
+  opacity: 1;
+}
+
+/* The + menu: Add above, Arrange below. */
+.tab-plus-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-05);
+  padding: 1px var(--space-2);
+}
+.tab-plus-name {
+  flex: 1 1 auto;
+  font-size: var(--text-sm);
+  color: var(--fg-secondary);
+  white-space: nowrap;
+}
+.tab-plus-pop .tab-plus-move {
+  flex: 0 0 auto;
+  width: 20px;
+  padding: var(--space-05) 0;
+  text-align: center;
+  color: var(--fg-muted);
+  border-radius: var(--radius-xs);
+}
+.tab-plus-pop .tab-plus-move:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--fg-primary);
+}
+.tab-plus-pop .tab-plus-move:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+/* The + sits at the end of a strip that can wrap, so its menu hangs from
+   the strip (stable, full width) rather than from a button that moves.
+   The strip must own the positioning context or the menu would escape to
+   the viewport. */
+.inspector-tabs {
+  position: relative;
+}
+.tab-plus-wrap {
+  position: static;
+}
+.tab-plus-pop {
+  top: 100%;
+  right: var(--space-2);
+  left: auto;
+}
+
+
+/* ---- 9.36 the project preview: look before you open ---- */
+.project-card.previewable {
+  cursor: pointer;
+}
+/* Sits above the projects screen it opens from. */
+.project-preview-backdrop {
+  z-index: 60;
+}
+.modal.project-preview {
+  width: min(620px, 100%);
+}
+.project-preview .preview-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.preview-where {
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The loading state holds the stage's height so the modal never jumps
+   when the frames land. */
+.preview-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 240px;
+  color: var(--fg-secondary);
+  font-size: var(--text-sm);
+}
+
+.preview-stage {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 240px;
+}
+.preview-arrow {
+  flex: 0 0 auto;
+}
+.preview-arrow:disabled {
+  opacity: 0.35;
+}
+
+.preview-frame {
+  flex: 1 1 auto;
+  min-width: 0;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-2);
+  animation: preview-in var(--motion-standard) var(--ease-enter) both;
+}
+@keyframes preview-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+:root.motion-minimal .preview-frame {
+  animation: none;
+}
+
+.preview-frame-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+.preview-frame-note {
+  margin: 0;
+}
+
+.preview-frame-cover {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+}
+.preview-cover {
+  max-width: 100%;
+  max-height: 240px;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.preview-prose {
+  font-family: var(--font-prose);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--fg-secondary);
+  max-height: 200px;
+  overflow-y: auto;
+}
+.preview-prose p {
+  margin: 0 0 var(--space-2);
+}
+
+.preview-codex-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 210px;
+  overflow-y: auto;
+}
+.preview-codex-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: var(--space-2);
+  align-items: baseline;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border);
+}
+.preview-codex-item:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.preview-codex-name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.preview-codex-kind {
+  font-family: var(--font-ui);
+  font-size: var(--text-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--fg-muted);
+}
+.preview-codex-line {
+  grid-column: 1 / -1;
+  font-size: var(--text-sm);
+  color: var(--fg-secondary);
+}
+
+.preview-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+.preview-stat {
+  flex: 1 1 90px;
+  padding: var(--space-3);
+  text-align: center;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.preview-stat-num {
+  display: block;
+  font-family: var(--font-ui);
+  font-variant-numeric: tabular-nums lining-nums;
+  font-size: var(--text-xl);
+}
+.preview-stat-label {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--fg-muted);
+}
+
+.preview-dots {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+}
+.preview-dot {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--border-strong);
+  cursor: pointer;
+  transition: background var(--motion-quick) var(--ease-color),
+    transform var(--motion-quick) var(--ease-color);
+}
+.preview-dot:hover {
+  background: var(--fg-muted);
+}
+.preview-dot.on {
+  background: var(--accent);
+  transform: scale(1.3);
+}
+
+.preview-actions {
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--border);
+}
+.project-actions {
+  flex-wrap: wrap;
+}
+
+
+/* ---- 9.37 your colors, your themes ---- */
+
+.ap-swatch-label {
+  margin: var(--space-3) 0 var(--space-2);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+}
+.ap-saved {
+  position: relative;
+  display: inline-flex;
+}
+.ap-saved .ap-swatch {
+  display: block;
+}
+/* The way to drop a saved color stays out of sight until you go looking
+   for it — a delete affordance on every swatch would read as clutter. */
+.ap-swatch-remove {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--bg-raised);
+  border: 1px solid var(--border-strong);
+  color: var(--fg-muted);
+  font-size: var(--text-2xs);
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--motion-quick) var(--ease-color);
+}
+.ap-saved:hover .ap-swatch-remove,
+.ap-swatch-remove:focus-visible {
+  opacity: 1;
+}
+.ap-swatch-remove:hover {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.ap-theme-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+.ap-theme-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-raised);
+}
+.ap-theme-row.on {
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
+}
+.ap-theme-meta {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+.ap-theme-name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.ap-theme-blurb {
+  font-size: var(--text-xs);
+  color: var(--fg-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ap-theme-row .btn-row {
+  flex: none;
+  margin: 0;
+  gap: var(--space-1);
+}
+
+.ap-theme-editor {
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-raised);
+}
+/* The sample deliberately sets NO background or color of its own: those
+   arrive inline from the derived tokens, so the preview shows the real
+   contrast correction rather than a flattering lie. */
+.ap-theme-sample {
+  display: flex;
+  gap: var(--space-2);
+  height: 96px;
+  padding: var(--space-2);
+  border: 1px solid;
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-3);
+  overflow: hidden;
+  font-size: var(--text-xs);
+}
+.ap-sample-pane {
+  flex: 0 0 28%;
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+}
+.ap-sample-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-prose);
+  line-height: var(--leading-prose);
+}
+.ap-sample-btn {
+  padding: var(--space-05) var(--space-3);
+  border-radius: 999px;
+  font-family: var(--font-ui);
+  font-size: var(--text-2xs);
 }

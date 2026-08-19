@@ -135,6 +135,15 @@ export function luminanceOf(hex: string): number {
   return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
 }
 
+/** Plain sRGB channel distance — the right question for "are these two
+    surfaces the same color", which contrast ratio answers badly at both
+    ends of the range. */
+export function channelDistance(a: string, b: string): number {
+  const [ar, ag, ab] = channels(a);
+  const [br, bg, bb] = channels(b);
+  return Math.abs(ar - br) + Math.abs(ag - bg) + Math.abs(ab - bb);
+}
+
 /** WCAG contrast, 1 (identical) to 21 (black on white). */
 export function contrastRatio(a: string, b: string): number {
   const la = luminanceOf(a);
@@ -174,21 +183,49 @@ export function hslToHex(h: number, s: number, l: number): string {
    already answers "black or white on this?" for accent buttons; these two
    build on it so the same judgement governs every derived text token. */
 
+/* The only two colors readableOn() ever returns — the app's near-black
+   and near-white ink. Read off it rather than restated, so retuning them
+   there retunes them here. */
+const INK_DARK = readableOn("#ffffff");
+const INK_LIGHT = readableOn("#000000");
+
+/** readableOn(), corrected where it is provably wrong.
+
+    readableOn judges by perceived luminance, which is the right call for
+    a button label and costs nothing on the greys and browns the shipped
+    themes use. On a saturated page it can misfire: #ff44ff reads as dark
+    to that formula, so it picks the light ink and lands at a ratio of
+    2.4 — unreadable. Here we take its answer unless the other ink
+    measurably reads better, which puts a floor of about 4.0 under every
+    background a writer can pick. */
+export function bestOn(bg: string): string {
+  const first = readableOn(bg);
+  const other = first === INK_LIGHT ? INK_DARK : INK_LIGHT;
+  return contrastRatio(other, bg) > contrastRatio(first, bg) ? other : first;
+}
+
 /** `fg` if it clears `min` against `bg`, otherwise the readable extreme. */
 export function safeForeground(fg: string, bg: string, min = 4.5): string {
-  return contrastRatio(fg, bg) >= min ? (normalizeHex(fg) ?? readableOn(bg)) : readableOn(bg);
+  return contrastRatio(fg, bg) >= min ? (normalizeHex(fg) ?? bestOn(bg)) : bestOn(bg);
 }
 
 /** Walk a derived color back toward readability until it clears `min`.
     Used for secondary/muted text and links, where flipping straight to
-    black or white would throw away the writer's hue for no reason. */
+    black or white would throw away the writer's hue for no reason.
+
+    Some backgrounds — a flat mid-grey being the classic — simply cannot
+    carry a 4.5 ratio with either ink. In that case we stop compromising
+    and take the most readable color available, so the guarantee this
+    function makes is exact: never worse than the better ink. */
 export function atLeast(fg: string, bg: string, min: number): string {
-  let out = normalizeHex(fg) ?? readableOn(bg);
-  const target = readableOn(bg);
-  for (let i = 0; i < 8 && contrastRatio(out, bg) < min; i++) {
-    out = mixHex(out, target, 0.25);
+  const target = bestOn(bg);
+  let out = normalizeHex(fg) ?? target;
+  for (let i = 0; i < 6 && contrastRatio(out, bg) < min; i++) {
+    out = mixHex(out, target, 0.35);
   }
-  return out;
+  return contrastRatio(out, bg) < contrastRatio(target, bg) && contrastRatio(out, bg) < min
+    ? target
+    : out;
 }
 
 /* ---- entity colors ----
@@ -221,7 +258,7 @@ export function themeCssVars(colors: CustomThemeColors): Record<string, string> 
   const raised = normalizeHex(colors.bgPane) ?? FALLBACK_COLORS.bgPane;
   const editor = normalizeHex(colors.bgEditor) ?? FALLBACK_COLORS.bgEditor;
   const accent = normalizeHex(colors.accent) ?? FALLBACK_COLORS.accent;
-  const wanted = normalizeHex(colors.fgPrimary) ?? readableOn(bgApp);
+  const wanted = normalizeHex(colors.fgPrimary) ?? bestOn(bgApp);
 
   /* Text: the page wins. If the writer's text color can be read on both
      the page and the panes it stands; otherwise we fall back to whatever
@@ -230,7 +267,7 @@ export function themeCssVars(colors: CustomThemeColors): Record<string, string> 
   const fg =
     contrastRatio(wanted, editor) >= 4.5 && contrastRatio(wanted, raised) >= 4.0
       ? wanted
-      : readableOn(editor);
+      : bestOn(editor);
 
   const dark = isDarkHex(bgApp);
 
@@ -238,13 +275,20 @@ export function themeCssVars(colors: CustomThemeColors): Record<string, string> 
      five shipped themes already use (Vellum: e9e0cd → f2ead9 → faf5e9). */
   const pane = mixHex(bgApp, raised, 0.6);
 
-  /* Hover and active step toward the text, not toward white: that is the
-     one rule that works in a dark theme and a parchment one alike. */
-  const hover = mixHex(raised, fg, 0.07);
-  const active = mixHex(raised, fg, 0.15);
+  /* Hover, active and borders all step toward the text rather than toward
+     white — the one rule that works in a dark theme and a parchment one
+     alike. The steps are bigger in light themes because they have to be:
+     the same absolute shift that reads as a clear lift on near-black is
+     invisible near white, which is exactly why Ember's hover is +8 and
+     Vellum's is -24. These ratios are read off the shipped five. */
+  const step = (base: string, darkT: number, lightT: number): string =>
+    mixHex(base, fg, dark ? darkT : lightT);
 
-  const border = mixHex(pane, fg, 0.1);
-  const borderStrong = mixHex(pane, fg, 0.22);
+  const hover = step(raised, 0.05, 0.11);
+  const active = step(raised, 0.1, 0.17);
+
+  const border = step(pane, 0.07, 0.15);
+  const borderStrong = step(pane, 0.16, 0.26);
 
   const secondary = atLeast(mixHex(fg, pane, 0.3), pane, 4.0);
   const muted = atLeast(mixHex(fg, pane, 0.53), pane, 3.0);
@@ -328,10 +372,14 @@ export function contrastWarnings(colors: CustomThemeColors): string[] {
   const editor = normalizeHex(colors.bgEditor);
   const fg = normalizeHex(colors.fgPrimary);
   const accent = normalizeHex(colors.accent);
+  const app = normalizeHex(colors.bgApp);
   if (editor && fg && contrastRatio(fg, editor) < 4.5) {
     notes.push("That text color can't be read on that page — it'll be adjusted until it can.");
   }
-  if (editor && normalizeHex(colors.bgApp) && contrastRatio(colors.bgApp, editor) < 1.05) {
+  /* Channel distance, not contrast ratio: two near-blacks are plainly
+     different to the eye and nearly identical to the ratio, and Ember
+     itself (#100e10 window, #131113 page) would fail a ratio test. */
+  if (editor && app && channelDistance(app, editor) < 6) {
     notes.push("The page and the window are the same color, so the page won't read as a page.");
   }
   if (accent && editor && contrastRatio(accent, editor) < 2) {
@@ -454,7 +502,10 @@ function readList(): CustomTheme[] {
 }
 
 function writeList(themes: CustomTheme[]): void {
-  cache = sortThemes(themes);
+  // Sanitize on the way IN as well as out: readList already drops junk,
+  // but sorting an unsanitized object throws before it can ever be
+  // repaired, which would take the theme picker down with it.
+  cache = sortThemes(themes.map(sanitizeTheme).filter((t): t is CustomTheme => t !== null));
   try {
     localStorage.setItem(THEMES_KEY, JSON.stringify(cache));
   } catch {

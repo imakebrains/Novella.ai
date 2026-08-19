@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { NovellaPlugin, SettingField } from "../core/plugins";
 import { pluginHost, usePluginVersion } from "../plugins/runtime";
 import { SetupPanel } from "./SetupPanel";
-import { THEMES, useTheme } from "./useTheme";
+import { THEMES, useCustomThemes, useTheme } from "./useTheme";
 import { useProfile } from "../state/profile";
 import { SessionSummary } from "./GoalMeter";
 import { activeProviderSlash, setActiveProvider } from "../ai/generate";
@@ -29,6 +29,26 @@ import {
   savePersonalization,
   type Personalization,
 } from "./personalize";
+import {
+  BLURB_MAX,
+  COLOR_FIELDS,
+  NAME_MAX,
+  contrastWarnings,
+  currentThemeColors,
+  deleteCustomTheme,
+  duplicateOf,
+  loadSavedSwatches,
+  makeCustomTheme,
+  normalizeHex,
+  removeSwatch,
+  saveCustomTheme,
+  saveSwatch,
+  themeCssVars,
+  uniqueName,
+  validateTheme,
+  type CustomTheme,
+  type CustomThemeColors,
+} from "./customThemes";
 
 /* Settings.
 
@@ -193,6 +213,13 @@ function AppearanceTab() {
   const { theme, setTheme } = useTheme();
   const [personal, setPersonal] = useState<Personalization>(() => loadPersonalization());
   const prefs = useTabPrefs();
+  const customThemes = useCustomThemes();
+
+  /* Saved colors and the theme editor are local state on purpose: the
+     stores below own the truth, this is just what's on screen. */
+  const [saved, setSaved] = useState<string[]>(() => loadSavedSwatches());
+  const [editing, setEditing] = useState<CustomTheme | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
   const change = (patch: Partial<Personalization>) => {
     const next = { ...personal, ...patch };
@@ -200,11 +227,22 @@ function AppearanceTab() {
     savePersonalization(next);
   };
 
+  /* A color is worth offering to save only if it's actually the writer's
+     own — not one of the eight presets, and not already on their row. */
+  const accentHex = normalizeHex(personal.accent ?? "");
+  const worthSaving =
+    !!accentHex && !INTRO_SWATCHES.includes(accentHex) && !saved.includes(accentHex);
+
+  const names = customThemes.map((t) => t.name);
+
   return (
     <>
       <section className="ap-section">
         <h3 className="ap-title">Theme</h3>
-        <p className="ap-sub">Five worlds, tuned for long sessions. Pick the one your story lives in.</p>
+        <p className="ap-sub">
+          Whole worlds, tuned for long sessions. Pick the one your story lives in — or
+          build your own below.
+        </p>
         <div className="theme-grid">
           {THEMES.map((t) => (
             <button
@@ -222,6 +260,94 @@ function AppearanceTab() {
             </button>
           ))}
         </div>
+      </section>
+
+      <section className="ap-section">
+        <h3 className="ap-title">Your themes</h3>
+        <p className="ap-sub">
+          Name five colors and Novella works out the other twenty-two — panes, borders,
+          hover states, the codex. Anything that couldn't be read gets nudged until it can.
+        </p>
+
+        {editing ? (
+          <ThemeEditor
+            draft={editing}
+            onChange={setEditing}
+            onCancel={() => setEditing(null)}
+            onSave={() => {
+              saveCustomTheme(editing);
+              // Building a theme and not seeing it is a bad joke — wear it.
+              setTheme(editing.id);
+              setEditing(null);
+            }}
+          />
+        ) : (
+          <>
+            {customThemes.length > 0 && (
+              <div className="ap-theme-list">
+                {customThemes.map((t) => (
+                  <div key={t.id} className={`ap-theme-row ${theme === t.id ? "on" : ""}`}>
+                    <span className="ap-theme-dots" aria-hidden>
+                      <i style={{ background: t.colors.bgApp }} />
+                      <i style={{ background: t.colors.bgPane }} />
+                      <i style={{ background: t.colors.accent }} />
+                    </span>
+                    <span className="ap-theme-meta">
+                      <span className="ap-theme-name">{t.name}</span>
+                      <span className="ap-theme-blurb">{t.blurb || "No description"}</span>
+                    </span>
+                    {confirmDelete === t.id ? (
+                      /* Two steps, no dialog: a hand-built theme is worth
+                         more than one stray click, and a modal on top of a
+                         modal is worth less than nothing. */
+                      <span className="btn-row">
+                        <button
+                          className="btn-ghost danger"
+                          onClick={() => {
+                            deleteCustomTheme(t.id);
+                            setConfirmDelete(null);
+                          }}
+                        >
+                          Delete for good
+                        </button>
+                        <button className="btn-ghost" onClick={() => setConfirmDelete(null)}>
+                          Keep it
+                        </button>
+                      </span>
+                    ) : (
+                      <span className="btn-row">
+                        <button className="btn-ghost" onClick={() => setEditing(t)}>
+                          Edit
+                        </button>
+                        <button
+                          className="btn-ghost"
+                          onClick={() => saveCustomTheme(duplicateOf(t, names))}
+                        >
+                          Duplicate
+                        </button>
+                        <button className="btn-ghost danger" onClick={() => setConfirmDelete(t.id)}>
+                          Delete
+                        </button>
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="btn-row">
+              <button
+                className="btn-ghost"
+                onClick={() =>
+                  /* Start from whatever's on screen rather than a blank
+                     slate — most custom themes are "that, but bluer". */
+                  setEditing(makeCustomTheme(uniqueName("My theme", names), currentThemeColors()))
+                }
+              >
+                Build a theme…
+              </button>
+            </div>
+          </>
+        )}
       </section>
 
       <section className="ap-section">
@@ -247,6 +373,40 @@ function AppearanceTab() {
             +
           </label>
         </div>
+
+        {saved.length > 0 && (
+          <>
+            <p className="ap-sub ap-swatch-label">Your colors</p>
+            <div className="ap-swatches" role="radiogroup" aria-label="Your saved colors">
+              {saved.map((hex) => (
+                <span key={hex} className="ap-saved">
+                  <button
+                    className={`ap-swatch ${personal.accent === hex ? "on" : ""}`}
+                    style={{ background: hex }}
+                    onClick={() => change({ accent: hex })}
+                    aria-label={`Accent ${hex}`}
+                  />
+                  <button
+                    className="ap-swatch-remove"
+                    onClick={() => setSaved(removeSwatch(hex))}
+                    title="Forget this color"
+                    aria-label={`Forget ${hex}`}
+                  >
+                    ✕
+                  </button>
+                </span>
+              ))}
+            </div>
+          </>
+        )}
+
+        {worthSaving && (
+          <div className="btn-row">
+            <button className="btn-ghost" onClick={() => setSaved(saveSwatch(accentHex))}>
+              Keep {accentHex} in your colors
+            </button>
+          </div>
+        )}
       </section>
 
       <section className="ap-section">
@@ -434,6 +594,110 @@ function AppearanceTab() {
         </button>
       </div>
     </>
+  );
+}
+
+/* The theme editor is deliberately dumb: every decision — what the five
+   colors are called, what they derive into, what counts as unreadable —
+   lives in customThemes.ts where it can be tested without a browser. */
+function ThemeEditor({
+  draft,
+  onChange,
+  onSave,
+  onCancel,
+}: {
+  draft: CustomTheme;
+  onChange: (t: CustomTheme) => void;
+  onSave: () => void;
+  onCancel: () => void;
+}) {
+  const vars = themeCssVars(draft.colors);
+  const problems = validateTheme(draft);
+  const warnings = contrastWarnings(draft.colors);
+
+  const setColor = (key: keyof CustomThemeColors, value: string) =>
+    onChange({ ...draft, colors: { ...draft.colors, [key]: value } });
+
+  return (
+    <div className="ap-theme-editor">
+      {/* The preview shows the DERIVED tokens, not the five inputs, so a
+          writer sees the contrast correction happen rather than meeting
+          it later as a surprise. */}
+      <div
+        className="ap-theme-sample"
+        style={{ background: vars["--bg-app"], borderColor: vars["--border"] }}
+        aria-hidden
+      >
+        <span className="ap-sample-pane" style={{ background: vars["--bg-pane"], color: vars["--fg-muted"] }}>
+          Manuscript
+        </span>
+        <span
+          className="ap-sample-page"
+          style={{ background: vars["--bg-editor"], color: vars["--fg-primary"] }}
+        >
+          The tide had taken the marker stones again.
+          <span className="ap-sample-btn" style={{ background: vars["--accent"], color: vars["--accent-fg"] }}>
+            Continue
+          </span>
+        </span>
+      </div>
+
+      <div className="setting">
+        <label className="setting-label">Name</label>
+        <input
+          className="field-input"
+          value={draft.name}
+          maxLength={NAME_MAX}
+          onChange={(e) => onChange({ ...draft, name: e.target.value })}
+          aria-label="Theme name"
+        />
+      </div>
+      <div className="setting">
+        <label className="setting-label">Description</label>
+        <input
+          className="field-input"
+          value={draft.blurb}
+          maxLength={BLURB_MAX}
+          placeholder="Optional — what it's for, or where it came from"
+          onChange={(e) => onChange({ ...draft, blurb: e.target.value })}
+          aria-label="Theme description"
+        />
+      </div>
+
+      {COLOR_FIELDS.map((f) => (
+        <label key={f.key} className="personalize-row">
+          <span>
+            {f.label} <span className="hint-inline">{f.hint}</span>
+          </span>
+          <input
+            type="color"
+            value={normalizeHex(draft.colors[f.key]) ?? "#000000"}
+            onChange={(e) => setColor(f.key, e.target.value)}
+            aria-label={f.label}
+          />
+        </label>
+      ))}
+
+      {warnings.map((w) => (
+        <p key={w} className="hint">
+          {w}
+        </p>
+      ))}
+      {problems.map((p) => (
+        <p key={p} className="hint probe-bad">
+          {p}
+        </p>
+      ))}
+
+      <div className="btn-row">
+        <button className="btn-primary" onClick={onSave} disabled={problems.length > 0}>
+          Save and use it
+        </button>
+        <button className="btn-ghost" onClick={onCancel}>
+          Cancel
+        </button>
+      </div>
+    </div>
   );
 }
 

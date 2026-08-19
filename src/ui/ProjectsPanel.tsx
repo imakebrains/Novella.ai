@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { store, useVaultVersion } from "../state/vaultStore";
+import { ProjectPreviewModal } from "./ProjectPreviewModal";
 import {
   clearProjectBanner,
   hydrateProjectBanner,
@@ -31,13 +32,24 @@ export function ProjectsPanel({ onClose }: { onClose: () => void }) {
   const [preset, setPreset] = useState("novel");
   const isWeb = storage().kind === "web";
 
+  /* Which card is being previewed, held by id rather than by object: the
+     project re-renders while the preview is up (cover art hydrating off
+     disk), and the preview should show the current one, not the copy that
+     existed at click time. A forgotten project closes its own preview. */
+  const [previewId, setPreviewId] = useState<string | null>(null);
+  const preview = projects.find((p) => p.id === previewId) ?? null;
+
   useEffect(() => {
+    // One owner for Escape. Two window listeners would both fire and the
+    // preview would take the whole projects screen down with it.
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key !== "Escape") return;
+      if (previewId) setPreviewId(null);
+      else onClose();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, [onClose, previewId]);
 
   const openExisting = async () => {
     setBusy("Opening…");
@@ -167,6 +179,7 @@ export function ProjectsPanel({ onClose }: { onClose: () => void }) {
   };
 
   return (
+    <>
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal projects-modal" onClick={(e) => e.stopPropagation()}>
         <header className="modal-head">
@@ -248,6 +261,7 @@ export function ProjectsPanel({ onClose }: { onClose: () => void }) {
                   project={p}
                   active={active?.id === p.id}
                   onOpen={() => void switchTo(p)}
+                  onPreview={() => setPreviewId(p.id)}
                 />
               ))}
             </div>
@@ -255,6 +269,25 @@ export function ProjectsPanel({ onClose }: { onClose: () => void }) {
         </div>
       </div>
     </div>
+
+    {/* A sibling, not a child: it needs its own backdrop over the projects
+        screen, and nesting it inside would inherit that screen's
+        click-to-close. */}
+    {preview && (
+      <ProjectPreviewModal
+        project={preview}
+        active={active?.id === preview.id}
+        busy={!!busy}
+        onClose={() => setPreviewId(null)}
+        onOpen={() => {
+          // Close first: switching can take a moment or fail outright, and
+          // both the progress line and the error live on the screen behind.
+          setPreviewId(null);
+          void switchTo(preview);
+        }}
+      />
+    )}
+    </>
   );
 }
 
@@ -262,13 +295,27 @@ function ProjectCard({
   project,
   active,
   onOpen,
+  onPreview,
 }: {
   project: Project;
   active: boolean;
   onOpen: () => void;
+  onPreview: () => void;
 }) {
   const fileInput = useRef<HTMLInputElement>(null);
   const [bannerError, setBannerError] = useState<string | null>(null);
+
+  /* Clicking the card shows what's inside instead of swapping the vault
+     on the spot — a name and a folder path are not enough to choose by.
+     The card can't be a <button> (it holds the name and subtitle fields),
+     so the controls it contains keep their own clicks; the Preview button
+     in the footer is the keyboard route to the same place. */
+  const cardClick = (e: MouseEvent<HTMLElement>) => {
+    if (e.target instanceof HTMLElement && e.target.closest("input, button, textarea, a, label")) {
+      return;
+    }
+    onPreview();
+  };
 
   const pickBanner = async (file: File | undefined) => {
     if (!file) return;
@@ -290,7 +337,10 @@ function ProjectCard({
   };
 
   return (
-    <article className={`project-card ${active ? "active" : ""}`}>
+    <article
+      className={`project-card previewable ${active ? "active" : ""}`}
+      onClick={cardClick}
+    >
       {/* No cover chosen yet? Show generated art seeded by the name, so a
           fresh project never sits there as a grey rectangle. The moment a
           real cover is set, it takes over. */}
@@ -354,8 +404,12 @@ function ProjectCard({
       </div>
 
       <footer className="project-actions">
+        {/* Still one click to open. The preview is an offer, not a toll. */}
         <button className="btn-primary" onClick={onOpen} disabled={active}>
           {active ? "Open" : "Switch to"}
+        </button>
+        <button className="btn-ghost" onClick={onPreview} title="See what's inside">
+          Preview
         </button>
         <button
           className="btn-ghost"

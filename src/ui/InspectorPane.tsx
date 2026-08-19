@@ -58,19 +58,21 @@ const TAB_DEFS: Record<TabId, { label: string; title: string; needsNote: boolean
 export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => void }) {
   useVaultVersion();
   const prefs = useTabPrefs();
-  const [plusOpen, setPlusOpen] = useState(false);
+  // The Tools dropdown. The strip's + menu is its own state inside
+  // TabStrip — two menus, two names, so neither can close the other.
+  const [menuOpen, setMenuOpen] = useState(false);
   const headRef = useRef<HTMLDivElement>(null);
   const active = store.active();
   const tab = prefs.active;
 
   // Click-away and Escape close the tool menu.
   useEffect(() => {
-    if (!plusOpen) return;
+    if (!menuOpen) return;
     const away = (e: MouseEvent) => {
-      if (!headRef.current?.contains(e.target as Node)) setPlusOpen(false);
+      if (!headRef.current?.contains(e.target as Node)) setMenuOpen(false);
     };
     const key = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setPlusOpen(false);
+      if (e.key === "Escape") setMenuOpen(false);
     };
     window.addEventListener("mousedown", away);
     window.addEventListener("keydown", key);
@@ -78,7 +80,7 @@ export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => 
       window.removeEventListener("mousedown", away);
       window.removeEventListener("keydown", key);
     };
-  }, [plusOpen]);
+  }, [menuOpen]);
 
   const renderTab = (id: TabId) => {
     if (TAB_DEFS[id].needsNote && !active)
@@ -117,7 +119,7 @@ export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => 
       <div className="pane-head inspector-head" ref={headRef}>
         <button
           className="tool-picker-btn"
-          onClick={() => setPlusOpen((v) => !v)}
+          onClick={() => setMenuOpen((v) => !v)}
           onWheel={(e) => {
             // Scroll over the button to flip through tools without opening
             // the menu — peek by wheel, commit by click. It walks the
@@ -127,13 +129,13 @@ export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => 
             const dir = e.deltaY > 0 ? 1 : -1;
             tabPrefs.setActive(cycleTab(tab, tabPrefs.visible(), dir));
           }}
-          aria-expanded={plusOpen}
+          aria-expanded={menuOpen}
           title="Switch tool — click for the menu, or scroll over this button to flip through"
         >
           {TAB_DEFS[tab].label} <span className="picker-caret">▾</span>
         </button>
 
-        {plusOpen && (
+        {menuOpen && (
           <div className="tool-picker-menu" role="menu">
             {visibleTabs(prefs).map((id) => (
               <button
@@ -143,7 +145,7 @@ export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => 
                 onClick={() => {
                   tabPrefs.show(id);
                   tabPrefs.setActive(id);
-                  setPlusOpen(false);
+                  setMenuOpen(false);
                 }}
               >
                 <span className="tool-name">{TAB_DEFS[id].label}</span>
