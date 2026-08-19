@@ -18,6 +18,7 @@ import {
 } from "./introScript";
 import { loadPersonalization, reducedMotion, savePersonalization } from "./personalize";
 import { BACKDROP_PRESETS, presetMarker, resolveBackdrop } from "./backdrops";
+import { Logo } from "./Logo";
 import { THEMES, useTheme, type Theme } from "./useTheme";
 import { profileStore } from "../state/profile";
 import { projectStore, toBannerDataUrl, useProjects } from "../state/projects";
@@ -439,6 +440,14 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
         data-screen={screen.id}
         style={boot !== "off" ? { visibility: "hidden" } : undefined}
       >
+        {/* The gates open once, on the title card only: the mark IS the
+            promise the first line makes, so it should be the first thing
+            that moves. Every later screen is a question, not a curtain. */}
+        {screen.id === "cold-open" && (
+          <span className="intro-logo">
+            <Logo size={84} animate />
+          </span>
+        )}
         {lines.map((l, i) => renderLine(l, i))}
 
         {/* The window arrives once the copy has landed, alongside the

@@ -10991,3 +10991,72 @@ body:has(.col-divider.dragging) {
   font-size: var(--text-sm);
   cursor: pointer;
 }
+
+/* ---- 9.54 the Novella mark ---- */
+/* Never the blue one in chrome: the brand blue is lovely on a press
+   sheet and illegible on half the themes. Cream on dark grounds,
+   charcoal on light ones, chosen in Logo.tsx from the theme's own
+   dark flag so a custom theme gets it right too. */
+.logo-mark {
+  display: block;
+  width: auto;
+  flex: none;
+  user-select: none;
+}
+
+/* The gates open and the path draws itself between them. Three clipped
+   copies of ONE image, so the animation can never drift from the mark:
+   the outer quarters are the gate leaves, the middle half is the path
+   (boundaries measured off the artwork's alpha channel). */
+.logo-mark.logo-opening {
+  position: relative;
+  display: inline-block;
+  aspect-ratio: 1;
+}
+.logo-part {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+.logo-gate-left {
+  clip-path: inset(0 calc(100% - var(--gate)) 0 0);
+  transform-origin: left center;
+  animation: logo-gate-left 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.logo-gate-right {
+  clip-path: inset(0 0 0 calc(100% - var(--gate)));
+  transform-origin: right center;
+  animation: logo-gate-right 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+/* The path is revealed upward from the threshold, the way a road
+   arrives when you finally have somewhere to walk. */
+.logo-path {
+  clip-path: inset(0 var(--gate) 0 var(--gate));
+  animation: logo-path 800ms cubic-bezier(0.22, 0.9, 0.3, 1) 420ms both;
+}
+@keyframes logo-gate-left {
+  from { transform: translateX(28%) rotateY(38deg); opacity: 0.35; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes logo-gate-right {
+  from { transform: translateX(-28%) rotateY(-38deg); opacity: 0.35; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes logo-path {
+  from { clip-path: inset(100% var(--gate) 0 var(--gate)); }
+  to { clip-path: inset(0 var(--gate) 0 var(--gate)); }
+}
+
+/* The brand lockup in the titlebar. */
+.brand-mark {
+  display: flex;
+  align-items: center;
+}
+
+/* The mark opens the welcome, above the first line. */
+.intro-logo {
+  display: block;
+  margin-bottom: var(--space-3);
+}

@@ -22,6 +22,7 @@ import { RecoveryBanner } from "./ui/RecoveryBanner";
 import { UndoToastHost } from "./ui/UndoToastHost";
 import { TrashHost } from "./ui/TrashPanel";
 import { TourButton, TourOverlay, openTour } from "./ui/TourOverlay";
+import { Logo } from "./ui/Logo";
 import { AmbientGlow } from "./ui/AmbientGlow";
 import { Backdrop } from "./ui/Backdrop";
 import { WelcomeIntro, introPending, registerIntroOpener } from "./ui/WelcomeIntro";
@@ -329,7 +330,9 @@ export default function App() {
     <div className="app">
       <header className="titlebar">
         <div className="brand">
-          <span className="brand-mark">◈</span>
+          <span className="brand-mark">
+            <Logo size={20} animate />
+          </span>
           <span className="brand-name">Novella</span>
           <button
             className="brand-vault"
