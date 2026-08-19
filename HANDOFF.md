@@ -110,10 +110,46 @@ everything except pretending. He wants premium (Apple/Lingrow), playful where
 it earns it (the cat), and full customizability. Say plainly when something
 needs him.
 
+## IN FLIGHT at handoff time (2026-08-19, late) — five agents
+
+Launched in parallel, each owning distinct files, all reporting CSS to the
+main session rather than editing app.css (that separation is what keeps them
+from colliding — keep it):
+
+1. **Side-docking** (InspectorPane.tsx, inspectorTabs.ts) — the drop band that
+   splits a tool into a panel below gains LEFT/RIGHT bands too, so the Tools
+   pane can split into columns as well as rows. Must stay ONE pane internally
+   split, so the titlebar Tools toggle still hides/shows everything together.
+   Requires a richer layout model than `stack[]` + `sizes[]`, with migration
+   for existing saved layouts.
+2. **Hints library** (TourOverlay.tsx, tourSteps.ts) — a scrollable, grouped
+   left sidebar for jumping to any hint, plus 12-16 total clips covering
+   features that have none yet. Shortcuts must be read from palette.ts /
+   EditorPane keymap, never invented.
+3. **Connections + per-role routing** (roles.ts new, generate.ts,
+   SettingsModal.tsx) — easy per-provider connect flows, multiple simultaneous
+   connections, and roles (Drafting / Ideas / Research / Critique) each
+   assigned to a provider with a fallback chain. **Honesty constraint given:
+   Anthropic and OpenAI have no Google/OAuth sign-in for API access — the
+   mechanism is an API key. No fake OAuth button was permitted.**
+4. **Intro rebuilt in the tour's language** (WelcomeIntro.tsx, introScript.ts)
+   — the owner loves the tour and asked for the intro to match it "to a t":
+   little looping example windows beside the copy. Everything load-bearing
+   must survive (live recolour, theme preview, backdrop carousel, boot cat,
+   Skip/Back, ghost-clone transitions created OUTSIDE the state updater).
+5. **Custom calendar labels** (calendarEntries.ts, CalendarTab.tsx) — create,
+   rename, recolour, archive/delete, with the rule that an entry can never end
+   up pointing at a broken label, plus migration for existing built-in ids.
+
+If a report is lost, each agent's brief is recoverable from this list; re-brief
+with the same file-ownership and no-CSS constraints.
+
 ## Pending / next
 
-- **Not yet seen by the owner:** the tour, the calendar tidy-up, task
-  edit-in-place, stacked panels beyond a first look. Cursor keyframes in the
+- **Owner has SEEN and liked:** the tour (called it beautiful — it is now the
+  style template for the intro), stacked panels/dragging, the tidied calendar,
+  the codex fold-all.
+- **Not yet seen:** everything from the five in-flight agents above. Cursor keyframes in the
   tour clips were computed, not eyeballed — expect pixel nudges.
 - Google account linking: **NEEDS OWNER** (OAuth credentials, a Google Cloud
   project). ICS subscription ships as the honest credential-free path. Google's
