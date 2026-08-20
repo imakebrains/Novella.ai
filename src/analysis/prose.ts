@@ -63,6 +63,105 @@ const BE_VERBS = ["is","are","was","were","be","been","being","am"];
 
 const COMMON = new Set([...GLUE, "s","t","said","asked","replied"]);
 
+/* Words that end in -ly and are not adverbs. Without this list the
+   adverb check underlines "family", "butterfly" and "supply", which is
+   the fastest way to teach a writer to switch the whole feature off. */
+const NOT_ADVERB = new Set([
+  "family","supply","apply","imply","reply","multiply","assembly","anomaly",
+  "monopoly","melancholy","butterfly","dragonfly","firefly","gadfly","italy",
+  "holy","ugly","only","early","likely","lonely","lovely","friendly","costly",
+  "deadly","elderly","ghastly","gravelly","homely","jolly","kindly","lively",
+  "manly","measly","oily","orderly","prickly","rally","silly","smelly",
+  "stately","steely","surly","timely","ally","belly","bully","folly","gully",
+  "jelly","rely","tally","valley","volley","wobbly","worldly","curly",
+]);
+
+/* Dialogue attribution repeats on purpose — "said" is meant to disappear,
+   and a writer varying it every line is the actual mistake. Never flag
+   these as echoes. */
+const ATTRIBUTION = new Set([
+  "said","asked","replied","answered","whispered","muttered","shouted",
+  "called","added","offered","murmured","continued","repeated","echoed",
+]);
+
+/**
+ * Names and places, found by capitalisation away from sentence start.
+ *
+ * Fiction repeats character names constantly and *should* — the
+ * alternative ("the taller woman") is worse writing. This is the single
+ * biggest source of false echoes, so names come out before we look.
+ */
+function properNounsIn(text: string): Set<string> {
+  const names = new Set<string>();
+  const capsAtStart = new Map<string, number>();
+  const lower = new Set<string>();
+
+  const re = /[\p{L}][\p{L}'’-]*/gu;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text))) {
+    const word = m[0];
+    const key = word.toLowerCase();
+    if (!/^\p{Lu}/u.test(word)) {
+      lower.add(key);
+      continue;
+    }
+    // Walk back past opening quotes and brackets: in dialogue a name very
+    // often sits behind a “ that is itself at the start of a line.
+    let i = m.index - 1;
+    while (i >= 0 && /[\s"“'‘(\[—–-]/.test(text[i] ?? "")) i--;
+    const prev = i >= 0 ? text[i] : "";
+    if (!prev || /[.!?:;\n]/.test(prev)) capsAtStart.set(key, (capsAtStart.get(key) ?? 0) + 1);
+    else names.add(key);
+  }
+
+  // Some names only ever open a sentence — "Nesbitt," she said. Capitalised
+  // every time it appears, never once lowercase, more than once: that is a
+  // name, not a sentence that happened to start with a noun. The failure
+  // mode is exempting a word like "Nothing" from the echo check, which
+  // costs a missed suggestion; getting it wrong the other way underlines a
+  // character's name, which costs the writer's trust in the whole panel.
+  for (const [word, count] of capsAtStart) {
+    if (count >= 2 && !lower.has(word)) names.add(word);
+  }
+  return names;
+}
+
+/**
+ * How far apart two uses of a word can sit and still read as an echo.
+ *
+ * A flat window is what made this detector unusable: "looked" twice in
+ * sixty words is invisible, "phosphorescent" twice in sixty words is a
+ * thud. Distinctiveness is what sets the range, and length is the only
+ * proxy for it we can compute offline.
+ */
+function echoRangeFor(word: string): number {
+  if (word.length >= 9) return 60;
+  if (word.length >= 7) return 40;
+  return 25;
+}
+
+export interface ProseOptions {
+  /**
+   * Names the writer's codex already knows. A character called "Sparrow"
+   * is a common noun to a regex and a protagonist to the book — the codex
+   * is the only thing that can tell them apart, so let it.
+   */
+  known?: Iterable<string>;
+}
+
+/** One exemption test shared by the panel and the underlines, so they can't disagree. */
+function echoExemption(text: string, opts?: ProseOptions): (word: string) => boolean {
+  const names = properNounsIn(text);
+  const known = new Set<string>();
+  for (const k of opts?.known ?? []) {
+    // A codex title may be several words ("Halden's Reach"); exempt each part.
+    for (const part of k.toLowerCase().match(/[\p{L}'’-]+/gu) ?? []) known.add(part);
+  }
+  return (word: string) =>
+    word.length < 5 || COMMON.has(word) || ATTRIBUTION.has(word) ||
+    names.has(word) || known.has(word);
+}
+
 export function splitSentences(text: string): Sentence[] {
   const out: Sentence[] = [];
   const re = /[^.!?]+[.!?]*/g;
@@ -106,7 +205,7 @@ function readabilityLabel(score: number): string {
   return "Very hard";
 }
 
-export function analyseProse(input: string): ProseReport {
+export function analyseProse(input: string, opts?: ProseOptions): ProseReport {
   // Strip wiki-link syntax so [[Halden's Reach]] counts as two words,
   // not as brackets, and markdown emphasis doesn't skew counts.
   const text = input
@@ -141,6 +240,7 @@ export function analyseProse(input: string): ProseReport {
   const adverbRe = /\b\w{4,}ly\b/g;
   let am: RegExpExecArray | null;
   while ((am = adverbRe.exec(text))) {
+    if (NOT_ADVERB.has(am[0].toLowerCase())) continue;
     adverbs.push({
       index: am.index,
       length: am[0].length,
@@ -165,14 +265,17 @@ export function analyseProse(input: string): ProseReport {
 
   // Echoes: a distinctive word repeated close to itself is the kind of
   // thing a writer never notices and a reader always does.
+  const exempt = echoExemption(text, opts);
   const positions = new Map<string, number[]>();
   const wordRe = /[\p{L}'’-]+/gu;
   let wm: RegExpExecArray | null;
   let ordinal = 0;
   while ((wm = wordRe.exec(text))) {
     const w = wm[0].toLowerCase();
+    // Ordinal counts every word, exempt or not — the gap has to be the
+    // distance a reader travels, not the distance between survivors.
     ordinal++;
-    if (w.length < 5 || COMMON.has(w)) continue;
+    if (exempt(w)) continue;
     const list = positions.get(w) ?? [];
     list.push(ordinal);
     positions.set(w, list);
@@ -186,7 +289,7 @@ export function analyseProse(input: string): ProseReport {
       const gap = (list[i] ?? 0) - (list[i - 1] ?? 0);
       if (gap < nearest) nearest = gap;
     }
-    if (nearest <= 60) echoes.push({ word, count: list.length, nearest });
+    if (nearest <= echoRangeFor(word)) echoes.push({ word, count: list.length, nearest });
   }
   echoes.sort((a, b) => a.nearest - b.nearest || b.count - a.count);
 
@@ -255,6 +358,9 @@ function clampScore(n: number): number {
 
 export type IssueKind = "adverb" | "passive" | "echo" | "sticky";
 
+/** Most underlines one repeated word may claim. See the note at the call site. */
+const ECHOES_PER_WORD = 2;
+
 export interface InlineIssue {
   from: number;
   to: number;
@@ -271,7 +377,11 @@ function linkRanges(text: string): [number, number][] {
   return out;
 }
 
-export function findInlineIssues(text: string, kinds?: Set<IssueKind>): InlineIssue[] {
+export function findInlineIssues(
+  text: string,
+  kinds?: Set<IssueKind>,
+  opts?: ProseOptions,
+): InlineIssue[] {
   const want = (k: IssueKind) => !kinds || kinds.has(k);
   const issues: InlineIssue[] = [];
   const links = linkRanges(text);
@@ -281,7 +391,7 @@ export function findInlineIssues(text: string, kinds?: Set<IssueKind>): InlineIs
     const re = /\b\w{4,}ly\b/g;
     let m: RegExpExecArray | null;
     while ((m = re.exec(text))) {
-      if (insideLink(m.index)) continue;
+      if (insideLink(m.index) || NOT_ADVERB.has(m[0].toLowerCase())) continue;
       issues.push({
         from: m.index,
         to: m.index + m[0].length,
@@ -309,7 +419,9 @@ export function findInlineIssues(text: string, kinds?: Set<IssueKind>): InlineIs
   }
 
   if (want("echo")) {
-    // Same word, twice, within 60 words of itself.
+    // Same word twice inside its own range — see echoRangeFor. Names,
+    // dialogue tags and anything in the codex are exempt.
+    const exempt = echoExemption(text, opts);
     const seen = new Map<string, { index: number; ordinal: number }[]>();
     const re = /[\p{L}'’-]+/gu;
     let m: RegExpExecArray | null;
@@ -317,26 +429,32 @@ export function findInlineIssues(text: string, kinds?: Set<IssueKind>): InlineIs
     while ((m = re.exec(text))) {
       ordinal++;
       const w = m[0].toLowerCase();
-      if (w.length < 5 || COMMON.has(w) || insideLink(m.index)) continue;
+      if (exempt(w) || insideLink(m.index)) continue;
       const list = seen.get(w) ?? [];
       list.push({ index: m.index, ordinal });
       seen.set(w, list);
     }
     for (const [word, hits] of seen) {
       if (hits.length < 2) continue;
+      const range = echoRangeFor(word);
+      const near: InlineIssue[] = [];
       for (let i = 1; i < hits.length; i++) {
         const prev = hits[i - 1];
         const cur = hits[i];
         if (!prev || !cur) continue;
-        if (cur.ordinal - prev.ordinal <= 60) {
-          issues.push({
-            from: cur.index,
-            to: cur.index + word.length,
-            kind: "echo",
-            message: `“${word}” repeats ${cur.ordinal - prev.ordinal} words after the last one.`,
-          });
-        }
+        const gap = cur.ordinal - prev.ordinal;
+        if (gap > range) continue;
+        near.push({
+          from: cur.index,
+          to: cur.index + word.length,
+          kind: "echo",
+          message: `“${word}” repeats ${gap} words after the last one.`,
+        });
       }
+      // A word the scene genuinely turns on will recur all chapter. Show
+      // the two tightest repeats and stop — a wall of underlines reads as
+      // noise, and noise is what gets the whole panel switched off.
+      issues.push(...near.slice(0, ECHOES_PER_WORD));
     }
   }
 

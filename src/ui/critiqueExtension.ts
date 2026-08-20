@@ -1,6 +1,7 @@
 import { Decoration, EditorView, ViewPlugin, hoverTooltip, type DecorationSet, type ViewUpdate } from "@codemirror/view";
 import { StateEffect, StateField, Compartment, RangeSetBuilder } from "@codemirror/state";
 import { findInlineIssues, type InlineIssue, type IssueKind } from "../analysis/prose";
+import { store } from "../state/vaultStore";
 
 /* Inline critique for the manuscript.
 
@@ -22,6 +23,18 @@ export const critiqueKinds = StateField.define<Set<IssueKind> | null>({
   },
 });
 
+/* Every name the book knows — titles and aliases of every codex entry.
+   The echo check uses this so a character called Sparrow isn't underlined
+   as a repeated common noun. linkTargets() walks and sorts the whole
+   index, and this runs on every keystroke, so it's cached against the
+   store's version counter. */
+let namesCache: { version: number; names: string[] } | null = null;
+export function codexNames(): string[] {
+  const version = store.getSnapshot();
+  if (namesCache?.version !== version) namesCache = { version, names: store.linkTargets() };
+  return namesCache.names;
+}
+
 const marks: Record<IssueKind, Decoration> = {
   adverb: Decoration.mark({ class: "cm-issue cm-issue-adverb" }),
   passive: Decoration.mark({ class: "cm-issue cm-issue-passive" }),
@@ -34,7 +47,7 @@ function buildDecorations(view: EditorView): DecorationSet {
   if (!kinds || kinds.size === 0) return Decoration.none;
 
   const text = view.state.doc.toString();
-  const issues = findInlineIssues(text, kinds);
+  const issues = findInlineIssues(text, kinds, { known: codexNames() });
   const builder = new RangeSetBuilder<Decoration>();
   const docLength = view.state.doc.length;
 
@@ -71,7 +84,7 @@ const critiqueTooltip = hoverTooltip((view, pos) => {
   const kinds = view.state.field(critiqueKinds, false);
   if (!kinds || kinds.size === 0) return null;
 
-  const issues = findInlineIssues(view.state.doc.toString(), kinds);
+  const issues = findInlineIssues(view.state.doc.toString(), kinds, { known: codexNames() });
   // Innermost match wins, so hovering an adverb inside a sticky sentence
   // explains the adverb rather than the sentence.
   const hit = issues
