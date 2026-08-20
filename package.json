@@ -21,7 +21,7 @@
     "typecheck": "tsc --noEmit",
     "test:engine": "tsx test.ts",
     "test": "tsx test-units.ts",
-    "verify": "tsc --noEmit && tsx test.ts && tsx test-units.ts && tsx test-themes.ts && tsx test-tabs.ts && tsx test-stack.ts && tsx test-trash.ts && tsx test-timers.ts && tsx test-calendar.ts && tsx test-projectpreview.ts && tsx test-tour.ts && tsx test-roles.ts && tsx test-tasks.ts && tsx test-paste.ts && tsx test-format.ts && tsx test-prose.ts && tsx test-styleme.ts && tsx test-chat.ts && tsx test-storage.ts && vite build",
+    "verify": "tsc --noEmit && tsx test.ts && tsx test-units.ts && tsx test-themes.ts && tsx test-tabs.ts && tsx test-stack.ts && tsx test-trash.ts && tsx test-timers.ts && tsx test-calendar.ts && tsx test-projectpreview.ts && tsx test-tour.ts && tsx test-roles.ts && tsx test-tasks.ts && tsx test-paste.ts && tsx test-format.ts && tsx test-prose.ts && tsx test-styleme.ts && tsx test-chat.ts && tsx test-storage.ts && tsx test-personalize.ts && vite build",
     "tauri": "tauri"
   },
   "dependencies": {

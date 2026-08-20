@@ -541,11 +541,27 @@ function AppearanceTab() {
             }
             aria-label="Motion"
           >
-            <option value="auto">Follow system (default)</option>
-            <option value="full">Full</option>
+            <option value="full">Full (default)</option>
+            <option value="auto">Follow system</option>
             <option value="minimal">Minimal</option>
           </select>
         </label>
+        <label className="personalize-row">
+          <span>Motion blur</span>
+          <select
+            value={personal.motionBlur === false ? "off" : "on"}
+            onChange={(e) => change({ motionBlur: e.target.value === "on" })}
+            aria-label="Motion blur"
+          >
+            <option value="on">On (default)</option>
+            <option value="off">Off</option>
+          </select>
+        </label>
+        <p className="ap-sub">
+          Motion blur is the soft focus scenes and titles pass through as
+          they move. Turning it off keeps the movement and the frosted
+          glass — only the smear goes.
+        </p>
       </section>
 
       <section className="ap-section">

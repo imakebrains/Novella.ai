@@ -5496,7 +5496,7 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
 .intro.closing {
   opacity: 0;
   transform: scale(1.05);
-  filter: blur(8px);
+  filter: blur(calc(8px * var(--motion-blur-k, 1)));
   pointer-events: none;
   transition: opacity 800ms var(--ease-hero, var(--ease-color)),
     transform 800ms var(--ease-hero, var(--ease-color)),
@@ -5557,7 +5557,7 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
   from {
     opacity: 0;
     transform: translateY(14px);
-    filter: blur(7px);
+    filter: blur(calc(7px * var(--motion-blur-k, 1)));
   }
   to {
     opacity: 1;
@@ -6925,18 +6925,18 @@ body {
   animation: stage-out-right 380ms cubic-bezier(0.55, 0, 0.85, 0.4) both !important;
 }
 @keyframes stage-in-right {
-  from { opacity: 0; transform: translateX(64px) scale(1.01); filter: blur(8px); }
+  from { opacity: 0; transform: translateX(64px) scale(1.01); filter: blur(calc(8px * var(--motion-blur-k, 1))); }
   to { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); }
 }
 @keyframes stage-in-left {
-  from { opacity: 0; transform: translateX(-64px) scale(1.01); filter: blur(8px); }
+  from { opacity: 0; transform: translateX(-64px) scale(1.01); filter: blur(calc(8px * var(--motion-blur-k, 1))); }
   to { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); }
 }
 @keyframes stage-out-left {
-  to { opacity: 0; transform: translateX(-72px) scale(0.98); filter: blur(6px); }
+  to { opacity: 0; transform: translateX(-72px) scale(0.98); filter: blur(calc(6px * var(--motion-blur-k, 1))); }
 }
 @keyframes stage-out-right {
-  to { opacity: 0; transform: translateX(72px) scale(0.98); filter: blur(6px); }
+  to { opacity: 0; transform: translateX(72px) scale(0.98); filter: blur(calc(6px * var(--motion-blur-k, 1))); }
 }
 
 /* Back mirrors Skip: quiet, top corners, never in the way. */
@@ -7190,7 +7190,7 @@ body {
 .intro-boot.leaving {
   opacity: 0;
   transform: scale(1.04);
-  filter: blur(6px);
+  filter: blur(calc(6px * var(--motion-blur-k, 1)));
   transition: opacity 500ms var(--ease-hero, ease),
     transform 500ms var(--ease-hero, ease),
     filter 500ms var(--ease-hero, ease);
@@ -7280,7 +7280,7 @@ body {
   from {
     opacity: 0;
     letter-spacing: 0.22em;
-    filter: blur(10px);
+    filter: blur(calc(10px * var(--motion-blur-k, 1)));
   }
   to {
     opacity: 1;
@@ -11576,4 +11576,38 @@ body:has(.col-divider.dragging) {
     animation: none;
     transition: none;
   }
+}
+
+/* ---- 9.58 motion blur, off ---- */
+/* One factor scales every blur that happens DURING a movement — scene
+   changes, the intro's lines, the title condensing. Zero removes the
+   smear and keeps the move.
+
+   Deliberately NOT the frosted glass or the ambient glow: those are a
+   look rather than a movement, and the writer asked for them kept. It is
+   also a factor rather than a class per rule, so a blur added later
+   inherits the switch by writing calc(Npx * var(--motion-blur-k, 1)). */
+:root.no-motion-blur {
+  --motion-blur-k: 0;
+}
+
+/* ---- 9.59 fold the tool strip ---- */
+/* The strip lists every visible tool and can run three rows deep at the
+   top of the inspector. Folded it gives that height back to the tool
+   itself, and nothing becomes unreachable: the picker above it opens the
+   same list. */
+.strip-fold {
+  position: absolute;
+  right: var(--space-2);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: var(--text-sm);
+  line-height: 1;
+}
+.inspector-head {
+  position: relative;
+}
+/* The picker must not run under the fold button. */
+.inspector-head .tool-picker-btn {
+  padding-right: var(--space-5);
 }

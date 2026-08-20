@@ -103,6 +103,14 @@ export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => 
   // The Tools dropdown. The strip's + menu is its own state inside
   // TabStrip — two menus, two names, so neither can close the other.
   const [menuOpen, setMenuOpen] = useState(false);
+  // Remembered: folding the strip is a working posture, not a fidget, and
+  // an app that unfolded it every launch would be arguing with the writer.
+  const [stripOpen, setStripOpen] = useState(
+    () => localStorage.getItem("novella.inspector.strip") !== "0",
+  );
+  useEffect(() => {
+    localStorage.setItem("novella.inspector.strip", stripOpen ? "1" : "0");
+  }, [stripOpen]);
   // What the strip is dragging and where it would land, reported upward so
   // the pane can offer somewhere to drop it. The bands have to live down
   // here, around the panels — the strip can't render anything outside
@@ -235,6 +243,22 @@ export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => 
           {TAB_DEFS[tab].label} <span className="picker-caret">▾</span>
         </button>
 
+        {/* The strip is a grid of every visible tool and can run three rows
+            deep. Folded, the picker above still reaches all of them — so
+            this buys back the height without costing any reach. */}
+        <button
+          className="icon-btn strip-fold"
+          onClick={() => setStripOpen((v) => !v)}
+          aria-expanded={stripOpen}
+          title={
+            stripOpen
+              ? "Hide the tool strip — the picker still reaches every tool"
+              : "Show the tool strip"
+          }
+        >
+          {stripOpen ? "⌃" : "⌄"}
+        </button>
+
         {menuOpen && (
           <div className="tool-picker-menu" role="menu">
             {visibleTabs(prefs).map((id) => (
@@ -256,7 +280,7 @@ export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => 
         )}
       </div>
 
-      <TabStrip prefs={prefs} hitDrop={hitDrop} onDrag={setDrag} />
+      {stripOpen && <TabStrip prefs={prefs} hitDrop={hitDrop} onDrag={setDrag} />}
 
       {/* The bands are positioned against this, so the pane never depends
           on anything outside itself being a positioning context. */}

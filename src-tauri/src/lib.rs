@@ -192,6 +192,37 @@ pub fn run() {
             secret_delete
         ])
         .setup(|app| {
+            // Give the WINDOW its own icon.
+            //
+            // Windows draws a running app's taskbar button from the
+            // window's icon, not the executable's. Without one set, this
+            // window reported no ICON_BIG at all and only a 16x16
+            // ICON_SMALL — so on a 4K screen at 250% scaling, where the
+            // taskbar wants 60 pixels, Windows was enlarging a 16-pixel
+            // image nearly four times. All the care in the .ico went to
+            // the one icon nobody was looking at.
+            //
+            // 128 rather than the 1024 master: everything that uses the
+            // window icon wants 40-96px, so this is a gentle reduction in
+            // every case instead of a big one. Explorer still reads the
+            // executable's .ico, which carries a native 256.
+            {
+                use tauri::Manager;
+                if let Some(window) = app.get_webview_window("main") {
+                    match tauri::image::Image::from_bytes(include_bytes!("../icons/128x128.png")) {
+                        Ok(icon) => {
+                            if let Err(e) = window.set_icon(icon) {
+                                log::warn!("could not set the window icon: {e}");
+                            }
+                        }
+                        // Never fatal: a missing icon is a cosmetic
+                        // problem, and refusing to start over one would
+                        // be a real problem.
+                        Err(e) => log::warn!("could not decode the window icon: {e}"),
+                    }
+                }
+            }
+
             if cfg!(debug_assertions) {
                 app.handle().plugin(
                     tauri_plugin_log::Builder::default()

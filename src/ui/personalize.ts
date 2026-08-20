@@ -32,7 +32,18 @@ export interface Personalization {
       machines tuned for gaming often have OS animations off, which was
       silently flattening the whole app for those writers. */
   motion?: "auto" | "full" | "minimal";
+  /** Motion blur: the soft focus scenes and titles pass THROUGH as they
+      move. Absent = on. Deliberately not the same switch as the frosted
+      glass on surfaces, which is a static look rather than a movement,
+      and which people tend to want kept. */
+  motionBlur?: boolean;
+  /** Schema version of the STORED blob, stamped by migrate(). Absent
+      means it predates any migration. */
+  v?: number;
 }
+
+/** Bump when a stored value needs moving. See migrate(). */
+const SCHEMA = 2;
 
 /** Effective motion mode, OS flag included — pure given its inputs. */
 export function motionModeOf(p: Personalization): "auto" | "full" | "minimal" {
@@ -95,13 +106,43 @@ export const DEFAULTS: Personalization = {
   motion: "full",
 };
 
+/**
+ * Move stored values that a change of default cannot reach.
+ *
+ * Pure: it never writes. Every read comes back migrated, and the next
+ * savePersonalization carries the stamp to disk — so nothing has to
+ * happen at boot, and a read is still just a read.
+ *
+ * The motion case is why this exists. "auto" was the old default and it
+ * was written into everyone's storage explicitly, so `{...DEFAULTS,
+ * ...stored}` merges the new default straight underneath it: the app
+ * kept following the OS for every writer who had ever opened it before,
+ * and on a machine with Windows animation effects off that means every
+ * animation in the app is stripped — including the tour clips, which
+ * then look broken rather than still.
+ *
+ * The stamp is what makes this safe to do once. A writer who chooses
+ * Follow system AFTER this ships saves with v === SCHEMA, and is never
+ * second-guessed again.
+ */
+function migrate(stored: Personalization): Personalization {
+  const p: Personalization = { ...DEFAULTS, ...stored };
+  if ((stored.v ?? 0) < 2 && (stored.motion ?? "auto") === "auto") p.motion = "full";
+  p.v = SCHEMA;
+  return p;
+}
+
 export function loadPersonalization(): Personalization {
   try {
-    const stored = JSON.parse(localStorage.getItem(KEY) ?? "{}") as Personalization;
-    return { ...DEFAULTS, ...stored };
+    return migrate(JSON.parse(localStorage.getItem(KEY) ?? "{}") as Personalization);
   } catch {
-    return { ...DEFAULTS };
+    return { ...DEFAULTS, v: SCHEMA };
   }
+}
+
+/** Is motion blur on? Absent means yes — it is the app's normal look. */
+export function motionBlurOn(p: Personalization = loadPersonalization()): boolean {
+  return p.motionBlur !== false;
 }
 
 const listeners = new Set<() => void>();
@@ -210,6 +251,11 @@ export function applyPersonalization(p: Personalization): void {
   const motionMode = motionModeOf(p);
   document.documentElement.classList.toggle("motion-full", motionMode === "full");
   document.documentElement.classList.toggle("motion-minimal", motionMode === "minimal");
+
+  // Scales every blur that happens DURING a movement to zero, leaving the
+  // frosted glass and the ambient glow alone — those are a look, not a
+  // movement, and the writer asked for them.
+  document.documentElement.classList.toggle("no-motion-blur", p.motionBlur === false);
 
   if (p.corners === "sharp") {
     root.setProperty("--radius-sm", "3px");
