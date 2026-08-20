@@ -218,7 +218,15 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       system (round 3) — today's styles are hand-authored, never learned
       from the writer's own words. This is core to the "writes with you"
       half of the thesis, not a worldbuilding nice-to-have, so it ranks
-      above the location map/timeline items below.
+      above the location map/timeline items below. Research round 35
+      (2026-08-20) finds the pattern converging further, not staying a
+      Novel Mage novelty: PlotForge Desktop lists a "Voice Engine" ("AI
+      that matches author's unique writing style") among its tools,
+      Sudowrite's "Style Examples" trains generations on a writer's pasted
+      prose, and a newer entrant, SidekickWriter, markets its own
+      "voice-matching pass" — three more products now doing what our
+      Upload-style flow still doesn't. Strengthens this item's priority
+      rather than changing its scope.
 - [ ] **Recommend a fiction-capable local model instead of silently defaulting
       to a generic one** — research round 12 (2026-07-29): checked our own
       one-click setup — `DEFAULT_MODEL = "llama3.1:8b"` in
@@ -510,6 +518,18 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       commits total. Ruled out on the same two grounds as every prior
       near-miss. Otherwise dry: type.ai has no changelog dated after
       2026-08-18 and neither does any tracked Obsidian plugin.
+      Research round 35 (2026-08-20) ran the check a twenty-first time
+      (the round-33 owner-decision flag on whether to keep running it is
+      still unanswered) and again found no match. One near-miss worth
+      adding to the standing watch list so it isn't "rediscovered" as new
+      later: StoryLine, an actively-developed Obsidian plugin (latest
+      release the day before this check) with a writing-sprint timer,
+      streak/stats tracking, and a full codex hub (characters, locations,
+      relationship graph) — but its own tagline is "No AI · No Cloud,"
+      explicit and deliberate, same shape as WebNovel Assistant's earlier
+      near-miss. PlotForge Desktop, Scríob, and Novel Forge AI are all
+      unchanged from prior rounds. Twenty-one dedicated rechecks in, the
+      gap stays open on both sides.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -617,6 +637,15 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       updated June 29, 2026, changelog text only "Bugfixes and performance
       improvements" — the mid-sentence-reset/cursor-jump bug tracked since
       round 14 still has no confirmed fix. Treat the Aug 13 claim as dead.
+      Research round 35 (2026-08-20) finds a possible new data point, not
+      yet confirmed on date: a Campfire Write App Store review timestamped
+      "1 day ago" at fetch time reports recurring chapter loss from a
+      save-time glitch, including one loss "today while working on wifi"
+      — a different symptom than the tracked cursor-jump bug (data loss on
+      save, not mid-sentence reset). The relative timestamp could resolve
+      to Aug 19 or Aug 20, so this isn't logged as confirmed-new; re-check
+      with an exact date next round before citing it in copy. App version
+      unchanged at 1.3.2.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent
@@ -736,6 +765,22 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       also has nothing filed yet, two days out. Re-check both after the
       dates actually pass rather than on the day of, since same-day
       coverage is structurally unlikely to have the outcome yet.
+      Research round 35 (2026-08-20) re-checked the day after the Bartz
+      appeal window closed: no appeal of the settlement approval or Final
+      Judgment itself was found from any class member — but a related,
+      narrower appeal did surface, filed 8/19-8/20 (Law360, Bloomberg
+      Law): Edelson and Oppenheim + Zebrak, two firms excluded from the
+      $101M attorney-fee award (Judge Alsup restricted fees to
+      court-approved class counsel Susman Godfrey and Lieff Cabraser),
+      appealed that fee ruling to the Ninth Circuit. This is a dispute
+      among plaintiffs' lawyers over their own cut, not a challenge to the
+      settlement itself or the class — but public reporting doesn't say
+      whether it counts as "an appeal" under the settlement's Effective
+      Date clause, so the claims-portal timeline is genuinely unclear
+      rather than confirmed on track. Not citable in copy as-is; re-check
+      whether Anthropic/Class Counsel characterize it as delaying anything.
+      Kadrey v. Meta's mediation-outcome report (due 8/21, tomorrow) still
+      has nothing filed as of the last docket entry (8/17-8/18).
 - [ ] **Say the export advantage louder** — research round 7: Sudowrite
       reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
       Novella already ships all three plus one-click backup
@@ -916,6 +961,44 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-08-20 — Research round 35 (autopilot; no code). Dispatched the same
+  four parallel research passes as recent rounds (NovelCrafter/Sudowrite;
+  Dabble/Scrivener/Campfire; type.ai/Obsidian/four-pillar check; industry/
+  legal sentiment), each briefed on rounds 1-34's findings and searching
+  for material dated after round 34's 2026-08-19 cutoff. **Mostly dry, no
+  brand-new checklist items — four small findings folded into existing
+  items.** (1) NovelCrafter/Sudowrite pass fully dry: no new changelog
+  entries, incidents, or pricing moves for either product; the two
+  long-dead rumors ("Story Engine 3.0," a Sudowrite Developer API) stay
+  dead, still uncorroborated by any primary source. (2) Dabble/Scrivener/
+  Campfire pass mostly dry, with one date-ambiguous lead: a Campfire Write
+  App Store review reporting recurring chapter loss from a save-time
+  glitch — a different symptom than the tracked cursor-jump bug — folded
+  into the no-outage-advantage item with an explicit flag that the
+  relative timestamp couldn't be pinned to before or after the cutoff;
+  re-check with an exact date next round rather than citing it yet. (3)
+  The four-pillar competitive check ran a twenty-first dedicated recheck
+  (rounds 15, 17-35) and again found no match; one new near-miss worth
+  tracking going forward — StoryLine, an actively-developed Obsidian
+  plugin with a sprint timer and a full codex hub, but explicitly "No AI ·
+  No Cloud" by its own tagline, same shape as WebNovel Assistant's earlier
+  near-miss — folded into the four-app-bundle item. The same pass also
+  found three more products doing prose-voice-matching from a writer's
+  own samples (PlotForge's "Voice Engine," Sudowrite's "Style Examples," a
+  newer entrant SidekickWriter) — folded into the voice-matching item as
+  reinforcement, not a scope change. (4) The industry/legal pass found the
+  one genuinely new item this round: the Bartz v. Anthropic settlement's
+  30-day appeal window closed 2026-08-19 with no appeal of the settlement
+  itself filed, but two law firms excluded from the $101M attorney-fee
+  award (Edelson; Oppenheim + Zebrak) filed a Ninth Circuit appeal over
+  that fee ruling specifically — a dispute among plaintiffs' counsel, not
+  a challenge to the class or the settlement, but public reporting doesn't
+  confirm whether it delays the settlement's Effective Date or claims
+  portal, so it's folded into the no-training/privacy item as an open
+  ambiguity to re-check, not a citable fact yet. Kadrey v. Meta's
+  mediation-outcome report (due 2026-08-21) still has nothing filed as of
+  the last docket entry. Full notes in RESEARCH.md Round 35.
 
 - 2026-08-19 — Research round 34 (autopilot; no code). Housekeeping first:
   the session started with HEAD detached at round 33's own commit (same

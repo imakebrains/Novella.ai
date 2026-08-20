@@ -4232,3 +4232,157 @@ were fully dry.
 - blog.taaonline.net (Bartz v. Anthropic — "When to Expect Payments")
 - Kadrey v. Meta docket coverage
 - Notion status/incident coverage (July 2026, background only)
+
+---
+
+# Round 35 (2026-08-20) — cadence, mostly dry, one litigation update
+
+Same brief as rounds 28-34: fresh reviews, feature announcements, and
+complaints for NovelCrafter, Sudowrite, Dabble, Scrivener, Campfire,
+type.ai, Obsidian-for-writers setups, and Notion writing templates,
+checked against everything already logged through round 34. Dispatched
+four parallel passes (NovelCrafter/Sudowrite; Dabble/Scrivener/Campfire;
+type.ai/Obsidian/new-entrant scan and the four-pillar competitive check;
+industry/legal sentiment including the two litigation dates round 34
+flagged as imminent), each briefed on the relevant standing findings and
+told to search for material dated strictly after round 34's 2026-08-19
+cutoff.
+
+## NovelCrafter / Sudowrite
+
+Fully dry. feedback.sudowrite.com/changelog is still at the Aug 18 entry
+("Easier Formatting"); status.sudowrite.com shows all services operational
+with no new incident since the already-known Aug 11 partial outage.
+feedback.novelcrafter.com/changelog is still at March 21, 2026, and
+novelcrafter.com/blog still at the Aug 5 Opus-5 piece. Pricing unchanged
+for both. Re-checked the two long-standing rumors ("Sudowrite Story Engine
+3.0," a Sudowrite Developer API) directly against sudowrite.com,
+feedback.sudowrite.com, and docs.sudowrite.com — still no primary-source
+confirmation; both stay dead per round 28's determination. Trustpilot and
+Reddit direct fetches were both refused this round (403 / fetch-refused);
+had to rely on indirect search-engine snippets, which surfaced nothing
+dated after 2026-08-19.
+
+## Dabble / Scrivener / Campfire
+
+Mostly dry, with one date-ambiguous lead. Dabble: no new post on
+dabblewriter.com/blog; Trustpilot direct fetch 403'd, search snippets
+surfaced only previously-known reviews. Scrivener: literatureandlatte.com
+release notes and forum unchanged — still Mac 3.5.2 (Dec 19, 2025) /
+Scapple 1.5.4 (Nov 13, 2025), no new build. Campfire: still v1.3.2 on the
+App Store (June 29, 2026 changelog, unchanged) — but a fresh App Store
+review, timestamped "1 day ago" relative to the fetch, reports recurring
+chapter loss from a save-time glitch ("I've lost whole chapters sometimes
+because it glitched while saving," including one loss "today while
+working on wifi"). This is a different symptom than the already-tracked
+mid-sentence cursor-jump/reset bug — data loss on save, not a live editing
+glitch. Because "1 day ago" could resolve to either side of the 2026-08-19
+cutoff, this is *not* logged as confirmed-new; folded into the no-outage
+item with an explicit flag to re-check the exact date next round before
+using it in copy. Also worth a housekeeping note for future rounds: the
+Campfire Write App Store listing's correct app ID is 1626123915 — a
+previously-used ID (1660781612) now 404s and should be retired from any
+bookmarked source list.
+
+## type.ai / Obsidian / four-pillar check
+
+type.ai/changelog still 404s (21st round confirming this); blog.type.ai's
+most recent post is still Jan 21, 2026. Obsidian: Longform still frozen at
+v2.1.0 (Mar 20, 2025) per obsidianstats.com, though its GitHub repo picked
+up a few post-freeze, no-version-bump commits between Sep and Dec 2025
+(docs, a scene-numbering opt-in, a path fix) — none after 2026-08-19.
+Novel Word Count unchanged since Aug 2024. StoryLine (an actively
+developed Obsidian plugin) shipped v1.10.62 on 2026-08-19 — same day as
+the cutoff, not strictly after it, so not logged as new this round, but
+worth flagging: its feature set (Writing Sprint timer, stats/streak
+tracking, and a full "Codex Hub" — characters, locations, relationship
+graph, story graph) makes it the closest four-pillar near-miss found since
+WebNovel Assistant, except its own site tagline is explicit and
+deliberate: "No AI · No Cloud." Noveler (a StoryLine expansion,
+manuscript-formatting layer) was directly re-checked and confirmed to have
+no AI features — an earlier search snippet suggesting otherwise was
+describing an unrelated plugin in the same page's "Related plugins"
+section, not Noveler itself.
+
+**Four-pillar check, twenty-first recheck (rounds 15, 17-35):** again no
+match. StoryLine is the new near-miss to carry on the standing watch list
+(timer ✓, worldbuilding/codex ✓, stats/streaks task-adjacent but not a
+real task tracker ~, AI ✗ by explicit design). PlotForge Desktop, Scríob,
+and Novel Forge AI are all unchanged from prior rounds — no task tracker,
+no confirmed timer, no new activity.
+
+**Voice-matching convergence, worth noting for the existing round-11
+item:** PlotForge Desktop lists a "Voice Engine" ("AI that matches
+author's unique writing style") among its 11 tools; Sudowrite's "Style
+Examples" trains generations on a writer's pasted prose; a newer entrant,
+SidekickWriter, markets its own "voice-matching pass." None of this is
+dated strictly after 2026-08-19, but it hadn't been explicitly named in
+prior summaries and reinforces rather than changes the existing item's
+priority — three more products now do what Novella's Upload-style flow
+still doesn't (learn a voice from samples rather than require a
+hand-authored template).
+
+## Industry / legal sentiment
+
+The one genuinely new item this round:
+
+1. **Bartz v. Anthropic** — the 30-day appeal window on the settlement's
+   final approval closed 2026-08-19 as expected. No appeal of the
+   settlement/Final Judgment itself was found from any class member or
+   objector (checked Authors Alliance, Writer Beware, TAA/Abstract blog,
+   Copyright Alliance, and the official settlement site — all silent on
+   any such appeal). A *related but narrower* appeal did surface, filed
+   2026-08-19/20 (Law360, Bloomberg Law): Edelson and Oppenheim + Zebrak
+   — two firms excluded from the $101M attorney-fee award after Judge
+   Alsup restricted fees to court-approved class counsel (Susman Godfrey,
+   Lieff Cabraser) — appealed that fee ruling to the Ninth Circuit. This
+   is a dispute among plaintiffs' lawyers over their own cut, not a
+   challenge to the certified class or the settlement's approval. Public
+   reporting does not say whether it counts as "an appeal" under the
+   settlement's own Effective Date clause (defined as expiration of the
+   time to appeal the Final Judgment) — a genuine, unresolved ambiguity,
+   not a confirmed delay. The claims portal is not yet confirmed open;
+   Class Counsel's last guidance (blog.taaonline.net, Aug 7) was still
+   "by the end of August" if no appeals are filed.
+2. **Kadrey v. Meta** — the mediation-outcome report due 2026-08-21
+   (tomorrow at time of this round) has nothing filed yet; last known
+   docket entry is Aug 17-18. CourtListener direct access 403'd this
+   round; status reconstructed from search-indexed docket summaries and
+   law-firm trackers (McKool Smith) rather than the primary docket text.
+
+Secondary sweep otherwise dry: no new author-training survey, no new named
+lawsuit, no EU AI Act enforcement action past the already-logged Aug 2
+start of enforcement. The already-logged Jerry Falade/Minotaur/Macmillan
+AI-detection book-deal story is still the only one in that thread — still
+being covered as of Aug 18 but no new incident. One adjacent, non-writer-
+specific note: ByteDance's paid-fiction app Red Candle Stories shut down
+Aug 17, just before this round's cutoff — adjacent to the space, not core
+fiction-writing-tool news, not logged as a finding.
+
+## What changed in ROADMAP.md
+
+No brand-new "Next up" items — four existing items got findings folded
+in: (1) the four-pillar check's twenty-first negative recheck plus the
+StoryLine near-miss, folded into the four-app-bundle item; (2) the
+Campfire chapter-loss review lead (date-ambiguous, flagged not
+confirmed), folded into the no-outage-advantage item; (3) the
+voice-matching convergence (PlotForge, Sudowrite, SidekickWriter), folded
+into the voice-matching item as reinforcement; (4) the Bartz fee-appeal
+development and Kadrey's still-pending mediation report, folded into the
+no-training/privacy item with the ambiguity flagged explicitly rather than
+stated as fact. NovelCrafter and type.ai passes were fully dry.
+
+## Round 35 sources
+
+- feedback.sudowrite.com/changelog, status.sudowrite.com
+- feedback.novelcrafter.com/changelog, novelcrafter.com/blog
+- Trustpilot (Sudowrite, NovelCrafter, Dabble — 403 direct, snippets only)
+- dabblewriter.com/blog
+- literatureandlatte.com/scrivener/release-notes, forum.literatureandlatte.com
+- apps.apple.com (Campfire Write, id1626123915), campfirewriting.com/learn
+- type.ai (changelog 404), blog.type.ai
+- obsidianstats.com, github.com (Longform, Novel Word Count, StoryLine, Noveler)
+- plotforge.app, scriob.app, mediachance.com/novelforge
+- blog.taaonline.net, Law360, Bloomberg Law, Authors Alliance, Writer Beware,
+  Copyright Alliance, anthropiccopyrightsettlement.com
+- Kadrey v. Meta docket coverage (McKool Smith trackers; CourtListener 403'd)
