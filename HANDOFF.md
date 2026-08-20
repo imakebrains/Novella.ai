@@ -108,6 +108,12 @@ separation is what keeps parallel agents from colliding.
   broke a regex (`/^\s+by\b/` became `/^\s+by<BS>/` and never matched). Tests
   caught it. Prefer the Write tool for anything with escapes, and
   `grep -P '[\x08\x0b\x0c\x1b]'` the tree if a regex mysteriously never fires.
+- **The owner's display is 4K at 250% scaling (240 DPI).** Windows asks for
+  icons at logical size x scaling, so it wants 40 / 60 / 80px where a
+  default ladder stops at 64 — it then ENLARGES a smaller frame, and no
+  amount of care spent on the 32px art is ever seen. `icon.ico` now carries
+  19 frames covering 100-300%. Worth remembering for any asset picked by
+  size rather than scaled by CSS.
 - Port 5173 is hard-wired (tauri devUrl + strictPort + CSP). Closing the Tauri
   window kills its vite; relaunch detached with
   `Start-Process cmd -ArgumentList "/c","npm run tauri dev"`.
