@@ -11,6 +11,9 @@ fn main() {
     println!("cargo:rerun-if-changed=icons/icon.ico");
     println!("cargo:rerun-if-changed=icons/icon.png");
     println!("cargo:rerun-if-changed=icons/icon.icns");
+    // The brand art the icons are generated FROM, so replacing the source
+    // and re-running scripts/make-icons.py reaches the binary too.
+    println!("cargo:rerun-if-changed=../assets/brand");
 
     tauri_build::build()
 }
