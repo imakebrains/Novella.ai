@@ -738,6 +738,7 @@ const TOOL_LABELS: Record<TabId, string> = {
   tasks: "Tasks",
   history: "History",
   assistant: "Assistant",
+  chat: "Chat",
   continuity: "Continuity",
   goals: "Goals",
   calendar: "Calendar",

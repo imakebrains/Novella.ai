@@ -11060,3 +11060,258 @@ body:has(.col-divider.dragging) {
   display: block;
   margin-bottom: var(--space-3);
 }
+
+/* ---- 9.55 chat ---- */
+/* A conversation about the book, not a prompt box. The writer's turns sit
+   right and compact, the model's turns read left as prose on the page —
+   the asymmetry is doing the work a name label would otherwise do, and it
+   keeps the answer looking like something you'd paste into a chapter.
+
+   Chat owns its own scrolling: the transcript scrolls, the composer is
+   pinned. The tab body around it must therefore NOT scroll as well, or
+   the composer rides away down the page. Chat is the only tool that wants
+   this, so it's asked for by :has() rather than by weakening .pane-scroll
+   for everything. .slot-body sets overflow inline (side-docking computes
+   it), which no rule here can reach — zeroing the padding is enough
+   there, because the child is already full-height. */
+.pane-scroll:has(> .chat-panel),
+.slot-body:has(> .chat-panel) {
+  padding-bottom: 0;
+}
+.pane-scroll:has(> .chat-panel) {
+  overflow: hidden;
+}
+
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+/* ---- the head: which thread, and who answers ---- */
+
+.chat-head {
+  position: relative; /* the thread list hangs off this */
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex: 0 0 auto;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.chat-thread-btn {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--space-1);
+}
+
+.chat-thread-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-role {
+  flex: 0 1 auto;
+  max-width: 45%;
+  font-size: var(--text-sm);
+}
+
+.chat-threads {
+  top: calc(100% - var(--space-1));
+  left: var(--space-3);
+  right: var(--space-3);
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.chat-threads-empty {
+  margin: var(--space-2);
+}
+
+.chat-thread-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-05);
+}
+
+.chat-thread-row .menu-item {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Delete sits inside the row and only shows on approach, so a list of
+   threads reads as a list rather than a row of hazards. It stays visible
+   once focused, or the keyboard can never reach it. */
+.chat-thread-row .icon-btn {
+  opacity: 0;
+  transition: opacity var(--motion-quick) var(--ease);
+}
+.chat-thread-row:hover .icon-btn,
+.chat-thread-row:focus-within .icon-btn {
+  opacity: 1;
+}
+
+/* .menu-pop had no selected state — chat is the first menu where one row
+   is the one you're already in. */
+.menu-item.on {
+  background: var(--bg-hover);
+}
+
+.chat-answers {
+  margin: var(--space-2) var(--space-3) 0;
+}
+
+/* ---- the transcript ---- */
+
+.chat-log {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain; /* don't drag the pane behind it */
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+}
+
+.chat-msg {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-05);
+  max-width: 92%;
+  animation: chat-msg-in var(--motion-standard) var(--ease-enter) both;
+}
+
+.chat-msg[data-from="writer"] {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.chat-msg[data-from="assistant"] {
+  align-self: flex-start;
+}
+
+@keyframes chat-msg-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.chat-bubble {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-raised);
+  color: var(--fg-primary);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  min-height: 1.6em; /* an answer that hasn't started still shows its caret */
+}
+
+/* The model's turn is set in the book's face, because half the time it IS
+   the book — you're about to insert it. The accent rule replaces a name
+   label; the app background makes it sit on the page rather than on top
+   of it. */
+.chat-msg[data-from="assistant"] .chat-bubble {
+  font-family: var(--font-prose);
+  font-size: var(--text-base);
+  background: var(--bg-app);
+  border-left: 2px solid var(--accent);
+  border-top-left-radius: var(--radius-xs);
+  border-bottom-left-radius: var(--radius-xs);
+}
+
+.chat-knows-said,
+.chat-by,
+.chat-note,
+.chat-error {
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: var(--leading-ui);
+}
+
+.chat-knows-said,
+.chat-by {
+  color: var(--fg-secondary);
+}
+
+.chat-note {
+  color: var(--fg-secondary);
+}
+
+.chat-error {
+  color: var(--danger);
+}
+
+/* Insert and Copy appear on approach. Insert writes into the manuscript,
+   so it should never be the thing your cursor lands on by accident. */
+.chat-actions {
+  display: flex;
+  gap: var(--space-1);
+  opacity: 0;
+  transition: opacity var(--motion-quick) var(--ease);
+}
+.chat-msg:hover .chat-actions,
+.chat-msg:focus-within .chat-actions {
+  opacity: 1;
+}
+
+.chat-banner,
+.chat-blocked {
+  margin: var(--space-2) var(--space-3);
+}
+
+/* ---- the composer ---- */
+
+.chat-composer {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3) var(--space-3);
+  border-top: 1px solid var(--border);
+  background: var(--bg-raised);
+}
+
+/* What the model will actually be told. Invisible context is how trust
+   dies, so this is shown before you send, not explained afterwards. */
+.chat-knows {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--fg-secondary);
+}
+
+.chat-input {
+  width: 100%;
+  resize: vertical;
+  line-height: var(--leading-ui);
+}
+
+.chat-elsewhere {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:not(.motion-full) .chat-msg {
+    animation: none;
+  }
+  :root:not(.motion-full) .chat-actions,
+  :root:not(.motion-full) .chat-thread-row .icon-btn {
+    transition: none;
+  }
+}

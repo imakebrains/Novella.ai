@@ -188,6 +188,19 @@ export default function App() {
     return () => registerIntroOpener(null);
   }, []);
 
+  // Panels deep in the tree send people to Settings — "no provider
+  // connected" is only useful if the way to fix it is one click away. The
+  // event is cancelable and the sender falls back to naming the gear icon,
+  // so answering it here upgrades the button rather than enabling it.
+  useEffect(() => {
+    const open = (e: Event) => {
+      e.preventDefault();
+      setSettingsOpen(true);
+    };
+    window.addEventListener("novella:open-settings", open);
+    return () => window.removeEventListener("novella:open-settings", open);
+  }, []);
+
   // Keyboard: Ctrl/Cmd+K opens the palette; Ctrl/Cmd+S saves;
   // Ctrl/Cmd+Shift+F toggles focus mode; Esc leaves focus mode, since
   // it's the one mode you might want out of in a hurry without reaching

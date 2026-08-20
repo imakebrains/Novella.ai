@@ -17,6 +17,7 @@ import { insertIntoEditor } from "./editorBridge";
 import { CritiquePanel } from "./CritiquePanel";
 import { ContinuityPanel } from "./ContinuityPanel";
 import { HistoryPanel } from "./HistoryPanel";
+import { ChatPanel } from "./ChatPanel";
 import { TasksPanel } from "./TasksPanel";
 import { SetupPanel } from "./SetupPanel";
 import { CalendarTab } from "./CalendarTab";
@@ -78,6 +79,13 @@ const TAB_DEFS: Record<TabId, { label: string; title: string; needsNote: boolean
   tasks: { label: "Tasks", title: "Every to-do across the project", needsNote: false },
   history: { label: "History", title: "Earlier versions of this note", needsNote: true },
   assistant: { label: "Assistant", title: "Draft with your connected AI", needsNote: true },
+  // needsNote is false on purpose: a chat is worth having before a note is
+  // open, and a [[Wren Calloway]] typed into the box still reaches the model.
+  chat: {
+    label: "Chat",
+    title: "Talk to your AI about the book — a thread that remembers",
+    needsNote: false,
+  },
   continuity: {
     label: "Continuity",
     title: "Provable slips: early mentions, duplicate names, dangling links",
@@ -191,6 +199,8 @@ export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => 
         return <HistoryPanel />;
       case "assistant":
         return <AssistantTab />;
+      case "chat":
+        return <ChatPanel />;
       case "continuity":
         return <ContinuityPanel />;
       case "goals":
