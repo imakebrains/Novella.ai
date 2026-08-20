@@ -162,7 +162,7 @@ export const KIND_EXPLAIN: Record<IssueKind, string> = {
   adverb:
     "-ly adverbs (walked slowly, said angrily). Often a weak verb in disguise — 'crept' beats 'walked slowly'.",
   passive:
-    "Passive voice (the door was opened by her). Fine on purpose, flat by accident — highlights let you decide which is which.",
+    "Passive voice (the door was opened by her). Fine on purpose, flat by accident — highlights let you decide which is which. 'She was tired' isn't passive and isn't flagged.",
   echo:
-    "Echoes — the same word repeated within a few lines without meaning to. Readers hear it before writers do.",
+    "Echoes — the same word repeated within a few lines without meaning to. Readers hear it before writers do. Names, anything in your codex, and dialogue tags like 'said' are left alone, because those are meant to repeat.",
 };
