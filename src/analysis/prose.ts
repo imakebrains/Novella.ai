@@ -61,6 +61,22 @@ const FILLER = new Set(["very","really","just","quite","rather","somewhat","actu
 
 const BE_VERBS = ["is","are","was","were","be","been","being","am"];
 
+/* "She was tired" is not passive voice — it's a linking verb and an
+   adjective that happens to end in -ed. The regex cannot tell the
+   difference, so the words that most often sit in that slot are listed
+   here. An explicit agent overrides the list: "was worried by the sound"
+   really is passive, so a following "by" puts it back. */
+const PARTICIPIAL_ADJECTIVES = new Set([
+  "tired","scared","excited","interested","worried","married","bored",
+  "confused","surprised","pleased","annoyed","embarrassed","exhausted",
+  "frightened","satisfied","disappointed","determined","concerned",
+  "involved","relieved","amused","ashamed","crowded","dressed","seated",
+  "located","situated","supposed","used","aged","gifted","talented",
+  "experienced","qualified","prepared","finished","done","gone","closed",
+  "opened","broken","tangled","curved","pointed","rounded","wooded",
+  "faded","weathered","hooded","bearded","spotted","striped",
+]);
+
 const COMMON = new Set([...GLUE, "s","t","said","asked","replied"]);
 
 /* Words that end in -ly and are not adverbs. Without this list the
@@ -205,6 +221,17 @@ function readabilityLabel(score: number): string {
   return "Very hard";
 }
 
+/**
+ * True when a "be + -ed" match is a linking verb and an adjective rather
+ * than passive voice. An explicit agent ("by the sound") settles it the
+ * other way, because that is what actually marks the passive.
+ */
+function readsStative(match: string, text: string, end: number): boolean {
+  const participle = (match.match(/[\p{L}'’-]+$/u)?.[0] ?? "").toLowerCase();
+  if (!PARTICIPIAL_ADJECTIVES.has(participle)) return false;
+  return !/^\s+by\b/.test(text.slice(end, end + 12));
+}
+
 export function analyseProse(input: string, opts?: ProseOptions): ProseReport {
   // Strip wiki-link syntax so [[Halden's Reach]] counts as two words,
   // not as brackets, and markdown emphasis doesn't skew counts.
@@ -255,6 +282,7 @@ export function analyseProse(input: string, opts?: ProseOptions): ProseReport {
   const passiveRe = new RegExp(`\\b(${BE_VERBS.join("|")})\\s+(\\w+ed|born|done|gone|seen|known|taken|given|made|held|told|found)\\b`, "gi");
   let pm: RegExpExecArray | null;
   while ((pm = passiveRe.exec(text))) {
+    if (readsStative(pm[0], text, pm.index + pm[0].length)) continue;
     passive.push({
       index: pm.index,
       length: pm[0].length,
@@ -409,6 +437,7 @@ export function findInlineIssues(
     let m: RegExpExecArray | null;
     while ((m = re.exec(text))) {
       if (insideLink(m.index)) continue;
+      if (readsStative(m[0], text, m.index + m[0].length)) continue;
       issues.push({
         from: m.index,
         to: m.index + m[0].length,

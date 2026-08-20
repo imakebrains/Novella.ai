@@ -197,6 +197,54 @@ check(
 );
 
 /* ============================================================
+   Passive voice, and the linking verbs mistaken for it
+
+   "She was tired" is an adjective after a linking verb. Calling it
+   passive and asking "who is doing this?" makes the panel look like it
+   cannot read.
+   ============================================================ */
+
+const PASSIVE: Set<IssueKind> = new Set(["passive"]);
+function passivePhrases(text: string): string[] {
+  return findInlineIssues(text, PASSIVE)
+    .sort((a, b) => a.from - b.from)
+    .map((i) => text.slice(i.from, i.to).toLowerCase());
+}
+
+check("was tired is not passive", passivePhrases("She was tired."), []);
+check("was married is not passive", passivePhrases("They were married."), []);
+check("was gone is not passive", passivePhrases("By morning he was gone."), []);
+check("the door was closed is not passive", passivePhrases("The door was closed."), []);
+check("is supposed to is not passive", passivePhrases("He is supposed to wait."), []);
+
+// An explicit agent is what actually marks the passive, so it wins.
+check(
+  "an agent puts it back",
+  passivePhrases("She was worried by the sound."),
+  ["was worried"],
+);
+check(
+  "the door was opened by her is passive",
+  passivePhrases("The door was opened by her."),
+  ["was opened"],
+);
+
+// Real passives with no stative reading are untouched.
+check("was carried is passive", passivePhrases("The body was carried inside."), ["was carried"]);
+check("were followed is passive", passivePhrases("They were followed."), ["were followed"]);
+
+check(
+  "the panel agrees about was tired",
+  analyseProse("She was tired.").passive.map((p) => p.text),
+  [],
+);
+check(
+  "the panel agrees about was carried",
+  analyseProse("The body was carried inside.").passive.map((p) => p.text),
+  ["was carried"],
+);
+
+/* ============================================================
    The panel and the underlines agree
 
    If the report lists an echo the manuscript refuses to mark, the writer
