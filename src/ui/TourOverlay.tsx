@@ -371,6 +371,7 @@ const CLIPS: Record<ClipId, () => React.ReactElement> = {
   wikilink: WikiLinkClip,
   paragraph: ParagraphClip,
   reword: RewordClip,
+  chat: ChatClip,
 };
 
 function Clip({ step, still }: { step: TourStep; still: boolean }) {
@@ -997,6 +998,15 @@ function SlashClip() {
    the feature nobody discovers on their own. */
 const CODEX_HITS = ["Elowen Vance", "Elowen's ward", "Ferry House"];
 
+/* Streamed a line at a time, so the clip shows an answer arriving rather
+   than an answer appearing. Written as prose the writer might actually
+   keep — a demo full of lorem teaches nothing about what the tool does. */
+const CHAT_ANSWER = [
+  "Because the ferryman knew her mother.",
+  "Wren has spent nine years being someone else,",
+  "and the crossing is the first place that costs her.",
+];
+
 function WikiLinkClip() {
   return (
     <>
@@ -1083,6 +1093,43 @@ function ParagraphClip() {
    demonstration can't drift from the menu it demonstrates. Three fit;
    the app offers five. */
 const REWORD_PICKS = REWORD_STYLES.slice(0, 3);
+
+/* The chat clip has one job: show that the app tells you what it told the
+   model. The "knows about" line lands BEFORE the answer, because that is
+   the order it happens in and the order that earns the trust. */
+function ChatClip() {
+  return (
+    <>
+      <div className="tour-mock tour-mock-chat">
+        <div className="tour-mock-chat-turn" data-from="writer">
+          <span className="tour-mock-chat-bubble">
+            Why would Wren lie to the ferryman?
+          </span>
+        </div>
+
+        <p className="tour-mock-chat-knows">
+          <span className="tour-mock-chat-knows-label">knows about</span>
+          <span className="tour-mock-chat-knows-names">Wren Calloway, Halden&rsquo;s Reach</span>
+        </p>
+
+        <div className="tour-mock-chat-turn" data-from="assistant">
+          <span className="tour-mock-chat-bubble">
+            {CHAT_ANSWER.map((line, i) => (
+              <span className="tour-mock-chat-line" key={line} style={vars({ "--i": i })}>
+                {line}
+              </span>
+            ))}
+          </span>
+          <span className="tour-mock-chat-actions">
+            <span className="tour-mock-chat-action" data-press="true">Insert</span>
+            <span className="tour-mock-chat-action">Copy</span>
+          </span>
+        </div>
+      </div>
+      <TourCursor />
+    </>
+  );
+}
 
 function RewordClip() {
   return (

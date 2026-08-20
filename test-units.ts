@@ -599,6 +599,12 @@ lied, and Wren had known that since she was nine.
   const base = {
     id: "a1",
     name: "Test",
+    // description and example are required on Agent; the fixture predates
+    // them and the typecheck only started saying so once the root test
+    // files joined tsconfig. Triggers ignore both fields — they are here
+    // so the fixture is a real Agent rather than an approximate one.
+    description: "A fixture agent.",
+    example: "- Something the report would say.",
     instructions: "x",
     scope: "manuscript" as const,
     enabled: true,

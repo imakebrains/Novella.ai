@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { store, useVaultVersion } from "../state/vaultStore";
 import { ProjectPreviewModal } from "./ProjectPreviewModal";
+import { openStyleMe } from "./StyleMeModal";
 import {
   clearProjectBanner,
   hydrateProjectBanner,
@@ -239,6 +240,18 @@ export function ProjectsPanel({ onClose }: { onClose: () => void }) {
               </button>
             </div>
           )}
+
+          {/* The moment a book is created is when a voice is worth choosing,
+              so the offer sits here rather than only in the palette. */}
+          <div className="btn-row">
+            <button
+              className="btn-ghost"
+              onClick={openStyleMe}
+              title="Learn a writing style from prose you like, and save it as a style you can draft with"
+            >
+              Style me…
+            </button>
+          </div>
 
           {!isTauri() && (
             <p className="hint">

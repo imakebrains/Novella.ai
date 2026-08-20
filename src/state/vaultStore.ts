@@ -1,6 +1,16 @@
 import { useSyncExternalStore } from "react";
 import { Vault, parseNote, serializeNote, linksOf, type Note } from "../core/vault";
 import { storage, type VaultFile } from "../storage";
+import type { TauriStorage } from "../storage/tauriStorage";
+import {
+  decideWrite,
+  diskChanged,
+  keepBothPathFor,
+  partitionVaultFiles,
+  sidecarPathFor,
+  uniqueIdAmong,
+  type FlaggedFile,
+} from "../storage/vaultSafety";
 import { SEED_FILES } from "../seed/seedWorld";
 import { desktopLog } from "../debug";
 import { BUILTIN_PROMPTS, promptSeedToMarkdown } from "../ai/prompts";
@@ -12,6 +22,20 @@ import { extractTasks, toggleTaskAt, type BodyTask } from "../core/tasks";
    class only adds change notification, the notion of "which note is
    open", and persistence — all UI concerns the engine shouldn't know. */
 
+/** One note whose file changed on disk while the writer had unsaved
+    edits. Nothing is written until they say which version wins. */
+export interface SaveConflict {
+  noteId: string;
+  path: string;
+  title: string;
+  /** The writer's version, serialized exactly as it would have landed. */
+  mine: string;
+  /** What the file holds right now. */
+  theirs: string;
+  /** Epoch ms the clash was noticed. */
+  at: number;
+}
+
 export class VaultStore {
   private index = new Vault();
   private listeners = new Set<() => void>();
@@ -21,6 +45,13 @@ export class VaultStore {
   private root: string | null = null;
   private busy = false;
   private lastError: string | null = null;
+  /** Files a sync client left behind, held out of the index until the
+      writer says what they are. Rebuilt on every ingest. */
+  private flagged: FlaggedFile<VaultFile>[] = [];
+  /** noteId -> the clash waiting on a decision. While a note is in here
+      saveAll refuses to write it: the words stay in memory (and in the
+      localStorage draft snapshot), and disk keeps whatever arrived. */
+  private pending = new Map<string, SaveConflict>();
 
   /** The live index. Components read from this; it is never reassigned
       in place, so always go through the getter rather than caching it. */
@@ -81,17 +112,29 @@ export class VaultStore {
 
   /** Replace the whole vault from a set of files. */
   private ingest(files: VaultFile[]): void {
+    // Sync clients drop second copies of a note beside the original —
+    // "Chapter 7 (conflicted copy 2026-08-19).md" and friends — and those
+    // copies carry the ORIGINAL's frontmatter id. Loading one would evict
+    // the real chapter from the link index: the note vanishes from the
+    // codex and its duplicate answers to its name. So they are held aside
+    // here and handed to the writer as a question instead. Nothing is
+    // deleted; see conflictCopies() and the two doors out below it.
+    const { notes, conflicts } = partitionVaultFiles(files);
+    this.flagged = conflicts;
+
     const next = new Vault();
-    for (const f of files) next.add(parseNote(f.path, f.contents));
+    for (const f of notes) next.add(parseNote(f.path, f.contents));
     this.index = next;
     this.activeId = next.byType("chapter")[0]?.id ?? next.all()[0]?.id;
     this.dirty.clear();
+    this.pending.clear();
     // Re-seed the built-in prompts on every swap. Without this, switching
     // projects silently emptied the Assistant's prompt list — the prompts
     // are in-memory notes, and a fresh index doesn't have them.
     this.ensureBuiltinPrompts();
     for (const fn of this.replacedHooks) fn();
     this.emit();
+    if (this.flagged.length > 0) this.notifySafetyUi();
   }
 
   /** First run: the bundled seed world, held in memory. */
@@ -173,12 +216,25 @@ export class VaultStore {
 
   /* ---------- saving ---------- */
 
-  /** Write every dirty note back to disk in its original Markdown form. */
+  /** Write every dirty note back to disk in its original Markdown form.
+
+      A vault in a Dropbox/Drive/iCloud folder has a second writer, so
+      every write here first asks "has this file moved under me?" — see
+      guardWrite below. The check costs one stat per dirty note on the
+      desktop build and nothing at all in the browser, where there is no
+      second writer and no mtime to ask about. */
   async saveAll(): Promise<void> {
     if (this.dirty.size === 0) return;
+    // Everything still unsaved is waiting on the writer. Returning here
+    // is not an optimisation: saveAll ends in emit(), emit re-triggers
+    // the autosave effect, and the effect schedules the next saveAll —
+    // so without this a pending conflict would spin the app in a 1.5s
+    // loop for as long as the dialog is open.
+    if ([...this.dirty].every((id) => this.pending.has(id))) return;
     const store = storage();
     const root = this.root;
     let wroteAny = false;
+    let blocked = 0;
 
     // Memory storage has no root and cannot truly persist; writing to it
     // still keeps this session consistent, so don't bail out.
@@ -189,6 +245,26 @@ export class VaultStore {
       for (const id of [...this.dirty]) {
         const note = this.index.get(id);
         if (!note) continue;
+        // Already waiting on the writer. Leave it dirty — the words are
+        // still in memory and still in the draft snapshot — and do not
+        // re-stat it every 1.5 seconds for as long as the dialog is up.
+        if (this.pending.has(id)) {
+          blocked++;
+          continue;
+        }
+
+        const verdict = await this.guardWrite(note);
+        if (verdict === "reload") {
+          // Their version, our copy had nothing to keep. No dialog: the
+          // note is already correct on screen and nothing was lost.
+          this.dirty.delete(id);
+          continue;
+        }
+        if (verdict === "conflict") {
+          blocked++;
+          continue;
+        }
+
         // Snapshot before the write, so history records the version that
         // was actually committed. A failing hook must never block a save —
         // losing a revision is survivable, losing the manuscript is not.
@@ -207,6 +283,12 @@ export class VaultStore {
       this.lastError = err instanceof Error ? err.message : String(err);
     } finally {
       this.busy = false;
+      if (blocked > 0 && this.lastError === null) {
+        this.lastError =
+          blocked === 1
+            ? "A note changed on disk while you were writing. Nothing was overwritten — choose which version to keep."
+            : `${blocked} notes changed on disk while you were writing. Nothing was overwritten — choose which versions to keep.`;
+      }
       this.emit();
       if (wroteAny) {
         for (const fn of this.afterSaveHooks) {
@@ -218,6 +300,290 @@ export class VaultStore {
         }
       }
     }
+  }
+
+  /* ---------- don't clobber newer (D2) ----------
+
+     The decision itself is pure and lives in storage/vaultSafety.ts.
+     This is only the part that has to touch a filesystem: read the two
+     mtimes, work out whether our copy actually differs from the text we
+     last saw, and — when it does — capture their version for the dialog.
+
+     Deliberately NOT a filesystem watcher. `notify` isn't in Cargo.lock,
+     and sync clients deliver changes seconds-to-minutes late anyway, so
+     sub-second precision would buy nothing but a background thread that
+     wakes up during every one of the writer's own saves. Checking at the
+     moment we are about to overwrite is both cheaper and exactly when
+     the answer matters.
+
+     Everything degrades to "write" — no baseline, no stat, no mtime, a
+     web or memory adapter, a brand-new file. Not knowing is never
+     evidence that somebody else edited the file, and refusing to save on
+     an absence of evidence would turn this into a new way to lose work. */
+  private async guardWrite(note: Note): Promise<"write" | "reload" | "conflict"> {
+    const backing = storage();
+    const root = this.root;
+    // Narrowed on `kind`, the pattern ProjectsPanel already uses for
+    // WebStorage.rootExists. IndexedDB and memory have no mtime and no
+    // second writer; a browser writer is exactly as well off as before.
+    if (root === null || backing.kind !== "tauri") return "write";
+    const disk = backing as TauriStorage;
+
+    const known = disk.knownMtime(root, note.path);
+    const now = await disk.statMtime(root, note.path);
+    if (!diskChanged(known, now)) return "write";
+
+    // Only now is the expensive comparison worth doing. "Dirty" here
+    // means genuinely different from the bytes we last saw — not merely
+    // flagged dirty, which a rename or an undone edit also does. Both
+    // sides go through parse→serialize so YAML re-emission differences
+    // don't read as a conflict.
+    const baseline = disk.knownText(root, note.path);
+    const mine = serializeNote(note);
+    const hasLocalEdits =
+      baseline === null || serializeNote(parseNote(note.path, baseline)) !== mine;
+
+    const verdict = decideWrite({ ourMtime: known, diskMtime: now, dirty: hasLocalEdits });
+    if (verdict === "write") return "write";
+
+    // readOne re-reads AND re-baselines, which is what makes "keep mine"
+    // work later: by then our recorded mtime is theirs, so the write is
+    // no longer clobbering anything we hadn't seen.
+    const theirs = await disk.readOne(root, note.path);
+    if (theirs === null) return "write"; // unreadable — don't hold the save hostage
+
+    if (verdict === "reload") {
+      this.adoptDiskVersion(note, theirs);
+      return "reload";
+    }
+
+    this.pending.set(note.id, {
+      noteId: note.id,
+      path: note.path,
+      title: note.title,
+      mine,
+      theirs,
+      at: Date.now(),
+    });
+    this.notifySafetyUi();
+    return "conflict";
+  }
+
+  /** Overwrite a note in place from raw disk Markdown.
+
+      In place, and keeping OUR id, because the vault holds notes by
+      reference and half the app (boards, sessions, history) remembers
+      note ids. Swapping in a fresh object would orphan every one of
+      those. If the disk copy carries a different frontmatter id, ours
+      wins — a changed id is not worth an orphaned corkboard. */
+  private adoptDiskVersion(note: Note, raw: string): void {
+    const fresh = parseNote(note.path, raw);
+    note.type = fresh.type;
+    note.title = fresh.title;
+    note.aliases = fresh.aliases;
+    note.tags = fresh.tags;
+    note.data = { ...fresh.data, id: note.id };
+    note.body = fresh.body;
+    // Re-register so the new title and aliases resolve links.
+    this.index.add(note);
+    this.forgetDraft(note.id);
+    this.emit();
+  }
+
+  /** Wake the conflict dialog.
+
+      A dynamic import, and pointing UP a layer at that, which needs an
+      argument: this module cannot import UI, and App.tsx is not ours to
+      edit, so without this the whole feature would sit silent until
+      somebody adds a mount line. The import only ever runs in a browser
+      and only when there is genuinely something to ask about, so a
+      headless test never touches React. Once <ConflictHost /> is mounted
+      in App.tsx this becomes a no-op — the panel checks for a real host
+      before mounting its own. */
+  private notifySafetyUi(): void {
+    if (typeof document === "undefined") return;
+    void import("../ui/ConflictPanel").catch(() => {
+      // No UI available (a headless run, a build that tree-shook it).
+      // The conflict is still recorded and still blocking the write,
+      // which is the part that protects the manuscript.
+    });
+  }
+
+  /** Drop the crash-recovery snapshot for a note we just replaced from
+      disk, so the recovery banner doesn't offer back the very version
+      the writer chose to discard. Dynamic import: state/autosave imports
+      this module, and a static edge would be a cycle. */
+  private forgetDraft(id: string): void {
+    void import("./autosave")
+      .then((m) => m.clearDraft(id))
+      .catch(() => {
+        /* no localStorage (node, private browsing) — nothing to clear */
+      });
+  }
+
+  /* ---------- the writer's three answers ---------- */
+
+  /** Notes waiting on a decision, oldest first. */
+  conflicts(): SaveConflict[] {
+    return [...this.pending.values()].sort((a, b) => a.at - b.at);
+  }
+
+  conflictCount(): number {
+    return this.pending.size;
+  }
+
+  /** Resolve one clash.
+
+      "mine"   — our text wins. The baseline is already their version
+                 (guardWrite re-read it), so the ordinary save path now
+                 has permission and no special case is needed.
+      "theirs" — take the file as it stands and drop our edits.
+      "both"   — the disk copy keeps the canonical path so every
+                 [[wiki link]] still resolves, and our version lands
+                 beside it as a new note the writer can read and merge
+                 by hand. Nothing is thrown away in this branch, which
+                 is why it's the safe answer when unsure. */
+  async resolveConflict(noteId: string, choice: "mine" | "theirs" | "both"): Promise<void> {
+    const clash = this.pending.get(noteId);
+    const note = this.index.get(noteId);
+    if (!clash || !note) {
+      this.pending.delete(noteId);
+      this.emit();
+      return;
+    }
+    this.pending.delete(noteId);
+
+    if (choice === "theirs") {
+      this.adoptDiskVersion(note, clash.theirs);
+      this.dirty.delete(noteId);
+      this.lastError = null;
+      this.emit();
+      return;
+    }
+
+    if (choice === "both") {
+      const path = keepBothPathFor(note.path, this.index.all().map((n) => n.path));
+      const copy = parseNote(path, clash.mine);
+      // Our version is a duplicate of the note it forked from — same id,
+      // same title — so it needs its own identity before it goes in.
+      this.makeDistinct(copy, "my version");
+      this.index.add(copy);
+      this.dirty.add(copy.id);
+      this.adoptDiskVersion(note, clash.theirs);
+      this.dirty.delete(noteId);
+    } else {
+      this.dirty.add(noteId);
+    }
+
+    this.lastError = null;
+    this.emit();
+    await this.saveAll();
+  }
+
+  /* ---------- D3: what a sync client left behind ----------
+
+     These files are real Markdown and may hold real prose — quite
+     possibly the only surviving copy of an hour's work from another
+     machine. So nothing here deletes one. There are exactly three
+     doors: keep it (renamed to something sane), put it in the trash
+     where the retention window can look after it, or leave it alone
+     and stop being asked. */
+
+  /** Files held out of the index because they look like sync leftovers. */
+  conflictCopies(): FlaggedFile<VaultFile>[] {
+    return this.flagged;
+  }
+
+  /** Keep it as a real note.
+
+      Renamed on the way in, for two reasons: the sync-client name would
+      be flagged again on the next open, and `Chapter 7 (from another
+      device).md` is a name a writer can act on. The new file is written
+      BEFORE the old one is removed — the same ordering trash.ts uses,
+      so a storage failure leaves the copy exactly where it was rather
+      than nowhere. */
+  async adoptConflictCopy(path: string): Promise<string | null> {
+    const entry = this.flagged.find((f) => f.file.path === path);
+    if (!entry) return null;
+
+    const target = sidecarPathFor(
+      entry.info.origin ?? path,
+      "from another device",
+      this.index.all().map((n) => n.path),
+    );
+    const note = parseNote(target, entry.file.contents);
+    this.makeDistinct(note, "from another device");
+    this.index.add(note);
+    this.dirty.add(note.id);
+    this.flagged = this.flagged.filter((f) => f.file.path !== path);
+    this.emit();
+
+    await this.saveAll();
+    // Only once the new file actually exists. A note still marked dirty
+    // is the honest signal that the write did not land.
+    //
+    // The root dance mirrors reloadFromStorage: memory storage ignores
+    // the argument, so "" is right there, while a null root on any other
+    // adapter means we have no idea where the file lives and must not
+    // guess — remove("", path) on disk would resolve to "/path".
+    const backing = storage();
+    const removeRoot = this.root ?? (backing.kind === "memory" ? "" : null);
+    if (removeRoot !== null && !this.dirty.has(note.id)) {
+      try {
+        await backing.remove(removeRoot, path);
+      } catch {
+        // The copy is safe under its new name; a leftover duplicate is
+        // untidy, not lost. It gets flagged again next open.
+      }
+    }
+    return note.id;
+  }
+
+  /** Put a flagged file into the vault index just long enough for the
+      trash to archive it, WITHOUT marking it dirty — an autosave firing
+      between here and moveToTrash would otherwise write it straight back
+      out. Its path is the real on-disk path, so deleteNote removes the
+      actual file once the trash holds a copy. */
+  stageConflictCopyForTrash(path: string): Note | null {
+    const entry = this.flagged.find((f) => f.file.path === path);
+    if (!entry) return null;
+    const note = parseNote(entry.file.path, entry.file.contents);
+    this.makeDistinct(note, "sync copy");
+    this.index.add(note);
+    this.flagged = this.flagged.filter((f) => f.file.path !== path);
+    this.emit();
+    return note;
+  }
+
+  /** Give a copy its own identity before it enters the index.
+
+      A sync client's conflict copy is a byte-for-byte duplicate: same
+      frontmatter id, same name. Adding it as-is does two kinds of damage
+      at once — Vault.add keys notes BY id, so the original is evicted
+      outright, and it keys the link table by title, so every [[Chapter
+      7]] in the book starts pointing at the duplicate. And when the
+      duplicate is later removed, Vault.remove drops every link entry
+      aimed at it, taking the original's entry with it.
+
+      Both are fixed by the same two lines: a unique id and a title
+      nothing else answers to. The suffix is shown to the writer, so it
+      reads as a label rather than a mangled filename. */
+  private makeDistinct(note: Note, suffix: string): void {
+    note.id = uniqueIdAmong(note.id, this.index.all().map((n) => n.id));
+    note.data.id = note.id;
+
+    let title = `${note.title} (${suffix})`;
+    for (let i = 2; this.index.resolveLink(title); i++) title = `${note.title} (${suffix} ${i})`;
+    note.title = title;
+    note.data.name = title;
+  }
+
+  /** Stop asking about it. The file stays on disk, untouched, and turns
+      up again the next time the project is opened — which is the right
+      amount of persistence for "not now". */
+  forgetConflictCopy(path: string): void {
+    this.flagged = this.flagged.filter((f) => f.file.path !== path);
+    this.emit();
   }
 
   /* ---------- navigation ---------- */

@@ -237,7 +237,7 @@ const prefsOf = (order: TabId[], hidden: TabId[] = [], active?: TabId): TabPrefs
 
   const junk = normalizePrefs({
     order: ["music", "not-a-tab", "music", "links"] as TabId[],
-    hidden: ["also-not-a-tab"] as TabId[],
+    hidden: ["also-not-a-tab"] as unknown as TabId[],
     active: "gone" as TabId,
   });
   check("normalize: unknown ids are dropped", junk.order.includes("not-a-tab" as TabId), false);

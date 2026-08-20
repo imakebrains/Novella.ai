@@ -56,7 +56,8 @@ export type ClipId =
   | "slash"
   | "wikilink"
   | "paragraph"
-  | "reword";
+  | "reword"
+  | "chat";
 
 export type CategoryId = "around" | "tools" | "organising" | "yours" | "writing";
 
@@ -311,6 +312,16 @@ export const TOUR_STEPS: TourStep[] = [
     where: "The editor, on any selection",
     keys: null,
     loopMs: 6000,
+  },
+  {
+    id: "chat",
+    category: "writing",
+    title: "Talk it through",
+    body: "The Chat tool holds a conversation about the book, not a single question. It reads the scene you have open and only the codex entries that scene refers to — and it shows you which ones before you send, so you always know what it was told. Answers stream in; Insert drops one at the cursor, and nothing arrives in the manuscript unless you put it there.",
+    still: "A question, the entries it carried, and the answer waiting to be inserted.",
+    where: "The inspector, Chat tab",
+    keys: null,
+    loopMs: 5800,
   },
 ];
 

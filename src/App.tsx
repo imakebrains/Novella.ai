@@ -21,6 +21,8 @@ import type { BoardLayout } from "./ui/BoardLayoutToggle";
 import { RecoveryBanner } from "./ui/RecoveryBanner";
 import { UndoToastHost } from "./ui/UndoToastHost";
 import { TrashHost } from "./ui/TrashPanel";
+import { ConflictHost } from "./ui/ConflictPanel";
+import { STYLE_ME_COMMAND, StyleMeHost } from "./ui/StyleMeModal";
 import { TourButton, TourOverlay, openTour } from "./ui/TourOverlay";
 import { Logo } from "./ui/Logo";
 import { AmbientGlow } from "./ui/AmbientGlow";
@@ -274,6 +276,7 @@ export default function App() {
     { id: "import", label: "Import manuscript…", run: () => setImportOpen(true) },
     { id: "projects", label: "Switch project…", run: () => setProjectsOpen(true) },
     { id: "settings", label: "Open Settings", run: () => setSettingsOpen(true) },
+    STYLE_ME_COMMAND,
     { id: "tour", label: "Show me around", hint: "tour", run: () => openTour() },
     { id: "music", label: "Open music player", run: () => setMusicOpen(true) },
     { id: "theme", label: `Change theme (now: ${themeInfo.name})`, run: cycleTheme },
@@ -538,6 +541,7 @@ export default function App() {
       <MusicDock open={musicOpen} onClose={() => setMusicOpen(false)} />
       <UndoToastHost />
       <TrashHost />
+      <ConflictHost />
 
       {paletteOpen && (
         <CommandPalette
@@ -553,6 +557,7 @@ export default function App() {
       {exportOpen && <ExportModal onClose={() => setExportOpen(false)} />}
       {importOpen && <ImportModal onClose={() => setImportOpen(false)} />}
       {projectsOpen && <ProjectsPanel onClose={() => setProjectsOpen(false)} />}
+      <StyleMeHost onOpenSettings={() => setSettingsOpen(true)} />
       {introOpen && <WelcomeIntro onDone={() => setIntroOpen(false)} />}
       {!introOpen && <TourOverlay />}
     </div>

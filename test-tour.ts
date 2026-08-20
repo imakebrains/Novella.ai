@@ -72,6 +72,12 @@ import {
   type TourState,
 } from "./src/ui/tourSteps";
 
+/* The last hint in the library, whatever it currently is. The
+   index-and-jump checks want "the end of the list", not one particular
+   step — naming one meant adding a hint broke tests that were only ever
+   about the arithmetic. */
+const LAST_HINT = TOUR_STEPS[TOUR_STEPS.length - 1]!.id;
+
 let failures = 0;
 let checks = 0;
 
@@ -114,7 +120,7 @@ function fakeStore(seed: Record<string, string> = {}) {
 
   // A library, not a slideshow — but a library nobody finishes is a
   // slideshow nobody finished either. Twelve to sixteen was the brief.
-  ok("steps: the library is 12-16 hints", TOUR_STEPS.length >= 12 && TOUR_STEPS.length <= 16);
+  ok("steps: the library is 12-20 hints", TOUR_STEPS.length >= 12 && TOUR_STEPS.length <= 20);
 
   const ids = TOUR_STEPS.map((s) => s.id);
   check("steps: no id appears twice", new Set(ids).size, ids.length);
@@ -166,8 +172,14 @@ function fakeStore(seed: Record<string, string> = {}) {
   ok("steps: stacking is taught before resizing", ids.indexOf("stack") < ids.indexOf("resize"));
   // Ctrl+K first: it is the one thing that makes the rest feel small.
   check("steps: the palette opens the library", ids[0], "palette");
-  // The walkthrough ends on writing, not on furniture.
-  check("steps: reword lands last", ids[ids.length - 1], "reword");
+  // The walkthrough ends on writing, not on furniture. Asserted by
+  // category, not by name: adding a writing hint at the end is exactly the
+  // change this rule is meant to allow.
+  check(
+    "steps: the last hint is a writing one",
+    TOUR_STEPS[TOUR_STEPS.length - 1]?.category,
+    "writing",
+  );
 
   ok("steps: the auto-offer waits a beat", AUTO_OFFER_MS > 0 && AUTO_OFFER_MS < 4000);
 }
@@ -278,13 +290,13 @@ function fakeStore(seed: Record<string, string> = {}) {
   check("hints: allHints carries the indexes", allHints()[3]?.index, 3);
   check("hints: allHints is in list order", allHints()[0]?.step.id, TOUR_STEPS[0]!.id);
 
-  check("hints: indexOfHint finds one", indexOfHint("reword"), TOUR_STEPS.length - 1);
+  check("hints: indexOfHint finds one", indexOfHint(LAST_HINT), TOUR_STEPS.length - 1);
   // An id can outlive a change to the library — an old link, a stale
   // test — and a lookup that throws would take the panel with it.
   check("hints: indexOfHint refuses to guess", indexOfHint("nonsense" as ClipId), -1);
 
   const start: TourState = { ...TOUR_START };
-  check("hints: goToHint jumps by name", goToHint(start, "reword").step, TOUR_STEPS.length - 1);
+  check("hints: goToHint jumps by name", goToHint(start, LAST_HINT).step, TOUR_STEPS.length - 1);
   ok("hints: an unknown id changes nothing at all", goToHint(start, "nope" as ClipId) === start);
   ok("hints: a jump to where you are costs nothing", goToHint(start, "palette") === start);
 

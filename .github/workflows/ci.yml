@@ -1,0 +1,63 @@
+name: CI
+
+# The gate, run on every change instead of only at release time.
+#
+# Until this file existed, `npm run verify` ran in two places: the release
+# workflow (tag pushes only) and the Pages deploy (pushes to main). Both are
+# too late. A tag-only gate means main can sit red for a week and nobody
+# finds out until someone tries to cut a release; a stranger's pull request
+# had nothing checking it at all, so the first signal they got was a human
+# noticing. Same command, run where it can still change the answer.
+#
+# `npm run verify` is tsc + the whole test suite + a production build. It is
+# deliberately the one command — a CI script that runs a *subset* of the
+# gate teaches everyone to trust a check that isn't the check.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # So a red run can be re-tried from the Actions tab after fixing the cause.
+  workflow_dispatch:
+
+# Read-only: this workflow proves the tree is green and publishes nothing.
+permissions:
+  contents: read
+
+# Pushing twice in a minute should not queue two full builds — the older
+# run's answer is about code nobody has any more.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    # Pinned, NOT ubuntu-latest. `latest` moves underneath you: when GitHub
+    # rolls the label to a newer image the glibc under it changes with it,
+    # and a build that passed yesterday fails today for a reason nothing in
+    # this repository can explain. Bumping this line is a decision someone
+    # makes on purpose.
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          # Keys off package-lock.json, so the cache is only reused for an
+          # identical dependency tree.
+          cache: npm
+
+      # `npm ci` and not `npm install`: it installs exactly the lockfile and
+      # fails if package.json and the lock disagree. CI's job is to build
+      # what the repository says, not to quietly resolve a newer tree.
+      - name: Install dependencies
+        run: npm ci
+
+      # Bare, never piped. A piped command reports the *pipe's* exit code,
+      # which is how a suite goes green while it is failing.
+      - name: Verify
+        run: npm run verify

@@ -10526,6 +10526,146 @@ body:has(.col-divider.dragging) {
 @keyframes tour-block-yield { 0%,30%{transform:translateY(-42px);} 54%,100%{transform:translateY(0);} }
 .tour-mock-block-caret { position: absolute; left: var(--space-2); top: 6px; width: 2px; height: 12px; background: var(--accent); animation: tour-caret 1s steps(2, end) infinite; }
 
+/* ---- clip: chat ---- */
+/* Every base rule below is the FINISHED frame, never the hidden one:
+   reduced motion strips the animations outright, so a hidden base would
+   leave a writer looking at an empty stage. The keyframes start from
+   hidden, and while one runs it overrides the base.
+
+   The beat order is the lesson: question, then what the app is about to
+   send, then the answer, then Insert. Showing the context line before the
+   answer is the whole point — after it, it reads as a footnote nobody
+   asked for. */
+.tour-mock-chat {
+  position: relative;
+  width: 408px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--bg-pane);
+}
+
+.tour-mock-chat-turn {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 86%;
+}
+.tour-mock-chat-turn[data-from="writer"] {
+  align-self: flex-end;
+  align-items: flex-end;
+  animation: tour-chat-ask var(--clip) var(--ease-enter) infinite;
+}
+.tour-mock-chat-turn[data-from="assistant"] {
+  align-self: flex-start;
+  animation: tour-chat-answer var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-chat-ask {
+  0%, 4% { opacity: 0; transform: translateY(5px); }
+  14%, 100% { opacity: 1; transform: none; }
+}
+@keyframes tour-chat-answer {
+  0%, 34% { opacity: 0; transform: translateY(5px); }
+  44%, 100% { opacity: 1; transform: none; }
+}
+
+.tour-mock-chat-bubble {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-raised);
+  color: var(--fg-primary);
+  font-size: var(--text-2xs);
+  line-height: 1.55;
+}
+.tour-mock-chat-turn[data-from="assistant"] .tour-mock-chat-bubble {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--font-prose);
+  background: var(--bg-editor);
+  border-left: 2px solid var(--accent);
+  border-top-left-radius: var(--radius-xs);
+  border-bottom-left-radius: var(--radius-xs);
+}
+
+/* One line at a time, so it reads as arriving rather than appearing. */
+.tour-mock-chat-line {
+  animation: tour-chat-line var(--clip) var(--ease-color) infinite;
+  animation-delay: calc(var(--i) * 260ms);
+}
+@keyframes tour-chat-line {
+  0%, 40% { opacity: 0; }
+  50%, 100% { opacity: 1; }
+}
+
+/* The differentiator, and it lands before the answer on purpose. */
+.tour-mock-chat-knows {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  margin: 0;
+  align-self: flex-end;
+  font-size: 9px;
+  animation: tour-chat-knows var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-chat-knows {
+  0%, 18% { opacity: 0; transform: translateY(-3px); }
+  27%, 100% { opacity: 1; transform: none; }
+}
+.tour-mock-chat-knows-label {
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--fg-muted);
+}
+.tour-mock-chat-knows-names {
+  padding: 1px 5px;
+  border-radius: 7px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.tour-mock-chat-actions {
+  display: flex;
+  gap: var(--space-1);
+  animation: tour-chat-actions var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-chat-actions {
+  0%, 62% { opacity: 0; }
+  70%, 100% { opacity: 1; }
+}
+.tour-mock-chat-action {
+  padding: 2px 7px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--bg-raised);
+  color: var(--fg-secondary);
+  font-size: 9px;
+}
+/* Insert lights as the cursor reaches it — the clip never actually shows
+   prose landing in the manuscript, because nothing lands unless you press
+   it, and a demo that skipped that would be teaching the wrong thing. */
+.tour-mock-chat-action[data-press="true"] {
+  animation: tour-chat-press var(--clip) var(--ease-color) infinite;
+}
+@keyframes tour-chat-press {
+  0%, 80% { border-color: var(--border); background: var(--bg-raised); color: var(--fg-secondary); }
+  86%, 94% { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+  100% { border-color: var(--border); background: var(--bg-raised); color: var(--fg-secondary); }
+}
+
+.tour-clip-chat .tour-cursor {
+  animation: tour-cursor-chat var(--clip) var(--ease-enter) infinite;
+}
+@keyframes tour-cursor-chat {
+  0%, 58% { opacity: 0; transform: translate(300px, 60px); }
+  66% { opacity: 1; transform: translate(240px, 140px); }
+  84% { opacity: 1; transform: translate(96px, 178px); }
+  92% { opacity: 1; transform: translate(96px, 181px); }
+  100% { opacity: 0; transform: translate(96px, 178px); }
+}
+
 /* ---- 9.52 the intro's demonstration windows ---- */
 /* Three little looping windows, built the way the tour's clips are built
    (9.44/9.51) and for the same reasons — but these arrive already wearing
@@ -11312,6 +11452,128 @@ body:has(.col-divider.dragging) {
   }
   :root:not(.motion-full) .chat-actions,
   :root:not(.motion-full) .chat-thread-row .icon-btn {
+    transition: none;
+  }
+}
+
+/* ---- 9.56 style me ---- */
+/* Paste a page you admire and the app works out what it's doing. The
+   result is saved as an ordinary prompt note under Prompts/, so it turns
+   up in the Writing style list beside the built-ins and stays yours in
+   plain Markdown — a style you can read, edit and take with you, not a
+   setting locked in a database. */
+.styleme-modal {
+  width: min(760px, 100%);
+}
+
+/* This should read as somewhere you paste a page, not as a comment box:
+   the book's face, at the book's leading. */
+.styleme-sample {
+  min-height: 14em;
+  font-family: var(--font-prose);
+  font-size: var(--text-base);
+  line-height: 1.6;
+}
+
+.styleme-field {
+  min-height: 3.4em;
+  margin-bottom: var(--space-2);
+}
+
+/* The reply we could not read, shown verbatim rather than summarised —
+   a model that answered oddly should be visible, not paraphrased into
+   sounding like it worked. Wrapping and the scroll cap are set inline in
+   the component, so nothing here is load-bearing. */
+.styleme-raw {
+  margin-top: var(--space-2);
+  padding: var(--space-2);
+  background: var(--bg-raised);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  color: var(--fg-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: var(--leading-ui);
+}
+
+/* ---- 9.57 sync collisions ---- */
+/* A vault inside Google Drive is the whole storage story, and the day it
+   goes wrong is the day the app either earns its keep or loses a
+   chapter. Nothing here has a safe default, so nothing here has a
+   default: the dialog closes without resolving, and the chip below is
+   how the writer finds their way back. */
+.conflict-host {
+  display: contents; /* the self-mounted host must never affect layout */
+}
+
+.conflict-modal {
+  width: min(820px, 100%); /* a shade wider than the trash: it carries a diff */
+}
+
+.conflict-item + .conflict-item {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+.conflict-title {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--fg-primary);
+  overflow-wrap: anywhere;
+}
+
+/* Three equal choices, deliberately. Making one of them primary would be
+   the app having an opinion about which copy of your chapter is real. */
+.conflict-actions {
+  flex-wrap: wrap;
+  margin-top: var(--space-3);
+}
+
+/* Closing the dialog resolves nothing, so something has to stay on
+   screen saying so. It sits above the undo toast and clear of it: the
+   two can be up at once, and the one about a chapter shouldn't be the
+   one that gets covered. */
+.conflict-chip {
+  position: fixed;
+  right: var(--space-5);
+  bottom: var(--space-5);
+  z-index: 81;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-lg);
+  background: var(--bg-pane);
+  box-shadow: var(--shadow);
+  color: var(--fg-primary);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  line-height: var(--leading-ui);
+  cursor: pointer;
+  animation: rise-in var(--motion-standard) var(--ease-enter);
+  transition: border-color var(--motion-quick) var(--ease),
+    background var(--motion-quick) var(--ease);
+}
+.conflict-chip::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--danger);
+}
+.conflict-chip:hover,
+.conflict-chip:focus-visible {
+  background: var(--bg-hover);
+  border-color: var(--danger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:not(.motion-full) .conflict-chip {
+    animation: none;
     transition: none;
   }
 }
