@@ -73,7 +73,7 @@ import {
 
 import { TimerTab } from "./TimerTab";
 
-const TAB_DEFS: Record<TabId, { label: string; title: string; needsNote: boolean }> = {
+export const TAB_DEFS: Record<TabId, { label: string; title: string; needsNote: boolean }> = {
   links: { label: "Links", title: "Backlinks and references for this note", needsNote: true },
   critique: { label: "Critique", title: "Prose analysis of this note", needsNote: true },
   tasks: { label: "Tasks", title: "Every to-do across the project", needsNote: false },
@@ -121,7 +121,6 @@ export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => 
   const belowRef = useRef<HTMLDivElement>(null);
   const leftRef = useRef<HTMLDivElement>(null);
   const rightRef = useRef<HTMLDivElement>(null);
-  const active = store.active();
   const tab = prefs.active;
   const rows = paneRows(prefs);
   const heights = rowShares(prefs);
@@ -186,41 +185,9 @@ export function InspectorPane({ onShowMusicPlayer }: { onShowMusicPlayer: () => 
     };
   }, [menuOpen]);
 
-  const renderTab = (id: TabId) => {
-    if (TAB_DEFS[id].needsNote && !active)
-      return (
-        <div className="empty-state">
-          <span className="empty-glyph" aria-hidden>
-            ¶
-          </span>
-          <p className="empty-line">Nothing open.</p>
-        </div>
-      );
-    switch (id) {
-      case "links":
-        return <LinksTab />;
-      case "critique":
-        return <CritiquePanel />;
-      case "tasks":
-        return <TasksPanel />;
-      case "history":
-        return <HistoryPanel />;
-      case "assistant":
-        return <AssistantTab />;
-      case "chat":
-        return <ChatPanel />;
-      case "continuity":
-        return <ContinuityPanel />;
-      case "goals":
-        return <GoalsTab />;
-      case "calendar":
-        return <CalendarTab />;
-      case "music":
-        return <MusicTab onShowPlayer={onShowMusicPlayer} />;
-      case "timer":
-        return <TimerTab />;
-    }
-  };
+  const renderTab = (id: TabId) => (
+    <ToolBody id={id} onShowMusicPlayer={onShowMusicPlayer} />
+  );
 
   return (
     <aside className="pane pane-right">
@@ -719,6 +686,60 @@ function splitTitle(prefs: TabPrefs, id: TabId, room: boolean, where: string): s
   if (id === prefs.active) return "This tool is already the one on show";
   if (!room) return `${MAX_SLOTS} panels at once is the limit — close one first`;
   return `Open ${where} — keep it on screen in its own panel`;
+}
+
+/**
+ * One tool, rendered on its own.
+ *
+ * Lifted out of the inspector so the board can float the same tools in
+ * draggable panels. It stays the ONLY place that maps a TabId to a
+ * component: two switches would drift, and the day they disagree is the
+ * day a tool works in one place and is blank in the other.
+ */
+export function ToolBody({
+  id,
+  onShowMusicPlayer,
+}: {
+  id: TabId;
+  onShowMusicPlayer?: () => void;
+}) {
+  useVaultVersion();
+  const active = store.active();
+
+  if (TAB_DEFS[id].needsNote && !active)
+    return (
+      <div className="empty-state">
+        <span className="empty-glyph" aria-hidden>
+          ¶
+        </span>
+        <p className="empty-line">Nothing open.</p>
+      </div>
+    );
+
+  switch (id) {
+    case "links":
+      return <LinksTab />;
+    case "critique":
+      return <CritiquePanel />;
+    case "tasks":
+      return <TasksPanel />;
+    case "history":
+      return <HistoryPanel />;
+    case "assistant":
+      return <AssistantTab />;
+    case "chat":
+      return <ChatPanel />;
+    case "continuity":
+      return <ContinuityPanel />;
+    case "goals":
+      return <GoalsTab />;
+    case "calendar":
+      return <CalendarTab />;
+    case "music":
+      return <MusicTab onShowPlayer={onShowMusicPlayer ?? (() => {})} />;
+    case "timer":
+      return <TimerTab />;
+  }
 }
 
 function TabStrip({

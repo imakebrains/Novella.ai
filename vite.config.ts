@@ -68,7 +68,15 @@ export default defineConfig(({ mode }) => ({
     watch: {
       // Never watch the Rust build tree. Cargo holds locks on the .exe files
       // in target/, and the watcher dies with EBUSY the moment it touches one.
-      ignored: ["**/src-tauri/**"],
+      //
+      // writing-skills/ is reference material vendored into the repo, and it
+      // contains a self-referential symlink:
+      //   vendor/story-skills/plugins/story-skills -> ..
+      // The watcher follows that forever, building a path out of repeated
+      // "plugins/story-skills" until the stat call fails and takes the whole
+      // dev server down with it. Nothing in there is app source, so the fix
+      // is simply not to look.
+      ignored: ["**/src-tauri/**", "**/writing-skills/**"],
     },
   },
 }));

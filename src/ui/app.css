@@ -160,6 +160,10 @@
   display: grid;
   flex: 1 1 auto;
   min-height: 0;
+  /* The board's floating panel layer is positioned against this. Safe to
+     add: nothing here is absolutely positioned against an ancestor
+     further up, and the grid tracks are unaffected. */
+  position: relative;
   /* No transition on the track list. Once the panes became draggable this
      stopped being a nicety and became a bug: the list mixes auto and
      minmax keywords, which the browser can't interpolate, so the tracks
@@ -11610,4 +11614,121 @@ body:has(.col-divider.dragging) {
 /* The picker must not run under the fold button. */
 .inspector-head .tool-picker-btn {
   padding-right: var(--space-5);
+}
+
+/* ---- 9.60 the board as a planner ---- */
+/* Any tool can be pulled onto the board as a floating panel, dragged
+   anywhere, sized, folded and kept. The inspector shows one tool in a
+   fixed column, which is the right shape for writing and the wrong shape
+   for planning a book.
+
+   The layer sits over the board and takes no pointer events of its own —
+   only the panels and the + Tool button do. Without that, an invisible
+   sheet would swallow every click meant for the corkboard underneath. */
+.board-panels {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+.board-panels > * {
+  pointer-events: auto;
+}
+
+.board-panel-add {
+  position: absolute;
+  right: var(--space-4);
+  top: var(--space-3);
+  z-index: 1;
+}
+.board-panel-menu {
+  top: calc(100% + var(--space-1));
+  right: 0;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.board-panel {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  min-width: 240px;
+  min-height: 34px;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-pane);
+  box-shadow: var(--shadow);
+  /* A panel arrives rather than appearing. */
+  animation: surface-in var(--motion-quick) var(--ease-enter);
+}
+
+/* Frosted only over a backdrop, matching every other surface. Kept off
+   otherwise: backdrop-filter on a dozen panels is real GPU work, and
+   over an opaque board it buys nothing. */
+:root.has-backdrop .board-panel {
+  background: color-mix(in srgb, var(--bg-pane) 82%, transparent);
+  backdrop-filter: blur(10px) saturate(1.1);
+}
+
+.board-panel-head {
+  flex: 0 0 auto;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-1) 0 var(--space-3);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-raised);
+  cursor: grab;
+  /* The header IS the drag handle: let the pointer own it outright, or
+     the browser starts a text selection two pixels into every drag. */
+  user-select: none;
+  touch-action: none;
+}
+.board-panel-head:active {
+  cursor: grabbing;
+}
+.board-panel.collapsed .board-panel-head {
+  border-bottom: none;
+}
+
+.board-panel-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--fg-primary);
+}
+
+.board-panel-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: var(--space-3);
+}
+
+/* The grip. Two hairlines rather than a filled wedge — it should read as
+   an affordance at the corner, not as a piece of the tool. */
+.board-panel-grip {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 16px;
+  height: 16px;
+  cursor: nwse-resize;
+  touch-action: none;
+  background:
+    linear-gradient(135deg, transparent 46%, var(--border-strong) 46%, var(--border-strong) 54%, transparent 54%),
+    linear-gradient(135deg, transparent 68%, var(--border-strong) 68%, var(--border-strong) 76%, transparent 76%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:not(.motion-full) .board-panel {
+    animation: none;
+  }
 }

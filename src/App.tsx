@@ -22,6 +22,7 @@ import { RecoveryBanner } from "./ui/RecoveryBanner";
 import { UndoToastHost } from "./ui/UndoToastHost";
 import { TrashHost } from "./ui/TrashPanel";
 import { ConflictHost } from "./ui/ConflictPanel";
+import { BoardPanels } from "./ui/BoardPanels";
 import { STYLE_ME_COMMAND, StyleMeHost } from "./ui/StyleMeModal";
 import { TourButton, TourOverlay, openTour } from "./ui/TourOverlay";
 import { Logo } from "./ui/Logo";
@@ -519,6 +520,9 @@ export default function App() {
         )}
 
         {center}
+        {mode === "board" && !focus && (
+          <BoardPanels onShowMusicPlayer={() => setMusicOpen(true)} />
+        )}
 
         {!focus && rightOpen && (
           <Resizer
