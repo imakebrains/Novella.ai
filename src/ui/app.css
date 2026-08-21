@@ -11732,3 +11732,206 @@ body:has(.col-divider.dragging) {
     animation: none;
   }
 }
+
+/* ============================================================
+   9.61 COMPACT — one column, and the panes become drawers
+
+   The three-column grid's track list is an INLINE style, so none of this
+   can fix the layout on its own; App.tsx switches to a single track below
+   the same breakpoint (see useCompact.ts). What follows is everything
+   else that has to change once it does.
+
+   899px matches the 900px query already in this file. Two breakpoints a
+   hundred pixels apart is how a layout ends up broken in a band nobody
+   tests.
+   ============================================================ */
+
+@media (max-width: 899px) {
+  /* The panes leave the grid entirely. Absolute, not fixed: the workspace
+     is the positioning context (it already is, for the board's panels),
+     so a drawer sits under the titlebar rather than over it — the writer
+     can still reach Codex/Tools to dismiss it. */
+  .pane-left,
+  .pane-right {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 30;
+    width: min(min(320px, 86vw), 100%);
+    box-shadow: var(--shadow);
+    /* Its own scroller, and never rubber-band the page behind it. */
+    overscroll-behavior: contain;
+  }
+  .pane-left {
+    left: 0;
+    border-right: 1px solid var(--border-strong);
+  }
+  .pane-right {
+    right: 0;
+    border-left: 1px solid var(--border-strong);
+  }
+
+  .drawer-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background: color-mix(in srgb, var(--bg-app) 55%, transparent);
+    animation: fade-in var(--motion-quick) var(--ease-enter);
+  }
+
+  /* Titlebar triage. Thirteen controls in a no-wrap row need ~660px, and
+     there are 375. What goes is anything reachable elsewhere: the brand
+     name (the mark stays), the word count (in Goals), the theme cycle and
+     focus toggle (both in Settings and the palette). What STAYS is
+     SaveStatus — "did that save?" matters most exactly where storage is
+     least trusted. */
+  /* Specificity matters here: .icon-btn.labeled is (0,2,0) and sets a
+     display, so a bare .focus-toggle at (0,1,0) loses and the button
+     stays on screen. Each selector below is qualified to at least match
+     it, and these rules come later in the file. */
+  .titlebar .brand-name,
+  .titlebar .stat,
+  .titlebar .icon-btn.theme-cycle,
+  .titlebar .icon-btn.focus-toggle {
+    display: none;
+  }
+
+  /* Codex / Tools / Write / Board go to glyphs. The label is inside a
+     span precisely so it can be dropped without touching the icon. */
+  .icon-btn.labeled > span,
+  .view-switch .view-label {
+    display: none;
+  }
+
+  /* The project name is the one variable-width thing up here, and a book
+     called "The Seventeenth Letter of Marque" would push everything else
+     off on its own. Truncate rather than wrap: the titlebar is one row. */
+  .brand-vault {
+    /* 4.5em, not 6.5: at 6.5 the cap never bit — "Seed World" rendered at
+       72px inside an 84px allowance — and the bar stayed five pixels over
+       375. The name is also the least costly thing to abbreviate, because
+       the writer knows which book they opened. */
+    max-width: 4.5em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Measured, not guessed. At 375px the bar wanted 500px: brand 169
+     (mark 20 + name 72 + "+ New" 61), the view switch 106, four 44px
+     buttons on the right at 200, and 36 of padding.
+
+     The four right-hand buttons stay 44px — that is the touch minimum and
+     shrinking them to win layout would be the wrong trade. So the width
+     comes from everything else: the mark, the "New" word, a truncated
+     project name, tighter padding, and Hints, which is also in Settings
+     and in the palette. */
+  .titlebar {
+    gap: var(--space-1);
+    padding-left: var(--space-2);
+    padding-right: var(--space-2);
+  }
+  .titlebar .brand-mark,
+  .titlebar .quick-create-word,
+  .titlebar .tour-btn {
+    display: none;
+  }
+
+  /* The board's panel layer is a desktop affordance — free-floating
+     windows on a 375px screen are a puzzle, not a planner. */
+  .board-panels {
+    display: none;
+  }
+}
+
+/* ============================================================
+   9.62 TOUCH — by input, not by width
+
+   Deliberately (hover: none) rather than max-width: a touch laptop has
+   every one of these problems at 1920px, and a narrow window on a mouse
+   machine has none of them.
+   ============================================================ */
+
+@media (hover: none) {
+  /* touch-action: none on a card kills scrolling THROUGH it, and the
+     cards fill the whole corkboard — so the board could not be scrolled
+     by finger at all. pan-y gives the page back its vertical scroll while
+     leaving horizontal drag to the reorder gesture. */
+  .board-card {
+    touch-action: pan-y;
+  }
+
+  /* Reordering by tap is better than dragging on a phone anyway — but
+     these arrows are opacity:0 until :hover, and :hover never comes. */
+  .card-nudge {
+    opacity: 1;
+  }
+
+  /* Same trap: a close affordance that only appears on hover cannot be
+     reached at all. */
+  .tab-close,
+  .chat-thread-row .icon-btn,
+  .chat-actions,
+  .board-panel-grip {
+    opacity: 1;
+  }
+
+  /* 44px is the floor every platform's guidance agrees on. Applied by
+     min-size so nothing re-centres or reflows. */
+  .icon-btn,
+  .tab-close,
+  .card-nudge,
+  .fb-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Hover tooltips have nowhere to go on a touch screen; the title
+     attribute still reaches a screen reader. */
+  [data-tip]::after,
+  [data-tip]::before {
+    display: none;
+  }
+}
+
+@media (max-width: 899px) {
+  /* The music dock is fixed at 330px; edge to edge is the only sane
+     answer on a narrow screen. */
+  .music-dock {
+    left: var(--space-2);
+    right: var(--space-2);
+    width: auto;
+  }
+
+  /* Settings is a 168px sidebar beside a body — one column, with the nav
+     as a horizontal scroller above it. */
+  .settings-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .settings-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    gap: var(--space-1);
+    padding-bottom: var(--space-1);
+  }
+  .settings-nav-item {
+    white-space: nowrap;
+  }
+
+  /* Wide 2D surfaces are not going to work at 375px and pretending
+     otherwise makes them worse. Let them scroll sideways instead of
+     crushing them. */
+  .plot-grid,
+  .board-table,
+  .relationship-web,
+  .board-stats {
+    overflow-x: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:not(.motion-full) .drawer-scrim {
+    animation: none;
+  }
+}

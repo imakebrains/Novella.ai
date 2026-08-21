@@ -32,6 +32,7 @@ import {
   type Panel,
 } from "./src/ui/panelLayout";
 import { ALL_TABS } from "./src/ui/inspectorTabs";
+import { COMPACT_MAX, isCompactWidth, nextDrawer } from "./src/ui/useCompact";
 
 let failures = 0;
 let checks = 0;
@@ -219,6 +220,34 @@ for (const tool of ALL_TABS) {
 ok("two projects get two keys", panelsKey("C:/Books/One") !== panelsKey("C:/Books/Two"));
 check("the same project is stable", panelsKey("C:/Books/One"), panelsKey("C:/Books/One"));
 ok("no project still has a key", panelsKey(null).length > 0);
+
+/* ============================================================
+   The compact breakpoint
+
+   Below this the three-column grid cannot fit: at 375px its fixed tracks
+   ask for 626px and the editor resolves to ZERO pixels wide. The track
+   list is built as an inline style, so no stylesheet can rescue it and
+   the decision has to be made here.
+   ============================================================ */
+
+ok("a phone is compact", isCompactWidth(375));
+ok("a small tablet is compact", isCompactWidth(768));
+ok("the breakpoint itself is compact", isCompactWidth(COMPACT_MAX));
+ok("one pixel wider is not", !isCompactWidth(COMPACT_MAX + 1));
+ok("a laptop is not compact", !isCompactWidth(1280));
+
+// It must agree with the 900px query already in app.css. Two breakpoints
+// a hundred pixels apart is how a layout breaks in a band nobody tests.
+check("the breakpoint matches the stylesheet's", COMPACT_MAX, 899);
+
+// Tapping the open pane's button closes it — the titlebar button is a
+// toggle in both layouts.
+check("tapping the open drawer closes it", nextDrawer("codex", "codex"), null);
+check("tapping the other one swaps straight to it", nextDrawer("codex", "tools"), "tools");
+check("tapping from closed opens", nextDrawer(null, "tools"), "tools");
+// Swapping rather than closing matters: the alternative costs two taps
+// to get from one pane to the other.
+ok("swapping never passes through closed", nextDrawer("tools", "codex") !== null);
 
 if (failures > 0) {
   console.error(`\n${failures} of ${checks} checks failed.`);

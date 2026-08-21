@@ -23,6 +23,7 @@ import { UndoToastHost } from "./ui/UndoToastHost";
 import { TrashHost } from "./ui/TrashPanel";
 import { ConflictHost } from "./ui/ConflictPanel";
 import { BoardPanels } from "./ui/BoardPanels";
+import { useCompact, nextDrawer, type Drawer } from "./ui/useCompact";
 import { STYLE_ME_COMMAND, StyleMeHost } from "./ui/StyleMeModal";
 import { TourButton, TourOverlay, openTour } from "./ui/TourOverlay";
 import { Logo } from "./ui/Logo";
@@ -53,6 +54,13 @@ export default function App() {
   const [rightOpen, setRightOpen] = useState(
     () => localStorage.getItem("novella.pane.right") !== "0",
   );
+  // Below ~900px the three-column grid cannot fit (see useCompact.ts), so
+  // the panes become drawers over one column.
+  const compact = useCompact();
+  // EPHEMERAL on purpose. The persisted leftOpen/rightOpen describe the
+  // writer's desktop layout; a phone opening the codex for ten seconds
+  // must not rewrite that and greet them with a changed desk next time.
+  const [drawer, setDrawer] = useState<Drawer>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
@@ -191,6 +199,19 @@ export default function App() {
     return () => registerIntroOpener(null);
   }, []);
 
+  // Tapping a chapter in the codex drawer means "read this", not "show me
+  // the list I just used". Closing on the note change rather than on the
+  // tap catches every route in — the list, a [[link]], the palette — and
+  // is the single interaction that makes the compact layout feel like an
+  // app instead of a squeezed desktop.
+  const activeNoteId = store.activeIdOrUndefined();
+  useEffect(() => {
+    if (compact && drawer === "codex") setDrawer(null);
+    // drawer is deliberately absent: this fires on the NOTE changing, and
+    // including it would slam the drawer shut the moment it opened.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeNoteId, compact]);
+
   // Panels deep in the tree send people to Settings — "no provider
   // connected" is only useful if the way to fix it is one click away. The
   // event is cancelable and the sender falls back to naming the gear icon,
@@ -281,8 +302,16 @@ export default function App() {
     { id: "tour", label: "Show me around", hint: "tour", run: () => openTour() },
     { id: "music", label: "Open music player", run: () => setMusicOpen(true) },
     { id: "theme", label: `Change theme (now: ${themeInfo.name})`, run: cycleTheme },
-    { id: "left", label: leftOpen ? "Hide codex pane" : "Show codex pane", run: () => setLeftOpen((v) => !v) },
-    { id: "right", label: rightOpen ? "Hide inspector" : "Show inspector", run: () => setRightOpen((v) => !v) },
+    {
+      id: "left",
+      label: (compact ? drawer === "codex" : leftOpen) ? "Hide codex pane" : "Show codex pane",
+      run: () => (compact ? setDrawer((d) => nextDrawer(d, "codex")) : setLeftOpen((v) => !v)),
+    },
+    {
+      id: "right",
+      label: (compact ? drawer === "tools" : rightOpen) ? "Hide inspector" : "Show inspector",
+      run: () => (compact ? setDrawer((d) => nextDrawer(d, "tools")) : setRightOpen((v) => !v)),
+    },
     { id: "banner", label: bannerOn ? "Hide board cover art" : "Show board cover art", hint: "board", run: () => setBannerOn((v) => !v) },
   ];
 
@@ -380,14 +409,14 @@ export default function App() {
               onClick={() => setMode("write")}
               aria-pressed={mode === "write"}
             >
-              <span className="view-icon">✎</span> Write
+              <span className="view-icon">✎</span> <span className="view-label">Write</span>
             </button>
             <button
               className={mode === "board" ? "on" : ""}
               onClick={() => setMode("board")}
               aria-pressed={mode === "board"}
             >
-              <span className="view-icon">▦</span> Board
+              <span className="view-icon">▦</span> <span className="view-label">Board</span>
             </button>
           </div>
         </div>
@@ -410,23 +439,31 @@ export default function App() {
             </button>
           )}
           <button
-            className={`icon-btn labeled ${leftOpen ? "on" : ""}`}
-            onClick={() => setLeftOpen((v) => !v)}
+            className={`icon-btn labeled ${(compact ? drawer === "codex" : leftOpen) ? "on" : ""}`}
+            onClick={() =>
+              compact
+                ? setDrawer((d) => nextDrawer(d, "codex"))
+                : setLeftOpen((v) => !v)
+            }
             data-tip="Chapters, characters and notes"
-            aria-pressed={leftOpen}
+            aria-pressed={compact ? drawer === "codex" : leftOpen}
           >
             ▤ <span>Codex</span>
           </button>
           <button
-            className={`icon-btn labeled ${rightOpen ? "on" : ""}`}
-            onClick={() => setRightOpen((v) => !v)}
+            className={`icon-btn labeled ${(compact ? drawer === "tools" : rightOpen) ? "on" : ""}`}
+            onClick={() =>
+              compact
+                ? setDrawer((d) => nextDrawer(d, "tools"))
+                : setRightOpen((v) => !v)
+            }
             data-tip="Links, tasks, history, assistant"
-            aria-pressed={rightOpen}
+            aria-pressed={compact ? drawer === "tools" : rightOpen}
           >
             ▥ <span>Tools</span>
           </button>
           <button
-            className={`icon-btn labeled ${focus ? "on" : ""}`}
+            className={`icon-btn labeled focus-toggle ${focus ? "on" : ""}`}
             onClick={() => setFocus((v) => !v)}
             data-tip="Just the page (Ctrl+Shift+F)"
             aria-pressed={focus}
@@ -491,11 +528,25 @@ export default function App() {
 
       <div
         className={`workspace ${mode === "board" ? "board-mode" : ""}`}
+        // Tapping a chapter you are ALREADY reading has to close the drawer
+        // too. The effect above fires on the note CHANGING, which covers a
+        // link or the palette but not the commonest tap of all: opening the
+        // codex, seeing the chapter you are on, and tapping it. Capture
+        // phase so it still runs if the row stops propagation.
+        onClickCapture={(e) => {
+          if (!compact || drawer !== "codex") return;
+          const t = e.target as HTMLElement;
+          if (t.closest(".pane-left") && t.closest(".note-item")) setDrawer(null);
+        }}
         style={{
           // Focus mode is the whole point of a "just the page" view, so the
           // side panes collapse regardless of their toggles — one centered
           // column of text and nothing else.
-          gridTemplateColumns: focus
+          // Compact is the same answer as focus for the same reason: there
+          // is room for exactly one column. Without this branch the fixed
+          // tracks below add up to more than the viewport and the editor
+          // resolves to ZERO pixels wide.
+          gridTemplateColumns: focus || compact
             ? "minmax(0, 1fr)"
             : [
                 leftOpen ? `${left.width}px` : null,
@@ -508,10 +559,13 @@ export default function App() {
                 .join(" "),
         }}
       >
-        {!focus && leftOpen && (
+        {!focus && (compact ? drawer === "codex" : leftOpen) && (
           <CodexPane onImport={() => setImportOpen(true)} onExport={() => setExportOpen(true)} />
         )}
-        {!focus && leftOpen && (
+        {/* Never a resizer when compact: the pane is an overlay at a fixed
+            width, so there is no track to drag, and a 9px grab strip on a
+            touch screen is a trap rather than a control. */}
+        {!focus && !compact && leftOpen && (
           <Resizer
             side="left"
             onResize={(d) => left.setWidth((w) => left.clamp(w + d))}
@@ -524,14 +578,27 @@ export default function App() {
           <BoardPanels onShowMusicPlayer={() => setMusicOpen(true)} />
         )}
 
-        {!focus && rightOpen && (
+        {!focus && !compact && rightOpen && (
           <Resizer
             side="right"
             onResize={(d) => right.setWidth((w) => right.clamp(w + d))}
             onReset={right.reset}
           />
         )}
-        {!focus && rightOpen && <InspectorPane onShowMusicPlayer={() => setMusicOpen(true)} />}
+        {!focus && (compact ? drawer === "tools" : rightOpen) && (
+          <InspectorPane onShowMusicPlayer={() => setMusicOpen(true)} />
+        )}
+
+        {/* Tap-anywhere-else to dismiss. Rendered last so it sits under the
+            drawer but over the page, and only when a drawer is actually
+            open — a permanent scrim would eat every tap on the editor. */}
+        {compact && drawer && (
+          <div
+            className="drawer-scrim"
+            onPointerDown={() => setDrawer(null)}
+            aria-hidden
+          />
+        )}
       </div>
 
       {focus && (
