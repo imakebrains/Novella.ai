@@ -1,8 +1,18 @@
 # Novella roadmap
 
 The working backlog. The autonomous build routine reads this file, takes the
-**topmost unchecked item**, builds it to the gate below, checks it off with a
-dated log line, and pushes. Humans edit it freely — reorder, add, strike.
+**topmost unchecked item that is not marked WITH-OWNER**, builds it to the gate
+below, checks it off with a dated log line, and pushes. Humans edit it freely —
+reorder, add, strike.
+
+The WITH-OWNER exemption is not cosmetic. Between 2026-08-12 and 2026-08-20 the
+topmost unchecked item was a deferred block whose own text said "do NOT
+bulk-build these autonomously", so every run read the top of the list, correctly
+declined to build it, and fell through to another research round — eight of them
+in sixty commits, while six of that block's eight sub-items were meanwhile being
+built by hand in owner sessions. A parked item at the top of a list is a stop
+sign for everything under it. Mark taste calls WITH-OWNER, leave them wherever
+they belong by priority, and let the routine walk past them to real work.
 
 ## The gate (every change, no exceptions)
 
@@ -42,7 +52,7 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
 
 ## Next up
 
-- [ ] **OWNER ROUND 5 (2026-08-12) — the type.ai comparison.** Eight changes
+- [x] **OWNER ROUND 5 (2026-08-12) — the type.ai comparison.** Eight changes
       the owner asked for after looking at type.ai. They deferred these to a
       working session ("we will work on this after session usage resets"), so
       do NOT bulk-build them autonomously. The four marked CLOUD-OK have a
@@ -123,12 +133,38 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
          Sequencing note: this should land AFTER the responsive/mobile pass.
          A premium first impression that renders at 0px on a phone is worth
          less than nothing.
+      CLOSED 2026-08-20. Six of the eight shipped: the interactive calendar
+      (entries, custom labels, ICS subscription), the settings modal's stable
+      height, the new logo (the gates mark, with the whole icon ladder behind
+      it), the real Chat panel, reword-in-place, and "Style me". The two that
+      remain are broken out as their own items below, because leaving them
+      inside a checked block hid them.
+
       8. **Absorb the type.ai lessons generally** (research round 27). What
          reviewers like is *interaction*, not model quality — selective inline
          edits, and an AI that lives in the document. What they dislike is
          shallow output, occasional context misses, and inflexible pricing. The
          first two are ours to win with the voice-matching item; the third we
          win by construction.
+
+- [ ] **Split the Board from Write entirely** (WITH-OWNER — round 5 item 2).
+      The board should stop being manuscript-centric and become its own
+      space: character information, a story board, and a home for memories,
+      schedules and plans. Partly answered on 2026-08-20 — any tool can now
+      be floated on the board as a draggable, sizeable, remembered panel
+      (`BoardPanels.tsx` / `panelLayout.ts`), which is the "planner" half.
+      What is still an owner call is the information architecture: what a
+      board IS when it is not a view of chapters, and whether the mode
+      switch survives. Scope it with the owner before moving code.
+
+- [ ] **Conversational onboarding presentation** (WITH-OWNER — round 5 item 7).
+      The "Style me" mechanism shipped 2026-08-20 and derives a real style
+      from a real sample. What has not shipped is the Lingrow feeling the
+      owner pointed at: one question per screen, arriving as typed-out
+      messages, each answer visibly changing the app as it is answered. The
+      pieces exist (FirstRunWizard's four steps, the intro's motion system);
+      this is a presentation pass over them, and it is taste, so it wants
+      the owner in the room.
 
 - [x] **Slash commands in the editor** — shipped 2026-07-22.
 - [x] **Writing sprints (the fourth app)** — shipped 2026-07-23.
@@ -911,7 +947,7 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       native spellcheck for free before building anything — a bundled
       offline grammar engine is a real size/scope tradeoff against the
       lightweight-installer promise.
-- [ ] **Clean up paste from Word/Google Docs** — research round 34
+- [x] **Clean up paste from Word/Google Docs** — shipped 2026-08-20 (HTML to Markdown on the paste event, Google Docs' `<b style="font-weight:normal">` wrapper and Word's `mso-list` both handled, refuses conversion rather than corrupting a manuscript; test-paste.ts). Original note: research round 34
       (2026-08-19): Sudowrite's Aug 18, 2026 changelog shipped exactly
       this — pasting from Word/Google Docs no longer produces doubled line
       breaks, headings scale with the surrounding text size, nested
