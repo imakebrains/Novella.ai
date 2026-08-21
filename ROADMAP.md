@@ -34,6 +34,11 @@ they belong by priority, and let the routine walk past them to real work.
 - Release tags are cut ~weekly, only when user-visible features shipped and
   the suite is green: bump `version` in `package.json` + `src-tauri/tauri.conf.json`,
   then `git tag vX.Y.Z && git push origin vX.Y.Z` (CI builds installers).
+  **FOUR files, not two**: `package.json`, `src-tauri/tauri.conf.json`,
+  `src-tauri/Cargo.toml`, and `src-tauri/Cargo.lock` (bump the lock with
+  `cd src-tauri && cargo update -p app --offline`). This line named only
+  the first two until 2026-08-20, which is how the Rust crate version
+  drifted away from the tag.
 
 ## The thesis (what "#1" means here)
 
