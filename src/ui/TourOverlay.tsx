@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { reducedMotion } from "./personalize";
+import {
+  loadPersonalization,
+  motionModeOf,
+  reducedMotion,
+  savePersonalization,
+} from "./personalize";
 import { REWORD_STYLES } from "./rewordCore";
 import { SLASH_COMMANDS } from "./slashCommands";
 import { introPending } from "./WelcomeIntro";
@@ -205,6 +210,11 @@ export function TourOverlay() {
     currentRow.current?.scrollIntoView({ block: "nearest" });
   }, [open, state.step, query]);
 
+  // reducedMotion() reads localStorage during render rather than living in
+  // state, so changing it needs a nudge to re-render. A counter is enough
+  // and keeps the preference in one place rather than mirroring it here.
+  const [, bump] = useState(0);
+
   const groups = useMemo(() => hintGroups(query), [query]);
 
   if (!open) return null;
@@ -295,6 +305,30 @@ export function TourOverlay() {
               <p className="tour-copy">{step.body}</p>
               <p className="tour-where">{step.where}</p>
               {still && <p className="tour-still-caption">{step.still}</p>}
+
+              {/* A frozen clip in a tour ABOUT gestures reads as broken
+                  software, not as a respected preference — and the setting
+                  that caused it is four clicks away in Settings. Say which
+                  of the two reasons it is, and offer the fix here, because
+                  here is where anyone notices. */}
+              {still && (
+                <p className="tour-motion-note">
+                  {motionModeOf(loadPersonalization()) === "minimal"
+                    ? "Animations are set to Minimal, so these play as still frames."
+                    : "Your system asks for reduced motion, so these play as still frames."}{" "}
+                  <button
+                    className="link-btn"
+                    onClick={() => {
+                      savePersonalization({ ...loadPersonalization(), motion: "full" });
+                      // reducedMotion() is read during render, so a re-render
+                      // is all it takes for every clip to start moving.
+                      bump((n) => n + 1);
+                    }}
+                  >
+                    Play them anyway
+                  </button>
+                </p>
+              )}
             </div>
           </div>
         </div>

@@ -2387,8 +2387,18 @@ body:has(.resizer.dragging) {
 .beat-add {
   display: flex;
   align-items: center;
+  /* "Suggest next steps" is 127px in a 192px column beside an input and
+     an Add button; unwrapped it hung 21px outside the pane. */
+  flex-wrap: wrap;
+  row-gap: var(--space-1);
   gap: var(--space-2);
   padding: 3px 0;
+}
+/* The input takes the slack rather than the buttons, and min-width: 0 is
+   what lets a flex item shrink below its content at all. */
+.beat-add .beat-text {
+  flex: 1 1 8ch;
+  min-width: 0;
 }
 .beat.busy {
   opacity: 0.6;
@@ -5830,11 +5840,22 @@ input[type="range"]:focus-visible::-webkit-slider-thumb {
   animation: rise-in var(--motion-quick) var(--ease-enter);
 }
 
-/* Pane open/close glides instead of snapping. A deliberate user
-   action, not a typing path — reflow during it is acceptable. */
-.workspace {
-  transition: grid-template-columns var(--motion-standard) var(--ease-enter);
-}
+/* NO transition on the track list — and this is the second time it has
+   been removed, so the reason is worth stating twice.
+
+   The list mixes `auto` and `minmax()` keywords. The browser cannot
+   interpolate between those, so instead of gliding it FREEZES the tracks
+   at their old widths. Measured 2026-08-20 at 1440px with the inspector
+   open: the inline style correctly said
+   `minmax(0px, 1fr) auto 340px`, and the used value was stuck at
+   `268px 9px 1163px` — the editor squeezed to a codex-width 268 while
+   the inspector took 1163, and the format bar wrapped to four rows
+   inside it. The panes look like they are in the wrong places because
+   they are.
+
+   It also cost a reflow on every frame of a pane drag. If pane open and
+   close should ever glide, animate something that CAN interpolate — a
+   width on the pane itself — not the grid definition. */
 
 /* Theme and accent swaps crossfade once, via a class that useTheme
    adds for the duration of the change and then removes — ordinary
@@ -10936,10 +10957,20 @@ body:has(.col-divider.dragging) {
 .format-bar {
   display: flex;
   align-items: center;
+  /* Fourteen controls need ~330px and the editor column is 268 with both
+     panes open at 1440 — so without this the last four buttons rendered
+     OUTSIDE the bar, over the page. Wrapping keeps every control
+     reachable; scrolling would hide the ones at the end behind a gesture
+     nobody looks for on a toolbar. */
+  flex-wrap: wrap;
+  row-gap: var(--space-1);
   gap: var(--space-1);
   flex: 0 0 auto;
   min-height: 34px;
-  padding: var(--space-1) var(--space-5);
+  /* Was --space-5 (26px) each side, which spent 52px of a 268px column on
+     margin. The bar is chrome, not prose; it does not need the page's
+     measure. */
+  padding: var(--space-1) var(--space-2);
   border-bottom: 1px solid var(--border);
   background: var(--bg-app);
   transition: opacity var(--motion-quick) var(--ease-color);
@@ -11600,20 +11631,28 @@ body:has(.col-divider.dragging) {
    top of the inspector. Folded it gives that height back to the tool
    itself, and nothing becomes unreachable: the picker above it opens the
    same list. */
+/* LEFT, not right. On the right it sat a few pixels from the picker's own
+   ▾ — two chevrons touching, one meaning "open the menu" and one meaning
+   "fold the strip", which is a coin toss. At opposite ends of the head
+   position tells them apart before the glyph has to. */
 .strip-fold {
   position: absolute;
-  right: var(--space-2);
+  left: var(--space-2);
   top: 50%;
   transform: translateY(-50%);
   font-size: var(--text-sm);
   line-height: 1;
+  color: var(--fg-muted);
+}
+.strip-fold:hover {
+  color: var(--fg-primary);
 }
 .inspector-head {
   position: relative;
 }
-/* The picker must not run under the fold button. */
+/* The picker starts clear of the fold button rather than under it. */
 .inspector-head .tool-picker-btn {
-  padding-right: var(--space-5);
+  padding-left: var(--space-5);
 }
 
 /* ---- 9.60 the board as a planner ---- */
@@ -11934,4 +11973,33 @@ body:has(.col-divider.dragging) {
   :root:not(.motion-full) .drawer-scrim {
     animation: none;
   }
+}
+
+/* ---- 9.63 why a clip is a still, and how to change it ---- */
+/* A frozen clip in a tour ABOUT gestures reads as broken software rather
+   than as a respected preference, and the setting that caused it is four
+   clicks away in Settings. This says which of the two reasons it is —
+   Minimal, or the OS asking — and offers the fix where it is noticed. */
+.tour-motion-note {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-xs);
+  line-height: var(--leading-ui);
+  color: var(--fg-muted);
+}
+
+/* A button that reads as a link: no chrome, inherits its sentence, and
+   underlines only on approach so it does not shout inside a paragraph. */
+.link-btn {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: none;
+}
+.link-btn:hover,
+.link-btn:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
