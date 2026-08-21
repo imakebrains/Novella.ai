@@ -1,7 +1,7 @@
 {
   "name": "novella",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "A local-first writing environment. Your book lives as plain Markdown on your disk.",
   "license": "Apache-2.0",

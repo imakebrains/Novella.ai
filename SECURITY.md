@@ -143,5 +143,34 @@ Non-negotiables, decided before any code:
 
 ## Reporting a problem
 
-Not yet applicable — there is no public release. Before one, this section
-needs a contact address and a stated response window.
+Email **drewpmedia@gmail.com** with "Novella security" in the subject.
+Please include what you did, what happened, and the version from
+Settings → About. A proof-of-concept helps but is not required.
+
+Expect an acknowledgement within **7 days** and an assessment within
+**30**. Novella is maintained by one person, so that is a realistic
+promise rather than a generous one; if a fix will take longer, you will
+be told where it stands rather than left waiting.
+
+Please report privately first and give a reasonable window before
+publishing. There is no bug bounty — this is a free, open-source project
+with no revenue behind it — but credit is given in the release notes for
+anything reported this way, unless you would rather not be named.
+
+**What is in scope.** Anything that could expose a writer's manuscript or
+credentials: the vault reader and writer, the path gate in
+`src-tauri/src/lib.rs`, the Tauri capability set, the CSP, the OS
+credential-store integration, the export and import paths, and the plugin
+sandbox. Anything that reaches the network without the writer asking is
+in scope by definition — see "What leaves this machine" above.
+
+**What is not.** Findings that require an attacker to already have the
+writer's unlocked machine; the unsigned installers (a known, documented
+trade-off — see the README); and denial-of-service against a local-only
+desktop app with no server to exhaust.
+
+> **NEEDS OWNER (free, one setting):** GitHub's private vulnerability
+> reporting is currently **disabled** on this repository, so the email
+> above is the only private channel. Turning it on — Settings → Code
+> security → Private vulnerability reporting — gives reporters a proper
+> advisory workflow. Add the link here once it is enabled.
