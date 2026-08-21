@@ -530,6 +530,19 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       near-miss. PlotForge Desktop, Scríob, and Novel Forge AI are all
       unchanged from prior rounds. Twenty-one dedicated rechecks in, the
       gap stays open on both sides.
+      Research round 36 (2026-08-21) ran the check a twenty-second time
+      and again found no match. One new near-miss for the standing watch
+      list: LocalProse (localprose.com) pairs local/on-device AI with
+      worldbuilding (characters, locations, relationship maps, timeline)
+      and a Pomodoro focus timer, but its only task-adjacent feature is a
+      notes/goals "idea box," not a real task tracker — three of four
+      pillars, same shape as StoryLine, PlotForge Desktop, Scríob, and
+      Novel Forge AI. StoryLine shipped no release past v1.10.62 (still
+      dated 2026-08-19, after a rapid run of point releases through
+      mid-August); Longform and Novel Word Count remain frozen at their
+      previously-logged versions; no new Notion-for-writers template
+      surfaced on Reddit or Notion's own gallery. Twenty-two dedicated
+      rechecks in, the gap stays open on both sides.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -646,6 +659,13 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       to Aug 19 or Aug 20, so this isn't logged as confirmed-new; re-check
       with an exact date next round before citing it in copy. App version
       unchanged at 1.3.2.
+      Research round 36 (2026-08-21) resolves that ambiguity: re-fetching
+      the same review today shows its relative timestamp advanced from
+      "1 day ago" to "2 days ago," pinning the incident to ~2026-08-19 — a
+      confirmed third failure mode (data loss during a save-time glitch,
+      one instance explicitly "today while working on wifi") distinct from
+      the long-tracked mid-sentence cursor-jump bug. App still at v1.3.2,
+      no changelog entry addressing either bug.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent
@@ -781,6 +801,23 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       whether Anthropic/Class Counsel characterize it as delaying anything.
       Kadrey v. Meta's mediation-outcome report (due 8/21, tomorrow) still
       has nothing filed as of the last docket entry (8/17-8/18).
+      Research round 36 (2026-08-21) checks both dates directly, now that
+      they've passed. The Bartz claims portal has **not** opened as of
+      today, despite Class Counsel's "end of August" guidance —
+      anthropiccopyrightsettlement.com still shows only the March 30, 2026
+      claim-filing deadline, and no class-member appeal of the Final
+      Judgment itself has surfaced anywhere (Writer Beware, Authors
+      Alliance, Copyright Alliance all silent); Bloomberg Law (Aug 19) and
+      Law360 (Aug 20) both confirm the only appellate activity is
+      Edelson/Oppenheim+Zebrak's fee-award appeal to the 9th Circuit,
+      unrelated to the settlement itself. Kadrey v. Meta's mediation-
+      outcome report was due today and no source yet confirms it was filed
+      or what it says — status unresolved, re-check next round rather than
+      assume either outcome. Separately: the EU AI Act's Article 53
+      enforcement machinery (Commission Implementing Regulation 2026/1755)
+      came into force 2026-08-10, but no actual enforcement action has
+      been taken under it yet — a regulatory-plumbing update, not yet a
+      citable fact for copy.
 - [ ] **Say the export advantage louder** — research round 7: Sudowrite
       reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
       Novella already ships all three plus one-click backup

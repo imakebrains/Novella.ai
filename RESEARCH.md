@@ -4386,3 +4386,155 @@ stated as fact. NovelCrafter and type.ai passes were fully dry.
 - blog.taaonline.net, Law360, Bloomberg Law, Authors Alliance, Writer Beware,
   Copyright Alliance, anthropiccopyrightsettlement.com
 - Kadrey v. Meta docket coverage (McKool Smith trackers; CourtListener 403'd)
+
+# Round 36 (2026-08-21) — cadence, mostly dry, two litigation dates resolved
+
+Same brief as rounds 20-35: fresh reviews, feature announcements, and
+complaints for NovelCrafter, Sudowrite, Dabble, Scrivener, Campfire,
+type.ai, Obsidian-for-writers setups, and Notion writing templates,
+checked against everything already logged through round 35. Dispatched
+four parallel passes (NovelCrafter/Sudowrite/type.ai; Dabble/Scrivener/
+Campfire; Obsidian/Notion four-pillar check; industry/legal sentiment
+including the two litigation dates round 35 flagged as imminent — both
+fell inside this round's window, 2026-08-19 and 2026-08-21), each briefed
+on the relevant standing findings and told to search for material dated
+strictly after round 35's 2026-08-20 cutoff.
+
+## NovelCrafter / Sudowrite / type.ai
+
+**Sudowrite** shipped one dated changelog entry, 2026-08-18: "Easier
+Formatting: Paragraph Spacing & Improved Copy/Paste" — paragraph-spacing
+controls, one-click empty-line removal, cross-platform copy/paste fixes,
+refined heading/bullet formatting
+(feedback.sudowrite.com/changelog/easier-formatting-paragraph-spacing-and-improved-copypaste).
+Minor UX polish, not a reliability or pricing item, so nothing folds into
+an existing ROADMAP item from it — logged here for completeness. Its
+status page confirms no new incidents 2026-08-15 through 2026-08-21 (all
+operational since the Aug 11 incident already logged; uptime 99.98%/
+99.97%). No fresh Trustpilot reviews could be confirmed dated inside this
+round's window; direct Trustpilot fetch 403'd, and search results
+returned only older, already-seen reviews.
+
+**NovelCrafter**: nothing dated inside the window. Its changelog's newest
+entry is still March 21, 2026; its blog's newest post is Aug 5, 2026
+("Is Claude Opus 5 an improvement for writers?"), two weeks before this
+round's cutoff, so not new, but the most recent activity found. No fresh
+Reddit or Trustpilot commentary with a confirmable date turned up.
+
+**type.ai**: still frozen, reconfirmed a second time. type.ai/changelog
+is a hard 404; blog.type.ai's newest post remains Jan 21, 2026, unchanged
+since round 35. A third-party pricing listing (toolradar.com, checked
+~Aug 12) shows $12/mo annual, $23/mo monthly — not primary-sourced,
+flagged as such, not logged as new.
+
+## Dabble / Scrivener / Campfire
+
+**Campfire Write**: the round-35 chapter-loss App Store review is now
+date-resolved. Re-fetching the same review today shows its relative
+timestamp advanced from "1 day ago" (round 35) to "2 days ago" (round
+36) — both resolve to the same calendar day, ~2026-08-19. Review text:
+"I've lost whole chapters sometimes because it glitched while
+saving...lost another chunk today while working on wifi." App still at
+v1.3.2, no changelog entry addressing this or the long-tracked
+mid-sentence cursor-jump bug. Folded into the no-outage/can't-lose-your-
+work ROADMAP item as a confirmed third failure mode.
+
+**Scrivener**: nothing new. Most recent actual release remains Scrivener
+3.5 for Mac (macOS 26 Tahoe support, announced Oct 2, 2025), with a 3.5.2
+build referenced on the current overview page but no dated changelog
+entry found for it. Windows stable remains 3.1.6 (Sept 3, 2025). No
+forum threads or beta announcements dated near this round's window.
+
+**Dabble**: nothing new. The "large portion of book deleted, unresponsive
+support" Trustpilot review already logged (round 14) is dated Feb 16,
+2026 — now confirmed by direct re-check, not a new incident. No August
+2026 Trustpilot, Reddit, or changelog entries surfaced.
+
+## Obsidian / Notion / four-pillar check
+
+Twenty-second dedicated recheck (rounds 15, 17-36) of "does any product
+pair a task tracker with a focus/sprint timer alongside writing AND
+worldbuilding AND real local AI?" Again no match. One new near-miss for
+the standing watch list: **LocalProse** (localprose.com) — local/
+on-device AI, worldbuilding (characters, locations, relationship maps,
+timeline), and a Pomodoro focus-mode timer, but its only task-adjacent
+feature is a notes/goals "idea box," not a real task tracker. Not new to
+this window (featured on Korben Feb 23, 2026; last updated v3.5.1 on
+2026-07-30) but hadn't been named in a prior round's summary — worth
+carrying forward alongside StoryLine, PlotForge Desktop, Scríob, and
+Novel Forge AI, all still three-of-four pillars.
+
+StoryLine (github.com/PixeroJan/obsidian-storyline) shipped no release
+past v1.10.62 (2026-08-19) — a rapid daily cadence through mid-August
+(v1.10.54 on 8/2 through v1.10.62 on 8/19: Kanban export ordering, Codex
+sorting, dialogue-counting fixes, quotation-mark handling), but still
+"No AI · No Cloud" by its own tagline, unchanged. Longform
+(github.com/kevboh/longform) remains frozen at v2.1.0 (2023-03-19); Novel
+Word Count (github.com/isaaclyman/novel-word-count-obsidian) remains
+frozen at v5.0.0 (2024-08-03). No new Notion-for-writers template or
+gallery post drawing fresh attention surfaced on r/notion, r/writing, or
+Notion's own marketplace — searches returned only pre-existing Gumroad
+templates (Scriborg, Author's Sidekick, Novel Planner with Worldbuilding).
+
+## Industry / legal sentiment
+
+Both dates round 35 flagged as imminent fell inside this round's window
+and were checked directly rather than left as open questions:
+
+1. **Bartz v. Anthropic claims portal** — has **not** opened as of today
+   (2026-08-21), despite Class Counsel's "by the end of August" guidance
+   (blog.taaonline.net). anthropiccopyrightsettlement.com still shows
+   only the March 30, 2026 claim-filing deadline, no portal-launch
+   announcement. No class-member appeal of the Final Judgment/settlement
+   approval itself has surfaced anywhere (Writer Beware, Authors
+   Alliance, Copyright Alliance all silent since late July). Bloomberg
+   Law (Aug 19) and Law360 (Aug 20) both independently confirm the only
+   appellate activity following the Aug 19 window close is
+   Edelson/Oppenheim+Zebrak's appeal of their exclusion from the $101M
+   fee award to the 9th Circuit — a dispute among plaintiffs' lawyers
+   over their own cut, unrelated to the settlement or the class itself.
+   Status: pending, not resolved; the portal's "end of August" promise
+   still has just over a week left to be kept.
+2. **Kadrey v. Meta mediation-outcome report** — was due today
+   (2026-08-21) per McKool Smith's tracker (the prior mediation round,
+   Aug 2025, was unsuccessful). No law-firm blog, Law360, or Bloomberg
+   Law post yet reports the report's filing or content; CourtListener
+   direct fetch 403'd as expected. Status: unresolved as of this check,
+   re-check next round rather than assume either outcome.
+
+Secondary sweep: EU AI Act Article 53 enforcement machinery (Commission
+Implementing Regulation 2026/1755) came into force 2026-08-10, activating
+enforcement *powers* — but no actual enforcement action has been taken
+under it yet. Regulatory plumbing, not yet a citable fact for copy. No
+new author-training survey, no new named lawsuit beyond the already-
+tracked Bartz/Kadrey/Carreyrou set.
+
+## What changed in ROADMAP.md
+
+No brand-new "Next up" items this round — three existing items got
+findings folded in: (1) the Campfire chapter-loss review's date resolved
+to ~2026-08-19, folded into the no-outage/can't-lose-your-work item as a
+confirmed third failure mode; (2) the four-pillar check's twenty-second
+negative recheck plus the LocalProse near-miss, folded into the
+four-app-bundle item; (3) both of round 35's flagged litigation dates
+(Bartz claims portal, Kadrey mediation report) checked directly and found
+still pending, folded into the no-training/privacy item along with the
+EU AI Act Article 53 plumbing note. NovelCrafter, type.ai, Scrivener, and
+Dabble passes were fully dry; Sudowrite's Aug 18 formatting update was
+logged here but didn't warrant a ROADMAP change.
+
+## Round 36 sources
+
+- feedback.sudowrite.com/changelog, status.sudowrite.com
+- feedback.novelcrafter.com/changelog, novelcrafter.com/blog
+- type.ai/changelog (404), blog.type.ai
+- Trustpilot (Sudowrite, NovelCrafter, Dabble — 403 direct, snippets only)
+- apps.apple.com (Campfire Write, id1626123915)
+- literatureandlatte.com/scrivener/release-notes, forum.literatureandlatte.com
+- dabblewriter.com/blog
+- obsidianstats.com, github.com (StoryLine, Longform, Novel Word Count)
+- localprose.com, plotforge.app, scriob.app, mediachance.com/novelforge
+- blog.taaonline.net, Law360 (Aug 20), Bloomberg Law (Aug 19), Writer
+  Beware, Authors Alliance, Copyright Alliance,
+  anthropiccopyrightsettlement.com
+- Kadrey v. Meta docket coverage (McKool Smith trackers; CourtListener 403'd)
