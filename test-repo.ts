@@ -184,6 +184,31 @@ for (const known of KNOWN_RECURSIVE) {
   );
 }
 
+/* ============================================================
+   The PWA belongs to the web build only
+
+   A service worker in the DESKTOP bundle would be a cache sitting in
+   front of an app that is already local — offline by construction, with
+   nothing to be offline from. It would also be a second, invisible
+   updater racing the real one. The plugin is mode-gated in
+   vite.config.ts; this asserts the gate is still there, because the
+   symptom of losing it is subtle and would surface as stale assets in a
+   packaged build rather than as an error.
+   ============================================================ */
+
+const cfg = readFileSync("vite.config.ts", "utf8");
+const webBlock = cfg.slice(cfg.indexOf('mode === "web"'));
+ok(
+  "vite.config gates the PWA on web mode",
+  cfg.includes('mode === "web"') && webBlock.indexOf("VitePWA(") >= 0,
+  "VitePWA must sit inside the `mode === \"web\"` branch, beside the CSP plugin.",
+);
+ok(
+  "the manifest uses relative URLs",
+  /start_url:\s*"\.\//.test(cfg) && /scope:\s*"\.\//.test(cfg),
+  'base is "./", so a root-absolute start_url breaks under the Pages subpath.',
+);
+
 if (failures > 0) {
   console.error(`\n${failures} of ${checks} checks failed.`);
   process.exit(1);

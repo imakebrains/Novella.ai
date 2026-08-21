@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import { VitePWA } from "vite-plugin-pwa";
 import react from "@vitejs/plugin-react";
 import { version } from "./package.json";
 
@@ -48,6 +49,47 @@ export default defineConfig(({ mode }) => ({
               );
             },
           },
+          VitePWA({
+            // Mode-gated with the CSP plugin above: a service worker has no
+            // business in the desktop bundle, which is already local and
+            // already offline by construction.
+            registerType: "autoUpdate",
+            includeAssets: ["favicon.png", "favicon-32.png"],
+            manifest: {
+              name: "Novella",
+              short_name: "Novella",
+              description:
+                "Write a novel offline. Your book is a folder of Markdown on your own machine.",
+              // Relative, like every other asset: base is "./" so the same
+              // build has to work under the /Novella.ai/ Pages subpath and
+              // at a future domain root.
+              start_url: "./",
+              scope: "./",
+              display: "standalone",
+              orientation: "any",
+              background_color: "#100e10",
+              theme_color: "#100e10",
+              icons: [
+                { src: "./favicon-32.png", sizes: "32x32", type: "image/png" },
+                { src: "./favicon.png", sizes: "180x180", type: "image/png" },
+                {
+                  src: "./favicon.png",
+                  sizes: "180x180",
+                  type: "image/png",
+                  purpose: "maskable",
+                },
+              ],
+            },
+            workbox: {
+              // The app is one HTML entry and a big bundle; precaching all
+              // of it is what makes airplane mode work at all. The default
+              // 2MB file cap would silently skip the main chunk.
+              maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
+              globPatterns: ["**/*.{js,css,html,png,svg,woff2}"],
+              // No client-side router, so any navigation is the one page.
+              navigateFallback: "index.html",
+            },
+          }),
         ]
       : []),
   ],
