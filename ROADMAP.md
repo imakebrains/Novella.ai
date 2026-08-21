@@ -152,6 +152,19 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
          first two are ours to win with the voice-matching item; the third we
          win by construction.
 
+- [x] **Plan phases 0/A/B/D/E and now C** — all six shipped by 2026-08-20.
+      0 (fs capabilities, LICENSE), A (**v0.3.0 released** — Windows .exe
+      and .msi, macOS universal .dmg, 54 commits after v0.2.0), B (Pages
+      live), D (sync safety), E (ci.yml, README, CONTRIBUTING, tsconfig),
+      and C (mobile): the editor rendered at literally 0px below ~900px
+      because the three-column grid's track list is an inline style no CSS
+      could reach. One track plus drawers, a measured titlebar triage,
+      touch fixes keyed on `(hover: none)` rather than width, and a
+      mode-gated PWA. The one thing NOT verified is the live transition
+      between layouts — the browser pane changes viewport metrics without
+      dispatching resize or matchMedia change, proven with a counter, so
+      both layouts are tested on load and the change path is not.
+
 - [ ] **Split the Board from Write entirely** (WITH-OWNER — round 5 item 2).
       The board should stop being manuscript-centric and become its own
       space: character information, a story board, and a home for memories,
