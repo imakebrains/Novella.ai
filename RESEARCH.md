@@ -4537,4 +4537,129 @@ logged here but didn't warrant a ROADMAP change.
 - blog.taaonline.net, Law360 (Aug 20), Bloomberg Law (Aug 19), Writer
   Beware, Authors Alliance, Copyright Alliance,
   anthropiccopyrightsettlement.com
+
+# Round 37 (2026-08-22) — cadence, driest round yet, one near-miss recheck
+
+Same brief as rounds 20-36: fresh reviews, feature announcements, and
+complaints for NovelCrafter, Sudowrite, Dabble, Scrivener, Campfire,
+type.ai, Obsidian-for-writers setups, and Notion writing templates,
+checked against everything already logged through round 36. Dispatched
+four parallel passes (NovelCrafter/Sudowrite; Dabble/Scrivener/Campfire;
+type.ai/Obsidian four-pillar check; industry/legal sentiment), each
+briefed on the relevant standing findings and told to search for material
+dated strictly after round 36's 2026-08-21 cutoff.
+
+**Housekeeping first:** the session started with HEAD detached, this time
+nine commits *ahead* of local `main` and what a first `git log` read of
+`origin/main` showed (round 32's own commit, "The board becomes a
+planner," plus eight later commits including the v0.3.0 release and the
+mobile/Phase-C work). Confirmed `origin/main` was a clean ancestor of the
+detached commits (`git merge-base --is-ancestor`), fast-forwarded local
+`main` to match, and pushed — but the push reported "Everything
+up-to-date," and a fresh `git fetch` showed `origin/main` already at the
+same commit. Same stale-ref-at-clone-time pattern already diagnosed in
+round 33: nothing was actually unpushed, the container's cached
+`origin/main` ref was just behind reality. No content was ever at risk.
+This is now the sixth round to hit some flavor of this issue (24, 29, 30,
+31, 33, now 37) — still worth whoever drives the autopilot container
+starting every run from a real `git fetch` before trusting any cached ref.
+
+## NovelCrafter / Sudowrite
+
+Fully dry — **nothing dated after 2026-08-21 for either product.**
+Sudowrite's status page explicitly reports no incidents in August beyond
+the already-logged Aug 11 blip; its changelog's newest entries (Aug 18
+formatting fixes, Aug 14 credit-estimate hardening) are both already
+logged from round 36. NovelCrafter's status page reports zero incidents
+in the last 14 days; its changelog and blog show nothing newer than the
+already-logged Aug 5 Opus-5 post. Trustpilot snippets surfaced only
+undated, previously-seen complaint themes (content-restriction refusals,
+a billing dispute) — nothing new enough to log. Sudowrite's cadence
+suggests another changelog entry is likely within the week; worth a
+closer look next round.
+
+## Dabble / Scrivener / Campfire
+
+Mostly dry, with two low-signal Scrivener forum threads, both dated
+2026-08-21: (1) a single user reports their project suddenly failing to
+save to an external drive — permission errors, apparently corrupted
+project folders (missing `/Files`, `/Data`, `/Settings`) — with staff
+still troubleshooting as of this check, not yet confirmed as a broader
+bug; (2) a separate iOS Dropbox-connection failure plus a stuck trial
+dialog, resolved same day and traced by staff to a Dropbox-side outage,
+not a Scrivener defect. Folded a caveated version of the first into the
+no-outage/can't-lose-your-work item below — this is Scrivener's first
+appearance in that item, but at single-report, unconfirmed confidence,
+well below the Sudowrite/Dabble/Campfire incidents already logged there.
+Dabble itself was fully dry (Trustpilot 403'd with no new snippets,
+Facebook login-walled, no dated blog entry). Campfire Write is still at
+v1.3.2 with no new changelog entry; App Store reviews mentioning chapter
+loss all trace back to the already-logged ~Aug 19 incident.
+
+## Obsidian / Notion / four-pillar check
+
+Twenty-third dedicated recheck (rounds 15, 17-37) of "does any product
+pair a task tracker with a focus/sprint timer alongside writing AND
+worldbuilding AND real local AI?" Again no full match. The one
+noteworthy update: **NovelMage** (novelmage.com) — tracked in this file
+since round 11 only for its "Writer's Voice" prose-matching feature — was
+checked directly against the four-pillar criteria for the first time.
+It clears three: genuine local AI (connects to Ollama/LM Studio, not
+cloud BYOK), a strong Codex (characters, world rules, lore with
+AI-continuity referencing), fully offline, one-time $99.99 purchase — but
+has no task tracker and no Pomodoro/sprint timer, the same shape as
+PlotForge Desktop, Scríob, Novel Forge AI, LocalProse, and StoryLine.
+LocalProse (still v3.5.1) and StoryLine (now showing v1.8.4 in its
+current docs, no dated changelog surfaced this pass) are otherwise
+unchanged. A fresh ProductHunt/IndieHackers/r/writing/r/ObsidianMD sweep
+found no brand-new entrant closing the gap (Cotypist, Novelizer each
+cover only one or two pillars). type.ai remains frozen — changelog still
+404s, blog's newest post still Jan 21, 2026, unchanged for a third
+consecutive round. No new Notion-for-writers template surfaced on
+r/notion or Notion's own marketplace.
+
+## Industry / legal sentiment
+
+Both litigation dates round 36 left pending are still pending, no new
+information beyond what's already logged: the Bartz v. Anthropic claims
+portal has not opened as of this check, still only "by end of August"
+guidance from Class Counsel with no firmer date; Kadrey v. Meta's
+mediation-outcome report deadline (2026-08-21) has passed but no filing
+or outcome has been publicly reported yet by any tracked source. One
+pass independently surfaced the Hachette/Cengage/Elsevier/Scott Turow
+suit against Google over Gemini training data — already logged in this
+file under round 14 (filed July 15, 2026), so not new, just a reminder
+it's real and dated for whoever needs a second named suit beyond
+Bartz/Kadrey/Carreyrou. No new author-training survey, no new named
+lawsuit, and no actual EU AI Act Article 53 enforcement action (the
+enforcement machinery activated 2026-08-10 but no case has been brought
+under it yet). No August reliability incidents found for Sudowrite,
+Dabble, Campfire, or NovelCrafter beyond what's already logged; Notion
+and Google Docs show nothing notable either.
+
+## What changed in ROADMAP.md
+
+No brand-new "Next up" items this round — the driest round in the
+cadence so far, all four passes coming back dry or re-confirming
+already-tracked findings. Two small updates folded into existing items:
+(1) the four-app-bundle item gets its twenty-third negative recheck plus
+NovelMage's first direct four-pillar check (three of four pillars); (2)
+the no-outage/can't-lose-your-work item gets a caveated, low-confidence
+first Scrivener data point (external-drive save/corruption report,
+unconfirmed, staff still investigating).
+
+## Round 37 sources
+
+- feedback.sudowrite.com/changelog, status.sudowrite.com
+- feedback.novelcrafter.com/changelog, novelcrafter.com/blog,
+  status.novelcrafter.com
+- type.ai/changelog (404), blog.type.ai
+- Trustpilot (Sudowrite, NovelCrafter, Dabble — 403 direct, snippets only)
+- apps.apple.com (Campfire Write, id1626123915), campfirewriting.com/learn
+- literatureandlatte.com/scrivener/release-notes, forum.literatureandlatte.com
+- dabblewriter.com/blog, Dabble Facebook (login-walled)
+- novelmage.com, localprose.com, plotforge.app, scriob.app,
+  mediachance.com/novelforge, obsidianstats.com, github.com (StoryLine)
+- blog.taaonline.net, writerbeware.blog, anthropiccopyrightsettlement.com,
+  courtlistener.com, mckoolsmith.com, taylorwessing.com
 - Kadrey v. Meta docket coverage (McKool Smith trackers; CourtListener 403'd)

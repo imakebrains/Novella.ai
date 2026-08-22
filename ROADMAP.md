@@ -597,6 +597,20 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       previously-logged versions; no new Notion-for-writers template
       surfaced on Reddit or Notion's own gallery. Twenty-two dedicated
       rechecks in, the gap stays open on both sides.
+      Research round 37 (2026-08-22) ran the check a twenty-third time and
+      again found no match. NovelMage (novelmage.com) — tracked elsewhere
+      in this list since round 11 only for its "Writer's Voice"
+      prose-matching feature — was checked directly against the
+      four-pillar criteria for the first time: genuine local AI (Ollama/
+      LM Studio, not cloud BYOK), a strong Codex (characters, world
+      rules, lore with AI-continuity referencing), fully offline,
+      one-time $99.99 purchase — but no task tracker and no Pomodoro/
+      sprint timer, the same three-of-four shape as PlotForge Desktop,
+      Scríob, Novel Forge AI, LocalProse, and StoryLine. No brand-new
+      entrant closed the gap on a fresh ProductHunt/IndieHackers/
+      r/writing/r/ObsidianMD sweep, and no new Notion-for-writers
+      template surfaced. Twenty-three dedicated rechecks in, the gap
+      stays open on both sides.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -720,6 +734,20 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       one instance explicitly "today while working on wifi") distinct from
       the long-tracked mid-sentence cursor-jump bug. App still at v1.3.2,
       no changelog entry addressing either bug.
+      Research round 37 (2026-08-22) adds a first, low-confidence data
+      point for a fourth cloud/sync-dependent tool: a Scrivener forum
+      thread posted 2026-08-21 reports a single user's project suddenly
+      failing to save to an external drive — permission errors, an
+      apparently corrupted project structure — with staff still
+      troubleshooting as of this check, not yet confirmed as a broader
+      bug. Unlike the Sudowrite/Dabble/Campfire incidents above, this is
+      one unconfirmed report, not a pattern — worth tracking, not yet
+      citable in copy the way the others are. A separate same-day
+      Scrivener forum thread (iOS Dropbox-connection failures) resolved
+      within hours and was traced by staff to a Dropbox-side outage, not
+      a Scrivener defect — a reminder that any optional cloud-sync
+      feature imports a third party's uptime, which a local-only vault
+      never does, but not itself evidence against Scrivener.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent
@@ -1052,6 +1080,45 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-08-22 — Research round 37 (autopilot; no code). Note: round 36
+  (2026-08-21) left no entry in this log even though its findings are
+  folded into three "Next up" items above (search "Research round 36") —
+  flagging the gap rather than silently backfilling it, since this
+  session didn't run round 36 and can't vouch for what else it did.
+  Housekeeping first this round: session started with HEAD detached nine
+  commits ahead of what a first `git log` read of `origin/main` showed —
+  confirmed a clean fast-forward (`git merge-base --is-ancestor`), moved
+  local `main` to match, and pushed; the push reported "Everything
+  up-to-date" and a fresh `git fetch` confirmed `origin/main` was already
+  at that commit — the same stale-ref-at-clone-time pattern round 33
+  diagnosed, not a real unpushed-work gap. Sixth round to hit some flavor
+  of this issue (24, 29, 30, 31, 33, now 37). Dispatched the same four
+  parallel research passes as recent rounds (NovelCrafter/Sudowrite;
+  Dabble/Scrivener/Campfire; type.ai/Obsidian/four-pillar check; industry/
+  legal sentiment), each briefed on rounds 1-36's findings and searching
+  for material dated after round 36's 2026-08-21 cutoff. **Driest round
+  yet — no brand-new checklist items, two small findings folded into
+  existing items.** (1) NovelCrafter/Sudowrite pass fully dry: both
+  status pages report zero new incidents, both changelogs/blogs show
+  nothing newer than what round 36 already logged. (2) Dabble/Scrivener/
+  Campfire pass mostly dry, with one new low-confidence data point: a
+  Scrivener forum thread (2026-08-21) reporting a single user's project
+  failing to save to an external drive, staff still investigating — the
+  first Scrivener data point in the no-outage/can't-lose-your-work item,
+  but explicitly caveated as unconfirmed/single-report, unlike the
+  Sudowrite/Dabble/Campfire incidents already logged there. (3) The
+  four-pillar competitive check ran a twenty-third dedicated recheck
+  (rounds 15, 17-37) and again found no match; NovelMage — tracked since
+  round 11 only for its voice-matching feature — was checked directly
+  against the four-pillar criteria for the first time and found to be
+  three of four (local AI, worldbuilding, offline; no task tracker or
+  timer) — folded into the four-app-bundle item. (4) The industry/legal
+  pass found both watched litigation dates (Bartz claims portal, Kadrey
+  mediation report) still unresolved with no new information, and
+  independently re-surfaced the already-tracked Hachette/Cengage/
+  Elsevier/Turow v. Google suit (not new, just re-confirmed) — nothing
+  added to "Next up" from this pass. Full notes in RESEARCH.md Round 37.
 
 - 2026-08-20 — Research round 35 (autopilot; no code). Dispatched the same
   four parallel research passes as recent rounds (NovelCrafter/Sudowrite;
