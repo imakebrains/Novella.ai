@@ -4662,4 +4662,109 @@ unconfirmed, staff still investigating).
   mediachance.com/novelforge, obsidianstats.com, github.com (StoryLine)
 - blog.taaonline.net, writerbeware.blog, anthropiccopyrightsettlement.com,
   courtlistener.com, mckoolsmith.com, taylorwessing.com
+
+# Round 38 (2026-08-23) — cadence, another dry round, no blockers
+
+Same brief as rounds 20-37: fresh reviews, feature announcements, and
+complaints for NovelCrafter, Sudowrite, Dabble, Scrivener, Campfire,
+type.ai, Obsidian-for-writers setups, and Notion writing templates,
+checked against everything already logged through round 37. Housekeeping
+was clean this time — the container's `main` was ten commits behind
+`origin/main` (round 37's own commit plus nine more), a plain fast-
+forward pull with no conflicts, unlike the stale-ref issue rounds 24-37
+kept hitting.
+
+## NovelCrafter / Sudowrite
+
+Fully dry — nothing dated after 2026-08-22 for either product.
+status.sudowrite.com now explicitly lists "No incidents reported" for
+all of August 2026 as of this check, meaning the Aug 11 partial outage
+(3 min web, 6 min mobile, logged round 31) remains the only August
+incident on record. Sudowrite's changelog has nothing newer than the
+already-logged Aug 18 paragraph-spacing entry; its "Sonnet 5, Folder
+Exports & More" release (mobile crash/loading fixes, folder export,
+keyboard-accessible reordering) traces to June 30, 2026 — already inside
+the logged window, not a new find, despite surfacing fresh in this
+round's search results. NovelCrafter's blog is unchanged since the
+already-logged Aug 5 Opus-5 post; its changelog page still shows nothing
+past March 21, 2026 verbatim.
+
+## Dabble / Scrivener / Campfire
+
+Fully dry. Dabble: no dated blog or social post found (Trustpilot 403'd,
+Facebook login-walled, same as every prior round). Scrivener: no new
+forum threads beyond the two already logged from round 37 (the
+unconfirmed external-drive save/corruption report and the resolved
+Dropbox-side iOS issue) — no follow-up posted to either thread yet.
+Campfire Write: could not confirm an exact "Updated on" date this round
+(the Play Store listing fetch returned only header content, not the
+detail section); secondary sources still show v1.3.2. Given round 32's
+own false "Aug 13 Campfire fix" signal (later traced to an unrelated
+"ONCE — Campfire" product and disconfirmed in round 33), treat any
+Campfire update claim as unconfirmed until the version number and
+changelog text are read directly — do not log a new Campfire release
+without that direct confirmation.
+
+## Obsidian / Notion / four-pillar check
+
+Twenty-fourth dedicated recheck (rounds 15, 17-38) of "does any product
+pair a task tracker with a focus/sprint timer alongside writing AND
+worldbuilding AND real local AI?" Again no full match. A fresh
+ProductHunt sweep surfaced nothing closing the gap: Novelizer (a pure
+AI story generator — chapter-by-chapter prose, no worldbuilding codex,
+no tasks, no timer) and Cotypist (general-purpose private AI writing,
+not novel-specific) were the only novel-adjacent listings found, neither
+new to this round. NovelMage, LocalProse, PlotForge Desktop, Scríob,
+Novel Forge AI, and StoryLine — the six standing three-of-four-pillar
+near-misses — show no version or feature changes since their last
+logged check. type.ai's changelog still 404s. No new Notion-for-writers
+template surfaced on Notion's own marketplace or Pinterest/blog
+roundups beyond the same "Novel & Fanfic Writer Hub" / "Book Builder AI"
+templates already circulating.
+
+Standing note: round 33's flag — whether to keep running this exact
+compound check every round, now unanswered across six more rounds
+(33-38) — is still open. Not re-flagging it again here beyond this one
+line; an owner call, not something to keep re-raising unilaterally.
+
+## Industry / legal sentiment
+
+Both litigation dates are still pending, incrementally further along but
+not resolved. The Bartz v. Anthropic 30-day appeal window closed
+2026-08-19 with no appeal filed per every tracked source; the claims
+portal has not opened as of this check, guidance still only "by end of
+August" with no firmer date. Kadrey v. Meta's mediation-outcome report
+deadline (2026-08-21) has now passed by two days with no filing or
+outcome publicly reported by any tracked source (CourtListener, McKool
+Smith trackers) — both are worth a direct check first thing next round,
+since the appeal window closing without a filed appeal makes an
+end-of-August portal opening more likely than not. No new author-
+training survey, no new named lawsuit, no EU AI Act Article 53
+enforcement action.
+
+## What changed in ROADMAP.md
+
+No brand-new "Next up" items this round — a fully dry round across every
+pass, the second in a row after round 37. Three small confirming notes
+folded into existing items: (1) the four-app-bundle item gets its
+twenty-fourth negative recheck; (2) the no-outage item gets a note that
+August 2026 shows zero new Sudowrite incidents beyond the already-logged
+Aug 11 blip, plus a caution against the unconfirmed Campfire update
+claim; (3) the no-training/legal item gets both litigation dates'
+current status with a next-round trigger (appeal window closed, portal
+still not open).
+
+## Round 38 sources
+
+- feedback.sudowrite.com/changelog, status.sudowrite.com,
+  status.sudowrite.com/incidents
+- feedback.novelcrafter.com/changelog, novelcrafter.com/blog
+- play.google.com (Campfire Write, com.campfiremobile — partial fetch only)
+- producthunt.com (Novelizer, Cotypist, weekly/yearly leaderboards)
+- community.obsidian.md, obsidianstats.com, github.com
+  (isaaclyman/novel-word-count-obsidian, StoryLine)
+- notion.com/templates, bloggingx.com, gridfiti.com (Notion writer templates)
+- blog.taaonline.net, copyrightalliance.org, authorsguild.org,
+  authorsalliance.org, legalblogs.wolterskluwer.com, ailawsuittracker.com,
+  courtlistener.com, mckoolsmith.com
 - Kadrey v. Meta docket coverage (McKool Smith trackers; CourtListener 403'd)

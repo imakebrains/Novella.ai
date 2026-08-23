@@ -611,6 +611,16 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       r/writing/r/ObsidianMD sweep, and no new Notion-for-writers
       template surfaced. Twenty-three dedicated rechecks in, the gap
       stays open on both sides.
+      Research round 38 (2026-08-23) ran the check a twenty-fourth time
+      and again found no match — a fresh ProductHunt sweep found only
+      Novelizer (pure AI story generator, no worldbuilding/tasks/timer)
+      and Cotypist (general-purpose AI writing, not novel-specific), no
+      new template on Notion's own marketplace, and no version or
+      feature change on any of the six standing three-of-four-pillar
+      near-misses (NovelMage, LocalProse, PlotForge Desktop, Scríob,
+      Novel Forge AI, StoryLine). Round 33's flag — whether to keep
+      running this exact compound check every round — is still
+      unanswered six rounds later; noted once, not re-raised further.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -748,6 +758,16 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       a Scrivener defect — a reminder that any optional cloud-sync
       feature imports a third party's uptime, which a local-only vault
       never does, but not itself evidence against Scrivener.
+      Research round 38 (2026-08-23) confirms status.sudowrite.com now
+      explicitly lists "No incidents reported" for all of August 2026 —
+      the Aug 11 partial outage stays the only August incident on
+      record, no new one surfaced. No follow-up found on either open
+      Scrivener forum thread. One caution worth carrying forward: this
+      round could not confirm Campfire Write's update date directly (a
+      partial page fetch), and round 32 already produced one false
+      "Campfire fixed a bug" signal that traced to an unrelated product —
+      don't log a Campfire release without reading its version number
+      and changelog text directly.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent
@@ -900,6 +920,16 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       came into force 2026-08-10, but no actual enforcement action has
       been taken under it yet — a regulatory-plumbing update, not yet a
       citable fact for copy.
+      Research round 38 (2026-08-23) checks both dates again: the Bartz
+      30-day appeal window closed 2026-08-19 with no class-member appeal
+      of the settlement itself filed (only the unrelated attorney-fee
+      appeal already logged), which makes an end-of-August portal opening
+      more likely than not — but the portal has still not opened as of
+      this check, no firmer date than "by end of August." Kadrey v.
+      Meta's mediation-outcome report (due 2026-08-21) is now two days
+      overdue with nothing filed or reported by any tracked source. Both
+      worth a direct check first thing next round rather than assumed
+      resolved.
 - [ ] **Say the export advantage louder** — research round 7: Sudowrite
       reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
       Novella already ships all three plus one-click backup
