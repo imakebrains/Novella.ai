@@ -204,12 +204,35 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       round-trips through Google Docs. Attach a note to a text range
       without touching prose, show it in a margin gutter, resolve/reply.
       Collapses one more reason to leave the app — high priority against
-      the thesis.
+      the thesis. Research round 40 (2026-08-24) confirmed still unbuilt
+      (`grep -i comment src/` finds only prose/CSS/docstring comments, no
+      feature) and adds a concrete implementation model from Dabble's
+      actual Review Copies feature: beta-reader feedback there is
+      deliberately asynchronous, not live co-editing — readers are invited
+      as Friend/Beta Reader/Editor roles, their comments/suggestions come
+      back as a separate layer, and the author explicitly "merges" them in
+      with a conflict prompt when edits overlap. That async, mergeable-
+      layer model fits how most solo novelists actually work with outside
+      readers better than live collaboration would, and is a smaller build
+      — worth designing to this model specifically rather than a generic
+      "add commenting" spec.
 - [ ] **Notion-parity pass, ongoing** — owner: "make this look and function
       exactly like Notion but better." Next concrete gaps: block-style
       hover handles in the editor, inline databases-as-tables on notes,
       synced project sidebar collapse, cover images on note headers.
-      One gap per run, verified live.
+      One gap per run, verified live. Research round 40 (2026-08-24) adds
+      one more concrete gap from cross-app UX research, not Notion
+      specifically: our own Ctrl+K command palette (`CommandPalette.tsx`/
+      `palette.ts`) mixes a fixed ~15-item command list with every vault
+      note in one flat list, with no contextual or recent-action
+      surfacing — Linear and Raycast's palettes push a "page" onto a stack
+      when a category is chosen (nested, breadcrumbed, backspace pops it)
+      rather than staying flat, and GitHub nearly removed its own command
+      palette for "low usage" in 2025 before discovering the stat was an
+      artifact of the feature being opt-in, not unwanted — a caution
+      against reading light usage as low value for a keyboard-first
+      feature. Small, CLOUD-OK, no new capability required, just
+      restructuring what's already there.
 - [ ] **NovelCrafter-parity pass, ongoing** — codex entry templates per
       type (character sheets with fields), chat-with-your-book mode,
       scene status labels (draft/revised/done) surfaced on cards and
@@ -260,7 +283,39 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       stabilizing the feature. Together these sharpen, rather than soften,
       the case that a local Codex-grounded chat-with-your-book mode (once
       built) should lead on "no cloud context window to silently truncate
-      or corrupt," not just "free and local."
+      or corrupt," not just "free and local." Research round 40
+      (2026-08-24) finds NovelCrafter's own top-voted open feature request
+      (195 votes, feedback.novelcrafter.com): "Create Summaries After
+      Import" — importing an existing manuscript doesn't auto-generate
+      scene summaries today, so a writer bringing in a draft has to
+      hand-backfill summaries before the Matrix/Plan views (the very
+      feature this item already tracks) become useful at all. That's a
+      first-run-with-existing-work problem, not a new-project one, and
+      it's the single most-requested fix on a direct competitor's own
+      board — worth folding into Novella's own import flow: offer to
+      auto-generate scene/chapter summaries with the local model at import
+      time so Table view and PlotGrid are populated immediately rather
+      than starting blank.
+- [ ] **Make it visible which Codex/notes content the AI can actually see**
+      — research round 40 (2026-08-24): NovelCrafter's own docs describe a
+      live trap worth avoiding rather than copying — a Codex entry's Tags
+      exist only to filter/organize for the human and are never sent to
+      the model, while anything the AI needs must be duplicated into a
+      "Details" field or the description, with nothing in the UI marking
+      which is which (novelcrafter.com/help/docs/codex/anatomy-codex-
+      entry). Checked our own `src/ai/context.ts` and `CodexPane.tsx`: a
+      Novella entry's `tags: string[]` (`vault.ts:20`) are search/filter
+      metadata only, same split in spirit, but the flip side of the
+      problem is present too — nothing in the UI currently confirms *what
+      the assembled context actually contains* for a given generation, so
+      a writer has no way to check, without reading source, whether a note
+      they just edited will really reach the model. Small, CLOUD-OK, pure
+      UI over an existing, already-tested assembler: surface which notes/
+      codex entries are part of the active context bundle when a
+      generation runs. Directly serves the "writes with you" half of the
+      thesis — a cowriter whose knowledge you can't verify isn't fully
+      trustworthy, and this turns an invisible assumption into a checkable
+      fact.
 - [ ] **Voice-matching from the writer's own prose, not just style templates**
       — research round 11 (2026-07-28): checked our own Upload style flow
       (`InspectorPane.tsx`) — it imports a .txt/.md file as the literal body
@@ -332,12 +387,6 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       working out a plot problem in Chat. Grepped `src/ai` for
       "reasoning"/"thinking" — no matches; every request is treated
       identically regardless of model or task.
-- [ ] **Location map / pinboard for codex locations** — research round 7:
-      Campfire's headline feature (maps + timelines linked to the
-      manuscript) is what fantasy/sci-fi reviewers rate it 4/5 for. Pin
-      codex location entries onto an uploaded map image; reuses the
-      card-image upload path already shipped for board cards. Worldbuilding
-      counterpart to the existing Relationship web.
 - [ ] **Timeline view for story chronology** — research round 10
       (2026-07-27): Campfire's Timeline module plots events, scenes and
       character appearances on one or more horizontal timelines, explicitly
@@ -345,14 +394,64 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       order and manuscript order diverge; its Arcs module links the same
       events to per-character development arcs. Verified we have nothing
       like it — grepped the codebase and the only "timeline" hits are an
-      agent example prompt and unrelated seed text, no feature. This is
-      the chronology counterpart to the location-map item above (both
-      Campfire headline features, both unbuilt) and doubles as a stronger
-      Continuity inspector: today's "unordered chapters" check only knows
-      manuscript order, not in-world date order for flashback-heavy or
-      multi-POV books. Lower priority than the map since it's a bigger
-      surface (needs an in-world date field on scenes), but the same
-      genre-fiction audience wants both.
+      agent example prompt and unrelated seed text, no feature. This
+      doubles as a stronger Continuity inspector: today's "unordered
+      chapters" check only knows manuscript order, not in-world date order
+      for flashback-heavy or multi-POV books. Research round 40
+      (2026-08-24) promotes this above the location-map item below: a
+      dedicated deep-dive found Aeon Timeline — the dominant third-party
+      timeline tool Scrivener writers pay for separately — exists because,
+      per multiple independent author accounts (KBoards forum, author
+      blogs), converging plotlines went "way out of sync" in Scrivener
+      alone and forced "serious rewriting" to fix; one author states
+      plainly they "never found a satisfactory way to manage timelines in
+      either a spreadsheet or in Scrivener." That's a recurring,
+      rewrite-inducing complaint with a whole paid product built to answer
+      it, stronger evidence than a single reviewer's headline-feature
+      rating. The same pass found a sharper, more specific shape worth
+      building toward rather than a generic timeline: setup/payoff tracking
+      (StoryLine, an actively-maintained Obsidian plugin, links a
+      foreshadowing scene to its payoff scene, auto-updates the link if
+      either scene is renamed, and flags unresolved setups; WebNovel
+      Assistant, a second independent Obsidian plugin, ships an equivalent
+      "Foreshadowing Board"). A Continuity check for dangling setups is a
+      concrete, scoped first slice of this item rather than the full
+      horizontal-timeline UI, and reuses the in-world-date field this item
+      already requires.
+- [ ] **Location map / pinboard for codex locations** — research round 7:
+      Campfire's headline feature (maps + timelines linked to the
+      manuscript) is what fantasy/sci-fi reviewers rate it 4/5 for. Pin
+      codex location entries onto an uploaded map image; reuses the
+      card-image upload path already shipped for board cards. Worldbuilding
+      counterpart to the existing Relationship web and the timeline item
+      above (both Campfire headline features, both unbuilt). Research round
+      40 (2026-08-24) confirmed the ceiling worth aiming at, not the MVP
+      bar: Campfire's actual Atlas module supports pins *and* area-based
+      "zones," per-map legends and layers, and direct map import from
+      Inkarnate — useful as a reference for how far this could eventually
+      go, not a requirement for a first version (pin-on-uploaded-image
+      alone already clears the gap). Ranked below the timeline item now
+      given round 40's stronger evidence there.
+- [ ] **Flag, not yet scoped: worldbuilding/timeline data that survives past
+      one manuscript, for series writers** — research round 40 (2026-08-24):
+      two independent signals point the same direction. Aeon Timeline (the
+      dominant Scrivener timeline companion) syncs to exactly one Scrivener
+      project in its current version, and its own user forum's top
+      recurring complaint is that this breaks the multi-book workflow
+      writers had under the prior version — codex/timeline data trapped
+      per-project when a series needs it to persist and grow across books.
+      Separately, a paid Notion story-bible template markets itself
+      explicitly as a workspace "to keep your world consistent from Book 1
+      to 10," i.e. writers already pay to solve exactly this. Checked
+      Novella's own model: `src/core/vault.ts` scopes a vault to one
+      project folder, so a Codex entry has no path to a second manuscript
+      today. This is a real architectural question, not a UI tweak — how a
+      character or location would be shared or forked across projects
+      without breaking the local-file, one-vault-per-project mental model —
+      so it is flagged here for scoping rather than committed as a build
+      item. Lower priority than the timeline/location items above since it
+      only bites series writers on book two, but worth having on record
+      before someone rediscovers the same gap from a support request.
 - [ ] **Say the four-app bundle louder, not just "local AI, no subscription"**
       — research round 11 (2026-07-28): three new products (LocalProse,
       Novel Mage, Noveling) now market themselves in nearly the same words
@@ -633,6 +732,43 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       type.ai's changelog still 404s; its blog (checked directly this
       round) has gone quiet too, nothing posted since January 21, 2026.
       No new entrant found on a fresh ProductHunt/IndieHackers sweep.
+      Research round 40 (2026-08-24) ran a different kind of check than the
+      twenty-five straight narrow "does one product already ship the exact
+      bundle" rechecks above — a full interaction-level UX research pass
+      across NovelCrafter, Sudowrite, Scrivener, Dabble, Campfire, type.ai,
+      Obsidian's writer-plugin ecosystem, and Notion's author templates,
+      rather than a news scan. It surfaces the strongest evidence yet for
+      *why* the bundle stays unclaimed, not just that it does. Three
+      findings stand out. (1) NovelCrafter's own blog
+      (novelcrafter.com/blog/smart-goals-for-writers) tells its users to
+      time their sessions with their phone's Pomodoro timer and track daily
+      word counts in a plain spreadsheet — a competitor that already ships
+      an in-app goal tracker is still routing its own users to two
+      external apps for exactly the fourth-app job, in its own words, not
+      inference. (2) Campfire users and reviewers repeatedly describe the
+      product as seventeen-odd separately-priced modules rather than one
+      tool — "not everyone needs all of those options... if you click the
+      wrong one in a hurry it's frustrating" (G2), "no depth, hard to use"
+      (AlternativeTo) — and pair it with Scrivener for the actual drafting,
+      because Campfire "does not offer novel writing tools" at all
+      (AlternativeTo). A funded, module-rich competitor choosing
+      fragmentation over coherence is a live counter-example, not a
+      hypothetical one. (3) On the Obsidian side specifically, two
+      independently-built plugins — StoryLine (30k+ downloads, sprint timer
+      + codex + relationship graph + scene board, actively maintained) and
+      WebNovel Assistant (9.7k downloads, focus-vs-slack detection + goal
+      tracking + lore/foreshadowing boards + a task board, also actively
+      maintained) — have now converged on Novella's exact four-pillar shape
+      from the plugin side, with zero AI in either. Two unrelated teams
+      independently rebuilding the same bundle inside someone else's app is
+      stronger demand evidence than a single feature request ever could be.
+      None of this closes the compound "local AI + all four pillars" gap
+      the last twenty-five rounds tracked — StoryLine and WebNovel Assistant
+      are both explicitly no-AI — but it answers the "is this a real
+      product opportunity or a coincidence of research framing" question
+      the round-33 owner-decision flag implicitly raised: the demand signal
+      is real and keeps reappearing from unrelated directions, even where
+      the narrow compound check keeps coming back dry.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -790,6 +926,20 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       partial-sync theory) but still no Literature & Latte staff response
       and no resolution — still one unconfirmed report, not yet a
       pattern. Sudowrite and Dabble: no new incidents or posts found.
+      Research round 40 (2026-08-24) adds a first data point for a fifth
+      product, Notion, structurally different from the others: rather than
+      an outage, Notion's own fix for its most-requested reliability gap
+      is itself incomplete. Native offline mode shipped in version 2.53
+      (~August 2025, techcrunch.com/2025/08/20) after years as one of the
+      most-requested features, but pages must be marked "available
+      offline" one at a time (no automatic subpage sync) and — the sharper
+      point — only the first 50 rows of a database's first view sync
+      offline at all. A novel-length Scenes database (60-120+ rows for a
+      full manuscript) works with silently incomplete data offline, over a
+      year after the feature shipped. Worth citing alongside the Sudowrite/
+      Dabble/Campfire incidents above as a different flavor of the same
+      structural point: cloud-first tools patch reliability gaps one
+      partial fix at a time; a local vault never has the gap.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent
@@ -968,7 +1118,20 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
       Novella already ships all three plus one-click backup
       (`src/export/formats.ts`) and the export modal / first-run copy
-      doesn't say so. Cheap copy win, low priority.
+      doesn't say so. Cheap copy win, low priority. Research round 40
+      (2026-08-24) sharpens this from a docked review score into a
+      structural product gap: Sudowrite ships no manuscript compile/export
+      at all — raw text only, no PDF/EPUB/DOCX/Kindle formatting — and
+      multiple independent 2026 reviews (Chapter.pub, Squibler) frame it as
+      fundamentally "a scene-level tool you stitch into a book," explicitly
+      recommending a hybrid Scrivener-for-structure-plus-Sudowrite-for-
+      line-polish workflow. Sudowrite's own blog concedes the framing in
+      its "Sudowrite vs. Scrivener" posts, and added Scrivener .zip import
+      specifically to ease the pairing without closing the underlying gap.
+      This is a near-exact match for Novella's own "structure stays flat,
+      leaving stays easy, one-click export" guardrails — the market
+      leader's own workaround is the second-app problem Novella's export
+      model already solves by construction.
 - [ ] **Say the performance/battery advantage louder** — research round 8:
       2026 Dabble reviews call it out by name as a CPU hog that "ran a
       user's laptop battery down really quickly," a direct cost of being a
@@ -1026,6 +1189,24 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       credit-accuracy bugs patched in one release, on top of the two
       already logged from round 21. Fourth consecutive dated release with
       a credit-mechanics fix in it; read as a trend, not an incident.
+      Research round 40 (2026-08-24) adds sharper, more severe first-hand
+      evidence than any prior round's changelog-reading: a Trustpilot
+      reviewer reports burning "over 300k" credits on a chapter-splitting
+      task that never completed, with no support response until Sudowrite
+      reportedly reached out June 23, 2026; Sudowrite's own public feedback
+      board (feedback.sudowrite.com/p/unlimited-credits) carries a report
+      of 2,000,000 credits consumed editing just four chapters, described
+      as costing hundreds of euros a month. Independent 2026 review sites
+      (DreamGen, Chapter.pub) independently name credit consumption as the
+      single top complaint category, not one incident among several. Also
+      new this round: Notion — a different kind of competitor than
+      Sudowrite, but relevant to the same pitch — removed its standalone
+      ~$8-10/mo AI add-on on May 13, 2025 and folded full AI access into
+      the $20/seat Business tier only, with no lighter option and legacy
+      pricing lost permanently on cancellation. Two unrelated products,
+      same direction: AI access getting more metered and more expensive,
+      not less, while a local model has no credit system to run out of at
+      all.
 - [ ] **Fix the Claude Fable 5 blurb in the optional Anthropic provider** —
       research round 10 (2026-07-27): July 2026 coverage confirms Fable 5
       is Anthropic's purpose-built creative-writing model, topping
@@ -1144,6 +1325,48 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-08-24 — Research round 40 (autopilot; no code). A deliberately
+  different kind of round from the 20-round competitive-news cadence
+  above: instead of scanning for what's new since yesterday, seven
+  parallel agents ran full interaction-level UX research — how the
+  actual features work, not just whether they exist — across
+  NovelCrafter, Sudowrite, Scrivener, Dabble, Campfire, type.ai,
+  Obsidian's writer-plugin ecosystem, Notion's author templates, and
+  cross-app "second app" pairings, plus one codebase gap-check agent to
+  verify claims against our own source before writing anything down. No
+  brand-new competitor found the four-pillar bundle (StoryLine and
+  WebNovel Assistant, both Obsidian plugins, are the closest — three of
+  four pillars each, no AI in either), but the round found much
+  stronger evidence for *why* it stays unclaimed: NovelCrafter's own
+  blog tells its users to use a phone Pomodoro timer and a spreadsheet;
+  Campfire users and reviewers describe it as disconnected modules, not
+  one tool, and pair it with Scrivener to actually draft; two
+  independent Obsidian plugin teams have separately rebuilt the same
+  four-pillar shape inside someone else's app. Folded into the
+  four-app-bundle item. Two new checklist items came out of this round
+  rather than another dry recheck: making it visible which Codex/notes
+  content actually reaches the AI (a live trap in NovelCrafter's own
+  Tags-vs-Details split, which we don't have but also don't visibly
+  avoid), and a scoping flag for worldbuilding/timeline data that
+  currently can't survive past one manuscript for series writers (an
+  architectural question, not committed as a build item). The Timeline
+  view item was promoted above the Location-map item given much
+  stronger evidence (Aeon Timeline, a paid third-party tool, exists
+  specifically because Scrivener's lack of one causes rewrite-inducing
+  continuity errors) and gained a scoped first slice: setup/payoff
+  tracking, seen independently in two Obsidian plugins. Smaller updates
+  folded into five more existing items: inline comments (Dabble's
+  async, mergeable Review Copies model), the no-outage item (Notion's
+  offline mode syncs only the first 50 rows of a database, over a year
+  after shipping), the no-credit-limits item (a Sudowrite user burning
+  300k credits on a task that never finished; Notion folding AI into
+  its priciest tier), the export-advantage item (Sudowrite ships no
+  compile/export at all, not just weaker export), and the
+  NovelCrafter-parity item (its own top-voted feature request is
+  auto-summarizing an imported manuscript). The standing skills-scouting
+  pass was not run this round — the assigned scope was the app/UX
+  research passes specifically. Full notes in RESEARCH.md Round 40.
 
 - 2026-08-24 — Research round 39 (autopilot; no code). Housekeeping
   first: the container's `main` branch ref was 11 commits behind
