@@ -621,6 +621,18 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       Novel Forge AI, StoryLine). Round 33's flag — whether to keep
       running this exact compound check every round — is still
       unanswered six rounds later; noted once, not re-raised further.
+      Research round 39 (2026-08-24) ran the check a twenty-fifth time
+      and again found no match. Two small updates on the standing
+      near-misses, neither closing the gap: LocalProse shipped native
+      iOS/Android apps (v3.4.3) with a mobile-editor polish pass, still
+      only a notes/goals "idea box" rather than a real task tracker; and
+      StoryLine's Obsidian ecosystem gained a companion plugin, Noveler
+      — A StoryLine Expansion (manuscript writer + scene routing +
+      formatted export), which extends StoryLine's existing sprint-timer/
+      codex pairing but adds no AI, so "No AI · No Cloud" still stands.
+      type.ai's changelog still 404s; its blog (checked directly this
+      round) has gone quiet too, nothing posted since January 21, 2026.
+      No new entrant found on a fresh ProductHunt/IndieHackers sweep.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -768,6 +780,16 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       "Campfire fixed a bug" signal that traced to an unrelated product —
       don't log a Campfire release without reading its version number
       and changelog text directly.
+      Research round 39 (2026-08-24) resolves that caution with a direct
+      read of the real App Store listing (not the "ONCE — Campfire"
+      decoy): Campfire Write is confirmed still at v1.3.2, last updated
+      June 29, 2026, changelog text only "Bugfixes and performance
+      improvements" — no fix for the long-tracked cursor-jump/mid-
+      sentence-reset bug. The open Scrivener external-drive save-failure
+      thread got one more reply (2026-08-22, a fellow user's Dropbox-
+      partial-sync theory) but still no Literature & Latte staff response
+      and no resolution — still one unconfirmed report, not yet a
+      pattern. Sudowrite and Dabble: no new incidents or posts found.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent
@@ -930,6 +952,18 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       overdue with nothing filed or reported by any tracked source. Both
       worth a direct check first thing next round rather than assumed
       resolved.
+      Research round 39 (2026-08-24) checks both directly again, still
+      unresolved: the Bartz claims portal (anthropiccopyrightsettlement.com,
+      cross-checked against a 2026-08-07 Authors Alliance blog post) still
+      says only "an online portal will be launched by the end of August,"
+      with payments themselves "not expected until at least the end of
+      the year" — no firmer date, five days from month-end now. Kadrey's
+      mediation-outcome report is three days overdue; the most recent
+      McKool Smith tracker edition found is dated 2026-07-13 ("no major
+      substantive developments"), with no edition covering the report's
+      due date located anywhere. Re-check both again next round — the
+      Bartz portal is the more likely of the two to actually resolve
+      within the next few days given the "end of August" guidance.
 - [ ] **Say the export advantage louder** — research round 7: Sudowrite
       reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
       Novella already ships all three plus one-click backup
@@ -1110,6 +1144,40 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-08-24 — Research round 39 (autopilot; no code). Housekeeping
+  first: the container's `main` branch ref was 11 commits behind
+  `origin/main`, but the detached HEAD it started on already matched
+  `origin/main` exactly (a77a57a) — same benign stale-local-branch
+  pattern flagged in rounds 24, 29, 30, 31, 33, 37 (never the same as
+  an actual unpushed-work risk, confirmed via `merge-base
+  --is-ancestor` both directions before touching anything), fixed with
+  a plain fast-forward. Dispatched the same four parallel research
+  passes as recent rounds, each briefed on rounds 1-38's findings and
+  searching for material dated after round 38's 2026-08-23 cutoff.
+  **Third dry round in a row (37, 38, 39)** — no brand-new checklist
+  item, four small confirming/updating notes folded into three
+  existing items. (1) NovelCrafter/Sudowrite pass fully dry: both
+  status pages and changelogs show nothing newer than what round 38
+  already logged. (2) Dabble/Scrivener/Campfire pass mostly dry, but
+  resolved a round-38 open caution by reading Campfire Write's real
+  App Store listing directly (still v1.3.2, June 29, 2026,
+  "Bugfixes and performance improvements" — confirmed, not the
+  round-32 decoy product) and found the open Scrivener external-
+  drive-save thread got one more user reply (2026-08-22) but still no
+  staff response — folded into the no-outage item. (3) The four-pillar
+  competitive check ran a twenty-fifth dedicated recheck (rounds 15,
+  17-39) and again found no match; two minor near-miss updates
+  (LocalProse shipped native mobile apps, StoryLine's ecosystem gained
+  a companion "Noveler" plugin, neither adding AI or a task tracker)
+  folded into the four-app-bundle item, plus a note that type.ai's
+  blog has now gone quiet since January 2026 on top of its
+  already-404ing changelog. (4) The industry/legal pass confirmed both
+  watched litigation dates (Bartz claims portal, Kadrey mediation
+  report) are still unresolved, with slightly more specific sourcing
+  than round 38 (a dated Authors Alliance post, the most recent McKool
+  Smith tracker edition found) — folded into the no-training/privacy
+  item. Full notes in RESEARCH.md Round 39.
 
 - 2026-08-22 — Research round 37 (autopilot; no code). Note: round 36
   (2026-08-21) left no entry in this log even though its findings are
