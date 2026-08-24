@@ -33,6 +33,17 @@ import {
 } from "./src/ui/panelLayout";
 import { ALL_TABS } from "./src/ui/inspectorTabs";
 import { COMPACT_MAX, isCompactWidth, nextDrawer } from "./src/ui/useCompact";
+import {
+  clampZoom,
+  DEFAULT_ZOOM,
+  MAX_ZOOM,
+  MIN_ZOOM,
+  parseZooms,
+  serializeZooms,
+  stepZoom,
+  withZoom,
+  zoomOf,
+} from "./src/ui/toolZoom";
 
 let failures = 0;
 let checks = 0;
@@ -248,6 +259,56 @@ check("tapping from closed opens", nextDrawer(null, "tools"), "tools");
 // Swapping rather than closing matters: the alternative costs two taps
 // to get from one pane to the other.
 ok("swapping never passes through closed", nextDrawer("tools", "codex") !== null);
+
+/* ============================================================
+   Per-tool zoom
+
+   Keyed by TOOL, not by panel: two calendars are the same thing shown
+   twice, not two documents, so they must agree. And nothing read back
+   off disk is trusted — a NaN here would reach CSS as `font-size:
+   NaNem` and blank the tool.
+   ============================================================ */
+
+check("zoom starts at 1", zoomOf({}, "calendar"), DEFAULT_ZOOM);
+ok("a step in gets bigger", stepZoom(1, 1) > 1);
+ok("a step out gets smaller", stepZoom(1, -1) < 1);
+
+// Multiplicative, so a notch feels the same at any zoom.
+ok("in then out returns to where it started", Math.abs(stepZoom(stepZoom(1, 1), -1) - 1) < 0.005);
+
+// Bounds hold however hard you scroll.
+let zin = 1;
+for (let i = 0; i < 40; i++) zin = stepZoom(zin, 1);
+check("zooming in forever stops at the ceiling", zin, MAX_ZOOM);
+let zout = 1;
+for (let i = 0; i < 40; i++) zout = stepZoom(zout, -1);
+check("zooming out forever stops at the floor", zout, MIN_ZOOM);
+
+check("a NaN never reaches CSS", clampZoom(NaN), DEFAULT_ZOOM);
+// Infinity is corruption, not an intent to zoom all the way in, so it
+// falls back to the default rather than the ceiling. Clamping it to MAX
+// would honour a value nobody chose.
+check("infinity falls back to the default", clampZoom(Infinity), DEFAULT_ZOOM);
+check("negative infinity too", clampZoom(-Infinity), DEFAULT_ZOOM);
+// A real in-range number is still respected, which is the difference.
+check("a legitimate value is kept", clampZoom(1.25), 1.25);
+check("a merely-too-big number IS clamped", clampZoom(4), MAX_ZOOM);
+
+// One tool's zoom must not touch another's — the entire point.
+const zoomed = withZoom({}, "calendar", 1.3);
+check("the zoomed tool changed", zoomOf(zoomed, "calendar"), 1.3);
+check("its neighbour did not", zoomOf(zoomed, "tasks"), DEFAULT_ZOOM);
+
+// Back to 1 drops the entry rather than storing a default.
+check("returning to normal forgets the entry", Object.keys(withZoom(zoomed, "calendar", 1)).length, 0);
+
+check("nothing stored is no zooms", parseZooms(null), {});
+check("unparseable is no zooms", parseZooms("{oh no"), {});
+check("a list is no zooms", parseZooms("[1,2]"), {});
+check("a NaN entry is dropped", parseZooms('{"calendar":null}'), {});
+check("an out-of-range entry is clamped", zoomOf(parseZooms('{"calendar":99}'), "calendar"), MAX_ZOOM);
+check("a stored default is not kept", parseZooms('{"calendar":1}'), {});
+check("a round trip survives", zoomOf(parseZooms(serializeZooms(zoomed)), "calendar"), 1.3);
 
 if (failures > 0) {
   console.error(`\n${failures} of ${checks} checks failed.`);

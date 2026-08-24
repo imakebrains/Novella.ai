@@ -111,7 +111,7 @@ export const AGENT_TEMPLATES: Omit<Agent, "id" | "lastRunAt" | "lastStatus" | "l
     description:
       "Reads the whole manuscript once a day and lists continuity slips — names spelled two ways, eyes that change colour, timelines that don't add up.",
     example:
-      "• Ch 2: Mira's scarf is \"emerald\"; Ch 5 calls it \"grey wool\" — same scarf?\n• Ch 3 says the funeral was \"last spring\", Ch 4 says \"two winters back\".",
+      "• Ch 2 gives a character green eyes; Ch 5 gives the same character grey.\n• Ch 3 places an event \"last spring\"; Ch 4 calls it \"two winters back\".",
     instructions:
       "Read the manuscript for continuity slips: names spelled two ways, physical details that change, timeline impossibilities, objects that vanish or teleport, weather or seasons that contradict. List each suspected slip with the chapter it appears in and a one-line quote. If you find nothing, say so briefly.",
     scope: "manuscript",
@@ -123,7 +123,7 @@ export const AGENT_TEMPLATES: Omit<Agent, "id" | "lastRunAt" | "lastStatus" | "l
     description:
       "When you open Novella, a fresh 200-word editor's note on where the story stands and the most pressing open question — so you start writing, not re-reading.",
     example:
-      "Wren has traded the memory and doesn't know what she lost. The map contradicts the coast. Open thread: nobody has explained why the Archivist wanted THAT memory.",
+      "Your protagonist has made the trade and does not yet know its cost. Two chapters now contradict each other on the geography. Open thread: the antagonist's motive is still unstated.",
     instructions:
       "Summarise the current state of the manuscript in under 200 words: where the story stands, which threads are open, and the single most pressing unanswered question. Write it as a note from an attentive editor, not a book report.",
     scope: "manuscript",
@@ -147,7 +147,7 @@ export const AGENT_TEMPLATES: Omit<Agent, "id" | "lastRunAt" | "lastStatus" | "l
     description:
       "Compares the codex to the manuscript daily: who's in the prose but missing an entry, which entries the prose contradicts, what's gone stale.",
     example:
-      "• \"Doctor Halloway\" appears in Ch 2 and 4 — no codex entry yet.\n• Codex says the Drift moves nightly; Ch 3 has it resting \"a fortnight\".",
+      "• A name appears in Ch 2 and Ch 4 with no codex entry yet.\n• The codex says a place moves nightly; Ch 3 leaves it still for a fortnight.",
     instructions:
       "Compare the codex to the manuscript. List: characters or places named in prose that have no codex entry; entries the prose never mentions; and codex facts the prose contradicts. Give file-worthy one-line suggestions, nothing more.",
     scope: "everything",

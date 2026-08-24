@@ -85,7 +85,10 @@ interface CreationStep {
 export function WelcomeIntro({ onDone }: { onDone: () => void }) {
   const projects = useProjects();
   const returning = projects.length > 0;
-  const { theme, setTheme } = useTheme();
+  // `theme` is deliberately not read: the welcome presents in its own
+  // palette until the writer chooses one, so the app's current theme is
+  // not the intro's starting point. setTheme is still how a choice lands.
+  const { setTheme } = useTheme();
 
   // The returning path swaps the project screen for the door back in and
   // drops the showing screens. The rule lives in introScript.ts, where it
@@ -96,7 +99,24 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
   const [line, setLine] = useState<LineState>({ lineIdx: 0, lineComplete: false });
   const [penName, setPenName] = useState("");
   const [accent, setAccent] = useState<string | null>(null);
-  const [committedTheme, setCommittedTheme] = useState<Theme>(theme);
+  /* The welcome opens LIGHT, whatever the writer will end up using.
+     Two reasons, and the second is the better one:
+
+     A threshold should feel open. On a dark-mode machine a fresh install
+     lands on Ember, so the first thing anyone ever saw of Novella was a
+     dark amber room — read back as "dirty" rather than welcoming, which
+     is a fair description of low-chroma yellow on near-black at that size.
+
+     And it gives the theme step something to do. Opening in the theme you
+     will end up with means the question "what should this room look like?"
+     is answered before it is asked. Opening on paper means the room takes
+     on the writer's colour in front of them, which is the whole promise
+     that step is making.
+
+     `chosen` is the switch. Until the writer picks, the intro presents in
+     vellum; after, it is theirs and stays theirs. */
+  const [committedTheme, setCommittedTheme] = useState<Theme>("vellum");
+  const [chosen, setChosen] = useState(false);
   const [ai, setAi] = useState<SetupReport | "checking" | null>(null);
   const [aiLine, setAiLine] = useState<string | null>(null);
   const [steps, setSteps] = useState<CreationStep[] | null>(null);
@@ -273,13 +293,34 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
     carousel.current?.scrollBy({ left: dir * 264, behavior: "smooth" });
   };
 
+  /* Dress the room in the welcome palette for as long as the welcome is
+     up, and hand it back on the way out. Restoring on unmount covers Skip
+     and Esc as well as finishing, so no exit can strand the app wearing a
+     theme the writer never picked. */
+  useEffect(() => {
+    const root = document.documentElement;
+    const theirs = root.getAttribute("data-theme");
+    if (!chosen) root.setAttribute("data-theme", "vellum");
+    return () => {
+      if (theirs) root.setAttribute("data-theme", theirs);
+    };
+    // Runs once: `chosen` flipping is handled by answerTheme below, which
+    // sets the attribute itself. Re-running here would fight it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const previewTheme = (id: Theme) =>
     document.documentElement.setAttribute("data-theme", id);
   const revertPreview = () =>
-    document.documentElement.setAttribute("data-theme", committedTheme);
+    document.documentElement.setAttribute(
+      "data-theme",
+      chosen ? committedTheme : "vellum",
+    );
   const answerTheme = (id: Theme) => {
     setTheme(id);
     setCommittedTheme(id);
+    setChosen(true);
+    document.documentElement.setAttribute("data-theme", id);
     bloom();
     advance();
   };

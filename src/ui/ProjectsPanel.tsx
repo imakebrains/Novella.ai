@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { store, useVaultVersion } from "../state/vaultStore";
 import { ProjectPreviewModal } from "./ProjectPreviewModal";
 import { openStyleMe } from "./StyleMeModal";
+import { previewOf, previewSummary } from "./presetPreview";
 import {
   clearProjectBanner,
   hydrateProjectBanner,
@@ -212,6 +213,37 @@ export function ProjectsPanel({ onClose }: { onClose: () => void }) {
             ))}
           </div>
           <p className="hint preset-blurb">{presetById(preset).blurb}</p>
+
+          {/* What the chosen preset actually builds. The welcome has shown
+              this since it was written; this picker never did, so the only
+              way to find out what "The Big Book" meant was to pick it and
+              look at the folder afterwards.
+
+              Derived from the files the preset really creates — the same
+              previewOf() the welcome uses — so it cannot drift from what
+              you get. Add a file to a preset and a row appears here. */}
+          {(() => {
+            const demo = previewOf(presetById(preset));
+            return (
+              <div className="preset-preview">
+                <p className="preset-summary">{previewSummary(demo)}</p>
+                <div className="preset-demo">
+                  {demo.rows.map((row) => (
+                    <span key={row.folder || "root"}>
+                      {row.folder && <span className="preset-folder">{row.folder}/</span>}
+                      {row.items.map((item) => (
+                        <span key={item} className="preset-file">
+                          {item}
+                        </span>
+                      ))}
+                      {row.more > 0 && <span className="preset-file">and {row.more} more</span>}
+                    </span>
+                  ))}
+                  {demo.taste && <span className="preset-taste">{demo.taste}</span>}
+                </div>
+              </div>
+            );
+          })()}
 
           {isTauri() ? (
             <div className="btn-row projects-actions">

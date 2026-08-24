@@ -4,10 +4,18 @@ import {
   useEffect,
   useRef,
   useState,
+  useSyncExternalStore,
   type CSSProperties,
   type ReactNode,
 } from "react";
 import { store, useVaultVersion } from "../state/vaultStore";
+import {
+  setToolZoom,
+  stepZoom,
+  subscribeToolZoom,
+  toolZooms,
+  zoomOf,
+} from "./toolZoom";
 import { pluginHost, usePluginVersion } from "../plugins/runtime";
 import { listOllamaModels, type OllamaModel } from "../plugins/providers/ollama";
 import { buildSceneContext, estimateTokens } from "../ai/context";
@@ -704,18 +712,57 @@ export function ToolBody({
   onShowMusicPlayer?: () => void;
 }) {
   useVaultVersion();
+  // Wrapping the tool HERE means every surface that can host one — the
+  // inspector, a side-docked column, a floating board panel — gets zoom
+  // without knowing about it, and they all agree because the scale is
+  // keyed by tool rather than by panel.
+  const zoom = useSyncExternalStore(subscribeToolZoom, () => zoomOf(toolZooms(), id));
   const active = store.active();
 
-  if (TAB_DEFS[id].needsNote && !active)
-    return (
-      <div className="empty-state">
-        <span className="empty-glyph" aria-hidden>
-          ¶
-        </span>
-        <p className="empty-line">Nothing open.</p>
-      </div>
-    );
+  const onWheel = (e: React.WheelEvent) => {
+    // Ctrl+wheel is the browser's zoom gesture, and the browser applies
+    // it to the whole app. Claiming it here scopes it to one tool, which
+    // is the thing the gesture was reached for in the first place.
+    if (!e.ctrlKey) return;
+    e.preventDefault();
+    setToolZoom(id, stepZoom(zoomOf(toolZooms(), id), e.deltaY > 0 ? -1 : 1));
+  };
 
+  const body = (() => {
+    if (TAB_DEFS[id].needsNote && !active)
+      return (
+        <div className="empty-state">
+          <span className="empty-glyph" aria-hidden>
+            ¶
+          </span>
+          <p className="empty-line">Nothing open.</p>
+        </div>
+      );
+    return renderToolBody(id, onShowMusicPlayer);
+  })();
+
+  return (
+    <div
+      className="tool-zoom"
+      data-zoomed={zoom !== 1 ? "true" : undefined}
+      style={zoom !== 1 ? { fontSize: `${zoom}em` } : undefined}
+      onWheel={onWheel}
+    >
+      {zoom !== 1 && (
+        <button
+          className="tool-zoom-reset"
+          onClick={() => setToolZoom(id, 1)}
+          title="Back to normal size"
+        >
+          {Math.round(zoom * 100)}%
+        </button>
+      )}
+      {body}
+    </div>
+  );
+}
+
+function renderToolBody(id: TabId, onShowMusicPlayer?: () => void) {
   switch (id) {
     case "links":
       return <LinksTab />;
