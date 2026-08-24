@@ -4,7 +4,6 @@ import {
   FINALE_MS,
   INTRO_SWATCHES,
   LINE_GAP_MS,
-  gerundAt,
   glueOrphans,
   inputReady,
   lineDurationMs,
@@ -22,8 +21,6 @@ import { Logo } from "./Logo";
 import { THEMES, useTheme, type Theme } from "./useTheme";
 import { profileStore } from "../state/profile";
 import { projectStore, toBannerDataUrl, useProjects } from "../state/projects";
-import catGif from "../assets/cat-loading.gif?inline";
-import catStill from "../assets/cat-still.avif?inline";
 import { store } from "../state/vaultStore";
 import { isTauri, storage } from "../storage";
 import { PRESETS } from "../seed/presets";
@@ -154,15 +151,6 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
      the moment they pick one. */
   const [introBg, setIntroBg] = useState<string | null>(null);
   const carousel = useRef<HTMLDivElement>(null);
-
-  /* The loading cat cycles its vocabulary while real steps tick. */
-  const [gerundTick, setGerundTick] = useState(0);
-  const gerundActive = !!steps || boot !== "off";
-  useEffect(() => {
-    if (!gerundActive) return;
-    const t = setInterval(() => setGerundTick((n) => n + 1), 800);
-    return () => clearInterval(t);
-  }, [gerundActive]);
 
   const screen = script[screenIdx]!;
   const vars = useMemo(
@@ -424,10 +412,19 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
 
       {boot !== "off" && (
         <div className={`intro-boot ${boot === "leaving" ? "leaving" : ""}`} aria-hidden>
-          <img src={reducedMotion() ? catStill : catGif} className="intro-boot-cat" alt="" />
-          <p className="intro-gerund" key={gerundTick}>
-            {gerundAt(gerundTick)}…
-          </p>
+          {/* A cold open, not a loading screen. Nothing here reports
+              progress, because at this moment there is none to report —
+              the work happens at the finale, where the steps list says so
+              honestly. This is the mark arriving, once, and getting out
+              of the way. Four beats on one clock: the mark, the rule that
+              draws under it, the wordmark, and a light that passes over
+              the whole thing and leaves. */}
+          <div className="intro-boot-mark">
+            <Logo size={96} animate />
+            <span className="intro-boot-sheen" />
+          </div>
+          <span className="intro-boot-rule" />
+          <p className="intro-boot-word">Novella</p>
         </div>
       )}
 
@@ -669,12 +666,22 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
 
         {steps && (
           <div className="intro-steps" aria-live="polite">
-            {/* The cat is decoration; the list below is the truth. */}
-            <div className="intro-cat-wrap" aria-hidden>
-              <img src={reducedMotion() ? catStill : catGif} className="intro-cat" alt="" />
-              <p className="intro-gerund" key={gerundTick}>
-                {gerundAt(gerundTick)}…
-              </p>
+            {/* A determinate rail, not a spinner and not a mascot. It
+                fills against the steps actually finished, so the bar and
+                the list below can never tell different stories — which is
+                the whole objection to an indeterminate loader: it implies
+                knowledge it does not have. */}
+            <div className="intro-progress" aria-hidden>
+              <span
+                className="intro-progress-fill"
+                style={{
+                  transform: `scaleX(${
+                    steps.length
+                      ? steps.filter((s) => s.done).length / steps.length
+                      : 0
+                  })`,
+                }}
+              />
             </div>
             {steps.map((s, i) => (
               <p key={i} className={`intro-step ${s.done ? "done" : ""}`}>

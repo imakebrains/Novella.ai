@@ -6880,25 +6880,6 @@ body {
   border-color: var(--accent);
   color: var(--accent);
 }
-
-/* The loading cat. The gerund rotates; the real steps below tell the truth. */
-.intro-cat-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-1);
-  margin-bottom: var(--space-3);
-}
-.intro-cat {
-  height: 72px;
-  width: auto;
-}
-.intro-gerund {
-  margin: 0;
-  color: var(--fg-muted);
-  font-size: var(--text-sm);
-  animation: gerund-life 790ms var(--ease, ease) both;
-}
 @keyframes gerund-life {
   0% { opacity: 0; transform: translateY(4px); }
   18% { opacity: 1; transform: translateY(0); }
@@ -6910,7 +6891,6 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   :root:not(.motion-full) .intro-bg,
-:root:not(.motion-full) .intro-gerund,
 :root:not(.motion-full) .task-add-row {
     animation: none;
   }
@@ -6988,15 +6968,6 @@ body {
   gap: var(--space-4);
 }
 
-/* The finale: the cat presides, larger, with room to breathe. */
-.intro-steps .intro-cat {
-  height: 96px;
-}
-.intro-gerund {
-  font-size: var(--text-base);
-  font-family: var(--font-display);
-}
-
 /* ---- 9.27 the shell never scrolls (QA round) ---- */
 /* An app shell manages its own scrolling; a document scrollbar under
    the workspace is always a bug. The culprit was subtle: [data-tip]
@@ -7063,27 +7034,13 @@ body {
 .intro-answers > *:nth-child(2) { animation-delay: 340ms; }
 .intro-answers > *:nth-child(3) { animation-delay: 430ms; }
 .intro-answers > *:nth-child(n + 4) { animation-delay: 520ms; }
-
-/* The companion. Small, alive, out of the way. */
-.intro-cat-corner {
-  position: absolute;
-  right: var(--space-5);
-  bottom: var(--space-5);
-  animation: cat-bob 3.2s ease-in-out infinite;
-}
-.intro-cat-corner img {
-  height: 64px;
-  width: auto;
-  opacity: 0.92;
-}
 @keyframes cat-bob {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :root:not(.motion-full) .intro-glow,
-:root:not(.motion-full) .intro-cat-corner {
+:root:not(.motion-full) .intro-glow {
     animation: none;
   }
   :root:not(.motion-full) .intro-line.done:first-child {
@@ -7180,14 +7137,6 @@ body {
   to { transform: scaleX(1); opacity: 1; }
 }
 
-/* The companion arrives with the same snap it lives by. */
-.intro-cat-corner {
-  animation: pop-set 460ms steps(4, end) both, cat-bob 1.8s steps(2, end) 600ms infinite;
-}
-.intro-cat-corner img {
-  height: 76px;
-}
-
 /* Buttons press like stamps. */
 .intro-primary:active,
 .intro-quiet:active,
@@ -7221,13 +7170,151 @@ body {
     filter 500ms var(--ease-hero, ease);
   pointer-events: none;
 }
-.intro-boot-cat {
-  height: 120px;
-  width: auto;
-  animation: pop-set 480ms steps(4, end) both;
+/* ---- the cold open ----
+
+   Four beats on one 2400ms clock, staged so no two things move at the
+   same time — that overlap is what makes a title sequence read as busy
+   rather than composed:
+
+     0-900     the mark arrives and its gates open
+     600-1400  a hairline rule draws outward from the centre
+     900-1700  the wordmark rises and settles its letter-spacing
+     1100-1900 one light passes across the mark and leaves
+
+   Everything uses --ease-hero, a long decelerating curve. Nothing
+   overshoots, nothing bounces, nothing spins. The difference between
+   premium motion and cheap motion is almost entirely this: slow starts,
+   long tails, and no elastic. */
+
+.intro-boot-mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  /* Clips the sheen to the mark's own box. */
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  animation: boot-mark 900ms var(--ease-hero, ease) both;
 }
-.intro-boot .intro-gerund {
+@keyframes boot-mark {
+  from {
+    opacity: 0;
+    /* 0.94, not 0.6. A big scale reads as a bounce even without one; a
+       small one reads as the thing settling into focus. */
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* A single specular pass. Angled, because a vertical wipe reads as a
+   loading bar and a horizontal one reads as light on a surface. */
+.intro-boot-sheen {
+  position: absolute;
+  inset: -40%;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 42%,
+    color-mix(in srgb, var(--fg-primary) 22%, transparent) 50%,
+    transparent 58%
+  );
+  transform: translateX(-120%);
+  animation: boot-sheen 800ms 1100ms var(--ease-hero, ease) both;
+}
+@keyframes boot-sheen {
+  from { transform: translateX(-120%); }
+  to { transform: translateX(120%); }
+}
+
+/* Draws outward from the centre rather than in from one side: symmetric
+   motion under a centred mark, asymmetric would drag the eye sideways. */
+.intro-boot-rule {
+  width: 132px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border-strong) 22%,
+    var(--border-strong) 78%,
+    transparent
+  );
+  transform: scaleX(0);
+  animation: boot-rule 800ms 600ms var(--ease-hero, ease) both;
+}
+@keyframes boot-rule {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* Letter-spacing settles as it rises. Tracking that tightens into place
+   is the oldest trick in title design and still the most effective,
+   because the word resolves rather than appears. */
+.intro-boot-word {
+  margin: 0;
+  font-family: var(--font-display, var(--font-prose));
   font-size: var(--text-lg);
+  font-weight: 500;
+  color: var(--fg-secondary);
+  animation: boot-word 800ms 900ms var(--ease-hero, ease) both;
+}
+@keyframes boot-word {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+    letter-spacing: 0.42em;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    letter-spacing: 0.24em;
+  }
+}
+
+/* Reduced motion keeps the composition and drops the choreography — the
+   rest state of every rule above is already the finished frame, so this
+   is one block rather than four rewrites. The sheen is the exception: it
+   exists only while travelling, so at rest it is simply not there. */
+@media (prefers-reduced-motion: reduce) {
+  :root:not(.motion-full) .intro-boot-mark,
+  :root:not(.motion-full) .intro-boot-rule,
+  :root:not(.motion-full) .intro-boot-word {
+    animation: none;
+  }
+  :root:not(.motion-full) .intro-boot-sheen {
+    display: none;
+  }
+}
+
+/* ---- the finale's progress rail ---- */
+/* Determinate, driven by steps actually finished. An indeterminate
+   spinner claims knowledge it does not have; this cannot disagree with
+   the list printed underneath it because it is computed from that list. */
+.intro-progress {
+  width: min(280px, 60vw);
+  height: 2px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--fg-primary) 12%, transparent);
+  overflow: hidden;
+  margin-bottom: var(--space-3);
+}
+.intro-progress-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transform-origin: left center;
+  /* transform, not width: width animates layout, transform animates on
+     the compositor. At 2px nobody would see the jank, but the habit is
+     the point. */
+  transition: transform var(--motion-slow) var(--ease-hero, ease);
+}
+@media (prefers-reduced-motion: reduce) {
+  :root:not(.motion-full) .intro-progress-fill {
+    transition: none;
+  }
 }
 
 /* Atmosphere: a vignette pulls the eye center, motes drift like dust
@@ -7351,24 +7438,6 @@ body {
   );
   pointer-events: none;
 }
-.intro-cat-wrap {
-  position: relative;
-}
-.intro-cat-wrap::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 62px;
-  width: 220px;
-  height: 60px;
-  transform: translateX(-50%);
-  background: radial-gradient(
-    ellipse 50% 50% at 50% 50%,
-    color-mix(in srgb, var(--accent) 20%, transparent),
-    transparent 70%
-  );
-  pointer-events: none;
-}
 
 /* The chosen scene breathes behind everything: a 36-second Ken Burns. */
 .intro-bg-img {
@@ -7479,10 +7548,6 @@ body.focus-mode .focus-exit:hover {
   height: 96px;
   opacity: 0.86;
   filter: drop-shadow(0 8px 24px rgb(0 0 0 / 0.35));
-}
-.intro-steps .intro-cat {
-  height: 84px;
-  opacity: 0.86;
 }
 
 /* ---- 9.34 board: cover art is a preference ---- */

@@ -22,11 +22,9 @@ import {
   lineFinished,
   substitute,
   tapAdvance,
-  gerundAt,
   scriptFor,
   CLIP_MIN_MS,
   CLIP_MAX_MS,
-  INTRO_GERUNDS,
   ENTRANCE_MS,
 } from "./src/ui/introScript";
 import { cycleTab, type TabId } from "./src/ui/inspectorTabs";
@@ -1019,9 +1017,6 @@ lied, and Wren had known that since she was nine.
     lineDurationMs("one two three four five"),
     ENTRANCE_MS,
   );
-  check("intro: gerunds cycle in order", gerundAt(1), INTRO_GERUNDS[1]);
-  check("intro: gerund cycle wraps", gerundAt(INTRO_GERUNDS.length), INTRO_GERUNDS[0]);
-  check("intro: gerund survives negative ticks", gerundAt(-1), INTRO_GERUNDS[INTRO_GERUNDS.length - 1]);
   check("intro: empty line takes no time", lineDurationMs("   "), 0);
 
   // The impatience ladder: tap completes the line, tap again jumps the screen.
