@@ -330,6 +330,18 @@ export function EditorPane() {
     const state = EditorState.create({
       doc: store.vault.get(activeId)?.body ?? "",
       extensions: [
+        /* Spellcheck, which the editor has never had.
+
+           CodeMirror sets spellcheck="false" on .cm-content itself, so a
+           writing app shipped with no squiggles at all — measured, not
+           assumed: the attribute was literally "false" in the running
+           app. Turning it on hands the work to the OS dictionary, which
+           costs nothing, works offline, and speaks the writer's own
+           installed languages.
+
+           The corrections themselves live in the browser's context menu,
+           which is why the right-click handler below no longer eats it. */
+        EditorView.contentAttributes.of({ spellcheck: "true" }),
         history(),
         closeBrackets(),
         autocompletion({ override: [wikiLinkSource, slashCommandSource], activateOnTyping: true }),
@@ -544,6 +556,19 @@ export function EditorPane() {
         <div className="editor-meta">
           {store.isDirty(active.id) && <span className="dot-dirty" title="Unsaved changes" />}
           <span title="Words in this note">{words.toLocaleString()} words</span>
+          <button
+            className="icon-btn"
+            title="Add this note to a board"
+            aria-label="Add this note to a board"
+            onClick={(e) => {
+              const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+              // Anchored under the button rather than at the pointer: it is
+              // a header control now, not a right-click.
+              setMenu({ x: r.right - 220, y: r.bottom + 4 });
+            }}
+          >
+            ▦
+          </button>
         </div>
       </header>
       <FormatBar />
@@ -551,12 +576,17 @@ export function EditorPane() {
       <div
         className="editor-surface"
         ref={host}
-        onContextMenu={(e) => {
-          // Our own menu: pin the open note to a board from where you're
-          // writing. CodeMirror has no native spellcheck menu to lose.
-          e.preventDefault();
-          setMenu({ x: e.clientX, y: e.clientY });
-        }}
+        /* No onContextMenu here any more.
+
+           It used to preventDefault unconditionally to show our own menu,
+           on the stated grounds that there was "no native spellcheck menu
+           to lose". Once spellcheck is on there very much is one, and it
+           is the only route to a correction or to "add to dictionary".
+
+           The menu it replaced offered exactly one thing — add this note
+           to a board — which is a note-level action that never belonged
+           on right-click-inside-a-word anyway. It now sits in the header,
+           beside the note's path. */
       />
       {menu && (
         <EditorContextMenu

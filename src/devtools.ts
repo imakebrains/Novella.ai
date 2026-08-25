@@ -29,7 +29,10 @@ import { extractEntities } from "./import/entities";
 import { allDrafts, pendingRecovery } from "./state/autosave";
 import { analyseProse } from "./analysis/prose";
 import { compileManuscript } from "./export/compile";
-import { render, type Format } from "./export/formats";
+/* Type-only: devtools is imported by main.tsx at boot, so a value
+   import here would put `docx` in the entry chunk for everyone,
+   including the writers who never export. */
+import type { Format } from "./export/formats";
 
 /* Dev-only debug surface.
 
@@ -92,7 +95,10 @@ export function installDevtools(): void {
     /** Compile the vault to a manuscript without exporting it. */
     compile: compileManuscript,
     /** Render an export in memory so its bytes can be inspected. */
-    render: async (format: Format = "docx") => render(compileManuscript({}), format),
+    render: async (format: Format = "docx") => {
+      const { render } = await import("./export/formats");
+      return render(compileManuscript({}), format);
+    },
     /** Escape hatches for poking at internals during development. */
     store,
     boards: boardStore,

@@ -223,10 +223,59 @@ export class PluginHost {
       this.emit();
     }
 
-    await plugin.onEnable(this.contextFor(plugin));
+    /* A plugin is other people's code, so enabling one is the moment this
+       host is least in control. Two things had to change:
+
+       `onEnable` was called unguarded. The interface requires it, which
+       protects plugins written in this repo and nothing else — a plugin
+       loaded at runtime is data, and data does not typecheck. A missing
+       method threw straight out of enable() and took the caller with it.
+
+       And a throw PART WAY THROUGH left the wreckage behind: commands and
+       providers registered before the throw stayed registered, while the
+       plugin never entered `active`. That is the worst of both — the
+       writer sees it as off, and its provider still answers. Cleaning up
+       on failure is what makes "off" mean off. */
+    if (typeof plugin.onEnable !== "function") {
+      this.notices.push({
+        id: ++this.noticeSeq,
+        message: `${plugin.name} could not start: it has no onEnable.`,
+        at: Date.now(),
+      });
+      this.emit();
+      return;
+    }
+
+    try {
+      await plugin.onEnable(this.contextFor(plugin));
+    } catch (err) {
+      this.forget(id);
+      this.notices.push({
+        id: ++this.noticeSeq,
+        message: `${plugin.name} failed to start: ${
+          err instanceof Error ? err.message : String(err)
+        }`,
+        at: Date.now(),
+      });
+      this.emit();
+      return;
+    }
+
     this.active.add(id);
     this.persistEnabled();
     this.emit();
+  }
+
+  /** Drop everything a plugin registered, without touching anyone else's.
+      Shared by disable() and by a failed enable(). */
+  private forget(id: string): void {
+    this.commands = this.commands.filter((c) => c.pluginId !== id);
+    for (const [slash, owner] of this.providerOwner) {
+      if (owner === id) {
+        this.providersBySlash.delete(slash);
+        this.providerOwner.delete(slash);
+      }
+    }
   }
 
   disable(id: string): void {
@@ -234,15 +283,9 @@ export class PluginHost {
     if (!plugin || !this.active.has(id)) return;
     plugin.onDisable?.();
     this.active.delete(id);
-
-    for (const [slash, owner] of this.providerOwner) {
-      if (owner === id) {
-        this.providersBySlash.delete(slash);
-        this.providerOwner.delete(slash);
-      }
-    }
-    this.commands = this.commands.filter((c) => c.pluginId !== id);
-
+    // Same cleanup a failed enable() runs, so the two paths cannot drift
+    // apart and leave one of them leaking a provider.
+    this.forget(id);
     this.persistEnabled();
     this.emit();
   }

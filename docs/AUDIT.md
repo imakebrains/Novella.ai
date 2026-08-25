@@ -52,11 +52,14 @@ Two things are in there that should not be:
   `src/export/formats.ts`, which `ExportModal.tsx` imports statically.
   Confirmed present in the main chunk by grepping it for
   `wordprocessingml`. It is needed only when someone exports.
-- **`@anthropic-ai/sdk`** (~9 MB unpacked) is reached through
-  `await import()` in `providers/anthropic.ts`, which *should* split —
-  but `AnthropicError` is present in the main chunk anyway, so something
-  upstream is pulling it in eagerly. It is needed only if a writer
-  connects Claude.
+- ~~**`@anthropic-ai/sdk`** is in the main chunk~~ — **WRONG, corrected
+  2026-08-24.** It is not. The dynamic import splits correctly into its
+  own 158 KB chunk; `AnthropicError` appears zero times in a fresh build.
+  The grep that "found" it ran against a stale artifact. A reminder to
+  rebuild before measuring.
+- **The real second half was images.** 1,530 KB of the 3,031 KB chunk —
+  half of it — was five backdrop photos imported `?inline` as base64.
+  Now emitted as files. Entry chunk: **3,404 KB to 1,536 KB.**
 
 Why it matters competitively: on the desktop build this is a local read
 and costs little. On the **hosted web build** — the one at
@@ -68,14 +71,22 @@ Fix: lazy-load `export/formats`, find and cut whatever drags the
 Anthropic SDK into the entry graph, and verify with a grep on the built
 chunk rather than by assuming the dynamic import worked.
 
-### 2. There is no way to fix a misspelling
+### 2. ~~There is no way to fix a misspelling~~ — FIXED, and it was worse
 
-*Inferred from source, not yet measured live.* `.cm-content` is
-contenteditable and nothing sets `spellcheck="false"` on it, so Chromium
-will underline misspellings. But `EditorPane.tsx` calls
-`e.preventDefault()` on `contextmenu` unconditionally to show Novella's
-own menu — and the browser's context menu is the **only** route to
-"correct spelling" and "add to dictionary".
+*The inference below was wrong in mechanism and understated the problem.*
+Measured live: CodeMirror sets `spellcheck="false"` on `.cm-content`
+itself, so there were **no squiggles at all** — a writing app with no
+spellcheck whatsoever, not one whose squiggles could not be corrected.
+
+Fixed 2026-08-24: enabled via `EditorView.contentAttributes`, and the
+unconditional `preventDefault` on `contextmenu` is gone so the native
+correction menu reaches the writer. The one action that menu replaced —
+add this note to a board — moved to the editor header.
+
+Original (wrong) reasoning kept for the record: `.cm-content` is
+contenteditable and nothing *in our code* sets `spellcheck="false"`, so
+Chromium will underline misspellings. But `EditorPane.tsx` calls
+`e.preventDefault()` on `contextmenu` unconditionally.
 
 The comment there says "CodeMirror has no native spellcheck menu to
 lose." That assumption is worth testing, because if squiggles do appear,
@@ -118,12 +129,14 @@ Substantial and with no test file naming them:
 | `plugins/runtime.ts` | 314 | Executes plugin behaviour |
 | `useTheme.ts` | 222 | Custom themes, contrast safety |
 | `providers/openaiCompatible.ts` | 212 | Every non-Anthropic provider |
-| `state/agentRunner.ts` | 154 | Fires agents on triggers |
+| ~~`state/agentRunner.ts`~~ | 154 | **Correction:** a filename match, not a real gap. `agentIsDue` — the scheduling decision — already has 14 assertions in test-units.ts; they import from `agents.ts`, so a search for "agentRunner" missed them. Its `buildAgentContext` is still uncovered. |
 | `ui/critiqueExtension.ts` | 168 | Runs on every keystroke |
 | `ui/editorBridge.ts` | 130 | Insert-into-manuscript seam |
 
-`agentRunner` and `plugins/runtime` are the two to write tests for first:
-both run code on the writer's behalf without the writer watching.
+**Done 2026-08-24 for `plugins/runtime`:** `test-plugins.ts`, 40 checks,
+which found two real bugs — `onEnable` called unguarded, and a throw part
+way through leaving commands and providers registered while the plugin
+never became active. Both fixed.
 
 ---
 

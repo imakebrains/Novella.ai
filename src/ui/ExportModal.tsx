@@ -2,7 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { compileManuscript, defaultTitle } from "../export/compile";
 import { backupProject } from "../export/backup";
 import { openPrintWindow } from "../export/printPdf";
-import { render, type Format } from "../export/formats";
+/* `render` is loaded on demand, not at boot. It pulls in `docx`, which
+   is ~1MB of the bundle and is needed only when somebody actually
+   exports — the type import stays static because types cost nothing at
+   runtime. */
+import type { Format } from "../export/formats";
 import { saveExport } from "../export/save";
 import { bylineOf, useProfile } from "../state/profile";
 import { isTauri, storage } from "../storage";
@@ -106,6 +110,7 @@ export function ExportModal({ onClose }: { onClose: () => void }) {
           );
         }
       } else {
+        const { render } = await import("../export/formats");
         const result = await render(manuscript, format);
         const where = await saveExport(result);
         if (where) setDone(where);

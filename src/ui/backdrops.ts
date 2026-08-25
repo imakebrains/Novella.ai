@@ -1,8 +1,20 @@
-import alpine from "../assets/backdrop-alpine.webp?inline";
-import goldenhour from "../assets/scene-goldenhour.webp?inline";
-import inkmoon from "../assets/scene-inkmoon.webp?inline";
-import maple from "../assets/scene-maple.jpg?inline";
-import suns from "../assets/scene-suns.jpg?inline";
+/* Emitted as files, NOT inlined as data URLs.
+
+   These five were `?inline` to dodge a WebView2 quirk: it caches a failed
+   fetch of the dev URL forever, so art that missed once stayed blank.
+   That fix charged every writer 1.5MB in the entry chunk on every load —
+   measured at HALF of a 3MB bundle — to solve a problem that only exists
+   when the dev server is down, at which point nothing else works either.
+
+   As emitted assets they are fetched only when a backdrop is actually
+   shown, which for most writers is never. The logo marks in Logo.tsx stay
+   inline on purpose: 24KB total, and they paint in the titlebar on the
+   first frame, so a request there would be a visible flash. */
+import alpine from "../assets/backdrop-alpine.webp";
+import goldenhour from "../assets/scene-goldenhour.webp";
+import inkmoon from "../assets/scene-inkmoon.webp";
+import maple from "../assets/scene-maple.jpg";
+import suns from "../assets/scene-suns.jpg";
 
 /* Bundled backdrops — a starting point, not a gallery.
 
