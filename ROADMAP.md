@@ -204,11 +204,60 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       round-trips through Google Docs. Attach a note to a text range
       without touching prose, show it in a margin gutter, resolve/reply.
       Collapses one more reason to leave the app — high priority against
-      the thesis.
+      the thesis. Research round 40 (2026-08-26) adds two reinforcing
+      data points: Dabble's own feature-request board
+      (dabble.featureupvote.com/suggestions/2307) shows users explicitly
+      asking for Google-Docs-style inline commenting even after Dabble 3.0
+      shipped co-authoring (which caps at five collaborators and leaves
+      non-subscribers read-only, per Reedsy's review), and a recurring
+      author-blog pattern ("Google Docs vs. Scrivener: What I Use")
+      describes drafting in the writing app, exporting to Google Docs
+      purely for the beta-read/editor pass, then hand-reconciling changes
+      back — the exact second-app round-trip this item already targeted,
+      now confirmed independently on both Dabble and Scrivener rather than
+      assumed from Dabble alone.
+- [ ] **Project-wide find & replace** — research round 40 (2026-08-26):
+      NovelCrafter's own feedback board (feedback.novelcrafter.com) has one
+      request at 631 votes, more than four times the next-highest (Split
+      Scene Command, 136) — universal search-and-replace across the whole
+      project, not just the open document. Verified against our own code:
+      no find/replace exists anywhere in `src/` — `CommandPalette.tsx`
+      navigates notes and runs commands, but nothing searches or replaces
+      text content within a note or across the vault. On an AI-forward
+      tool, the community's single loudest ask has zero AI in it — a
+      strong signal that mundane manuscript hygiene beats AI polish once a
+      project is mid-length (a character's name changes, a spelling gets
+      fixed, a repeated tic needs hunting down). Basic and overdue; ranks
+      above the copy-only items below because it's a real capability gap,
+      not a messaging one.
+- [ ] **Keyboard-driven accept/reject for Reword-in-place** — research
+      round 40 (2026-08-26): type.ai's inline-rewrite flow keeps both hands
+      on the keyboard — highlight text, pick a style, then `A` accepts and
+      `R` rejects the suggestion (auto-advancing to the next one),
+      `Cmd+Enter` accepts everything, `Esc` dismisses all. Checked our own
+      shipped Reword popover (`RewordPopover.tsx`): Replace and Keep
+      original are mouse-only buttons, no key accepts or rejects a result.
+      Small, cheap fix to a feature already core to the "writes with you"
+      half of the thesis — reviewing several rewrites in a chapter is
+      slower than it needs to be with a mouse round-trip on every one.
 - [ ] **Notion-parity pass, ongoing** — owner: "make this look and function
       exactly like Notion but better." Next concrete gaps: block-style
       hover handles in the editor, inline databases-as-tables on notes,
       synced project sidebar collapse, cover images on note headers.
+      Research round 40 (2026-08-26): the specific Notion mechanic writers
+      praise most isn't "have a database" — it's relation + rollup between
+      two linked databases (link a Scenes database to a Characters
+      database, and a rollup property automatically counts/surfaces every
+      scene a character touches, no manual re-tallying). A concrete,
+      buildable pattern distinct from our existing flat Codex — see the
+      backlink/rollup note under the NovelCrafter-parity item below, which
+      applies the same idea to continuity checking. Equally useful as a
+      guardrail: the recurring reason writers eventually leave Notion is
+      that its database-first architecture "fights narrative structure" (a
+      character's contradictions and evolving voice don't fit cleanly into
+      a row) and that performance degrades as relations/rollups/filters
+      pile up on a growing project — both reinforce staying prose-first and
+      FAST rather than chasing Notion's generality.
       One gap per run, verified live.
 - [ ] **NovelCrafter-parity pass, ongoing** — codex entry templates per
       type (character sheets with fields), chat-with-your-book mode,
@@ -260,7 +309,31 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       stabilizing the feature. Together these sharpen, rather than soften,
       the case that a local Codex-grounded chat-with-your-book mode (once
       built) should lead on "no cloud context window to silently truncate
-      or corrupt," not just "free and local."
+      or corrupt," not just "free and local." Research round 40
+      (2026-08-26) adds the sharpest concrete mechanism yet for this half
+      of the item: Sudowrite's own feedback board's top structural
+      complaint is that Story Bible facts don't propagate — editing a
+      character fact means manually rewriting every affected chapter by
+      hand, because nothing tracks the dependency back to prose
+      (feedback.sudowrite.com). Notion-for-writers research the same round
+      independently confirms the same gap from the other direction —
+      reviewers say generic database AI "cannot answer narrative
+      questions... they see only pages and database rows, not narrative
+      relationships," with the concrete example "which characters haven't
+      appeared in three chapters" (storyflow.so). Both point at the same
+      buildable feature: extend the Continuity inspector with automatic
+      backlink/rollup tracking on Codex entries — last-chapter-appeared,
+      scene counts per character, dormant-thread flags — surfaced the way
+      the Codex hover-preview already surfaces a summary, not a separate
+      report a writer has to remember to run. Also confirmed this round:
+      NovelCrafter's Scene Beat (`/` command) and any AI prompt
+      auto-detects and pulls in whichever Codex entries are mentioned by
+      name, zero manual linking required — checked our own
+      `src/ai/context.ts` against this and confirmed it only sends
+      explicitly *referenced* entries by design (the round-13
+      token-economy rule), a different and more conservative mechanism —
+      worth comparing directly against NovelCrafter's bar next time this
+      item is picked up.
 - [ ] **Voice-matching from the writer's own prose, not just style templates**
       — research round 11 (2026-07-28): checked our own Upload style flow
       (`InspectorPane.tsx`) — it imports a .txt/.md file as the literal body
@@ -337,7 +410,24 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       manuscript) is what fantasy/sci-fi reviewers rate it 4/5 for. Pin
       codex location entries onto an uploaded map image; reuses the
       card-image upload path already shipped for board cards. Worldbuilding
-      counterpart to the existing Relationship web.
+      counterpart to the existing Relationship web. Research round 40
+      (2026-08-26) sharpens the interaction to build: Campfire's pins link
+      directly into the full connected Locations/Character/event codex
+      entry, not just a label — click a pin and the actual article opens
+      in place — and maps can nest (a city map inside a state map) for
+      geographic layering. One caution from the same research: Campfire
+      reviewers call its separate Encyclopedia module "least useful"
+      specifically because it duplicates the dedicated Locations/Characters
+      modules once those exist, competing for the same fact. When this
+      gets built, a pin should open the *same* Codex entry a writer already
+      maintains, never a second location record — one canonical home per
+      entity, the same rule already followed for board cards. Separately
+      verified: Campfire reviewers also fault its Relationships module for
+      forcing every character connection into a one-directional arrow with
+      no way to mark a mutual pairing — checked our own
+      `src/ui/RelationshipWeb.tsx`, and it already dedupes edges by an
+      unordered key regardless of direction, so that specific complaint
+      does not apply to us; recorded so it isn't re-flagged later.
 - [ ] **Timeline view for story chronology** — research round 10
       (2026-07-27): Campfire's Timeline module plots events, scenes and
       character appearances on one or more horizontal timelines, explicitly
@@ -633,6 +723,36 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       type.ai's changelog still 404s; its blog (checked directly this
       round) has gone quiet too, nothing posted since January 21, 2026.
       No new entrant found on a fresh ProductHunt/IndieHackers sweep.
+      Research round 40 (2026-08-26) ran the check a twenty-sixth time and
+      again found no match. Re-checked all six standing near-misses
+      directly for capability additions since round 39: none gained AI, a
+      task tracker, or a timer (NovelMage, LocalProse, PlotForge Desktop,
+      Scríob, Novel Forge AI, StoryLine all unchanged). One new candidate,
+      Epilogue (epilogue.page, 4.9 on Product Hunt), was checked directly
+      and ruled out — plain-Markdown, no-lock-in, local-first sync, but no
+      AI, no worldbuilding module, no task/timer features at all. Two
+      pieces of evidence this round are sharper than another competitor
+      scan, because they bear on the thesis itself rather than just the
+      compound check: (1) Sudowrite's own blog concedes the gap from the
+      vendor's side — its "Sudowrite vs. Scrivener" post states plainly
+      that Sudowrite "has no compile engine, no real structural overview,
+      and no way to manage a finished, complex manuscript," and prescribes
+      drafting in Sudowrite then moving to Scrivener for structure and
+      compile — a competitor's own marketing telling its users to go get
+      the second app. (2) A working novelist's own published Obsidian
+      setup (P.D. Workman, pdworkman.com/write-book-with-obsidian) states
+      she "avoids using Obsidian for project management, preferring
+      Todoist" — a real author, already deep in a heavily-customized
+      vault, still splits task tracking off into a separate app rather
+      than force it into her writing tool. Both outrank another
+      competitor-feature-scan: one is a competitor admitting the gap, the
+      other is a working writer living inside it. A parallel finding from
+      2026 "best writing tools" roundups (kindlepreneur.com, reedsy.com)
+      independently describes "a manuscript tool + a kanban or Notion
+      board + Aeon Timeline + a separate Pomodoro app" as the default
+      writer stack now, not an edge case — fresher, more specific evidence
+      than the general "3-4 apps" framing this item already carries.
+      Twenty-six dedicated rechecks in, the gap stays open on both sides.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -964,6 +1084,20 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       due date located anywhere. Re-check both again next round — the
       Bartz portal is the more likely of the two to actually resolve
       within the next few days given the "end of August" guidance.
+      Research round 40 (2026-08-26) checks both directly again. The Bartz
+      claims portal still has not opened — anthropiccopyrightsettlement.com's
+      "Key Dates" page still frames it conditionally ("if no appeals are
+      filed, an online portal will be launched by the end of August"), with
+      no visible last-updated timestamp and no independent source
+      (Copyright Alliance, TAA/Abstract blog, LegalClarity) confirming it
+      live, even though today falls inside the "end of August" window
+      itself. Kadrey v. Meta's mediation-outcome report (due 2026-08-21,
+      now five days overdue) is still unconfirmed either way —
+      courtlistener.com returned a blocked 403 this round rather than a
+      negative result, a tooling gap rather than evidence nothing was
+      filed; worth a direct PACER/CourtListener check next round rather
+      than assuming silence means nothing happened. Re-check both once
+      more before citing either as resolved.
 - [ ] **Say the export advantage louder** — research round 7: Sudowrite
       reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
       Novella already ships all three plus one-click backup
@@ -1144,6 +1278,54 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-08-26 — Research round 40 (autopilot; no code). First research
+  round since round 39 (2026-08-24) — two owner sessions shipped code in
+  between (cinematic-intro follow-ups, an audit-driven cleanup) but no
+  research ran on either day. This round's brief asked for something
+  broader than the recent news-sweep cadence: real interaction-level UX
+  research and user sentiment across NovelCrafter, Sudowrite, Dabble,
+  Scrivener, Campfire, type.ai, Obsidian-for-writers setups, and
+  Notion-for-writers templates, not just changelog/outage tracking.
+  Dispatched six parallel research passes instead of the usual four
+  (NovelCrafter+Sudowrite; Dabble+Scrivener; Campfire+type.ai; the
+  Obsidian plugin ecosystem; the Notion template ecosystem; a cross-app
+  sentiment sweep that also carried the two standing checks — the
+  four-pillar competitive recheck and the two watched litigation dates).
+  **Two new "Next up" items, the first genuinely new items since round
+  34's paste-cleanup fix**: (1) project-wide find & replace — verified
+  absent from the codebase entirely, and NovelCrafter's own feedback board
+  ranks it the single most-requested feature at 631 votes, ahead of every
+  AI request; (2) keyboard accept/reject for the shipped Reword popover,
+  matching type.ai's A/R/Cmd+Enter pattern — verified `RewordPopover.tsx`
+  is mouse-only today. Five existing items got reinforcing research notes
+  instead of new entries: the NovelCrafter-parity item (a concrete
+  backlink/rollup mechanism for the Continuity inspector, drawn from
+  Sudowrite's own top feedback-board complaint and a matching Notion-AI
+  complaint converging on the same gap from opposite directions), the
+  Notion-parity item (the relation+rollup mechanic itself, plus why
+  writers eventually leave Notion — validates the existing FAST/FLAT
+  guardrails with fresh sources), inline comments (Dabble's own feature
+  board plus an independent Scrivener-to-Google-Docs workaround account),
+  the location-map item (Campfire's pin-to-full-entry click-through, plus
+  a one-canonical-home-per-entity caution from its own Encyclopedia-module
+  complaints), and the four-app-bundle item (26th dedicated recheck, still
+  no match; Epilogue ruled out; Sudowrite's own blog telling its users to
+  pair it with Scrivener; a working novelist's published Obsidian setup
+  that still splits task-tracking off to Todoist — the first working-
+  writer's-own-admission evidence in this thread, not another
+  competitor-feature scan). One non-issue verified and recorded so it
+  isn't re-flagged later: Campfire reviewers fault its Relationships
+  module for forcing every connection into a one-directional arrow with no
+  way to mark a mutual pairing — checked our own `RelationshipWeb.tsx`,
+  and it already dedupes edges by an unordered key regardless of
+  direction, so this specific complaint doesn't apply to us. A sourcing
+  gap worth naming: direct Reddit search returned almost nothing through
+  this environment this round (old.reddit.com fetches are blocked,
+  general search doesn't index recent threads well) — every pass leaned
+  on feedback boards, Trustpilot/G2, and blog/Substack accounts instead;
+  a future round with real Reddit access would likely sharpen several of
+  these findings. Full notes in RESEARCH.md Round 40.
 
 - 2026-08-24 — Research round 39 (autopilot; no code). Housekeeping
   first: the container's `main` branch ref was 11 commits behind
