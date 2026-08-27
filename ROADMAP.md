@@ -204,12 +204,93 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       round-trips through Google Docs. Attach a note to a text range
       without touching prose, show it in a margin gutter, resolve/reply.
       Collapses one more reason to leave the app — high priority against
-      the thesis.
+      the thesis. Research round 40 (2026-08-27) sharpens the underlying
+      job: the real beta-reader pain isn't only "no comment box" —
+      authors serious about beta feedback deliberately keep readers in
+      separate copies (so one reader's notes don't bias another's),
+      which means the actual bottleneck is reconciling several readers'
+      marks against one manuscript afterward. Authors do this by hand in
+      Word today ("Combine" merges N tracked-change copies into one
+      master so repeated flags stand out from one-off opinions). Inline
+      comments alone don't solve that reconciliation step — see the new
+      review-copy item below, which does; the two are companions, not
+      duplicates.
+- [ ] **Versioned review-copy export/import for beta readers** — research
+      round 40 (2026-08-27): a distinct job from the inline-comments item
+      above. Dabble 3.0 (shipped July 2026) ships three scoped invite
+      types (Friend/Beta Reader/Editor) that export an isolated snapshot
+      per reader and merge marks back with conflict prompts; Scrivener
+      has no equivalent, and its own forum names the standard workaround
+      as exporting to Word specifically because tracked changes is the
+      reconciliation format editors expect. Local-first version: "Export
+      review copy" freezes a versioned snapshot (reusing the existing
+      history/snapshot format) a reader annotates offline; on import,
+      diff the returned copy against the *current* manuscript with the
+      word-level diff already in `src/ui/diff.ts` so marks land at their
+      new location even if the author kept editing since export — no
+      server, no live sync, just file round-trips.
+- [ ] **Native writing-progress dashboard, computed from the vault itself**
+      — research round 40 (2026-08-27): the canonical Obsidian
+      novel-vault pattern (independent sources: forum.obsidian.md's
+      "Novel Writing Info Panel", P.D. Workman's own setup, several
+      blog write-ups) is a hand-built Dataview panel reading
+      writer-authored frontmatter (`words_current`, a session goal) into
+      per-scene and per-project totals — and Dataview can't write back,
+      so the writer manually updates the word-count field themselves.
+      That's real, observed effort spent recreating something Novella
+      already knows without being told: every scene's word count and
+      edit timestamp already live in the vault. Checked our own
+      `BoardStats.tsx` — it's a per-chapter word-count bar chart
+      (total/average), not a session-delta or across-project progress
+      view. A native Progress view — per-chapter and per-project totals,
+      a delta since last opened, computed directly off the file tree
+      with zero frontmatter authoring — collapses a multi-plugin DIY
+      assembly into something that's simply already true. (Streak/goal
+      tracking is NOT part of this gap — `GoalMeter.tsx`/`GoalsTab.tsx`
+      already ship daily streaks and a best-streak record, ahead of what
+      the Obsidian DIY pattern does by hand.)
+- [ ] **Unified Ctrl+K across manuscript, codex, tasks and notes, with a
+      sidebar recents rail** — research round 40 (2026-08-27): defends
+      the round-6 Notion-comparison guardrail directly — "stay FAST as
+      projects grow." Checked our own `CommandPalette.tsx`: it indexes
+      three kinds only (`command`, `chapter`, `note`) — no codex entries,
+      no tasks, no frecency/recency ranking. Meanwhile Obsidian users
+      with large vaults report feeling "lost in their own knowledge
+      base" from the default tree, and the community's own fix (a
+      plugin, Notebook Navigator, praised as solving the problem
+      "immediately") is exactly a dual tree/preview + search pattern;
+      Notion's large-workspace complaints are the same shape (buried
+      pages, slow search). Raycast's frecency ranking and Linear's
+      "every common action in two keystrokes" are the reference
+      patterns. Concrete gap: extend the palette to blend manuscript
+      text, codex entries, and tasks into one ranked list with small
+      type icons, plus a pinned Recent rail above the sidebar's grouped
+      sections (Manuscript / Codex / Tasks / Notes, each with a count) —
+      cheap to compute from existing open-events, no new library, reuses
+      the palette's own modal shell and `app.css` tokens.
 - [ ] **Notion-parity pass, ongoing** — owner: "make this look and function
       exactly like Notion but better." Next concrete gaps: block-style
       hover handles in the editor, inline databases-as-tables on notes,
       synced project sidebar collapse, cover images on note headers.
-      One gap per run, verified live.
+      One gap per run, verified live. Research round 40 (2026-08-27)
+      narrows the highest-value gap: across six popular Notion
+      novel-planning templates, the recurring pattern users cite as the
+      actual reason to stay in Notion is relations + rollups between
+      databases — a scene relates to its characters and locations, and
+      the character/location page auto-shows every linked scene back
+      ("where does this character appear") without re-reading the
+      manuscript. One author's own written workflow (Notion for
+      planning, Scrivener for drafting) names exactly this as what
+      Scrivener lacks and Notion has. Concrete next gap, scoped flat
+      rather than as a relational-database clone: bidirectional links
+      between codex entries and the scenes that mention them, with an
+      auto-populated "appears in" backlink section on the entry — this
+      also folds in NovelCrafter's live-underline mention-detection (see
+      the parity item below) rather than requiring the writer to
+      hand-link anything. A second, cheaper gap: a kanban view of scene
+      status (draft/revised/done) reading the same status field the
+      parity item below already tracks as a card/table label — one more
+      lens on data Novella already has, not a second data store.
 - [ ] **NovelCrafter-parity pass, ongoing** — codex entry templates per
       type (character sheets with fields), chat-with-your-book mode,
       scene status labels (draft/revised/done) surfaced on cards and
@@ -260,7 +341,42 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       stabilizing the feature. Together these sharpen, rather than soften,
       the case that a local Codex-grounded chat-with-your-book mode (once
       built) should lead on "no cloud context window to silently truncate
-      or corrupt," not just "free and local."
+      or corrupt," not just "free and local." Research round 40
+      (2026-08-27) adds five concrete next gaps, verified against our own
+      code. (1) NovelCrafter's own public feedback board's single
+      most-upvoted open request (136 votes) is a Split Scene command —
+      not reordering (drag already works everywhere) but dividing one
+      scene into two mid-draft without hand-editing paste boundaries.
+      Grepped the editor for any such command — none exists. A
+      cursor-position "Split scene here" that creates the new node,
+      carries over pov/label/tags, and re-slots it in the tree fuses our
+      write-mode and plan-mode in a way NovelCrafter's separate Plan view
+      doesn't, and is a frequently-repeated action worth the friction
+      reduction. (2) The round-11 case-sensitive-matching gap is still
+      open (grepped for `caseSensitive`/`exclusionList` — no matches) and
+      NovelCrafter's docs reveal the fuller shape it should take: a
+      per-entry exclusion list for words that would otherwise
+      false-positive (their own example is character "Will" vs. the verb
+      "will") on top of case-sensitivity — ship both together, since
+      case-sensitivity alone still misses "Grace"/"May"/"Red"-type names
+      against common words. (3) NovelCrafter's Extract feature (and the
+      duplicate-work complaint reviewers raise about Codex setup —
+      "comprehensive entries mean substantial manual data entry") points
+      at a local-AI-native advantage we aren't using: since Novella
+      already runs a local model, a "scan chapter → propose Codex
+      entries/aliases → one-click accept" pass after a writing session
+      could do offline what NovelCrafter gates behind its cloud API key.
+      (4) Campfire's hover-card on a linked name (surface the character
+      card without leaving the page) is the right payoff for mention
+      detection — better than NovelCrafter's underline-only, which
+      confirms a mention but requires a click to see anything. Combine
+      (1)'s live-underline detection with Campfire's hover payoff rather
+      than picking one. (5) World Anvil's typed custom-field builder
+      (int/string/text/select/checkbox) is the honest ceiling for the
+      "codex entry templates per type" line this item has carried since
+      round 8 — but World Anvil gates sheet *creation* behind its
+      Grandmaster tier; ship the same ceiling free, by default, in flat
+      Markdown frontmatter so the data stays portable.
 - [ ] **Voice-matching from the writer's own prose, not just style templates**
       — research round 11 (2026-07-28): checked our own Upload style flow
       (`InspectorPane.tsx`) — it imports a .txt/.md file as the literal body
@@ -337,7 +453,17 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       manuscript) is what fantasy/sci-fi reviewers rate it 4/5 for. Pin
       codex location entries onto an uploaded map image; reuses the
       card-image upload path already shipped for board cards. Worldbuilding
-      counterpart to the existing Relationship web.
+      counterpart to the existing Relationship web. Research round 40
+      (2026-08-27) adds a reason to prioritize the existing Relationship
+      web alongside this item: World Anvil — the dedicated worldbuilding
+      tool writers pair with Scrivener/Docs specifically for maps,
+      timelines and relationship webs (a documented "second app"
+      pairing) — has its own users asking its feature-request board for
+      a genuinely interconnected relationship map instead of a
+      pairwise/tree one. If our Relationship web is already graph-based
+      rather than pairwise, that's a real edge over the tool writers
+      currently leave their drafting app for; worth confirming next time
+      this item is picked up, not assuming.
 - [ ] **Timeline view for story chronology** — research round 10
       (2026-07-27): Campfire's Timeline module plots events, scenes and
       character appearances on one or more horizontal timelines, explicitly
@@ -352,7 +478,71 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       manuscript order, not in-world date order for flashback-heavy or
       multi-POV books. Lower priority than the map since it's a bigger
       surface (needs an in-world date field on scenes), but the same
-      genre-fiction audience wants both.
+      genre-fiction audience wants both. Research round 40 (2026-08-27)
+      scopes what to actually build once this is picked up: Aeon
+      Timeline — the dedicated tool writers pair with Scrivener for
+      exactly this — earns its keep on two specific mechanisms, not a
+      big multi-pane surface: automatic character-age calculation
+      propagated from a birth date across every event, and typed
+      relationships (which POV character owns which arc/event). Its own
+      users' most-repeated complaint isn't the timeline concept, it's
+      the Scrivener sync step ("clunky", conflict-prone, a separate $65
+      purchase) — since Novella's timeline would read the manuscript
+      natively with no export/sync step at all, scope it to those two
+      differentiators rather than Aeon's full multi-pane complexity,
+      which is the exact thing reviewers call overbuilt.
+- [ ] **Named, project-wide checkpoints and restore-a-selection in History**
+      — research round 40 (2026-08-27): checked our own
+      `src/state/history.ts` — `snapshot()` takes a `reason: string` that
+      is always system-generated ("saved", "before restoring an earlier
+      version"), never author-chosen, and every snapshot is per-note;
+      there is no manuscript-wide checkpoint. Scrivener's snapshots are
+      user-named and compared at word/clause/paragraph granularity;
+      Dabble 3.0's Time Machine adds a project-wide scrubbable timeline
+      plus a "Bring Forward" mode that pulls one document into the
+      present without touching the rest — both let a writer label a
+      moment and return to it at the scope they meant. Two gaps worth
+      building together: (1) an explicit "Save checkpoint" action that
+      snapshots every open note under one author-named, timestamped
+      group in `.novella/history/` — a second, coarser tier above the
+      existing per-note thinning, no server; (2) in `HistoryPanel.tsx`'s
+      existing diff view, let the writer select a changed span and
+      insert just that span at the current cursor instead of only being
+      able to restore an entire note body — reuses `diffWords`/
+      `diffParagraphs` already in `src/ui/diff.ts`, no new architecture.
+- [ ] **AI cross-chapter contradiction check, as a Continuity-inspector
+      sibling** — research round 40 (2026-08-27): the recurring, dated
+      complaint about AI manuscript review (a July 2026 Sudowrite
+      Trustpilot review: "missed major plot points"; an independent
+      April 2026 40k-word test: "missed characters, changed names,
+      invented story arcs not in the manuscript") is about trust in
+      coverage, not prose quality — already partly logged against the
+      chat-with-your-book item above. Novella's own deterministic
+      Continuity inspector (early mentions, dangling links, unordered
+      chapters — shipped 2026-07-23) is the right precedent for how to
+      ship this without inheriting that trust problem: flag a
+      cross-chapter contradiction only with both contradicting passages
+      quoted side by side, so a false flag is checkable at a glance and
+      a miss reads honestly as "nothing found" rather than a confidently
+      wrong summary. Distinct from free-text Chat review — this is
+      evidence-linked, closer to what the Continuity tab already does
+      than to what Sudowrite's Feedback does.
+- [ ] **Task-list templates, and a scoped personal submissions/query
+      tracker** — research round 40 (2026-08-27), lower priority, small
+      surface. (1) Writers who pair a writing app with Todoist report
+      saving one manuscript's revision-pass checklist (dev edit → line
+      edit → proofread → beta round → query prep) as a reusable template
+      rather than retyping it per project — Novella already has
+      note-templates and a Tasks panel; the only missing piece is a
+      small library of insertable checklist templates. (2) Querying
+      authors track agent/editor name, date sent, status and notes per
+      submission in QueryTracker or a spreadsheet — structurally the
+      same data shape as the existing task list, just a few extra fields
+      and a status enum. Explicitly OUT of scope: QueryTracker's real
+      moat is its *crowdsourced* agent response-time database, which
+      needs a server and contradicts local-first — build only the
+      personal-record half, and don't let this grow into a QueryTracker
+      clone.
 - [ ] **Say the four-app bundle louder, not just "local AI, no subscription"**
       — research round 11 (2026-07-28): three new products (LocalProse,
       Novel Mage, Noveling) now market themselves in nearly the same words
@@ -1144,6 +1334,53 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-08-27 — Research round 40 (autopilot; no code). Different shape
+  from rounds 20-39's narrow "check for news dated after X" cadence,
+  which had gone dry three rounds running (37, 38, 39) — this run
+  followed the fuller research brief instead: seven parallel passes
+  studying actual interaction design and real user behavior rather than
+  scanning for fresh announcements (manuscript navigation/editor UX;
+  worldbuilding/codex/timeline mechanics; the Obsidian writer-plugin
+  ecosystem; Notion author templates; task-management/second-app
+  pairings; AI chat/revision/comments UX; onboarding/IA/dashboard
+  design), each briefed on the standing thesis and guardrails and told
+  to dig into how competitors' features actually work, not just that
+  they exist. Not dry — surfaced enough to add seven new "Next up" items
+  and strengthen five existing ones, all grounded in a grep of our own
+  code before being written down (a habit carried over from the
+  narrower cadence). New items, in priority order: a versioned
+  review-copy export/import for beta readers (distinct job from the
+  already-planned inline comments); a native writing-progress dashboard
+  computed straight from the vault (replaces the Dataview-panel-plus-
+  manual-frontmatter pattern writers hand-build in Obsidian); a unified
+  Ctrl+K across manuscript/codex/tasks with a sidebar recents rail
+  (defends the round-6 "stay FAST" guardrail — `CommandPalette.tsx`
+  indexes only chapters/notes/commands today); named project-wide
+  History checkpoints plus restore-a-selection; an evidence-linked AI
+  cross-chapter contradiction check as a Continuity-inspector sibling;
+  and, lower priority, task-list templates plus a deliberately scoped
+  personal submissions/query tracker (explicitly not a QueryTracker
+  clone — that tool's real moat is a crowdsourced database, which needs
+  a server). Strengthened in place rather than duplicated: the
+  NovelCrafter-parity item gained five concrete next gaps (a Split
+  Scene command — NovelCrafter's own single most-upvoted open feature
+  request; a per-entry exclusion list to pair with the still-unbuilt
+  case-sensitive-matching gap from round 11; local-AI-native Codex
+  extraction from existing prose; Campfire-style hover-card mention
+  surfacing; a free typed custom-field builder where World Anvil gates
+  the same ceiling behind a paywall); the Notion-parity item gained a
+  scoped bidirectional codex-to-scene backlink gap (the actual reason
+  writers cite for staying in Notion, per six templates studied); the
+  location-map and timeline items each gained scope guidance from the
+  specific tools writers pair with a drafting app to get what those
+  items would provide (World Anvil, Aeon Timeline) rather than building
+  the competitor's whole surface. One explicit non-finding worth
+  recording: the Obsidian ecosystem's streak/habit-plugin stacking
+  turned out to already be moot — `GoalMeter.tsx`/`GoalsTab.tsx` already
+  ship daily streaks and a best-streak record ahead of what writers
+  stitch together by hand there, so no item was added for it. Full
+  findings and sourcing in RESEARCH.md Round 40.
 
 - 2026-08-24 — Research round 39 (autopilot; no code). Housekeeping
   first: the container's `main` branch ref was 11 commits behind
