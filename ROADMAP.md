@@ -204,7 +204,22 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       round-trips through Google Docs. Attach a note to a text range
       without touching prose, show it in a margin gutter, resolve/reply.
       Collapses one more reason to leave the app — high priority against
-      the thesis.
+      the thesis. Research round 40 (2026-08-29) raises the implementation
+      bar with mechanism detail from the category leader: Dabble's
+      comments anchor to a text range and **survive edits to the prose
+      around them** (not just a fixed character offset), support
+      resolve/reply threading, and pair with a read-only "Reviewer" share
+      role so an author can hand out a review copy without ceding edit
+      access — a bare comment popover that loses its anchor on the next
+      edit would ship visibly thinner than what's already on the market.
+      Two cheap additions worth speccing in alongside it: BetaBooks'
+      actual differentiator isn't the comment box, it's a per-reader
+      progress dashboard (how far each reader has gotten, when they last
+      opened it) — the "did anyone actually read this?" question a plain
+      comment feature doesn't answer; and a comment-type tag at entry
+      (Plot / Pacing / Continuity / Line-edit) that neither Dabble nor
+      BetaBooks does, cheap to add once the base feature exists, useful
+      for triaging feedback from several beta readers at once.
 - [ ] **Notion-parity pass, ongoing** — owner: "make this look and function
       exactly like Notion but better." Next concrete gaps: block-style
       hover handles in the editor, inline databases-as-tables on notes,
@@ -261,6 +276,54 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       the case that a local Codex-grounded chat-with-your-book mode (once
       built) should lead on "no cloud context window to silently truncate
       or corrupt," not just "free and local."
+      Research round 40 (2026-08-29) adds two Codex-specific findings from
+      a deeper interaction-level pass (not the usual daily-delta check):
+      NovelCrafter shipped its multi-category fix (already logged, round
+      11) only after the request sat on its feedback board with 34 votes —
+      confirms an entry belonging to more than one category is table
+      stakes, worth building into our own single-`type` Codex field from
+      the start rather than retrofitting it under pressure the way
+      NovelCrafter did. Separately, NovelCrafter had to ship a "slim"
+      dense-list Codex display in Feb 2025 explicitly "for those that have
+      hundreds of entries" — direct evidence the default card/panel view
+      doesn't scale, worth designing our own Codex list for hundreds of
+      entries (search-as-you-type, density toggle) rather than patching it
+      in later the way NovelCrafter did.
+- [ ] **Auto-extract Codex candidates from an existing manuscript, rather
+      than an empty Codex on import** — research round 40 (2026-08-29):
+      NovelCrafter's own feedback board lists "Import completed novels
+      with automatic codex" as its single most-requested Codex-adjacent
+      feature (133 votes, ahead of global search-replace) — confirms the
+      real pain isn't the Codex's data model, it's the labor of
+      hand-building a story bible from scratch. Checked our own import
+      path: manuscript text comes in as notes but generates zero Codex
+      entries — a writer arriving with an existing draft (exactly who the
+      four-app-bundle pitch targets: someone migrating off Scrivener or
+      Google Docs) starts with an empty Codex no matter how much
+      worldbuilding is already implicit in their prose. Scan imported
+      chapters for repeated capitalized names/places, propose them as
+      draft Codex entries for the writer to confirm or discard — never
+      auto-commit anything unreviewed. Turns the single biggest onboarding-
+      friction point in this whole category into a one-click win.
+- [ ] **Give the relationship web typed edges, and feed them to Continuity
+      and AI context** — research round 40 (2026-08-29): checked our own
+      code before writing this up. `RelationshipWeb.tsx` draws one edge
+      per "resolved link" between Codex entries — `vault.ts`'s
+      relationship graph is pure mention-detection with no label —
+      `src/analysis/continuity.ts` has zero relation-awareness, and
+      `src/ai/context.ts` never references relationships at all. The web
+      is a mentions-graph, not a story-bible relationship system. This
+      isn't just our gap: NovelCrafter's own Codex Reference field has the
+      identical limitation — a DreamGen review states plainly that a
+      linked entry "will only bring up the information," the AI is never
+      told what the link *means*, the writer has to restate it in prose
+      every time. Nobody in this category has closed this. A labeled edge
+      (mentor of / rival of / secret parent of) is cheap to add to data
+      that already exists as an unlabeled link, and wiring it into
+      Continuity (flag a scene where two "rivals" never actually appear
+      together) and AI context (Chat/Scene-plan can reference *why* two
+      characters interact, not just that they're both mentioned) would be
+      a genuine category-first, not a catch-up feature.
 - [ ] **Voice-matching from the writer's own prose, not just style templates**
       — research round 11 (2026-07-28): checked our own Upload style flow
       (`InspectorPane.tsx`) — it imports a .txt/.md file as the literal body
@@ -280,7 +343,19 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       prose, and a newer entrant, SidekickWriter, markets its own
       "voice-matching pass" — three more products now doing what our
       Upload-style flow still doesn't. Strengthens this item's priority
-      rather than changing its scope.
+      rather than changing its scope. Research round 40 (2026-08-29) adds
+      the mechanism, not just more competitors: Sudowrite's Style Examples
+      inject up to 1,000 words of the writer's *actual prose* verbatim into
+      every generation (the vendor's own guidance: "at least five
+      paragraphs… a full chapter is excellent") so the model matches
+      sentence-length and verb choice directly, rather than following an
+      adjective-based style description — the mechanism our own Upload
+      flow lacks isn't better prompting, it's sample injection. Worth
+      setting honest expectations when this is built: independent reviews
+      report Sudowrite's own voice match still sometimes "won't sound
+      fully like them" even with real samples loaded, so this should ship
+      as a genuine improvement over hand-authored templates, not a promise
+      of a perfect match.
 - [ ] **Recommend a fiction-capable local model instead of silently defaulting
       to a generic one** — research round 12 (2026-07-29): checked our own
       one-click setup — `DEFAULT_MODEL = "llama3.1:8b"` in
@@ -321,7 +396,19 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       just a "less restrictive" alternative — worth stating plainly once
       this item ships, though which content the shipped default should
       permit by design is a values call for the owner to make deliberately,
-      not something to default into silently.
+      not something to default into silently. Research round 40
+      (2026-08-29) finds a concrete, buildable piece of this that's pure
+      copy, not a values call: no local-AI competitor (Novel Mage,
+      PlotForge Desktop) explains "why this behaves differently than
+      ChatGPT" anywhere *inside the product* — only on marketing pages,
+      framed mechanically ("no remote filters, no hidden system prompts,
+      no output classifiers second-guessing the model" — Novel Mage's own
+      docs, alongside an honest warning that local generation is slower).
+      Checked our own `ChatPanel.tsx`: no such line exists anywhere near a
+      generation. A one-line in-product note near Chat/reword-in-place
+      ("running locally — no cloud content filter, response may take
+      longer") would be a first-of-its-kind pattern in this category, not
+      just repositioned marketing copy.
 - [ ] **Per-request reasoning toggle for local models** — research round 11
       (2026-07-28): NovelCrafter's Jan 9, 2026 "AI Thinking" release lets a
       writer prefer/avoid reasoning tokens per request, across Scene Beats
@@ -331,7 +418,31 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       distracting for a plain continue-the-paragraph request, useful when
       working out a plot problem in Chat. Grepped `src/ai` for
       "reasoning"/"thinking" — no matches; every request is treated
-      identically regardless of model or task.
+      identically regardless of model or task. Research round 40
+      (2026-08-29) adds the exact UX mechanism to build toward:
+      NovelCrafter's toggle is a plain on/off in a model-settings dropdown
+      exposed inline wherever AI is invoked (Chat, Scene Beat, Rewrite),
+      settable per-call or baked into a saved preset — and critically, its
+      own docs say it does NOT show the model's reasoning trace or reuse
+      it as chat history. It's a quality/latency dial the writer flips per
+      request, not a transparency feature — a good, simple pattern to copy
+      directly rather than build something more elaborate.
+- [ ] **Command palette doesn't reach AI actions, the sprint timer, or
+      tasks** — research round 40 (2026-08-29): checked our own
+      `CommandPalette.tsx`/`App.tsx` command list — it's navigation and
+      utility only (Go to Write/Board, Save, Export, Import, Switch
+      project, Settings, Tour, Music), nothing that opens Chat, starts
+      reword-in-place, starts a sprint, or adds a task. Research found no
+      fiction-writing tool with a real fuzzy-matched command palette at
+      all — Scrivener, Dabble and NovelCrafter all rely on menus and
+      toolbars; Obsidian's is the only well-regarded one in the category,
+      and it's a general notes app, not a novel tool. A palette that
+      reaches "start a 25-minute sprint," "ask Chat about this scene," or
+      "reword this selection" in one keystroke would be a first for a
+      purpose-built novel app — the natural place to put four apps' worth
+      of commands behind one shared launcher instead of four separate
+      menus. Small and CLOUD-OK: the palette and command list already
+      exist, this is wiring more actions into them.
 - [ ] **Location map / pinboard for codex locations** — research round 7:
       Campfire's headline feature (maps + timelines linked to the
       manuscript) is what fantasy/sci-fi reviewers rate it 4/5 for. Pin
@@ -353,6 +464,59 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       multi-POV books. Lower priority than the map since it's a bigger
       surface (needs an in-world date field on scenes), but the same
       genre-fiction audience wants both.
+- [ ] **Chapter-length / word-count-distribution chart, from data already
+      on disk** — research round 40 (2026-08-29): "reverse outlining" —
+      seeing chapter lengths and pacing at a glance to catch a sagging
+      middle or a runaway chapter — is a technique professional editors
+      recommend, but research found it built into no actual drafting tool;
+      writers do it by hand in a spreadsheet or Canva, or buy Vellum (a
+      formatting/export tool, not a drafting environment, whose own blog
+      markets a per-chapter word-count chart with a running-total/50%-
+      midpoint marker as a selling point). Every number this needs —
+      per-chapter word count — already exists in Novella's own board
+      data; this is a chart over data we already have, not a new data
+      model, and a structural-editing feature no competitor ships
+      natively inside the writing app itself.
+- [ ] **A revision kanban where cards point at a specific chapter or
+      scene, not a generic to-do list** — research round 40 (2026-08-29):
+      the clearest "second app" case found this round — a novelist's own
+      published account describes a three-column Trello board (To Do /
+      Doing / Done) where every card was one concrete revision issue tied
+      to a specific place in the manuscript ("continuity fix, Ch. 12"),
+      not a generic task. Checked our own `TasksPanel.tsx`: tasks already
+      live as `- [ ]` lines inside a specific note's body (`noteId`-
+      scoped), so the data model is already manuscript-linked — what's
+      missing is a board view across all of them: a kanban of every open
+      task in the project, grouped by status, each card linking back to
+      its chapter. No competitor ties a kanban card to manuscript location
+      this directly, and it's a smaller lift than it looks since the
+      underlying per-note task data already exists.
+- [ ] **Submission/query tracker — a confirmed "fifth app" gap, adjacent
+      to the task-manager pillar, not one of the four the thesis names**
+      — research round 40 (2026-08-29): a distinct Notion-template genre
+      exists purely for this (Query HQ, several "Manuscript Submissions
+      Tracker" templates) alongside a standalone site, QueryTracker.net
+      (1,900+ agent database, response-time stats) — writers currently
+      split between a self-built spreadsheet/Notion table for their own
+      submissions and a separate community site for agent research.
+      Flagging honestly: since this isn't one of the four named apps the
+      thesis defends, it ranks below items that are — but a lightweight
+      submission pipeline (manuscript → market → status → date sent →
+      response deadline, kanban by status) is a natural, small extension
+      of the task-manager pillar already shipped, and nobody in dedicated
+      novel-writing software owns any version of it.
+- [ ] **Streak-repair, so one missed day doesn't erase weeks of
+      motivation** — research round 40 (2026-08-29): checked our own
+      `src/state/sessions.ts` — `bestStreak` records the historical high
+      after a break, but a missed day still zeroes the live streak with no
+      way back. 4TheWords and Trackbear, the two dedicated word-count-
+      accountability apps writers pair with their main tool specifically
+      for streak motivation, both build in forgiveness (4TheWords sells
+      streak-repair items; a low, deliberately achievable daily threshold
+      keeps most days from breaking at all in the first place). Small,
+      pure-logic addition to an existing system, no taste dependency, and
+      it directly answers why writers still reach for a second app just to
+      keep a streak alive.
 - [ ] **Say the four-app bundle louder, not just "local AI, no subscription"**
       — research round 11 (2026-07-28): three new products (LocalProse,
       Novel Mage, Noveling) now market themselves in nearly the same words
@@ -633,6 +797,26 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       type.ai's changelog still 404s; its blog (checked directly this
       round) has gone quiet too, nothing posted since January 21, 2026.
       No new entrant found on a fresh ProductHunt/IndieHackers sweep.
+      Research round 40 (2026-08-29) — a deliberate scope reset per the
+      owner's research brief, deep interaction/UX research across six
+      parallel passes rather than the usual daily-delta scan — surfaces
+      the sharpest evidence yet for this item's core claim, from a
+      70+-published-book novelist's own account of her Obsidian setup: her
+      production stack is six separate plugins (Longform, Dataview,
+      Pandoc, Excalidraw/Canvas, Kanban, Note Refactor) reassembled by
+      hand into one workflow, and her own closing line is that
+      "customization options can distract writers from their #1 job —
+      writing." That's not a feature gap, it's a named practitioner
+      stating the DIY-toolkit tax directly — worth quoting near-verbatim
+      in copy. The same pass found Longform (the closest Obsidian analog
+      to Novella's own scene/chapter model) has open bugs where scene
+      reordering silently breaks and mobile edits scramble the desktop
+      index badly enough that one user abandoned the plugin mid-manuscript
+      — Novella's chapter order lives in frontmatter, not filename or
+      plugin-index state, which structurally can't produce that failure;
+      worth stating as a concrete, demonstrable differentiator rather than
+      a design footnote. Full findings from all six passes in RESEARCH.md
+      Round 40.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -790,6 +974,19 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       partial-sync theory) but still no Literature & Latte staff response
       and no resolution — still one unconfirmed report, not yet a
       pattern. Sudowrite and Dabble: no new incidents or posts found.
+      Research round 40 (2026-08-29) adds a fourth named tool to this
+      item's evidence, and a stronger-credibility one than the single
+      unconfirmed Scrivener forum thread already tracked: a 70+-published-
+      book novelist's own account of why she left Scrivener states her
+      files were "becoming corrupted, taking huge lengths of time to
+      open/close" — a named, high-credibility practitioner reporting data
+      corruption, not a single anonymous forum report. A local vault of
+      plain Markdown files, already backed by autosave and crash recovery,
+      structurally can't corrupt the way a large proprietary binary
+      project file can — worth adding Scrivener corruption risk to this
+      item's copy alongside the Sudowrite/Dabble/Campfire outage evidence,
+      distinct from the still-unconfirmed single Scrivener forum thread
+      already tracked above.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent
@@ -968,7 +1165,19 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
       Novella already ships all three plus one-click backup
       (`src/export/formats.ts`) and the export modal / first-run copy
-      doesn't say so. Cheap copy win, low priority.
+      doesn't say so. Cheap copy win, low priority. Research round 40
+      (2026-08-29) finds validation for keeping export narrow rather than
+      configurable: Scrivener's Compile is repeatedly the single most-
+      dreaded step in independent Capterra reviews — "configuring the
+      document compilation… is somewhat difficult and obscure," one
+      reviewer states plainly "if your solution takes a one-hour video to
+      explain its best usage, that's a problem." Compile is powerful
+      because it's a fully general document-transformation pipeline, and
+      that generality is exactly what makes it unlearnable. Novella's
+      narrow, opinionated "export to manuscript-standard DOCX/EPUB/PDF"
+      with almost no configuration surface is the right call, not a
+      missing-power gap — worth stating in copy as a deliberate contrast
+      ("no compile step to learn"), not just a feature-parity checkbox.
 - [ ] **Say the performance/battery advantage louder** — research round 8:
       2026 Dabble reviews call it out by name as a CPU hog that "ran a
       user's laptop battery down really quickly," a direct cost of being a
@@ -1144,6 +1353,55 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-08-29 — Research round 40 (autopilot; no code). A deliberate scope
+  reset, not another daily-delta pass: rounds 15-39 had narrowed to
+  checking the same five named competitors for anything published in the
+  prior day, with diminishing returns (three of the last four rounds fully
+  dry). This round's brief asked for something different — deep
+  interaction-level research into how writing, planning, worldbuilding and
+  task tools actually work day to day, not headline feature lists —
+  dispatched as six parallel passes instead of four: editor UX/manuscript
+  navigation; worldbuilding/Codex/planning surfaces; what writers
+  self-assemble on top of Obsidian; what writers self-assemble in Notion;
+  AI-writing interaction mechanics (not model quality); and revision/
+  beta-reader/task UX plus "second app" pairings. Every finding was tagged
+  by evidence type (official capability / observed behavior / recurring
+  complaint / feature request / reviewer opinion / inference), and several
+  were checked directly against our own code before being written up —
+  the same discipline prior rounds used for single findings, applied
+  across a much wider sweep. Added five new checklist items with real
+  buildable substance (auto-extract Codex from an imported manuscript —
+  NovelCrafter's own top-requested Codex feature at 133 votes; typed
+  relationship-web edges wired into Continuity and AI context — verified
+  gap in our own `RelationshipWeb.tsx`/`continuity.ts`/`context.ts`, and
+  one NovelCrafter's Reference field shares; a command palette that
+  reaches AI/sprint/task actions, not just navigation — verified gap in
+  `CommandPalette.tsx`; a chapter-length/word-count-distribution chart
+  from data already on disk; a manuscript-linked revision kanban over the
+  per-note tasks `TasksPanel.tsx` already scopes to a note) plus two
+  smaller ones (a submission/query tracker, flagged honestly as adjacent
+  to the thesis rather than core to it; streak-repair for the existing
+  sprint/goal system, verified missing in `sessions.ts`). Strengthened
+  seven existing items with sharper mechanism detail or new corroborating
+  evidence rather than duplicating them: inline comments (Dabble's
+  edit-surviving anchors, resolve/reply threading, reviewer-only share
+  role; BetaBooks' per-reader progress dashboard), the NovelCrafter-parity
+  item (Codex multi-category's real vote count, the "slim mode" scaling
+  fix), voice-matching (Sudowrite's verbatim-sample-injection mechanism),
+  the fiction-model item (an in-product copy pattern for explaining local
+  AI, verified absent from `ChatPanel.tsx`), the reasoning-toggle item
+  (NovelCrafter's exact per-call dropdown mechanism), the export-advantage
+  item (Scrivener's Compile as the industry's most-dreaded step —
+  validates staying narrow), and the no-outage item (a second, named,
+  high-credibility data point: a 70+-book novelist's own account of
+  Scrivener file corruption). The four-app-bundle item gained its
+  sharpest quotable evidence yet — a professional novelist's own words
+  that Obsidian plugin customization "can distract writers from their #1
+  job — writing." Full six-pass findings, sources, and the honest thin
+  spots (Reddit access was blocked for most of this run; several findings
+  lean on blog/review-site synthesis rather than primary forum threads,
+  flagged inline where that's true) are in RESEARCH.md Round 40.
 
 - 2026-08-24 — Research round 39 (autopilot; no code). Housekeeping
   first: the container's `main` branch ref was 11 commits behind
