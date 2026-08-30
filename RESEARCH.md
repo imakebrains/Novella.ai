@@ -4893,3 +4893,505 @@ current status with slightly sharper sourcing than round 38.
 - producthunt.com, indiehackers.com
 - anthropiccopyrightsettlement.com, blog.taaonline.net,
   mckoolsmith.com, courtlistener.com (403), law360.com, bloomberglaw.com
+
+# Round 40 (2026-08-30) — the deep-interaction brief, not just the cadence check
+
+Six days since round 39 (2026-08-24). The commits on `main` in between
+(CLAUDE.md's em-dash-ban guard, the cinematic-intro follow-ups, an owner
+audit and its corrections) are owner/session work, confirmed by their
+commit messages and dates — not research rounds, so there's no gap in
+the research log to explain.
+
+This round's brief (the scheduled autopilot prompt) asked for something
+broader than the narrow four-pillar/legal cadence check that's run for
+25+ consecutive rounds: actual interaction mechanics, not feature lists;
+real user behavior and complaints, not marketing copy; cross-app
+patterns; and specifically what happens on Obsidian and Notion when
+writers build their own systems. Given how thin the narrow check has run
+(three dry rounds in a row before this one), this round shifted most of
+its effort to unexplored ground — deep interaction audits of
+NovelCrafter's Codex/Matrix/Chat and Sudowrite's Story Bible/Style
+Examples, the Obsidian writer-plugin ecosystem, Notion's author
+templates, and a cross-tool comparison of comments/revision-history/
+beta-reader workflows — while keeping the standing narrow check running,
+but time-boxed and brief, since another negative four-pillar recheck
+adds little on its own. Six parallel research passes total (up from the
+usual four).
+
+## NovelCrafter — deep interaction audit
+
+**Nothing dated after 2026-08-24** — feedback.novelcrafter.com/changelog
+and novelcrafter.com/blog both confirmed unchanged since round 39.
+Treat as a confirmed null result on new material, not an unchecked gap.
+
+The interaction-mechanics dig was the point of this pass, and it's
+concrete. **Codex entry anatomy** (novelcrafter.com/help/docs/codex/
+anatomy-codex-entry): Type, Name, human-only Tags (invisible to the AI),
+a Thumbnail, an Aliases field the AI *does* read, a free-text
+Description, then per-type custom "Details" — structured key-value
+fields the writer defines, one field-type of which is a "Codex
+Reference" that cross-links straight to another entry (a character's
+Hometown field can point at a location entry rather than just naming it
+in prose). Separate Research, Relations, and Mentions tabs sit alongside
+the entry itself. Auto-linking highlights name/alias mentions
+case-insensitively by default, with case-sensitive matching opt-in per
+entry (confirms and extends the round-11 Codex-update finding). A
+"mentions heatmap" shows entry density across the manuscript. Docs did
+**not** confirm hover-card previews or a live sidebar of in-scene
+mentions while typing — flagged as unconfirmed, not assumed absent.
+
+**Matrix view** (help/docs/plan/planning-with-the-matrix): rows are
+scenes; columns toggle through a "Show" menu — POV, Labels, Codex
+entries (default), Custom Categories, Subplots. POV reassignment is one
+click per cell. Codex-entry columns auto-populate from what NovelCrafter
+detects in the scene's summary or content, not from manual tagging —
+genuinely "a spreadsheet that writes itself," which is the bar Novella's
+own table/matrix view needs to clear rather than a static read-only
+grid.
+
+**Manuscript structure**: Acts > Chapters > Scenes, but the nesting is
+optional/flexible. Reordering is a six-dot drag handle to the left of
+each title. Status is free-form, color-coded labels — there is no fixed
+draft/revised/done pipeline. That's a real opening: Novella's own
+scene-status-labels item (already tracked under NovelCrafter-parity)
+could differentiate with an actual guided state machine instead of
+labels-mean-whatever-you-make-them.
+
+**Chat-with-your-book** (help/docs/chat/the-chat-interface): context is
+manual, not automatic. A context picker lets a writer attach full novel
+text/outline (optionally filtered by POV character), individual
+acts/chapters/scenes, snippets, or codex entries by type/tag/category —
+before every session. Model is swappable per-message (BYO API/
+OpenRouter, or local Ollama/LM Studio). Independent reviewer commentary
+(Medium, "Powerful for Fiction Writers, Frustrating to Set Up," Apr
+2026) and a ScribeCount analysis both flag setup/configuration friction
+as NovelCrafter's main usability complaint — this context-picker
+workflow is the likely source. **Design implication for Novella**: a
+future chat-with-your-book mode should default to smart auto-attached
+context (current scene, referenced codex entries) with manual override,
+not manual-first the way NovelCrafter's is.
+
+**Annotation/comments** (help/faq/write/annotate-text — NovelCrafter's
+own help page states this plainly): NovelCrafter has **no
+Google-Docs-style inline comment/thread system at all**. The documented
+workaround is repurposing its structural "sections" feature, color-coded
+and marked hidden-from-AI / hidden-from-word-count. This is the category
+leader admitting the exact gap Novella's own unbuilt comments item
+exists to close — strong validation that building it is a real
+differentiator, not table-stakes parity.
+
+**Collaboration** (help/docs/app/collaboration-and-coauthoring): email
+invite from a settings cog, viewer/editor roles only (no comment-only
+role), near-real-time co-editing, riding on the same non-native comment
+workaround above — both invitees need a NovelCrafter account, and sync
+is not immediate ("you will not see changes immediately").
+
+**Revision history** (help/getting-started/quick-start/revision-
+history-saving-work): autosave snapshot roughly every 3 minutes,
+restorable, with recovery available 30 days back.
+
+**No native task manager or sprint timer** — and this is the sharpest
+single finding of the round. Third-party author-tooling sites
+(ScribeCount's own "Organization Tools for Indie Authors" and "Pomodoro
+Timers for Indie Authors" pages) categorize NovelCrafter as a
+"story-complexity" tool, distinct from task managers (Todoist, Trello)
+and Pomodoro apps, and explicitly recommend chaining Pomodone or
+ScribeCount on top of it for sprints. No NovelCrafter doc anywhere
+claims a native focus timer or task board. This directly validates the
+four-app-bundle thesis item with the market leader itself, not a niche
+indie bundler — folded there in full.
+
+Sentiment: a Trustpilot 1-star review (Ettore Triggiani, Nov 2025 — the
+only negative review found, small sample) complains the AI ignores
+supplied outline/context and that token limits aren't disclosed
+pre-purchase. Reddit (r/NovelCrafter) was not reachable via WebFetch
+this round and targeted searches returned no indexed threads — Reddit
+sentiment on Codex/Matrix specifically stays unverified; worth a
+follow-up with different search tooling if it matters later.
+
+## Sudowrite — deep interaction audit
+
+**Nothing dated after 2026-08-24.** status.sudowrite.com shows 100%
+uptime and zero incidents Aug 17-30 — the longest quiet stretch since
+the outage pattern (Apr 22-23, Aug 1-3, Aug 11) was first tracked in
+round 13. feedback.sudowrite.com/changelog's newest entry is still the
+Aug 18 paste-formatting fix already logged in round 34. Worth naming as
+a genuine break in the incident pattern, though one quiet week doesn't
+erase three status-page incidents in four months — track, don't spin.
+
+**Story Bible mechanics** (docs.sudowrite.com): seven fields form an
+explicit dependency graph, not a flat list — Braindump (manual only) →
+Genre (manual) → Style (manual, or "Match My Style") → Synopsis
+(generated from Braindump+Genre) → Characters (generated from Synopsis)
+→ Worldbuilding (generated from Synopsis) → Outline (Genre+Synopsis+
+Characters+Worldbuilding) → Scenes (all of the above) → Draft prose
+(Style+Genre+Characters+Worldbuilding+Scenes). Every field carries both
+Generate (AI drafts it) and Rewrite (writer gives correction
+instructions), so a writer can cascade-generate a whole bible from one
+braindump line, or hand-fill everything and skip generation entirely.
+Context inclusion during generation follows the dependency graph
+automatically — no evidence found of a per-generation checklist letting
+a writer toggle which Story Bible fields feed a specific prose request.
+That's a real gap a Novella codex could beat with explicit per-scene
+"what context is included" control, if confirmed absent on a closer
+look.
+
+**Style Examples / "Match My Style"**: a writer pastes roughly 2,000
+words (Sudowrite's own guidance: 3-5 pages) of their own prose, and it
+becomes persistent literal context re-injected into every generation
+call — not summarized or distilled into a style description, the actual
+sentences. Sudowrite's own docs frame this explicitly against generic AI
+tools that "summarize then forget" the source text, and advise
+refreshing the sample as a writer's voice evolves across a long
+manuscript (chapter 1 voice differs from chapter 20 voice). This
+validates Novella's own direction (the `conversational-authority` skill
+already seeds a voice anchor from real prose rather than a description
+of it) and gives the still-unbuilt voice-matching roadmap item an actual
+implementation spec — folded there.
+
+**Canvas**: a drag-and-drop 2D whiteboard (Card / Label / Outline node
+types) for outlining and relationship mapping, separate from the linear
+Story Bible fields. The docs page itself 404'd on a deep fetch, so
+mechanics beyond the three node types are unconfirmed — thin evidence,
+flag rather than cite as fact.
+
+**Version/revision history**: the only evidence found is a lightweight
+per-document History panel where a writer can star/favorite a prior
+version — no branching, no named snapshots, no diff view surfaced in any
+source checked. If accurate, this is a thin spot next to Dabble's Time
+Machine (see the comments/revision-history pass below) — worth
+confirming with a live account before citing as a settled fact, since
+this rests on one indirect source.
+
+Sentiment (Trustpilot, reviewer roundups): **credit anxiety remains the
+dominant complaint**, consistent with the credit-bug-fix pattern already
+tracked — one July 2026 review reports 300k credits burned on a chat
+task that never completed, followed by "radio silence" from support.
+The **Story Bible itself draws genuine unprompted praise** ("invaluable"
+for character/location consistency) — it's the feature holding people
+in, not what pushes them out; credits and reliability are the churn
+drivers, not the codex system. **Muse quality is bimodal**: "so good it
+is almost scary" when it works, but character-drift complaints
+(changing genders, political roles, beliefs) persist *despite* the
+Story Bible existing specifically to prevent that — worth noting for
+Novella's own AI-integration work that having a codex doesn't guarantee
+a model actually honors it. No live Reddit sourcing this round (search
+tooling returned no r/sudowrite hits) — treat as a tooling gap, not
+evidence of silence.
+
+## Obsidian writer ecosystem — what gets assembled by hand, and what still doesn't close
+
+**StoryLine is the dominant DIY answer, and it's iterating faster than
+most dedicated novel apps ship features.** GitHub shows seven releases
+between Aug 11-30, 2026 (v1.10.57 → v1.10.63): directional/custom
+relationship types, relationship-history-by-scene, dialogue-stat fixes,
+and a default Kanban status ordering that now matches StoryLine's own
+draft-stage progression. (github.com/PixeroJan/obsidian-storyline/
+releases) One indie developer, responding same-week to user complaints,
+is out-cadencing what most funded competitors ship in a quarter.
+
+**Writers explicitly frame the plugin stack as "Scrivener, minus the
+cost."** An Obsidian forum thread on StoryLine (forum.obsidian.md/t/
+plugin-storyline-obsidian-plugin-for-writers/111494): a user said it
+saved "a lot of back and forth with Scrivener" and consolidated "dozens"
+of plugins they'd cobbled together into one. This is the exact wedge
+Novella is aimed at — a plugin stack built specifically to avoid paying
+for or context-switching to Scrivener, which will switch again to
+whatever ships the stack pre-assembled.
+
+**Task/kanban management is bolted on, but converges on one shape every
+time.** Curtis McHale's guide (curtismchale.ca) and multiple vault
+templates ("The Novelist"; rrbaker/obsidian-novel-starter-vault)
+independently converge on an identical Kanban: columns for 1st draft →
+2nd draft → 3rd draft → Ready, one card per scene/chapter. StoryLine's
+Aug 12 release now ships this exact default ordering natively — the
+plugin author noticed everyone manually recreating the same board and
+built it in. That's table-stakes, not a power-user option: Novella
+should ship a draft-stage kanban as a default, not a settings screen.
+
+**Sprint/focus timers have a known, precise hole: they don't follow a
+writer across notes.** The Word Sprint plugin (kinabalu/obsidian-word-
+sprint) tracks WPM/word-count per session but, per an XDA-Developers
+writeup, "doesn't span different notes... if you're jumping around in
+your manuscript... Word Sprint won't track that work like Scrivener
+would." StoryLine's built-in sprint timer (in its Stats view) appears to
+solve this by living at the project level rather than the note level.
+**Checked against our own code**: Novella's sprint timer already samples
+`manuscriptWordCount()` — the whole manuscript, not the currently open
+file (`src/state/sprints.ts:94,107`) — so it's already immune to this
+exact gap. Confirmed non-issue, logged so it doesn't get "rediscovered"
+as a task later.
+
+**Dataview is the universal "give me a dashboard" tool, and the queries
+are always the same shape.** P.D. Workman (pdworkman.com) and Loreteller
+(loreteller.com) independently build near-identical Dataview tables:
+`TABLE role, status, first-appearance FROM Characters`, scene tables
+keyed on POV/chapter/act/revision-status from YAML frontmatter, and
+"notes/tasks requiring attention" rollups. StoryLine's Statistics view
+(character × chapter heatmap, progress by status/chapter/act) is already
+productizing exactly what Dataview users were hand-querying — Novella
+should treat "progress dashboard queryable by character/chapter/status"
+as core, not a power-user feature, since both the DIY and the
+dedicated-plugin path converge on wanting it.
+
+**The strongest residual-pain signal in the whole round: even a fully
+assembled vault still doesn't close the task-management loop.** P.D.
+Workman's own published writing workflow — Dataview dashboards, a
+Kanban draft tracker, StoryLine for codex/relationships — explicitly
+does NOT use Obsidian for project/task management (uses Todoist instead)
+or scheduling (Google Calendar via Fantastical). This is an unprompted
+admission in a workflow writeup, not a complaint solicited by a
+"what's missing" question — which makes it stronger evidence, not
+weaker. This is the closest any writer in forty rounds of checking the
+four-pillar gap has come to closing it by hand, and even they didn't.
+Folded into the four-app-bundle item as the sharpest evidence yet that
+the task-management piece isn't a startup-execution gap waiting to be
+closed — it's a blind spot nobody, dedicated app or power-user DIY
+stack alike, has actually filled.
+
+**Overbuilding-before-writing is a named, repeated failure mode.**
+Multiple guides warn that writers spend "three weeks building an
+elaborate vault structure and never write a scene." Novella's opinionated
+defaults (versus Obsidian's blank-slate configuration burden) are a
+direct, already-shipped answer to this — worth foregrounding in
+messaging rather than treating as incidental.
+
+## Notion for novelists — templates and the two-way pull
+
+Nothing writer/template-specific found dated after 2026-08-24 (only
+generic Notion platform notes — AI usage-tracking UI, a Personal Agent
+effort setting, developer/Workers API tooling — none relevant to
+novelists).
+
+**Templates**: "Fantasy Worldbuilding & Novel Planning" (Quill&Steel,
+free, 5.0★/12 ratings) and "Story Planner and Worldbuilding Organizer"
+(smickledoodle, free, 4.95★/200+ reviews) are both marketplace-gated —
+Notion's template pages show ratings and testimonials but not a live
+schema, so exact field lists weren't extractable without opening one in
+a live account. "World Building Bible" (StoryFlint, $19,
+notioneverything.com) describes itself more concretely: 7 interconnected
+databases (characters, events, countries, cities, governments,
+landscape, cults/religions, sports, language/animals/plants/historical
+figures) plus 4 pre-made role-based dashboards. Quill&Steel's own how-to
+blog lays out the pattern most templates converge on: a Character DB
+(name/age/role/appearance/personality/motivations/backstory/
+relationships), a Plot/Beat-Sheet DB, a Central Worldbuilding DB
+(cultures, geography, economics, history, species) cross-linked to the
+others, a Research DB, and a Writing Tracker calendar (word-count goals
+linked to beats). The explicit selling point across every template: "one
+edit propagates everywhere via relations."
+
+**What draws writers in**: real user statements confirm the relational-
+database pitch is the actual draw, not marketing spin — a Reddit user
+called a $39 novel template "so in love with," rivaling Scrivener/
+Bibisco/The Novel Factory, specifically for its relational databases
+(characters↔scenes↔locations), multiple views of the same data
+(board/table/calendar), and scene-tagged-by-character subplot tracking.
+This *is* the gap Novella should fill natively — a flat, fast,
+purpose-built character↔scene↔plot-thread linking model is the thing
+writers are hacking Notion's generic database engine into providing.
+
+**What eventually pushes writers off Notion, or splits their stack**:
+three recurring complaints, each directly validating one of the
+thesis's standing guardrails. (1) Speed: "takes ages to open...
+frustratingly slow" for drafting, block-per-paragraph architecture
+"interrupts prose flow," fine for short notes but "degrades noticeably
+for long-form work" — validates "stay FAST." (2) Offline/sync: no
+usable offline mode historically, Notion only shipped one in Aug 2025
+and even then capped at 50 rows per database offline — validates
+local-first as a real differentiator, not a nice-to-have. (3) Clutter:
+multiple independent sources describe the identical failure mode —
+seeing a beautiful Notion setup on social media, then redesigning the
+dashboard instead of writing — a structural risk of infinite
+flexibility, not a bug, validating "keep structure FLAT." The dominant
+resolved pattern isn't leaving Notion outright, it's **splitting the
+stack**: plan in Notion, draft in Scrivener/Word/Obsidian. A Threads
+quote captures the reasoning precisely: "...Scrivener backs up onto my
+computer and the cloud, because I don't think I could ever trust my
+whole novel to be solely in only one place" — a trust/lock-in complaint,
+not an editor complaint, which validates "keep leaving easy" (local
+files, one-click export) as directly as any finding this cadence has
+produced. One counter-example exists (a writer consolidating onto
+Notion+Notion AI after over-tooling elsewhere) — the failure mode cuts
+both ways, tool-sprawl and single-tool lock-in alike, which is exactly
+the wedge Novella's local-first, portable, all-in-one bet is aimed at.
+
+## Comments, revision history, and beta-reader workflows — five tools compared
+
+This pass exists to turn the still-unbuilt "inline comments / margin
+notes" roadmap item (open since round 7, 2026-07-24) into something
+buildable, not just re-confirm it matters.
+
+**Dabble 3.0 "review copies"** (dabblewriter.com/docs/reference/
+whats-new-in-3) is the strongest reference implementation found. A
+review copy is a forked, isolated copy of the project; invitee edits
+stay separate until the author explicitly merges them. Three invite
+roles, each a genuine permission ceiling rather than a toggle: Friend
+(comments visible to all invited Friends — workshop mode), Beta Reader
+(comments visible only to the author — private one-way feedback),
+Editor (track-changes suggestions plus comments, track-changes forced
+on). Merge is selective per-contributor ("bring in this editor's
+suggestions, or just this friend's comments") with a conflict prompt on
+overlapping edits.
+
+**Dabble Track Changes**: Cmd/Ctrl+Alt+E toggles suggestion mode; edits
+render as insert/strike diffs across three view tabs (Original,
+Difference, Suggestions); a sidebar lists changes as discrete cards,
+accept/reject/undo individually rather than only "accept all."
+
+**Dabble Time Machine**: a visual timeline, scrub to any past state with
+a read-only preview before acting. Three distinct actions: Restore
+(rolls the whole project back, but auto-snapshots the current state
+first so it's never destructive), Bring Forward (pulls one document from
+a past state into the present without touching the rest of the
+project), and Create New Version (a manual named checkpoint). Automatic
+history and named snapshots coexist rather than forcing a choice between
+them — worth remembering if Novella ever extends its own word-level
+diff-in-History system toward named snapshots.
+
+**Scrivener**: snapshots are per-document only (not whole-project),
+manually triggered, diff view is macOS-only, and a snapshot captures
+text/comments but not formatting or metadata. No native "share for
+comment" mode at all — a Literature & Latte forum thread ("Scrivener and
+Beta Readers") shows the actual user workaround: paste into a blank Word
+doc, or compile to PDF/EPUB and lose the feedback round-trip entirely
+("a pain in the keister" to pull comments back out of an EPUB, one user's
+words), or build a throwaway project with only the draft docs dragged
+in. Scrivener 3 added "insert links back to Scrivener" in compiled Word
+output specifically so an editor's Word comment can be traced back to
+its source location — the feature exists only because the native tool
+can't do this on its own.
+
+**Google Docs** supplies the interaction vocabulary users already expect
+from any comment system: a margin dot on the highlighted range, click to
+open an inline thread, reply, resolve/reopen, and a filter dropdown
+(All/Open/Resolved). Suggesting mode is a separate toggle from
+Commenting.
+
+**NovelCrafter**: only two collaboration roles (viewer, full editor),
+both requiring the invitee to already hold a NovelCrafter account, sync
+not immediate. No documented comment-resolve/thread mechanics at all —
+consistent with the "no inline comments at all" finding from the
+NovelCrafter deep-dive above, not a separate gap.
+
+**betareader.io**, a standalone paid third-party tool, exists
+specifically because novel-writing apps don't do this well: inline
+feedback anchored to text location, per-chapter or end-of-book surveys,
+reading-progress analytics (where each reader currently is, how fast),
+aggregated sentiment. Its existence as a viable standalone business is
+itself market evidence for the gap this roadmap item targets.
+
+**Recurring complaint** (Goodreads beta-reader threads, L&L forum):
+writers overwhelmingly still export to Word/Google Docs specifically
+because beta readers want to comment *as they read, anchored to the
+exact sentence*, and no novel-writing tool's native sharing format
+preserves that round-trip back into the source document. Dabble 3.0 is
+the first tool in this comparison set to solve it natively.
+
+**Recommended shape for Novella** (now written into the roadmap item
+itself, not just this research note): a share link scoped to one
+manuscript or chapter range, with two comment-only roles — Reader (sees
+only their own comments) and Trusted Reader (comments visible to all
+invitees on that link) — deliberately without an Editor/track-changes
+role for v1, since `vault.ts` is guarded and merge-conflict resolution
+is a large surface not worth taking on for a first version. Anchor a
+comment via selection → margin gutter icon, storing a start/end offset
+pair plus a stable content hash so the anchor survives light upstream
+edits instead of drifting silently. Sidebar shows threads, replyable and
+resolvable, unresolved-only as the default filter. The shared/reader
+view must be provably non-mutating — enforced at the same storage-
+adapter boundary that already separates Tauri/IndexedDB/memory, not just
+hidden edit affordances in the UI. Feedback re-entry into the manuscript
+stays manual and explicit (jump-to-text from a comment), not
+auto-merge — simpler than Dabble's per-contributor merge model, on
+purpose.
+
+## Standing narrow cadence check (time-boxed)
+
+**Four-pillar check, 26th consecutive recheck**: no match. No new
+entrant on a fresh ProductHunt/IndieHackers/r/writing sweep (only
+already-ruled-out shapes: Novelizer, MidReal, Neo, novelistAI — pure AI
+generators or general writing tools, no worldbuilding+task+timer
+combination). None of the six standing three-of-four near-misses
+(NovelMage, LocalProse, PlotForge Desktop, Scríob, Novel Forge AI,
+StoryLine) show any dated change to their missing pillar.
+
+**Dabble/Scrivener/Campfire**: Dabble's blog showed no post dated after
+Aug 24 (inconclusive — the blog page's dates weren't cleanly extractable
+by fetch, but nothing surfaced in search either). Scrivener release
+notes unchanged at 3.5.2 (Dec 18, 2025). Campfire Write shipped v1.4.0
+(~2026-08-27 per its App Store listing) — Spanish-language support and
+"bug fixes," but the changelog text does not mention the long-tracked
+mid-sentence cursor-jump/reset bug or the save-time data-loss report, so
+treat both as still unfixed rather than assume the bump touched them.
+The Scrivener external-drive-save-failure forum thread got one more
+reply (a fellow user's workaround: use Backup→Backup To instead of Save
+As, check Dropbox/iCloud offline settings) but still no Literature &
+Latte staff response.
+
+**Legal**: the Bartz v. Anthropic claims portal (anthropiccopyright
+settlement.com) still shows no dated update past the March 30, 2026
+claims-filing deadline; "end of August" guidance is now down to its last
+day or two, still unconfirmed on the primary source. Kadrey v. Meta's
+mediation-outcome report (due Aug 21) remains unresolved, now nine days
+overdue, with no filing or outcome located anywhere.
+
+**type.ai**: its blog, silent since January 21, 2026, posted again on
+August 27, 2026 — "Best Sudowrite Alternative for Writing Books in
+2026," a comparison/content-marketing post, not a product or pricing
+change. First sign of life from that product in over seven months, but
+doesn't move the four-app-bundle gap.
+
+## What changed in ROADMAP.md
+
+No brand-new item this round — five existing items sharpened instead,
+which is the intended outcome of shifting effort from the narrow cadence
+check toward deep-interaction research. (1) **Inline comments** gets a
+full buildable spec (roles, anchoring mechanism, storage-boundary
+enforcement) informed by Dabble 3.0, NovelCrafter's admitted gap, and
+Scrivener/Google Docs' failure modes — the headline result of the round.
+(2) **Four-app-bundle** gets its sharpest evidence yet: NovelCrafter
+itself lacks a task tracker/timer (confirmed by its own ecosystem), and
+Obsidian writers with a complete DIY stack for the other three pillars
+still keep tasks in Todoist. (3) **Voice-matching** gets Sudowrite's
+Style Examples mechanism as an implementation spec. (4) **NovelCrafter-
+parity** gets Codex field structure, Matrix-view mechanics, and a
+concrete chat-context design contrast. (5) **No-outage** and
+**no-training/legal** get small dated footnotes (Campfire v1.4.0,
+both litigation dates still unresolved). Also logged, outside "Next up":
+Novella's sprint timer already avoids the file-scoping gap found in
+Obsidian's Word Sprint plugin — verified against our own code, no action
+needed.
+
+## Round 40 sources
+
+- novelcrafter.com/help/docs/codex/anatomy-codex-entry,
+  novelcrafter.com/help/docs/plan/planning-with-the-matrix,
+  novelcrafter.com/help/docs/chat/the-chat-interface,
+  novelcrafter.com/help/faq/write/annotate-text,
+  novelcrafter.com/help/docs/app/collaboration-and-coauthoring,
+  novelcrafter.com/help/getting-started/quick-start/revision-history-saving-work,
+  feedback.novelcrafter.com/changelog, novelcrafter.com/blog,
+  scribecount.com (Organization Tools / Pomodoro Timers for Indie Authors),
+  trustpilot.com/review/novelcrafter.com
+- docs.sudowrite.com (Story Bible, Canvas), status.sudowrite.com,
+  status.sudowrite.com/incidents, feedback.sudowrite.com/changelog,
+  trustpilot.com/review/sudowrite.com
+- github.com/PixeroJan/obsidian-storyline/releases,
+  forum.obsidian.md/t/plugin-storyline-obsidian-plugin-for-writers/111494,
+  curtismchale.ca/2022/01/10/9-obsidian-writing-plugins,
+  github.com/rrbaker/obsidian-novel-starter-vault,
+  pdworkman.com/write-book-with-obsidian, loreteller.com/learn/
+  obsidian-fiction-writers-guide, xda-developers.com (Word Sprint plugin)
+- notion.com/templates, notioneverything.com (World Building Bible),
+  quillandsteel.com (Notion structuring guide), deepakness.com
+  (Notion performance complaints)
+- dabblewriter.com/docs/reference/whats-new-in-3,
+  forum.literatureandlatte.com (Scrivener and Beta Readers thread,
+  external-drive-save thread), literatureandlatte.com/blog/
+  use-snapshots-in-scrivener-to-save-versions-of-your-projects,
+  support.google.com/docs/thread/22085709, betareader.io
+- apps.apple.com/us/app/campfire-write-your-book/id1626123915,
+  literatureandlatte.com/scrivener/release-notes,
+  anthropiccopyrightsettlement.com, blog.type.ai
+- src/state/sprints.ts (internal — verified our own sprint-timer scoping)
