@@ -4893,3 +4893,193 @@ current status with slightly sharper sourcing than round 38.
 - producthunt.com, indiehackers.com
 - anthropiccopyrightsettlement.com, blog.taaonline.net,
   mckoolsmith.com, courtlistener.com (403), law360.com, bloomberglaw.com
+
+# Round 40 (2026-08-31) — cadence, first round after a week-long gap, Campfire ships v1.4.0
+
+Same brief as rounds 20-39: fresh reviews, feature announcements, and
+complaints for NovelCrafter, Sudowrite, Dabble, Scrivener, Campfire,
+type.ai, Obsidian-for-writers setups, and Notion writing templates,
+checked against everything already logged through round 39. Gap note:
+round 39 ran 2026-08-24; the next non-research commits (the audit and
+the cold-open/welcome session work) landed 2026-08-24-25, then nothing
+touched the repo until this round on 2026-08-31 — a full week with no
+research cadence run, wider than the usual one-day gap between rounds.
+Working tree was clean and `main` matched `origin/main` exactly at
+session start; no housekeeping needed this time. Dispatched the same
+four parallel research passes as recent rounds, each briefed on rounds
+1-39's findings and searching for material dated after round 39's
+2026-08-24 cutoff — a seven-day window instead of the usual one-day
+gap, so a genuinely dry result this round would mean more than it has
+in the recent daily cadence.
+
+## NovelCrafter / Sudowrite
+
+Fully dry for both products' own channels — nothing dated after
+2026-08-24 on NovelCrafter's changelog (still stuck at March 21, 2026)
+or blog (still the Aug 5 Opus-5 post), and nothing dated in-window on
+Sudowrite's changelog (still the Aug 18 paste-fix release) or status
+page, which explicitly reads "August 2026: No incidents reported" as of
+this check. One low-confidence data point, flagged rather than folded
+into copy: PeerSpot cites Sudowrite's "AI Writing Tools" category
+mindshare at 3.5% as of August 2026, down from 10.4% the prior year — a
+single secondary-source aggregator stat with no exact in-window publish
+date confirmed. If real, it would reinforce Novella's competitive
+narrative (an established competitor losing category share), but it
+needs corroboration from a second source before it's citable in copy.
+Treat as unconfirmed, not as a new finding, until then.
+
+## Dabble / Scrivener / Campfire
+
+One real update this round: Campfire Write shipped **v1.4.0** on iOS
+(App Store shows "updated 4 days ago" at the time of this check, ≈
+2026-08-27), developer "Campfire Technology LLC" — confirmed the real
+campfirewriting.com app, not the round-32 "ONCE — Campfire" decoy.
+Changelog text, verbatim: "Adds Spanish-language support and fixes a
+variety of issues. Update your language in the account details
+screen." Same vague "fixes a variety of issues" wording as the June 29
+v1.3.2 note that didn't actually kill the tracked cursor-jump/
+mid-sentence-reset bug, so this cannot be read as a fix without a
+post-1.4.0 review naming the bug specifically — worth a direct check
+next round. Google Play's listing for the same app still lags at
+v1.3.1 (≈ June 10), so iOS and Android are on different release
+cadences and parity isn't confirmed either way. Scrivener: the same
+external-drive-save-failure thread from round 39
+(forum.literatureandlatte.com, id 154495) got more activity — user
+"kewms" replied 2026-08-22 and again three times on 2026-08-24 with
+troubleshooting steps (Dropbox "available offline" settings, using
+"Backup To" instead of "Save As") — but kewms's staff/moderator status
+couldn't be confirmed from the page, no root cause was identified, and
+no activity was found after 2026-08-24. Read this as "a knowledgeable
+responder is actively troubleshooting," an upgrade from round 39's
+"no staff response yet," but still not a confirmed fix or root cause —
+still one report, not yet a pattern. Dabble: nothing dated in-window
+found on its blog, Trustpilot (still 403), or any dated social post.
+
+Also gathered, not dated/new but useful reference for a future
+corkboard-vs-Novella structural writeup: Scrivener's corkboard opens
+via View > Corkboard or Cmd/Ctrl+2 on any binder folder, turns
+subdocuments into draggable index cards (title + optional
+auto-generated synopsis), and offers a freeform mode that lets cards be
+repositioned without touching binder/manuscript order — grid mode
+mirrors binder order and reordering there is live-linked to the
+manuscript. Vendor-documented capability, not incident-driven.
+
+## Obsidian / Notion / four-pillar check
+
+Twenty-sixth dedicated recheck (rounds 15, 17-40) of "does any product
+pair local AI + a real task tracker + a focus/sprint timer +
+worldbuilding, in one app?" Again no match and no near-miss flipped to
+four-of-four. PlotForge Desktop (now v1.4.15) still has no task tracker
+or timer on its feature page. NovelMage's blog has nothing about either.
+WebNovel Assistant is now at v3.9.2 (released ≈2026-08-30) — an initial
+search snippet suggested it had grown an "AI chat" feature, which would
+have flipped it to four-of-four, but direct verification against its
+own GitHub README and obsidianstats.com found no such feature; the
+snippet traces to a search-summarizer conflation with an unrelated
+plugin (kowshik24/obsidian-ai-assistant). Corrected here so it isn't
+mistaken for real in a future round — WebNovel Assistant is still
+three-of-four (task tracker + timer + codex/lore graph, zero AI). A
+fresh ProductHunt/IndieHackers/r/writing/r/ObsidianMD/r/fantasywriters
+sweep found no new entrant. The round-33 owner question (keep running
+this exact narrow check every round, or space it out) is still
+unanswered seven rounds later — noted once per round-38's own practice,
+not re-raised further, though this is now the twenty-sixth consecutive
+negative result on the exact same compound check.
+
+Two positive-signal items outside the four-pillar check itself.
+type.ai's blog is no longer silent: a new post dated 2026-08-27, "Best
+Sudowrite Alternative for Writing Books in 2026" by Ben Denny, breaks a
+seven-month gap since January 21 — but it's a marketing/SEO listicle
+comparing AI writing tools, not a product-update announcement, and
+type.ai/changelog still 404s. Read as type.ai resuming content
+marketing, not shipping. StoryLine released v1.10.63 (2026-08-30,
+relationship-sorting/persistence bugfixes) and remains the most
+actively-maintained plugin in this space, still explicitly "No AI · No
+Cloud"; its companion expansion plugin, Noveler (by Dylan Comas,
+requires Obsidian desktop >= 1.5.0, adds a focused writing surface,
+page layout, Antidote Connect, and export tooling on top of StoryLine's
+scene/codex data), is confirmed real and live on the community plugin
+directory. And the clearest non-competitor evidence this round: the
+Dataview-based "Series Bible" pattern — a live-query note that
+auto-updates character/plot/world tables from a vault's own frontmatter
+— remains the dominant DIY structure Obsidian writers build for
+themselves, per Obsidian Forum discussion, rather than adopting a
+purpose-built app for it. This is the clearest recurring confirmation
+yet that writers keep hand-assembling exactly what Novella's Codex
+ships natively; it doesn't change any roadmap item's scope, but it's
+worth having as a citable "writers already build this by hand" data
+point the next time the Codex or a Notion/Obsidian-parity item is
+worked. The Notion side of this question (what makes writers eventually
+leave Notion) came back dry this round — search returned only template
+listings, not migration narratives; worth a more targeted r/notion or
+Notion-forum-specific search next time rather than a general sweep.
+
+## Industry / legal sentiment
+
+Both watched litigation dates checked directly again, on the day the
+guidance window itself expires. The Bartz v. Anthropic claims portal
+(anthropiccopyrightsettlement.com) shows **no announcement of a new
+portal as of today, 2026-08-31** — the site's claims-status language
+still centers on the already-closed March 30 claim-filing deadline
+(~91-93% of eligible works claimed) and offers only the pre-existing
+Works List Lookup, nothing resembling the "consolidated claim form"
+portal that class counsel's "by end of August" guidance (sourced from
+the 2026-08-07 TAA/Authors Alliance post already logged in round 39)
+described. Today is the last day of that guidance window and the
+portal has not visibly opened — this should resolve one way or the
+other by round 41. Payment timeline is unchanged: still "at least end
+of year," in two phases (~70%/30%) running through September 2027.
+Kadrey v. Meta's mediation-outcome report, due 2026-08-21, is now ten
+days overdue with still nothing found on PacerMonitor, CourtListener
+(403 on direct docket fetch), the McKool Smith tracker (still stuck at
+its 2026-07-13 edition), or National Law Review's most recent Kadrey
+coverage (2026-07-31, no mediation mention). No new author-AI lawsuit,
+settlement, or survey dated after 2026-08-24 turned up anywhere. A
+broader sweep for fresh outage/data-loss incidents at Scrivener,
+Ulysses, or Notion (beyond the products already tracked) found nothing
+dated in-window; Notion's own status page showed routine operational
+status as of 2026-08-21. No qualifying "I draft in X but plan in Y"
+second-app-problem complaint was found this round — searches returned
+general product-comparison content, not a real forum post meeting the
+bar for that pattern. One undated, low-confidence reviewer-opinion data
+point worth a mention rather than a citation: search results describe
+NovelCrafter's BYOK real-world cost running $14-70/month once API usage
+is added to its low base subscription, which would sharpen the existing
+no-credit-limits item's contrast if it can be corroborated and dated in
+a future round.
+
+## What changed in ROADMAP.md
+
+No brand-new "Next up" item this round — a fourth thin-to-dry round in
+a row (37, 38, 39, 40), and the first with a full week's search window
+rather than the usual one day, which makes the dry result carry more
+weight than usual. Three small notes folded into existing items: (1)
+the four-app-bundle item gets its twenty-sixth negative four-pillar
+recheck, the corrected WebNovel Assistant false-positive, the type.ai
+blog wake-up, the StoryLine/Noveler update, and the Series-Bible
+pattern as reinforcement; (2) the no-outage item gets Campfire's real
+v1.4.0 release (unconfirmed whether it touches the tracked bug) and the
+Scrivener thread's continued troubleshooting; (3) the no-training/legal
+item gets both litigation dates' current status, sharper for landing
+exactly on the guidance deadline day.
+
+## Round 40 sources
+
+- status.sudowrite.com, status.sudowrite.com/incidents,
+  feedback.sudowrite.com/changelog, peerspot.com (Sudowrite mindshare,
+  low-confidence secondary source)
+- feedback.novelcrafter.com/changelog, novelcrafter.com/blog
+- dabblewriter.com/blog, trustpilot.com/review/dabblewriter.com (403)
+- forum.literatureandlatte.com (thread 154495),
+  literatureandlatte.com/blog (corkboard docs)
+- apps.apple.com/us/app/campfire-write-your-book/id1626123915,
+  play.google.com (com.campfiremobile)
+- plotforge.app, novelmage.com/blog, github.com/PixeroJan/obsidian-storyline
+  (StoryLine + Noveler releases), obsidianstats.com, community.obsidian.md
+  (Series Bible / Dataview pattern)
+- blog.type.ai, type.ai/changelog (404)
+- notion.com/templates
+- producthunt.com, indiehackers.com, reddit.com/r/writing,
+  reddit.com/r/ObsidianMD, reddit.com/r/fantasywriters
+- anthropiccopyrightsettlement.com, mckoolsmith.com,
+  pacermonitor.com, courtlistener.com (403), nationallawreview.com

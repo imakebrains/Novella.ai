@@ -633,6 +633,28 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       type.ai's changelog still 404s; its blog (checked directly this
       round) has gone quiet too, nothing posted since January 21, 2026.
       No new entrant found on a fresh ProductHunt/IndieHackers sweep.
+      Research round 40 (2026-08-31), after a week-long gap with no
+      research run, ran the check a twenty-sixth time and again found no
+      match. WebNovel Assistant (now v3.9.2) briefly looked like it might
+      have grown an "AI chat" feature per a search-summary snippet, which
+      would have flipped it to four-of-four — direct verification against
+      its own GitHub README and obsidianstats.com found the snippet was a
+      search-summarizer conflation with an unrelated plugin
+      (kowshik24/obsidian-ai-assistant); WebNovel Assistant stays
+      three-of-four (task tracker + timer + codex, zero AI). type.ai's
+      blog broke its seven-month silence with a post dated 2026-08-27,
+      but it's a marketing listicle ("Best Sudowrite Alternative"), not a
+      product update — its changelog still 404s. StoryLine shipped
+      v1.10.63 (2026-08-30) and remains "No AI · No Cloud." The strongest
+      finding this round isn't a competitor at all: Obsidian's own forum
+      confirms the Dataview-based "Series Bible" — a live-query note that
+      auto-updates character/plot/world tables from vault frontmatter —
+      is still the dominant DIY structure writers build for themselves,
+      reinforcing (not changing the scope of) the case that Novella's
+      native Codex is solving a real, currently hand-assembled problem.
+      Twenty-six dedicated rechecks in, the four-pillar gap stays open on
+      both sides; the round-33 owner question on whether to keep running
+      this exact check every round is still unanswered.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -790,6 +812,23 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       partial-sync theory) but still no Literature & Latte staff response
       and no resolution — still one unconfirmed report, not yet a
       pattern. Sudowrite and Dabble: no new incidents or posts found.
+      Research round 40 (2026-08-31) finds the same Scrivener thread got
+      three more troubleshooting replies from user "kewms" on 2026-08-24
+      (Dropbox "available offline" settings, using "Backup To" instead of
+      "Save As") — a knowledgeable responder actively engaged, but
+      kewms's staff/moderator status is unconfirmed, no root cause was
+      identified, and no activity followed after 2026-08-24; still one
+      report, not a pattern. Separately, Campfire Write shipped a real
+      version bump, v1.4.0 (≈2026-08-27, confirmed via the real
+      campfirewriting.com App Store listing, not the round-32 decoy
+      product) — "Adds Spanish-language support and fixes a variety of
+      issues," the same vague wording as the June 29 v1.3.2 note that
+      didn't actually fix the long-tracked cursor-jump/mid-sentence-reset
+      bug. Cannot confirm whether v1.4.0 touches that bug without a
+      post-release review naming it specifically — check directly next
+      round rather than assume either way. No new incidents found for
+      Sudowrite (status page explicitly reads "August 2026: No incidents
+      reported") or Dabble.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent
@@ -964,6 +1003,26 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       due date located anywhere. Re-check both again next round — the
       Bartz portal is the more likely of the two to actually resolve
       within the next few days given the "end of August" guidance.
+      Research round 40 (2026-08-31, landing exactly on the last day of
+      that guidance window after a week-long gap with no research run)
+      checked both directly again: the Bartz claims portal
+      (anthropiccopyrightsettlement.com) still shows no announcement of a
+      new portal today — the site's claims-status language is unchanged
+      from round 39 (closed March 30 claim-filing deadline, ~91-93% of
+      eligible works claimed, only the pre-existing Works List Lookup).
+      Whether "by end of August" holds should resolve one way or the
+      other by round 41. Kadrey v. Meta's mediation-outcome report (due
+      2026-08-21) is now ten days overdue with nothing found on
+      PacerMonitor, CourtListener (403 on direct docket fetch), the
+      McKool Smith tracker (still stuck at its 2026-07-13 edition), or
+      National Law Review's most recent coverage (2026-07-31, no
+      mediation mention). No new author-AI lawsuit, settlement, or survey
+      surfaced. One undated, uncorroborated reviewer-opinion data point
+      for the no-credit-limits item below, not yet citable: search
+      results describe NovelCrafter's BYOK real-world cost running
+      $14-70/month once API usage is added to its low base subscription —
+      would sharpen that item's contrast if a future round can date and
+      corroborate it.
 - [ ] **Say the export advantage louder** — research round 7: Sudowrite
       reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
       Novella already ships all three plus one-click backup
@@ -1144,6 +1203,44 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-08-31 — Research round 40 (autopilot; no code). Housekeeping
+  first: working tree clean, local `main` matched `origin/main` exactly
+  at session start — no fast-forward or repair needed this time, unlike
+  most recent rounds. Gap note: round 39 ran 2026-08-24; nothing further
+  touched the repo until this round, a full week later, versus the
+  usual one-day gap between rounds — so this round's search window was
+  seven days wide, not one, making its dry result carry more weight
+  than usual. Dispatched the same four parallel research passes as
+  rounds 28-39, each briefed on rounds 1-39's findings and searching for
+  material dated after round 39's 2026-08-24 cutoff. **Fourth
+  thin-to-dry round in a row (37, 38, 39, 40)** — no brand-new checklist
+  item, three small findings folded into existing items. (1)
+  NovelCrafter/Sudowrite pass fully dry on both products' own channels;
+  one low-confidence, uncorroborated data point flagged rather than
+  cited — a PeerSpot stat claiming Sudowrite's AI-writing-tools category
+  mindshare fell from 10.4% to 3.5% year over year. (2) Dabble/
+  Scrivener/Campfire pass found one real release: Campfire Write shipped
+  v1.4.0 (≈2026-08-27, Spanish-language support, vague "fixes a variety
+  of issues") — can't confirm whether it touches the long-tracked
+  cursor-jump bug without a follow-up review check; the Scrivener
+  external-drive thread got three more troubleshooting replies but is
+  still unresolved; both folded into the no-outage item. (3) The
+  four-pillar competitive check ran a twenty-sixth dedicated recheck
+  (rounds 15, 17-40) and again found no match — corrected a
+  search-summarizer false positive that would have wrongly flipped
+  WebNovel Assistant to four-of-four (it's still zero-AI), logged
+  type.ai's blog waking up after seven months (marketing content, not a
+  product update), and noted the Dataview "Series Bible" pattern as the
+  round's clearest reinforcement that writers still hand-assemble what
+  Novella's Codex ships natively — folded into the four-app-bundle item.
+  (4) The industry/legal pass checked both watched litigation dates
+  exactly on the day the "by end of August" guidance window expires:
+  the Bartz claims portal still hasn't visibly opened, and Kadrey's
+  mediation report is now ten days overdue with nothing found anywhere —
+  folded into the no-training/privacy item, alongside an uncorroborated
+  lead (NovelCrafter's real BYOK cost running $14-70/month) worth dating
+  in a future round. Full notes in RESEARCH.md Round 40.
 
 - 2026-08-24 — Research round 39 (autopilot; no code). Housekeeping
   first: the container's `main` branch ref was 11 commits behind
