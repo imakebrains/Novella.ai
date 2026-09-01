@@ -5083,3 +5083,417 @@ exactly on the guidance deadline day.
   reddit.com/r/ObsidianMD, reddit.com/r/fantasywriters
 - anthropiccopyrightsettlement.com, mckoolsmith.com,
   pacermonitor.com, courtlistener.com (403), nationallawreview.com
+
+# Round 41 (2026-09-01) — a broader research brief: actual UX mechanics, real user sentiment, Obsidian/Notion deep dives, second-app pairings
+
+A different brief from rounds 20-40's cadence: instead of only tracking dated
+competitor news, this round was asked to go past headline feature lists into
+how these apps actually work in practice — click-by-click interaction design,
+real user complaints and workarounds, and the underlying job a writer is
+trying to accomplish when they reach for a second app. Six parallel passes
+ran: (1) NovelCrafter/Sudowrite deep UX audit, (2) Scrivener/Dabble/Campfire
+deep UX audit, (3) an Obsidian-for-writers deep dive, (4) Notion-for-writers
+plus dedicated second-app-pairing research, (5) a cross-app UX-pattern
+synthesis (command palettes, revision history, comments, focus modes, AI
+chat vs. inline AI, onboarding), and (6) a lightweight continuation of the
+standing four-pillar/litigation cadence check so that thread stays
+unbroken. Session note: Reddit (reddit.com, old.reddit.com, all subpaths)
+was blocked to every fetch tool this round across multiple passes — a new
+constraint not hit in prior rounds, which pushed evidence toward named
+author blogs, Substacks, official docs, and app-store/Trustpilot reviews
+instead. Flagging this as a method change, not a weaker result, since two
+passes independently found the same patterns through different sources.
+
+## NovelCrafter / Sudowrite — actual interaction mechanics
+
+**Codex creation and context (NovelCrafter)**, official docs: an entry has a
+Codex Type (Character/Location/Item/Subplot/Misc, single-select, system
+fields) plus five tabs (Details, Research — explicitly excluded from AI
+context, Relations, Mentions, Tracking). "Quick Create" is the fast manual
+path; "Extract" scans a pasted block or chat message and auto-generates
+entries from it — a materially different creation flow from filling a form
+by hand. Auto-detection of names/aliases/plurals is real and automatic once
+an entry exists. The March 21, 2026 changelog (already logged, round 11)
+shipped multi-category membership and case-sensitive matching. The part not
+previously verified: **Codex context reaching the AI is manual, not
+automatic** — a scene only sees a Codex entry once the writer clicks
++Codex on that scene, and NovelCrafter's own best-practice docs tell writers
+to be selective ("quality over quantity"). Checked against our own
+`src/ai/context.ts` (already documented in round 13): we do the same thing —
+send only explicitly-referenced Codex entries, not automatic retrieval. This
+is a shared weakness, not a competitor advantage, and sharpens rather than
+changes the priority of building genuine manuscript-aware retrieval.
+[docs.novelcrafter.com](https://docs.novelcrafter.com/en/articles/9419414-prompts-102-basic-prompt-changes), [novelcrafter.com/courses/codex-cookbook/codex-scenes](https://www.novelcrafter.com/courses/codex-cookbook/codex-scenes)
+
+**Matrix view**, official docs, confirmed directly: selecting "POV" from the
+"Show" menu lets a writer switch a scene's POV with one click, explicitly
+faster than the per-scene action menu; Matrix also sorts by Codex entry so a
+subplot's every appearance is one glance. A documented community workaround
+uses a Codex entry titled "Edits" to surface revision notes per-chapter
+inside Matrix — worth having as a usability bar for our own PlotGrid/table
+views once they gain inline editing (round 8's existing item).
+[docs.novelcrafter.com](https://docs.novelcrafter.com/en/articles/9888008-planning-with-the-matrix)
+
+**Sudowrite Story Bible and Chat**, official docs: Story Bible follows a
+strict generative chain (Braindump → Synopsis → Genre/Style → Characters →
+Worldbuilding → Outline → Scenes), each stage drawing on the one before.
+Chat reads the Story Bible, all documents, and (for a Series) more; in
+"Allow edits" mode it presents a plan for approval before touching text
+rather than editing autonomously — a real safety mechanism. Feedback reads
+a chapter/scene against the Story Bible and leaves inline margin comments on
+pacing, passive voice, unclear motivation, plot holes.
+[docs.sudowrite.com](https://docs.sudowrite.com/using-sudowrite/1ow1qkGqof9rtcyGnrWUBS/chat/5vbuELXf6LZQnGfVzsEXCV)
+**Recurring complaint, now two independent sources** (G2-aggregated summary
+and a Trustpilot review dated ≈2026-08-30 from "Val Lovelock"): the AI
+"forgets" established character details even when they're present in the
+Story Bible — a grounding-reliability failure, not a missing-feature one.
+[g2.com/products/sudowrite/reviews](https://www.g2.com/products/sudowrite/reviews), [trustpilot.com/review/www.sudowrite.com](https://www.trustpilot.com/review/www.sudowrite.com)
+
+**Onboarding friction, two independent reviewers**: NovelCrafter's BYOK setup
+(provider account, API key generation, pasting it in) plus 20+ tutorial
+screens, with reported "tutorial fatigue" after about 12 and 3-4 hours
+before feeling "anywhere near mastered" — one reviewer: users "felt like
+they had to be AI gurus" before writing a single word. [ilampadmanabhan.medium.com](https://ilampadmanabhan.medium.com/novelcrafter-review-powerful-for-fiction-writers-frustrating-to-set-up-april-2026-64d391c629a2), [dreamgen.com/blog/articles/novelcrafter-review](https://dreamgen.com/blog/articles/novelcrafter-review)
+Multiple independent 2026 comparison pieces converge on framing NovelCrafter
+as "the Photoshop of AI writing tools" (maximum configurability, steep
+floor) against Sudowrite's easier on-ramp with escalating credit costs — a
+fresh, independently-repeated characterization, not new pricing information.
+[ilampadmanabhan.medium.com/sudowrite-vs-novelcrafter](https://ilampadmanabhan.medium.com/sudowrite-vs-novelcrafter-bdc3f33ba95f)
+
+NovelCrafter's own changelog is stale at March 21, 2026 — over five months
+with no dated entry, worth a direct re-check next round rather than assuming
+either a quiet product or an incomplete fetch. Sudowrite's Trustpilot
+aggregate sits at 2.8/5 (30 reviews); NovelCrafter has no meaningful
+G2/Capterra presence at all as of 2026 (read by a reviewer-aggregator as
+early-market-stage adoption, not absence of users).
+
+## Scrivener / Dabble / Campfire — actual interaction mechanics
+
+**Scrivener corkboard**: Grid mode locks card order to binder/manuscript
+order (the default outlining/revision mode); Freeform mode lets cards be
+dragged into loose clusters without touching binder order until the writer
+explicitly clicks "Commit" — a genuinely well-liked design because it lets
+messy brainstorming and canon order stay deliberately separate.
+[loreteller.com](https://loreteller.com/learn/scrivener-corkboard-guide/)
+
+**Scrivener Compile — the specific failure mode, not just "it's complex"**:
+multiple independent sources name the same concrete trap — Compile requires
+two separate, easy-to-miss configuration layers (assign a "section type" to
+each document, then assign a "layout" to each section type) before output
+even starts, and getting that two-layer mapping wrong is what "drove me
+crazy in the beginning" for several writers, one calling it "a nightmare"
+that "got worse" even after the Scrivener 3 rewrite. [Cornell library guide](https://guides.library.cornell.edu/scrivener/compile), [tjosvold.substack.com](https://tjosvold.substack.com/p/scrivener-02-the-most-powerful-and)
+A related structural friction: Label (single-value) and Keywords
+(multi-value) are two overlapping metadata systems with different
+cardinality rules, and a named forum poster ("fto") describes searching for
+documents matching *both* a label and a keyword as genuinely difficult — the
+practical workaround people converge on is abandoning labels entirely to
+keep search simple. [forum.literatureandlatte.com/t/143259](https://forum.literatureandlatte.com/t/best-practices-for-using-keywords-and-labels-thread-view-in-novels/143259)
+Both are worth keeping as "don't do this" cautionary examples: our own
+export modal and Codex tagging are simpler by construction (round 7's
+export-advantage item already tracks the export half); the lesson for the
+Codex/metadata side is to never let a second overlapping tagging system
+appear next to the first.
+
+**Dabble's Plot Grid — live-synced, not a stale copy**, official docs:
+starts as a freeform grid for brainstorming, and clicking "Link to Book"
+locks in a Scenes column aligned to actual manuscript scenes — critically,
+"reordering scenes in your manuscript reorders the grid to match." This is
+the clearest proof found across 41 rounds that a plotlines-as-spreadsheet
+planning view can stay bound to live manuscript state instead of drifting
+out of sync with it, worth using as the bar for our own PlotGrid/Matrix-style
+view. [dabblewriter.com/docs/planning-story-notes/plot-grid-overview](https://www.dabblewriter.com/docs/planning-story-notes/plot-grid-overview)
+
+**Dabble 3.0's Time Machine — two distinct restore actions, not one generic
+button**, official docs: "Restore this version" rolls back the whole
+project (auto-saving current state first), while "Bring Forward" pulls one
+document into the present without touching the rest. Checked our own
+`src/state/history.ts`: `restore()` already implements the safer half well
+— it's per-note and snapshots the current body before restoring, so a
+restore can never destroy the newer draft — but there is no project-wide
+equivalent. [dabblewriter.com/docs/reference/whats-new-in-3](https://www.dabblewriter.com/docs/reference/whats-new-in-3)
+
+**Campfire's inline manuscript-to-worldbuilding link**, official capability:
+while drafting inside Campfire's own Manuscript module, a writer can
+highlight a name/location/item in the prose itself and link it directly to
+its Encyclopedia article, with a reference panel kept open beside the draft.
+This is the one place Campfire's design ties worldbuilding directly into
+active drafting rather than keeping it a separate reference tier — the
+closest thing found to solving the exact job that pushes Scrivener users
+toward a Scrivener+Notion or Scrivener+Aeon Timeline combination.
+[selfpublishing.com/campfire-writing-review](https://selfpublishing.com/campfire-writing-review/)
+Genuine criticism (Kindlepreneur): "clunky and cluttered," worse on tablet;
+per-module pricing ($12.50/mo for all 17 modules) risks the same "creeping
+subscription" complaint as competitors' credit systems. Campfire is
+explicitly framed by its own reviewers as pre-writing/planning software, not
+a manuscript-drafting replacement.
+
+**Beta-reader/revision workflows**: Scrivener has no native comment/beta-
+reader system (unchanged) — writers compile to DOCX/PDF and paste into
+Google Docs. Dabble's Review Copies + Comments + Track Changes solve this
+natively (comments documented to "survive even when the text they pointed
+to changes," role-separated as Friends/Beta Readers/Editors) but keep
+readers inside Dabble's own account system, capped at 5 collaborators even
+on Premium.
+
+**Universal gap, independently confirmed**: no source found across Scrivener,
+Dabble, or Campfire describes a native focus/session timer or task list —
+writers pair in Pomodone, Forest, or similar. This matches the four-pillar
+item's own finding from a different angle (see below).
+
+## Obsidian for writers — what the DIY assembly actually reveals
+
+Two worked examples of the Dataview "Series Bible" pattern (already named in
+round 40) show the real mechanics: a [character-tracking gist](https://gist.github.com/glenmoyes/e594016d48a362fcfff92051f3bc05a7)
+uses frontmatter fields like `importance` (1=lead..4=background) and
+`hidden`, plus **inline fields inside the prose itself** (`[type:: scene]`,
+`[tension:: 3]`, `[character:: John]`) so a Dataview query can extract scene
+metadata straight out of the manuscript text, and computes character age at
+any story date live (`= 1529 - this.birthyear`). A [dataviewjs info panel](https://forum.obsidian.md/t/novel-writing-info-panel-with-dataviewjs/62034)
+live-tracks word/char counts against goals per scene/chapter/project — but a
+recurring complaint in its own comment thread is that it doesn't auto-
+refresh, requiring a manual trigger or a Buttons-plugin workaround.
+
+**The load-bearing finding**: every one of these dashboards only works as
+long as the writer keeps re-typing state into frontmatter by hand — the
+moment that discipline lapses, the "bible" goes stale and silently lies. A
+[forum thread](https://forum.obsidian.md/t/best-practices-for-tracking-characters-locations-and-timeline-etc-in-a-novel/33990)
+captures the failure mode directly: one writer, after building this by
+hand, concluded "I'll settle into using Obsidian for research and drafting,
+but leave revising and final output in Scrivener" — a real hybrid-
+abandonment case, citing overwhelming complexity, not a hypothetical. A
+sharper blogger framing: "Obsidian out of the box is not a writing tool.
+It's a note-taking engine with no opinion about how you should use it… The
+blank-slate flexibility is the product's greatest strength and the reason
+most writers abandon it within a week." [xda-developers](https://www.xda-developers.com/would-never-try-writing-novel-in-obsidian-without-these-plugins/)
+Notably, that same blogger's "essential 5 plugins" list has no
+worldbuilding/Dataview plugin on it at all — suggesting the codex/bible
+layer is the part writers most often skip or half-build.
+
+The one Obsidian plugin that treats continuity as an automated, first-class
+feature rather than a query the writer has to remember to run is StoryLine:
+"automated validation across seven categories: timeline, characters,
+plotlines, setup/payoff, structure, continuity/pacing, and timeline gaps."
+[storyline.pixero.com](https://www.storyline.pixero.com/) Checked against
+our own `src/analysis/continuity.ts`: the deterministic tier currently
+covers five kinds — early-mention, duplicate-name, dangling link, unordered
+chapters, unknown POV — real, provable checks, but none of the seven
+StoryLine categories around setup/payoff or plot-thread tracking. Concrete
+room to extend, and a genuinely local-only differentiator since StoryLine
+itself has zero AI.
+
+**A notable absence, not a finding**: despite targeted searches, no post
+anywhere describes a writer who has actually assembled a local-AI Obsidian
+plugin (Smart Connections, Ollama Assistant, Text Generator) together with
+a novel-writing plugin (StoryLine, Longform, WebNovel Assistant) into one
+working pipeline — the AI-plugin and novel-plugin communities write for two
+different audiences and don't cross-reference each other publicly. This is
+itself strong supporting evidence for the thesis: assembling "local AI + a
+structured novel vault" today requires the writer to be the integrator, and
+as far as this search found, almost nobody has published having done it.
+
+## Notion for writers, and the second-app pattern
+
+**Real templates** (Notion's own marketplace): Story Bible: Novel & Book
+Writing Tracker (NotoMantra, 4.85★/24 reviews), World Building Bible (7
+interconnected databases), W.I.P. — Advanced System for Novel Writers
+(research/worldbuilding/character/storyboard/tasks/revision in one system),
+Notion Story Wiki (38+ sub-templates), Author Dashboard & Writing Tracker
+(word counts, submissions tracker with an agent/editor contacts database).
+The submissions-tracker sub-genre (Query HQ, Manuscript Submissions Tracker)
+is essentially QueryTracker.net rebuilt as a Notion relational database.
+[notion.com/templates](https://www.notion.com/templates/story-bible-continuity-tracker-for-novelists-book-writer)
+
+**What keeps writers there**: a first-person account of a 24-book series
+(after years of notes scattered across "OneDrive, Dropbox, 3-ring binders,
+random journals, even loose-leaf paper") calls Notion "the greatest tool
+ever" for the ability to organize anything in one linked, searchable
+workspace across a career, not for prose-writing itself. [forsythiacottagewriting.substack.com](https://forsythiacottagewriting.substack.com/p/writing-again-and-whats-saving-my)
+
+**What eventually pushes writers off it — the sharpest finding this round**:
+a competing tool's own pitch against Notion states it plainly (vendor
+opinion, but directionally consistent with the real example below):
+"Notion is fundamentally a database wearing a document UI... Characters
+have voices, contradictions, relationships, secrets. None of that fits
+cleanly into a database row." [storyflow.so](https://storyflow.so/blog/best-notion-alternatives-writers-2026)
+And independently, in the same 24-book-series account above: she keeps
+Notion for planning but has never drafted actual prose inside it — chapters
+are written in Google Docs, timelines in Google Sheets. This is a real,
+first-person "the planning tool became something I write *around*, not
+in" case, and it parallels the Obsidian abandonment-for-revision case found
+in the same round.
+
+**2026 Notion facts worth citing directly**: database performance is
+documented to degrade noticeably past ~5,000 records (3-5s added page-load
+time, sluggish filtering/sorting) [hackceleration.com](https://hackceleration.com/notion-review/)
+— a ceiling a long-running series' full codex could realistically hit.
+Offline mode is read-only: cached pages can be viewed, but nothing can be
+created or edited, and no AI feature works, without a connection — the
+direct opposite of local-first.
+
+**Second-app patterns, ranked by corroboration** (Reddit blocked this
+round, so evidence is blog/forum-sourced rather than thread-sourced):
+1. **Task/project manager bolted onto the writing tool** (Trello most
+   commonly, for revision-tracking, querying, beta-reader follow-ups,
+   cross-project tasks) — 4+ independent author blogs, including a named
+   case (Morgan Hazelwood) who needed something covering "revising
+   manuscripts, querying, beta-reading, blogging, vlogging, convention
+   work." [morganhazelwood.com](https://morganhazelwood.com/2020/01/30/how-one-writer-uses-trello-to-track-her-creative-progress/) Novella's built-in task system directly
+   closes this, provided tasks can hold non-manuscript items alongside
+   scene-linked ones.
+2. **Plotting/tracking spreadsheet alongside the drafting tool** — 5
+   independent author blogs (Darcy Pattison, Writers In The Storm, Aigner
+   Loren Wilson, among others), plus the frequently-repeated claim that
+   J.K. Rowling used spreadsheet grids for the Harry Potter timelines.
+   Closer to "story bible functionality" than a hard technical gap —
+   Novella's worldbuilding layer only closes this if its views are as fast
+   to scan/re-sort as a spreadsheet.
+3. **External Pomodoro/focus timer** — explicit and recurring ("Scrivener
+   won't track Pomodoros," stated almost verbatim across Literature &
+   Latte's own blog, ScribeCount, and Kindlepreneur). Directly closed by
+   Novella's shipped sprint timer — this is exactly the "4th app" the
+   thesis already names, now corroborated by a second, independent
+   evidence stream distinct from the four-pillar competitive check.
+4. **A plain prose editor used instead of the planning tool's own editor**
+   — the "database wearing a document UI" risk above. Novella only
+   partially closes this, and only if the manuscript editor keeps reading
+   as a true distraction-free prose surface as Board/Codex/task features
+   grow around it — flagged as a standing design risk, folded into the
+   thesis guardrails in ROADMAP.md.
+
+## Cross-app UX pattern synthesis
+
+Five patterns worth carrying forward, each tied to a concrete before/after
+rather than a feature name:
+
+1. **Split "restore everything" from "bring back one scene."** Dabble's
+   Time Machine names these as two separate, clearly-labeled actions;
+   Google Docs' and Notion's single generic "restore"/"history" force the
+   writer to guess which they'll get, and Notion's history is explicitly
+   documented as showing only "highlights," not a full diff — a trust gap.
+   [sparxno.com](https://www.sparxno.com/blog/notion-page-version-history)
+2. **Make range-anchored comments degrade visibly, never silently.**
+   Google Docs comments have a documented bug where an edit near the
+   anchor can produce "Original content deleted" with no highlighted text
+   at all; Dabble 3.0's comments are documented to survive edits instead.
+   The transferable lesson for whenever Novella's own inline-comments item
+   is built: if confidence in what a comment is still anchored to drops,
+   show that (e.g. a dashed vs. solid underline) rather than staying
+   falsely precise or vanishing outright.
+3. **Keep AI at two distinct surfaces, never blended, never auto-triggered
+   on plain typing.** Sudowrite/type.ai reviewers consistently split
+   "highlight → inline alternatives → accept/reject" (targeted craft fixes,
+   stays focused on the manuscript) from "open a chat panel and ask a
+   question" (planning/reasoning, doesn't touch the document) as two
+   different jobs writers use in the same session, not competing patterns.
+   [type.ai's own framing](https://blog.type.ai/post/introducing-a-faster-way-to-edit-with-ai):
+   "the machine shows up where you already are... the difference between a
+   tool that interrupts the editing process and one that actually helps
+   it." Academic ghost-text research adds a caution: longer/more
+   proactive suggestions are more distracting specifically in passages
+   "where voice and originality matter" — supports keeping first-draft
+   prose free of always-on suggestions. Novella's existing Reword-in-place
+   plus separate Chat panel split already matches this pattern — worth
+   treating as a confirmed-correct design choice, not something to merge.
+4. **Teach the keyboard-first path during first use, not after.** Linear
+   introduces Cmd+K during onboarding itself, before content exists,
+   rather than as an advanced tip found by accident later — the opposite
+   of Scrivener's own reviewers describing its features as "discovered by
+   accident." Worth folding into the still-open conversational-onboarding
+   item: demonstrate our Ctrl+K palette on the very first empty-manuscript
+   screen rather than leaving it to be found.
+5. **Front-load nothing that isn't writing.** NovelCrafter's steepest
+   onboarding complaint (above) is configuration, not editor complexity —
+   directly on point for Novella, since local-model setup is the one thing
+   that could recreate that same friction if it's ever required before the
+   first sentence. Our shipped "quiet first run" (2026-07-23: editor alone
+   on the seed chapter, AI setup one labeled click away) already matches
+   this principle — worth stating as a confirmed strength, not a gap.
+
+## Four-pillar / litigation standing check
+
+Twenty-seventh dedicated recheck (rounds 15, 17-41): no product pairs
+genuine local AI + a real task tracker + a focus/sprint timer +
+worldbuilding. PlotForge Desktop (now v1.026, recent changelog work is
+AI-streaming/billing fixes only), WebNovel Assistant, StoryLine, and
+NovelMage all unchanged from prior rounds; no new entrant found on a fresh
+ProductHunt/IndieHackers/r/writing/r/ObsidianMD/r/fantasywriters sweep. See
+the "Cross-app UX pattern synthesis" and "Notion" sections above for this
+round's independent, second-method corroboration of the same gap via
+second-app-pairing evidence rather than a fifth competitor sweep.
+
+Litigation: the Bartz v. Anthropic distribution portal (the "by end of
+August" guidance window, distinct from the already-closed March 30
+claim-submission deadline) has still not been confirmed open as of
+2026-09-01. Publishers' Coordination Counsel filed a notice of appeal
+2026-08-18 over the attorneys'-fee award; a dated source
+(chatgptiseatingtheworld.com, 2026-08-18) reports this does not affect the
+class payout schedule, still guided "at least end of year." Kadrey v.
+Meta's mediation-outcome report (due 2026-08-21) is now three weeks
+overdue with nothing found on any tracked source.
+
+Dated-news sweep (NovelCrafter, Sudowrite, Dabble, Scrivener, Campfire,
+type.ai): nothing dated after 2026-08-31 found anywhere.
+
+## What changed in ROADMAP.md
+
+Two new items added, both concrete and cheap relative to their payoff: (1)
+extending the Continuity inspector's deterministic tier toward
+codex-vs-manuscript fact-checking and plot-thread/setup-payoff tracking,
+inspired by StoryLine's seven-category validation and the DIY-Obsidian
+staleness pattern; (2) a project-wide restore in History, alongside the
+already-good per-note safe restore, inspired by Dabble's Time Machine.
+A fourth thesis guardrail was added (stay a true prose-writing surface,
+not "a database wearing a document UI"), citing this round's sharpest
+finding — a real writer who plans in Notion but has never drafted a single
+chapter inside it. Research notes were folded into six existing items:
+Inline comments (anchor-degradation design guidance), Notion-parity pass
+(concrete performance/offline numbers), NovelCrafter-parity pass (manual
+Codex-context confirmation, Matrix detail, Sudowrite grounding complaints),
+recommend-a-local-model (onboarding-friction evidence), four-app-bundle
+(27th recheck plus independent second-app-pairing corroboration), and
+no-training/privacy (litigation date status).
+
+## Round 41 sources
+
+- docs.novelcrafter.com (Codex, Matrix, prompts), novelcrafter.com/courses,
+  novelcrafter.com/blog, feedback.novelcrafter.com/changelog
+- docs.sudowrite.com (Story Bible, Chat, Feedback, interface),
+  status.sudowrite.com, feedback.sudowrite.com/changelog
+- g2.com/products/sudowrite/reviews, trustpilot.com/review/www.sudowrite.com,
+  ilampadmanabhan.medium.com (NovelCrafter review, Sudowrite-vs-NovelCrafter),
+  dreamgen.com/blog/articles/novelcrafter-review, checkthat.ai/brands/novelcrafter
+- loreteller.com (Scrivener corkboard/compile guides),
+  guides.library.cornell.edu/scrivener/compile,
+  tjosvold.substack.com, biancabreen.substack.com,
+  forum.literatureandlatte.com (thread 143259, thread 154495)
+- dabblewriter.com/docs (Plot Grid, What's New in 3), help.dabblewriter.com,
+  trustpilot.com/review/dabblewriter.com
+- selfpublishing.com/campfire-writing-review, kindlepreneur.com/campfire-write-review
+- annelyle.com (Aeon Timeline + Scrivener), hjsmithwilliams.substack.com
+- gist.github.com/glenmoyes (Dataview character/scene tracking),
+  forum.obsidian.md (novel info panel, character/location/timeline best
+  practices), storyline.pixero.com, github.com/PixeroJan/obsidian-storyline,
+  xda-developers.com, pdworkman.com, sakalakis.gumroad.com,
+  github.com/rrbaker/obsidian-novel-starter-vault,
+  github.com/danieltomasz/obsidian-writing-goals,
+  github.com/kinabalu/obsidian-word-sprint, obsidianstats.com,
+  github.com/brianpetro/obsidian-smart-connections, promptquorum.com
+- notion.com/templates, forsythiacottagewriting.substack.com,
+  storyflow.so/blog, hackceleration.com/notion-review,
+  notion.com/releases/2026-01-20
+- morganhazelwood.com, writeonsisters.com, thrivingscribes.com,
+  alexanderlane.co.uk, darcypattison.com, writersinthestormblog.com,
+  aignerlwilson.com, scribecount.com, literatureandlatte.com/blog
+- medium.com/design-bootcamp (command palette UX), notion.com/help
+  (slash commands), supademo.com (Linear onboarding), blog.superhuman.com,
+  github.com/microsoft/PowerToys/issues/39763, kimaireviews.com (Scrivener
+  review 2026), zapier.com/blog/google-docs-revision-history,
+  nuclino.com/solutions/notion-vs-google-docs, ia.net/writer (Focus Mode),
+  forestapp.cc, gentext.ai/blog (ghost-text research),
+  blog.type.ai/post/introducing-a-faster-way-to-edit-with-ai,
+  candu.ai/blog (Notion onboarding), uxpin.com/studio/blog (progressive
+  disclosure), groups.google.com (Google Docs comment-anchor bug)
+- plotforge.app/changelog, anthropiccopyrightsettlement.com,
+  chatgptiseatingtheworld.com, mckoolsmith.com, pacermonitor.com,
+  courtlistener.com (403), nationallawreview.com

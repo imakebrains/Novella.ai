@@ -54,6 +54,16 @@ The Notion comparison (round 6) adds three standing guardrails, because they
 are exactly why people quit Notion: stay FAST as projects grow (measure it),
 keep structure FLAT (nothing buried five layers deep), and keep leaving easy
 (plain Markdown, one-click export — lock-in is a churn engine, not a moat).
+Research round 41 (2026-09-01) adds a fourth, sharper for being caught in the
+wild rather than argued abstractly: a competing tool's own pitch against
+Notion — "a database wearing a document UI" — and a real writer who plans
+her 24-book series in Notion but has never once drafted prose inside it,
+using Google Docs instead, both point at the same risk for Novella. Every
+board/codex/task feature this roadmap adds must keep the manuscript editor
+reading as a true distraction-free prose surface, not database rows with a
+text field attached — the day a writer starts drafting somewhere else
+because the editor feels like the wrong tool for prose is the day the "one
+app" thesis quietly fails, even with every feature checked off.
 
 ## Next up
 
@@ -204,12 +214,74 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       round-trips through Google Docs. Attach a note to a text range
       without touching prose, show it in a margin gutter, resolve/reply.
       Collapses one more reason to leave the app — high priority against
-      the thesis.
+      the thesis. Research round 41 (2026-09-01) adds concrete design
+      guidance for whenever this is built: Google Docs' range-anchored
+      comments have a documented failure mode where an edit near the
+      anchor can silently detach it ("Original content deleted," no
+      highlighted text at all), while Dabble 3.0's comments are documented
+      to survive edits to their anchored text. The transferable lesson is
+      to make the failure mode visible rather than silent — if an edit
+      degrades confidence in what a comment is still anchored to, show it
+      (e.g. the anchor mark switching from a solid to a dashed underline)
+      rather than either staying falsely precise or vanishing outright.
+- [ ] **Make codex-vs-manuscript sync a checked invariant, not something the
+      writer maintains by hand** — research round 41 (2026-09-01): a deep
+      pass on DIY Obsidian novel setups (Dataview-based "Series Bible"
+      dashboards, hand-built character/timeline tables) found every one of
+      them works only as long as the writer keeps re-typing state into
+      frontmatter by hand — the moment that discipline lapses the "bible"
+      goes stale and silently lies. One forum author's own conclusion
+      after months of this: she moved structural revision back to
+      Scrivener specifically because Obsidian's flexibility became a
+      liability at the exact stage a tool needs to *impose* structure
+      rather than let the writer invent it — a parallel case to the
+      Notion "database wearing a document UI" guardrail added above. The
+      same pass flagged StoryLine (the most actively-maintained Obsidian
+      novel plugin) as the one product found in 41 rounds of research that
+      runs automated validation across seven categories — timeline,
+      characters, plotlines, setup/payoff, structure, continuity/pacing,
+      timeline gaps — proof this is buildable as a first-class feature,
+      not just a query the writer has to remember to write. Checked our
+      own `src/analysis/continuity.ts`: the deterministic tier currently
+      covers five kinds (early-mention, duplicate-name, dangling link,
+      unordered chapters, unknown POV) — real, but none of them check
+      whether a codex entry's stated facts still match what the
+      manuscript actually says, and none track a plot thread opened in
+      the codex/Beats system that never gets a payoff. Extending the
+      Continuity inspector along those lines is a genuinely local-only
+      advantage — no cloud competitor markets this either — and it
+      directly defends the "worldbuilding without another tool" and
+      "writes with you" halves of the thesis at once.
+- [ ] **History: a project-wide restore alongside the existing safe
+      per-note one** — research round 41 (2026-09-01): Dabble 3.0's Time
+      Machine names two separate, clearly-labeled restore actions —
+      "Restore this version" (rolls back the whole project, auto-saving
+      current state first) and "Bring Forward" (pulls one document into
+      the present without touching the rest) — rather than one generic
+      "Restore" button. Checked our own `src/state/history.ts`:
+      `restore()` already does the safer half well (per-note, and it
+      snapshots the current body before restoring, so nothing is ever
+      destroyed) — but there is no project-wide equivalent, so undoing a
+      bad multi-chapter AI edit or revision pass means restoring each note
+      by hand. Low priority against the thesis (Novella already avoids
+      the failure mode Dabble's split UI is guarding against) but a real,
+      cheap gap once picked up.
 - [ ] **Notion-parity pass, ongoing** — owner: "make this look and function
       exactly like Notion but better." Next concrete gaps: block-style
       hover handles in the editor, inline databases-as-tables on notes,
       synced project sidebar collapse, cover images on note headers.
-      One gap per run, verified live.
+      One gap per run, verified live. Research round 41 (2026-09-01) adds
+      two concrete numbers worth citing directly rather than only the
+      general FAST/FLAT guardrails above: Notion's own database
+      performance is documented to degrade noticeably past ~5,000 records
+      (3-5s added page-load time, sluggish filtering/sorting) — a ceiling
+      a long-running series' codex (characters + scenes + locations +
+      plot threads across several books) can realistically reach; and its
+      offline mode is read-only — cached pages can be viewed, but nothing
+      can be created or edited, and no AI feature works, without a
+      connection. Both sharpen the existing FAST-as-you-grow and
+      local-first-always-works guardrails with citable specifics instead
+      of just the general comparison.
 - [ ] **NovelCrafter-parity pass, ongoing** — codex entry templates per
       type (character sheets with fields), chat-with-your-book mode,
       scene status labels (draft/revised/done) surfaced on cards and
@@ -260,7 +332,28 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       stabilizing the feature. Together these sharpen, rather than soften,
       the case that a local Codex-grounded chat-with-your-book mode (once
       built) should lead on "no cloud context window to silently truncate
-      or corrupt," not just "free and local."
+      or corrupt," not just "free and local." Research round 41
+      (2026-09-01) adds three deeper findings, all reinforcing rather than
+      changing this item's scope. First, checked NovelCrafter's own docs
+      directly: Codex context is NOT automatic — a scene only sees a
+      Codex entry once the writer manually clicks +Codex on that scene,
+      and best-practice guidance tells writers to be selective ("quality
+      over quantity") — the same manual-curation design our own
+      `src/ai/context.ts` already uses (confirmed in round 13), so this
+      is a shared weakness to solve past, not a competitor advantage to
+      catch up to. Second, Matrix's single-click POV reassignment (tracked
+      since round 8) is confirmed directly from NovelCrafter's own docs,
+      plus a documented community workaround — a Codex entry titled
+      "Edits" used to surface revision notes per-chapter in Matrix — worth
+      having as a concrete usability bar once our own editable
+      planning-spreadsheet view is built. Third, two independent reports
+      (G2, Trustpilot) now describe Sudowrite's Story Bible "forgetting"
+      established character details mid-generation even though they're
+      present in the Story Bible — the exact grounding-reliability
+      failure a local, always-current codex should be immune to by
+      construction; worth stating plainly once chat-with-your-book ships,
+      not just "it's free and private" but "it can't drop what it already
+      knows."
 - [ ] **Voice-matching from the writer's own prose, not just style templates**
       — research round 11 (2026-07-28): checked our own Upload style flow
       (`InspectorPane.tsx`) — it imports a .txt/.md file as the literal body
@@ -321,7 +414,18 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       just a "less restrictive" alternative — worth stating plainly once
       this item ships, though which content the shipped default should
       permit by design is a values call for the owner to make deliberately,
-      not something to default into silently.
+      not something to default into silently. Research round 41
+      (2026-09-01) adds a sharper reason to lead with, beyond model
+      choice: two independent reviews of NovelCrafter's onboarding
+      (Medium, DreamGen) describe the BYOK setup itself — creating a
+      provider account, generating an API key, pasting it in, plus 20+
+      tutorial screens with reported "tutorial fatigue" after about 12 —
+      as feeling like "developer work, not writer work," with one
+      reviewer saying users "felt like they had to be AI gurus" before
+      writing a single word. Novella's zero-key local default sidesteps
+      this entire category of friction structurally, not just its cost or
+      privacy half — worth naming in first-run copy alongside the
+      model-choice guidance this item already tracks.
 - [ ] **Per-request reasoning toggle for local models** — research round 11
       (2026-07-28): NovelCrafter's Jan 9, 2026 "AI Thinking" release lets a
       writer prefer/avoid reasoning tokens per request, across Scene Beats
@@ -655,6 +759,29 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       Twenty-six dedicated rechecks in, the four-pillar gap stays open on
       both sides; the round-33 owner question on whether to keep running
       this exact check every round is still unanswered.
+      Research round 41 (2026-09-01) ran the check a twenty-seventh time
+      (rounds 15, 17-41) and again found no match — PlotForge Desktop
+      (now v1.026, recent changelog work is AI-streaming/billing fixes,
+      still no task tracker or timer), WebNovel Assistant, StoryLine, and
+      NovelMage all unchanged. This round also reached the same
+      conclusion by a different, independent method: dedicated
+      second-app-pairing research (not the four-pillar competitive check
+      itself) found the identical gap confirmed across four-plus
+      independent author blogs — Scrivener, Dabble, and Campfire writers
+      alike bolt on a separate Pomodoro/focus-timer app ("Scrivener won't
+      track Pomodoros," stated almost verbatim across Literature &
+      Latte's own blog, ScribeCount, and Kindlepreneur) and a separate
+      task manager (Trello most commonly, for revision-tracking,
+      querying, and beta-reader follow-ups that live outside the
+      manuscript entirely — corroborated across four independent author
+      blogs including a named case, Morgan Hazelwood, who needed
+      something accessible across "revising manuscripts, querying,
+      beta-reading, blogging, vlogging, convention work"). Direct Reddit
+      access was blocked to this session's fetch tools, which is why this
+      round's evidence comes from blogs rather than forum threads as in
+      some prior rounds — worth noting as a methodology change, not a
+      weaker result, since the same gap now has corroboration from a
+      second, independent evidence stream.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -1023,6 +1150,18 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       $14-70/month once API usage is added to its low base subscription —
       would sharpen that item's contrast if a future round can date and
       corroborate it.
+      Research round 41 (2026-09-01) checked both watched dates again:
+      the Bartz distribution portal (the "by end of August" guidance
+      window, distinct from the already-closed March 30, 2026
+      claim-submission deadline) has still not been confirmed open as of
+      today, 2026-09-01 — no source found it announced. One new wrinkle:
+      Publishers' Coordination Counsel filed a notice of appeal on
+      2026-08-18 over the attorneys'-fee award, but a dated source
+      (chatgptiseatingtheworld.com, 2026-08-18) reports this does not
+      affect the class payout schedule, which stays guided for "at least
+      end of year." Kadrey v. Meta's mediation-outcome report (due
+      2026-08-21) is now three weeks overdue with nothing found on any
+      tracked source. Re-check both again next round.
 - [ ] **Say the export advantage louder** — research round 7: Sudowrite
       reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
       Novella already ships all three plus one-click backup
@@ -1203,6 +1342,53 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-09-01 — Research round 41 (autopilot; no code). A broader brief
+  than the rounds-20-40 cadence: instead of only tracking dated
+  competitor news, this round dispatched six parallel passes to go past
+  headline feature lists into actual interaction mechanics and real user
+  sentiment — NovelCrafter/Sudowrite deep UX audit, Scrivener/Dabble/
+  Campfire deep UX audit, an Obsidian-for-writers deep dive, Notion-for-
+  writers plus dedicated second-app-pairing research, a cross-app
+  UX-pattern synthesis, and a lightweight continuation of the standing
+  four-pillar/litigation check. Working tree was clean at session start,
+  no housekeeping needed. Session note: Reddit was blocked to every
+  fetch tool this round across multiple passes — evidence leaned on
+  named author blogs, official docs, and app-store/Trustpilot reviews
+  instead, and two independent passes still converged on the same
+  findings through those different sources. Two new "Next up" items
+  added: extending the Continuity inspector's deterministic tier toward
+  codex-vs-manuscript fact-checking and plot-thread/setup-payoff
+  tracking (inspired by StoryLine's seven-category validation and a
+  documented DIY-Obsidian staleness pattern — hand-built "Series Bible"
+  dashboards only stay true as long as the writer keeps re-typing state
+  into frontmatter by hand), and a project-wide History restore
+  alongside the already-good per-note one (Dabble's Time Machine splits
+  "restore everything" from "bring back one scene" as two labeled
+  actions; checked our own `history.ts` — the per-note half is already
+  the safer of the two, since it auto-snapshots before restoring). A
+  fourth thesis guardrail was added: stay a true prose-writing surface,
+  not "a database wearing a document UI" — the round's sharpest single
+  finding was a real writer who plans her 24-book series in Notion but
+  has never once drafted a chapter inside it, using Google Docs instead,
+  paralleled by an Obsidian writer who moved revision back to Scrivener
+  for the same reason. Research notes folded into six existing items:
+  Inline comments (anchor-degradation design guidance from Google Docs'
+  detachment bug vs. Dabble's edit-surviving comments), Notion-parity
+  pass (a concrete ~5,000-record performance ceiling and read-only
+  offline mode), NovelCrafter-parity pass (Codex context confirmed
+  manual, not automatic — a weakness we share via `src/ai/context.ts`;
+  Matrix's single-click POV switch confirmed; two independent reports of
+  Sudowrite's Story Bible dropping established character details),
+  recommend-a-local-model (NovelCrafter's BYOK onboarding described as
+  needing writers to "be AI gurus" before writing a word), four-app-
+  bundle (27th consecutive dry four-pillar recheck, corroborated by an
+  independent second-app-pairing evidence stream — Trello/Pomodoro
+  pairings across Scrivener/Dabble/Campfire, 4+ sources), and
+  no-training/privacy (Bartz distribution-portal still unconfirmed open,
+  a fee-award appeal that doesn't affect the payout timeline, Kadrey
+  mediation report now three weeks overdue). Full notes in RESEARCH.md
+  Round 41.
 
 - 2026-08-31 — Research round 40 (autopilot; no code). Housekeeping
   first: working tree clean, local `main` matched `origin/main` exactly
