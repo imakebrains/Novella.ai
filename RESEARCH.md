@@ -5083,3 +5083,397 @@ exactly on the guidance deadline day.
   reddit.com/r/ObsidianMD, reddit.com/r/fantasywriters
 - anthropiccopyrightsettlement.com, mckoolsmith.com,
   pacermonitor.com, courtlistener.com (403), nationallawreview.com
+
+# Round 41 (2026-09-03) — cadence break, interaction mechanics instead of news, six new items
+
+Housekeeping first: working tree clean, local `main` matched
+`origin/main` exactly at session start — no fast-forward or repair
+needed, the second clean start in a row after round 40.
+
+**Why this round looks different.** Rounds 27-40 had settled into a
+narrow, repetitive cadence: the same four-pillar competitor-bundle
+check (local AI + task tracker + focus timer + worldbuilding, run 26
+times, always negative) and the same two litigation-date checks
+(Bartz v. Anthropic, Kadrey v. Meta), with four straight thin-to-dry
+rounds (37-40) as the news well ran dry. This round's operator brief
+asked explicitly for something that cadence had stopped doing: not
+"did a competitor announce X" but "how does X actually work, click by
+click, and what do real users say about it." So this round dispatched
+four parallel deep-dive passes into functional/UX territory instead of
+the usual four news passes, each briefed to skip the four-pillar check
+and litigation tracking entirely (both exhaustively covered) and dig
+into interaction mechanics with real user voices instead of feature
+lists. Every finding below was then checked against Novella's own
+source before being written up — a discipline the recent news-cadence
+rounds mostly didn't need, since they were tracking external events,
+not internal gaps.
+
+## Pass 1 — Codex / worldbuilding entity-linking mechanics
+
+Reddit itself was unreachable from the research sandbox this round
+(both direct fetch and domain-filtered search returned "not accessible
+to our user agent"); the pass substituted official docs/changelogs and
+dated third-party reviews, which still carry real user voices (forum
+threads, App Store-adjacent review sites) even where they aren't
+Reddit.
+
+**Finding: NovelCrafter auto-detects codex entities in prose; Novella
+requires a manual `[[ ]]` link for every mention.** NovelCrafter's
+Codex underlines names/aliases automatically when tracking is on,
+matches case-insensitively by default with a per-entry case-sensitive
+toggle (so a character "Will" doesn't light up every "will"),
+auto-pluralizes regular English plurals, and lets a user exclude
+false-positive phrases (novelcrafter.com/help/docs/codex/
+codex-tracking — official docs). Clicking a detected mention pops an
+inline preview card, and the same detection feeds AI prompts
+automatically — "anytime you're running a prompt... Novelcrafter will
+automatically pull that information into the prompt" (Kindlepreneur
+review, kindlepreneur.com/novelcrafter-review/). This matured across
+dated 2026 changelog entries: March 21 added case-sensitive matching
+and exclusion phrases; July added type/category filtering and a list
+of "unknown relationships" for cleanup (feedback.novelcrafter.com/
+changelog, official). Checked our own code: `stripWikiLinks()` in
+`src/ai/context.ts` and the `[[ ]]`-triggered autocomplete in
+`EditorPane.tsx` confirm Novella has no passive detection mechanism at
+all — a mention that isn't manually bracketed is invisible to both the
+UI and the AI-context builder.
+
+Scrivener and Campfire both require manual linking too — this is a
+recurring pattern across three independent sources, not one opinion.
+An official Literature & Latte forum thread ("Why is there no
+auto-link option?", forum.literatureandlatte.com/t/
+why-is-there-no-auto-link-option/41529) has a user calling wiki-linking
+"basically a mandatory thing" for a large cast, done by hand for
+"hundreds of unique pages." Campfire: "link character names or
+locations to specific words in the text" is described as a manual
+action in a dated Reedsy review (reedsy.com/blog/guide/
+book-writing-software/campfire-write-review, 2026-06-02).
+
+**Finding: nobody ships both halves of frictionless codex entry.** A
+Scrivener user, in an official Literature & Latte forum post
+(forum.literatureandlatte.com/t/scrivener-obsidian-and-aeon-timeline-
+oh-my/147060), describes switching to Obsidian specifically because
+typing `[[CharacterName]]` autocompletes against existing entries and,
+for a new character, "merely creates the link and it will create the
+new .md file for it" — zero-step entry creation, inline, mid-sentence.
+But the same DIY approach has a documented cost the moment a writer
+wants NovelCrafter-style automatic tracking on top of it: a detailed
+how-to (pdworkman.com/write-book-with-obsidian) shows the "series
+bible builds itself" claim actually depends on manually filling YAML
+frontmatter per chapter, with no automated char-appears-in-scene
+detection — the opposite of NovelCrafter's live matcher — and a
+companion guide (loreteller.com) is candid the whole approach "rewards
+investment... if you're willing to spend a weekend setting up your
+vault," recommending Scrivener instead for anyone who wants something
+that works the moment it's opened. Synthesis (inference, built from
+the two sourced facts above, not stated together anywhere): Obsidian
+writers get frictionless entry creation without tracking; NovelCrafter
+users get tracking without frictionless entry creation (its entry
+creation is called "exhausting" in both the Kindlepreneur review and a
+dated Medium review, April 2026). Novella already ships the
+`[[ ]]`-autocomplete half; closing the loop — an unrecognized
+capitalized name offers to stub a Codex entry inline, which then joins
+the live-tracked set immediately — would be the first product to do
+both.
+
+**Finding: NovelCrafter keeps organizational tags out of the AI
+prompt; Novella doesn't.** NovelCrafter's docs are explicit: tags are
+"organizational categories for human use only (not visible to AI)"
+(novelcrafter.com/help/docs/codex/anatomy-codex-entry). Checked
+`formatEntry()` in `src/ai/context.ts`: it excludes `name`/`title`/
+`type`/`id`/`aliases` from the fields sent to the model but includes
+`tags: ${n.tags.join(", ")}` directly in the formatted entry — a
+writer's private organizational tags currently leak into every
+generation prompt. Small, mechanical, checked-in-passing fix; folded
+into the new codex-detection roadmap item since it touches the same
+function.
+
+**Finding: setup/density tax is a recurring, dated (2026) complaint
+independent of vendor**, worth having as reinforcement even though it
+doesn't change any item's scope: NovelCrafter reviewers say the UI
+"still feels a little dense" and Codex entry creation is "exhausting"
+(Medium, April 2026); Campfire's Reedsy review (June 2026) warns
+"empty panels encourage procrastination" and per-module pricing
+becomes "a headache"; both Obsidian how-to guides flag the "weekend"
+setup cost. Reinforces Novella's existing positioning (one opinionated
+app, pre-built structure, no metered add-ons) rather than justifying
+anything new.
+
+## Pass 2 — Task management and the "second app" problem
+
+**Finding: the task manager covers the *publishing-project* layer; the
+writing app only ever covered the *manuscript* layer.** ScribeCount's
+organization-tools guide (2025-26) is explicit and typical: authors
+pair a writing app (Scrivener/Dabble/LivingWriter) with Todoist for
+"draft deadlines, editing milestones, cover art requests, publishing
+platform upload dates, newsletter schedules, and marketing campaign
+tasks," and separately use Trello where cards represent "chapters,
+characters, plot arcs, editing stages, or marketing tasks" across
+multiple books at once — because, in the source's own words, "these
+functions exist outside the manuscript itself." Corroborated
+independently by Jane Friedman's Notion-for-authors piece and
+author-OS template copy — a recurring pattern, not a single opinion.
+Extends (doesn't newly justify) the existing calendar/board items:
+their scope should reach publishing-adjacent milestones (cover art,
+ARC/newsletter dates), not just drafting/revision ones.
+
+**Finding: revision-pass tracking is a distinct, writer-specific task
+shape — chapter × pass-type status, not a flat checklist.** Multiple
+independent author-workflow sources (Dax Murray's published revision-
+tracking spreadsheet; Lara Willard's "Using Spreadsheets to Track Your
+Revision"; Notion's own Beta Reader Feedback Tracker template; Jami
+Gold's Beta Reading Worksheet; Emma Rowan's chapter-marker method for
+beta notes) converge on organizing both revision status and beta
+feedback by **chapter, against a sequence of pass-type columns**
+(drafted → self-edit → beta feedback addressed → copy-edit → final),
+explicitly because generic to-do apps have no chapter/scene entity to
+hang a task on. Folded into the NovelCrafter-parity item's
+scene-status-labels sub-point in ROADMAP.md.
+
+**Finding: submission/query tracking is a wholly separate job with its
+own dedicated tool category** (QueryTracker for agent queries;
+Duotrope/Chill Subs/Submission Grinder for magazine submissions),
+because it needs an external-entity relationship (agent/magazine)
+rather than a project task. A 2025-26 survey (litmaglab.substack.com)
+found writers still keep a spreadsheet alongside a dedicated tracker
+because the trackers don't interoperate (Chill Subs can't import
+Duotrope, per the tools' own ToS) and a spreadsheet handles payments,
+simultaneous submissions, and ghosted responses better than either.
+Real and well-documented, but arguably past the manuscript stage the
+four-app thesis names — filed as a WITH-OWNER scope flag in ROADMAP.md
+rather than a build item.
+
+**Finding: Notion "author OS" templates converge on kanban-by-stage
+over chapters as the dominant view, not calendars.** Across the Notion
+marketplace and Gumroad templates found (a Basic Novel Writing
+Planner, the $23 "W.I.P." template, Writers Hub, Storybook Lite), the
+consistent structure is a chapter/outline database with a kanban view
+whose columns are workflow stages (commonly Planning → Draft →
+Revision → Edit → Final), plus tag/relation fields linking chapters to
+characters and subplots. Calendar views for deadlines appear far less
+often than the stage-kanban. Strong pattern across many independently-
+sold templates, though the causal "why users prefer this" claim is
+inference from product structure, not a quoted user rationale — no
+first-person r/notion commentary on it was found this pass (Reddit was
+not reachable). Reinforces and sharpens the board/corkboard concept:
+a "revision stage" property with a kanban view over it, matching the
+Pass 2 revision-pass finding above.
+
+**Finding: even Obsidian's power users bolt on a third plugin (Kanban,
+Tasks, or Card Board) for task/board views**, because plain markdown
+notes have no native task/board affordance (pdworkman.com; Loreteller's
+Obsidian-for-fiction guide; "The Novelist" free vault). Useful mainly
+as competitive-positioning evidence — even the most customizable tool
+in the space needs a third piece bolted on for this job — not a new
+feature signal, since Novella already ships both a board and task
+lists in notes.
+
+Evidence caveat from this pass: direct verbatim "I wish [writing app]
+had a kanban/deadline feature" Reddit complaints could not be
+surfaced (Reddit access was blocked from this environment this round);
+NovelCrafter's own feature-request venue is a members-only Discord,
+also unreachable. The findings above rest on aggregator/guide sources
+with multiple independent corroboration, not raw forum threads.
+
+## Pass 3 — Revision, version history, comments, plotting boards
+
+**Finding: Dabble 3.0's Review Copies solve a specific, named Google
+Docs complaint with role-scoped comment visibility.** Rather than one
+shared link, Dabble 3.0 issues typed invitations — Friend (comments
+visible to all friends on the copy), Beta Reader (comments visible
+only to the author), Editor (tracked-change suggestions + comments,
+private-by-default until marked "Ready for review")
+(dabblewriter.com/docs/reference/whats-new-in-3, official changelog,
+2026). This directly answers an independently-documented pain point:
+writer-advice sources warn a single shared Google Doc creates a
+"bandwagon effect" where beta readers see and pile onto each other's
+comments, forcing authors into a manual one-doc-per-reader workaround
+(a Goodreads author blog; theauthorstack.com, "How to Get Actual
+Feedback from Beta Readers"). Strongest single finding from this pass:
+an official mechanic built explicitly against a recurring, documented
+pain point, not a guess at one.
+
+**Finding: track changes should propose replacement text inline, not
+float an annotation.** Google Docs' suggesting mode wins because a
+reviewer rewrites the sentence directly and the author accepts/rejects
+the literal replacement (developers.google.com API docs;
+the-blue-pencil.com). Dabble 3.0 copies this almost exactly: toggling
+Track Changes turns edits into suggestions, with three views —
+Original (read-only), Difference, Suggestions — and per-change
+Accept/Reject/Undo cards in the sidebar (dabblewriter.com changelog +
+an official YouTube walkthrough, "Dabble 3.0 Revision Tools," 2026).
+Scrivener's Snapshot Compare is architecturally weaker for this job: a
+manual, on-demand, read-only word-level diff between the live doc and
+one saved snapshot — users on the Literature & Latte forum note "the
+compare algorithm may not be the most advanced" and have asked for
+export to external diff tools (forum.literatureandlatte.com/viewtopic.
+php?t=37934, recurring forum complaint, not a single opinion).
+
+**Finding: comments must survive text drift and be resolvable, with a
+history trail.** Dabble's comment model anchors to a text range,
+threads with resolve/reply and read/unread state, allows editing, and
+explicitly "survives even when the text they pointed to changes," with
+a separate Comment History panel showing resolved/accepted/rejected
+threads and a jump-to-original-location action (dabblewriter.com
+changelog, official, corroborated by the feature walkthrough video).
+This is precisely the anchor + resolve/reply + persistence-through-
+edits pattern Google Docs is loved for, now inside a novel-specific
+tool for the first time — the clearest interaction spec for Novella's
+own inline-comments item, folded into it in ROADMAP.md.
+
+**Finding: plotting boards are powerful but cost ongoing structural
+maintenance, not a one-time build.** NovelCrafter's Matrix view
+supports single-click POV reassignment and drag-and-drop reordering,
+sortable by any codex dimension (novelcrafter.com/help/docs/plan/
+planning-with-the-matrix, official) — but its own changelog shows
+repeated correctness fixes to exactly this view: Feb 28, 2025 (fixed
+archived codex entries still appearing in Matrix; visual fixes) and
+July 24, 2025 (label-group filtering added to reduce clutter)
+(feedback.novelcrafter.com/changelog, official, dated). An independent
+April 2026 review separately calls setup "clunky" and "not
+friction-free at all" (Medium, ilampadmanabhan) — one changelog
+pattern plus one reviewer opinion, both pointing the same direction: a
+capable board that costs the vendor ongoing correctness work, not just
+initial build effort. Campfire's Arc module drew a split reaction —
+useful for Story-Grid-style structural analysis to one reviewer,
+"wasn't beneficial for their particular workflow" to another, and
+absent from mobile entirely (mythicscribes.com; selfpublishing.com) —
+two single-reviewer opinions, treated as a caution flag on
+structure-visualization add-ons that don't sit in the daily writing
+loop, not a confirmed pattern.
+
+**Finding: no competitor combines the best diff with the best
+restore.** Scrivener Snapshots give the best diff granularity
+(word-level, color-coded) but only between the live doc and one
+manual snapshot, on demand, no export. Dabble's Time Machine gives the
+best restore granularity — Restore this version (whole project,
+auto-backs-up current state first), Bring Forward (one document),
+Create new version (named checkpoint) — but no diff view between two
+arbitrary past points, only a read-only look at one (dabblewriter.com
+changelog, official, 2026). NovelCrafter's Revision History is
+thinnest: a per-item version list, click-to-preview, restore-replaces-
+wholesale, no diff, 30-day recovery cap (novelcrafter.com/help/docs/
+organization/revision-history, official). Checked our own
+`HistoryPanel.tsx`: Novella's word-level diff is likewise computed
+only against `revisions[i + 1]`, the immediately preceding revision —
+the same shared limitation, not something we've already solved. Filed
+as a new, lower-priority roadmap item (a real differentiator, not an
+urgent gap).
+
+## Pass 4 — AI-chat interaction UX and editor chrome
+
+**Finding: type.ai ships a specific, documented keyboard scheme for
+inline AI edits that Novella's reword-in-place lacks entirely.**
+type.ai's "faster way to edit with AI" release (blog.type.ai, 2026,
+official) documents: A accepts the current suggestion, R rejects it,
+Ctrl/Cmd+Enter accepts every remaining suggestion at once, Shift+Ctrl+
+Period/Comma steps forward/backward between suggestions, Escape clears
+all pending ones. Checked `src/ui/RewordPopover.tsx`: the only key it
+handles is Escape — every accept/reject decision needs a mouse today.
+Cheap, concrete, no design risk; filed as a new roadmap item.
+
+**Finding: Wordtune's side-by-side multi-alternative view is a
+genuinely different pattern from the sequential single-suggestion
+model Sudowrite, type.ai, and Novella all share.** Multiple
+independent review sources (TextCortex, AI Proven Tools, both 2026)
+single out Wordtune for showing 3-4 (up to 10-12 per some reviews)
+full alternative phrasings simultaneously rather than one candidate
+cycled through — reviewers credit this with sparking phrasings the
+writer "wouldn't have thought of." Evidence type: recurring across
+review/comparison sources, not raw user complaints — a credible
+pattern claim, not a verified satisfaction metric. Filed alongside the
+keyboard-scheme finding as a "compare mode" option for reword-in-place.
+
+**Finding: a chat that doesn't hold corrections across turns is an
+interaction failure, not an output-quality one.** A detailed Sudowrite
+iOS App Store review (reviewer "NeonEndTimes," with a Sudowrite team
+reply acknowledging the issue) reports giving the same correction
+"over and over again" while the chat "continued making the same
+unwanted changes," and separately that it "hijacked the story...
+changed major plot points, rewrote important scenes, altered character
+motivations" (apps.apple.com/app/sudowrite/id6740884542, 2026).
+Sudowrite's own reply cites a "Style Guide" feature in beta built
+specifically to pin instructions outside fragile chat memory — the
+vendor's own response corroborates the review, raising it above a
+one-off gripe. Filed as a new small roadmap item: a pinned-constraints
+surface for Novella's Chat panel, separate from the scrolling
+conversation.
+
+**Finding: command palettes are already a solved problem in
+Novella — the research pass initially misjudged this as a gap.**
+Obsidian's command palette is praised for fuzzy abbreviation matching,
+a discovery function for unknown commands, and recency on an empty
+query (demoted once a real match appears) — obsidian.rocks; a widely-
+cited Superhuman engineering post on the same convergent pattern.
+Checked `src/ui/palette.ts` and `CommandPalette.tsx`: Novella already
+ships a Ctrl+K palette (shipped 2026-07-23, per ROADMAP.md's own log)
+with tiered fuzzy matching (label-starts-with → word-starts-with →
+substring → subsequence, so "tcl" finds "The Compass That Lies") —
+comparable in kind to what was being proposed as new. Not filed as a
+roadmap item; noted here so a future round doesn't "rediscover" this
+as a gap. One minor, not-yet-actionable nuance worth having on record:
+an empty query currently returns items in list order rather than
+recency order, which the Obsidian/Superhuman sources treat as the
+better default — too small on its own to warrant a roadmap line.
+
+**Finding: mobile feature-parity gaps recur across three unrelated
+apps, but this doesn't change anything actionable today.** Sudowrite,
+Dabble, and Campfire App Store/review-aggregator sources
+independently describe mobile as a stripped viewer, not a peer editing
+surface, with AI features usually the first thing cut (apps.apple.com/
+app/sudowrite/id6740884542; dabble.featureupvote.com/suggestions/
+288414; justuseapp.com Campfire reviews, all 2026). Since Novella is
+desktop-first by Tauri architecture and its mobile/responsive phase
+(Plan phase C) already shipped, this isn't a build item now — worth
+keeping as the bar to measure against if a companion mobile view is
+ever scoped: "does AI assist work here too," not just "can I read/type
+here."
+
+## What changed in ROADMAP.md
+
+Six new "Next up" items and two sharpened existing ones, in priority
+order against the thesis: (1) auto-detect codex mentions in prose +
+inline stub-creation, with the tags-leak-into-AI-context fix folded
+in; (2) a sharpened inline-comments spec (anchor-survives-edits,
+resolve/reply, history drawer, reader-role-scoped visibility); (3)
+reword-in-place keyboard scheme + a compare view for several
+alternatives; (4) a pinned-constraints surface for the Chat panel; (5)
+version history diff between arbitrary saved points; (6) a WITH-OWNER
+scope flag for submission/query tracking. The NovelCrafter-parity
+item's scene-status-labels sub-point was sharpened into a
+revision-pass matrix. Did not touch the four-pillar bundle item or the
+no-training/privacy item this round — both were out of this round's
+scope by design, not rechecked and found unchanged.
+
+## Round 41 sources
+
+- novelcrafter.com/help/docs/codex/codex-tracking,
+  novelcrafter.com/help/docs/codex/anatomy-codex-entry,
+  novelcrafter.com/help/docs/plan/planning-with-the-matrix,
+  novelcrafter.com/help/docs/organization/revision-history,
+  feedback.novelcrafter.com/changelog, kindlepreneur.com/
+  novelcrafter-review/ (Medium review, ilampadmanabhan, April 2026)
+- forum.literatureandlatte.com (threads: why-is-there-no-auto-link-
+  option/41529, scrivener-obsidian-and-aeon-timeline-oh-my/147060,
+  viewtopic.php?t=37934)
+- reedsy.com/blog/guide/book-writing-software/campfire-write-review,
+  mythicscribes.com, selfpublishing.com (Campfire reviews)
+- pdworkman.com/write-book-with-obsidian, loreteller.com
+- dabblewriter.com/docs/reference/whats-new-in-3,
+  dabblewriter.com changelog + YouTube "Dabble 3.0 Revision Tools"
+- developers.google.com (Docs API, suggesting mode), the-blue-pencil.com
+- blog.type.ai (faster-way-to-edit-with-ai)
+- textcortex.com/post/wordtune-review, aiproventools.com/
+  wordtune-rewrite/
+- apps.apple.com/app/sudowrite/id6740884542,
+  dabble.featureupvote.com/suggestions/288414,
+  justuseapp.com (Campfire reviews)
+- obsidian.rocks, blog.superhuman.com/how-to-build-a-remarkable-
+  command-palette/
+- scribecount.com, janefriedman.com (Notion-for-authors),
+  notion.com/templates, gumroad.com (W.I.P. template)
+- litmaglab.substack.com (submission-tracker survey)
+- daxmurray.com / laraewillard.com (revision-tracking spreadsheets),
+  notion's Beta Reader Feedback Tracker template, jamigold.com (Beta
+  Reading Worksheet)
+- pdworkman.com, loreteller.com (Obsidian task/kanban plugin combos)

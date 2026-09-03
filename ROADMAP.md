@@ -204,7 +204,153 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       round-trips through Google Docs. Attach a note to a text range
       without touching prose, show it in a margin gutter, resolve/reply.
       Collapses one more reason to leave the app — high priority against
-      the thesis.
+      the thesis. Research round 41 (2026-09-03) supplies the interaction
+      spec competitors converged on after building this twice: Dabble
+      3.0's Review Copies (dabblewriter.com/docs/reference/whats-new-in-3,
+      official, 2026) anchor a comment to a text range so it survives
+      later edits to the surrounding prose, thread it with resolve/reply
+      and read/unread state, and keep a separate Comment History drawer
+      with jump-to-original-location — the same anchor + resolve/reply +
+      persist-through-edits pattern Google Docs is loved for, now built
+      into a novel-specific tool for the first time. It adds one mechanic
+      Google Docs doesn't have and that directly answers a documented
+      complaint: comments are scoped by reader role (Friend/Beta Reader/
+      Editor), so different readers' notes stay invisible to each other by
+      default — writer-advice sources (a Goodreads author blog;
+      theauthorstack.com) independently describe the alternative as a
+      "bandwagon effect" that today forces authors into a manual
+      one-Google-Doc-per-reader workaround. Build to this spec: re-anchor
+      on surrounding content rather than raw character offsets, resolve/
+      reply/read-unread, a history drawer, and a per-comment visibility
+      scope — not a Word-style balloon that only flags that something
+      changed.
+- [ ] **Auto-detect codex mentions in manuscript prose, and let an
+      unrecognized name become a Codex entry inline** — research round 41
+      (2026-09-03), a deliberate pass at competitor interaction mechanics
+      rather than feature lists. NovelCrafter's Codex runs a live matcher
+      over the manuscript: names/aliases underline automatically when
+      tracking is on, case-insensitive by default with a per-entry
+      case-sensitive toggle (so a character "Will" doesn't light up every
+      "will"), auto-pluralizes, and lets a user exclude false-positive
+      phrases — and the same detector feeds AI prompts automatically, no
+      manual selection needed (novelcrafter.com/help/docs/codex/
+      codex-tracking; dated changelog entries Mar 21 and Jul 2026).
+      Checked our own mechanism: `stripWikiLinks()` in `src/ai/context.ts`
+      and the `[[ ]]` autocomplete in `EditorPane.tsx` confirm Novella
+      requires the writer to manually type a wiki-link for every mention —
+      there is no passive detection at all, so a chapter that mentions
+      "Wren" five times without a bracket surfaces nothing and feeds
+      nothing to AI context. Scrivener has no auto-link either (an
+      official Literature & Latte forum thread calls manual wiki-linking
+      "basically mandatory" for a large cast — forum.literatureandlatte.com/
+      t/why-is-there-no-auto-link-option/41529); Campfire's linking is
+      manual too (Reedsy review, 2026-06-02) — a recurring pattern across
+      three independent sources, not one opinion.
+
+      The sharper opportunity nobody has built: Obsidian writers get
+      frictionless entry creation (`[[Name]]` autocompletes and stubs a
+      new note on the fly — an official Literature & Latte forum post
+      cites this as the specific reason a Scrivener user switched,
+      forum.literatureandlatte.com/t/scrivener-obsidian-and-aeon-timeline-
+      oh-my/147060) but no automatic mention-tracking back onto it;
+      NovelCrafter gets the tracking but still requires manually authoring
+      every entry first before it's recognized (entry creation is
+      "exhausting," per Kindlepreneur and a Medium review, both 2026).
+      Nobody ships both halves. Novella already has the wiki-link
+      autocomplete half; the win is closing the loop — detect an
+      unrecognized capitalized name during normal typing, offer to stub a
+      Codex entry from it inline, and have that stub immediately join the
+      live-tracked set. Serves both the worldbuilding half and the
+      "writes with you" half of the thesis at once, since the same
+      detector is what should decide which Codex entries get pulled into
+      a generation prompt instead of the writer selecting them by hand.
+
+      Smaller, checked-in-passing fix worth doing alongside it:
+      `formatEntry()` in `src/ai/context.ts` currently includes
+      `tags: ${n.tags.join(", ")}` in what gets sent to the model, while
+      NovelCrafter's own docs draw an explicit line — tags are "for human
+      use only (not visible to AI)," only Description/Details fields are
+      (novelcrafter.com/help/docs/codex/anatomy-codex-entry). A writer's
+      private organizational tags currently leak into every prompt; worth
+      excluding them the same way `id`/`type`/`aliases` already are.
+- [ ] **Reword-in-place: keyboard-first accept/reject, and a compare view
+      for several alternatives at once** — research round 41 (2026-09-03):
+      checked `src/ui/RewordPopover.tsx` — the only key it handles is
+      Escape; there is no accept/reject/step-through shortcut at all, so
+      every rewrite decision needs a mouse. type.ai's own "faster way to
+      edit with AI" release (blog.type.ai, 2026, official) documents the
+      shape worth copying: A accepts the current suggestion, R rejects it,
+      Ctrl/Cmd+Enter accepts every remaining suggestion in the document at
+      once, Shift+Ctrl+Period/Comma steps forward/backward between
+      suggestions, Escape clears all pending ones — a rewrite pass that
+      never needs the mouse once it starts. Separately, independent
+      reviews (TextCortex, AI Proven Tools, both 2026) single out
+      Wordtune's rewrite panel for showing 3-4 full alternative phrasings
+      side by side rather than one candidate you cycle through — reviewers
+      credit seeing several options at once with sparking a phrasing "you
+      wouldn't have thought of on your own," a distinct pattern from what
+      Novella and Sudowrite/type.ai all do today (sequential, one
+      candidate at a time). Two small, independent improvements to a
+      feature we already ship: add the keyboard scheme first (cheap, no
+      design risk), then consider a "compare" toggle for a browsing pass.
+- [ ] **Give the Chat panel a visible, persistent "pinned constraints"
+      surface, separate from the conversation itself** — research round 41
+      (2026-09-03): a detailed Sudowrite iOS App Store review (reviewer
+      "NeonEndTimes," with a Sudowrite team reply acknowledging the issue)
+      describes giving the chat the same correction "over and over again"
+      while it "continued making the same unwanted changes," and
+      separately reports it "hijacked the story... changed major plot
+      points, rewrote important scenes, altered character motivations"
+      (apps.apple.com/app/sudowrite/id6740884542, 2026). This is an
+      interaction failure, not an output-quality one: corrections made in
+      one turn don't reliably survive as constraints on later turns, and
+      Sudowrite's own reply points at a "Style Guide" feature in beta
+      built specifically to pin instructions outside fragile chat memory.
+      Novella's Chat panel (shipped under Round 5) keeps message history
+      but has no equivalent — a pinned list of standing instructions
+      ("never change character names," "keep this in first person")
+      that every generation checks against, visibly separate from the
+      scrolling conversation, would prevent the same failure mode before a
+      writer ever hits it.
+- [ ] **Version history: diff between any two saved points, not just each
+      revision against the one before it** — research round 41
+      (2026-09-03): checked `src/ui/HistoryPanel.tsx` — each revision's
+      word-level diff is computed only against `revisions[i + 1]`, the
+      immediately preceding one; there is no way to pick two arbitrary
+      past points and compare them. None of the three competitors checked
+      do this either, which makes it a real three-way gap rather than a
+      catch-up feature: Scrivener's Snapshot Compare gives the best diff
+      (word-level, color-coded) but only between the live document and one
+      manually-taken snapshot, on demand, no export (a Literature & Latte
+      forum thread, forum.literatureandlatte.com/viewtopic.php?t=37934,
+      names the compare algorithm itself as a recurring complaint);
+      Dabble's Time Machine (dabblewriter.com, official, 2026) gives the
+      best restore granularity — whole-project, single-document, or a
+      named checkpoint — but no diff view between two past states, only a
+      read-only look at one; NovelCrafter's Revision History (official
+      docs) is restore-only, no diff at all, and caps recovery at 30 days.
+      A real pick-any-two-points diff would beat everything on the list.
+      Lower priority than the items above — a real but non-urgent
+      differentiator, not a gap writers are actively leaving over.
+- [ ] **Submission/query tracking for querying novelists** (WITH-OWNER —
+      scope decision, not a build). Research round 41 (2026-09-03):
+      querying novelists and short-fiction writers maintain a wholly
+      separate tracker (QueryTracker for agent queries; Duotrope/Chill
+      Subs/Submission Grinder for magazine submissions) recording
+      submission → market/agent → status → response time — a
+      relationship-tracking job no task manager or writing app models
+      natively. A 2025-26 survey (litmaglab.substack.com) found writers
+      still keep a spreadsheet alongside a dedicated tracker because the
+      trackers don't interoperate and a spreadsheet handles payments,
+      simultaneous submissions, and ghosted responses better. This is a
+      real, well-documented job with zero overlap with the corkboard/
+      task-list/sprint-timer Novella already ships — but it's arguably a
+      step past drafting/planning into the querying-and-submission stage
+      of a writer's life, which may sit outside the four-app thesis rather
+      than inside it. Flagging the scope question rather than building:
+      does Novella want to serve the actively-querying-for-an-agent
+      writer, or stop at the manuscript stage? Owner call before this goes
+      anywhere.
 - [ ] **Notion-parity pass, ongoing** — owner: "make this look and function
       exactly like Notion but better." Next concrete gaps: block-style
       hover handles in the editor, inline databases-as-tables on notes,
@@ -247,6 +393,25 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       differentiator that survives is local/private/no-per-token-cost, not
       "an AI that knows your book," so lead any future copy or design for
       this half of the item with that framing rather than parity alone.
+      Research round 41 (2026-09-03) sharpens the scene-status-labels
+      sub-item specifically: independent author-workflow sources (a
+      published revision-tracking spreadsheet by Dax Murray; Lara
+      Willard's "Using Spreadsheets to Track Your Revision"; Notion's own
+      Beta Reader Feedback Tracker template; Jami Gold's Beta Reading
+      Worksheet) converge on the same structure — a matrix of chapters/
+      scenes against revision-PASS columns (drafted → self-edit → beta
+      feedback addressed → copy-edit → final), not one draft/revised/done
+      label — because a generic to-do app has no chapter/scene entity to
+      hang a task on. Notion's own "author OS" templates (a Basic Novel
+      Writing Planner, the $23 "W.I.P." template, Storybook Lite) confirm
+      the same pattern from the product-design side: a chapter database
+      rendered as a kanban whose columns ARE the revision stage. When this
+      sub-item is picked up, model it as a stage-per-pass matrix rather
+      than one status label, and pair it with a beta-reader-comment-to-
+      task pipeline scoped to a chapter — once inline comments (above)
+      ship, a comment flagged as needing action should be promotable to a
+      task against that chapter's revision-pass column, closing a loop no
+      competitor checked has closed.
       Research round 16 (2026-08-02) finds a concrete crack in that
       convergence: a Sudowrite Trustpilot review states its manuscript-
       review output "missed major plot points" and calls the claim that
@@ -1203,6 +1368,54 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-09-03 — Research round 41 (autopilot; no code). Housekeeping
+  first: working tree clean, local `main` matched `origin/main` exactly
+  at session start — no fast-forward or repair needed, the second clean
+  start in a row after round 40. Deliberate change of cadence this
+  round: rounds 27-40 had narrowed into a repetitive news-tracking
+  loop — the same four-pillar competitor-bundle recheck (26 times) and
+  the same two litigation-date checks, both increasingly dry (four
+  thin-to-dry rounds in a row: 37-40). This round's brief asked for
+  something the recent cadence had stopped doing — actual interaction
+  mechanics, not news — so it dispatched four parallel deep-dive passes
+  instead of the usual four: (1) codex/worldbuilding entity-linking
+  mechanics across NovelCrafter/Campfire/Scrivener/Obsidian; (2) the
+  task-management "second app" problem and what specific job forces the
+  pairing; (3) revision/version-history/comments/plotting-board
+  interaction mechanics; (4) AI-chat and editor-chrome interaction
+  patterns (inline rewrite keyboarding, command palettes, mobile
+  parity). Every finding was checked against Novella's own code before
+  being written up, not taken on the competitor's word alone. Six new
+  "Next up" items and two sharpened existing ones came out of it — the
+  most in one round since the original research passes (rounds 6-19):
+  auto-detecting codex mentions in prose instead of requiring manual
+  `[[ ]]` links (checked `src/ai/context.ts`/`EditorPane.tsx` — no
+  passive detection exists at all today, and a related fix: codex tags
+  currently leak into the AI prompt via `formatEntry()`, which
+  NovelCrafter's own docs treat as human-only metadata); a keyboard
+  scheme and a multi-alternative compare view for reword-in-place
+  (checked `RewordPopover.tsx` — only Escape is wired today); a pinned-
+  constraints surface for the Chat panel, prompted by a Sudowrite review
+  describing corrections that don't stick across chat turns; a
+  pick-any-two-points diff for version history (checked
+  `HistoryPanel.tsx` — today's diff is always against the immediately
+  prior revision only, the same limitation every competitor checked
+  has); a sharpened spec for the already-queued inline-comments item
+  (anchor-that-survives-edits, resolve/reply, a history drawer, and
+  Dabble 3.0's reader-role-scoped visibility, which answers a documented
+  "bandwagon effect" complaint about shared Google Docs); a sharpened
+  revision-pass-matrix spec for the NovelCrafter-parity item's scene-
+  status sub-point; and one WITH-OWNER scope flag (submission/query
+  tracking for querying novelists — a real, well-documented job, but
+  arguably past the manuscript stage the four-app thesis names). Did
+  NOT re-run the four-pillar bundle check or the litigation-date
+  tracking this round — both were exhaustively covered through round
+  40 and the brief called for depth over another repeat; the round-33
+  owner question on whether to keep running the bundle check every
+  round stays open and unaddressed by this round's silence on it. Full
+  notes, evidence-type breakdown, and source lists in RESEARCH.md
+  Round 41.
 
 - 2026-08-31 — Research round 40 (autopilot; no code). Housekeeping
   first: working tree clean, local `main` matched `origin/main` exactly
