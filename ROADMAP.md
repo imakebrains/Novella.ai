@@ -273,6 +273,49 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       (novelcrafter.com/help/docs/codex/anatomy-codex-entry). A writer's
       private organizational tags currently leak into every prompt; worth
       excluding them the same way `id`/`type`/`aliases` already are.
+      Research round 42 (2026-09-04) finds NovelCrafter's real mechanism is
+      more granular than one blanket rule: each custom Details field
+      carries its own three-way AI-visibility setting — Always Include /
+      Never / NSFW-only (novelcrafter.com/help/docs/codex/codex-details,
+      official) — not a single exclude-tags toggle. Worth building the fix
+      as a per-field visibility flag on Codex Details from the start
+      rather than a hardcoded exclusion list, since a writer may
+      reasonably want some custom fields in AI context (a character's
+      speech quirks) and others (a private note-to-self) never sent.
+- [ ] **A deliberate manuscript import flow — .docx/Markdown in, with a
+      preview before anything touches the vault** — research round 42
+      (2026-09-04): a dedicated pass on the "switching from another tool"
+      moment finds it's the single biggest, least-addressed barrier in the
+      category. Dabble ships no file import at all — writers must
+      copy-paste an existing manuscript into the editor, and chapter/scene
+      detection depends on exact heading formatting; a standing public
+      feature request for it sits unresolved on Dabble's own roadmap
+      (dabble.featureupvote.com/suggestions/14273), and Reedsy's own
+      comparison piece names this directly as "likely the top reason
+      Scrivener users aren't switching over"
+      (reedsy.com/studio/resources/dabble-vs-scrivener/). Scrivener
+      imports .docx but needs the writer to manually mark every
+      chapter/scene heading with a `#` first, with RTF round-tripping as
+      the documented workaround for footnote/highlight corruption.
+      NovelCrafter has the best pattern found: a dedicated Import entry
+      point → pick a .docx → configure which heading level means
+      act/chapter and what marks a scene break → **a preview screen
+      showing the resulting act/chapter/scene counts and total word
+      count** → confirm (novelcrafter.com/help/docs/import/word,
+      official; documented limits: no table-of-contents support, no
+      inline images, one summary per chapter). Checked our own code path:
+      Novella ships paste-from-Word cleanup (shipped 2026-08-20, HTML to
+      Markdown on the paste event) but nothing that imports a whole
+      manuscript file with structural detection — a writer arriving from
+      Scrivener or Google Docs today still pastes chapter by chapter by
+      hand. Build the NovelCrafter shape (detect structure, show counts,
+      let the writer confirm or adjust before the vault is touched)
+      rather than Dabble's silent copy-paste or Scrivener's
+      manual-pre-markup requirement. This is an acquisition-moment
+      feature, not editor polish — it's the difference between a writer
+      trying Novella with their real, in-progress novel versus a blank
+      test file, which is exactly the moment the four-app thesis needs to
+      win to get a writer in the door at all.
 - [ ] **Reword-in-place: keyboard-first accept/reject, and a compare view
       for several alternatives at once** — research round 41 (2026-09-03):
       checked `src/ui/RewordPopover.tsx` — the only key it handles is
@@ -332,6 +375,33 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       A real pick-any-two-points diff would beat everything on the list.
       Lower priority than the items above — a real but non-urgent
       differentiator, not a gap writers are actively leaving over.
+- [ ] **Corkboard: let free arrangement diverge from manuscript order, and
+      let a card's face content be overridden per card** — research round
+      42 (2026-09-04): Scrivener's corkboard forks into two genuinely
+      different modes rather than one drag gesture trying to satisfy both
+      jobs — Grid mode, where card position IS binder position and a drag
+      immediately reorders the manuscript, and Freeform mode, where cards
+      float and cluster with zero effect on manuscript order until the
+      writer explicitly clicks Commit
+      (literatureandlatte.com/blog/how-to-use-scriveners-freeform-corkboard,
+      official). Writers want both jobs from the same board: spatial
+      brainstorming where nothing moves out from under them, and exact
+      structural sequencing — Scrivener resolves the conflict by making
+      the writer declare which mode they're in rather than one drag
+      meaning two different things. Separately, a Literature & Latte forum
+      thread (forum.literatureandlatte.com/t/index-cards-synopsis-on-the-
+      corkboard/39192) surfaces a recurring, specific complaint: newer
+      Scrivener versions auto-fill a card's lower half with the scene's
+      actual prose text rather than leaving it blank absent a written
+      synopsis, which the reporting user calls "really cluttered," with
+      manually blanking each card as the only workaround — no per-card or
+      global toggle exists. Check `Corkboard.tsx`: if every drag is an
+      immediate, authoritative manuscript reorder with no freeform/commit
+      distinction, that's a plausible source of "finicky and scary to
+      touch" friction at scale; and if card faces ever show auto-derived
+      preview text, it needs a per-card override, not only a global
+      setting — the Scrivener complaint is specifically about lacking
+      that override, not about the feature existing at all.
 - [ ] **Submission/query tracking for querying novelists** (WITH-OWNER —
       scope decision, not a build). Research round 41 (2026-09-03):
       querying novelists and short-fiction writers maintain a wholly
@@ -426,6 +496,45 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       the case that a local Codex-grounded chat-with-your-book mode (once
       built) should lead on "no cloud context window to silently truncate
       or corrupt," not just "free and local."
+      Research round 42 (2026-09-04) adds a caution specifically for the
+      codex-entry-templates-per-type sub-item: Reedsy's hands-on Campfire
+      review (blog.reedsy.com/guide/book-writing-software/campfire-write-
+      review/) found Campfire's prescriptive attribute/location panels
+      "confusing" and "too specific," producing "a pretty uninspiring page
+      full of blank spaces" that "encourage procrastination" — direct
+      evidence that a rigid, comprehensive default field schema backfires,
+      not just that per-type templates should exist. When this sub-item is
+      built, keep fields optional and collapsible with a light empty
+      state, not a full form every new entry is pressured to fill in.
+- [ ] **Structured relations between Codex entries, not just prose fields
+      and tags** — research round 42 (2026-09-04): the strongest
+      cross-platform pattern this round wasn't a single competitor
+      feature but a convergence between two unrelated DIY ecosystems.
+      Obsidian writers hand-build it with Dataview tables and YAML
+      frontmatter (free, code-like, steep setup) to make every
+      character/location note a queryable row; Notion writers buy or
+      build it with relational databases and rollups — named, sold
+      templates (notion.com/templates/story-bible; StoryFlint's "World
+      Building Bible," $8, storyflint.com/blog/notion-relations; "Fantasy
+      Story Planner & Toolkit," $49.99) all use the same mechanic:
+      Characters ↔ Scenes ↔ Locations ↔ Chapters linked by relation
+      properties, with rollups surfacing related data across databases
+      without re-typing it. Two structurally opposite platforms
+      independently converging on the same job — characters, locations,
+      scenes and plot threads need to be linked, filterable entities, not
+      prose in folders — is stronger evidence than either alone.
+      NovelCrafter's Codex reference field (a Details field that links to
+      another entry) is the one dedicated competitor found doing any of
+      this natively; ours is Description + freeform Details + tags with
+      wiki-links as the only cross-reference mechanism. This is exactly
+      what the thesis cares about — a job writers currently pay $8-50 for
+      a Notion template to solve, or hand-roll with Dataview queries — and
+      Novella can win it by being native, local-first and flat where
+      Notion hits its own scaling/offline limits at exactly this kind of
+      structure (round 6's guardrail: stay fast, stay flat, keep leaving
+      easy). Scope as an optional structured "relation" field type on
+      Codex entries (link + relationship label), not a full database/
+      relation system — keep it flat, per the standing guardrail.
 - [ ] **Voice-matching from the writer's own prose, not just style templates**
       — research round 11 (2026-07-28): checked our own Upload style flow
       (`InspectorPane.tsx`) — it imports a .txt/.md file as the literal body
@@ -820,6 +929,24 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       Twenty-six dedicated rechecks in, the four-pillar gap stays open on
       both sides; the round-33 owner question on whether to keep running
       this exact check every round is still unanswered.
+- [ ] **Say the Relationship-web advantage louder** — research round 42
+      (2026-09-04): checked relationship modeling across every competitor
+      in this round's worldbuilding pass and found none combine structured
+      character fields with an automatic relationship graph. NovelCrafter
+      and Campfire both model relationships as a manual link or a
+      hand-authored "relationships" panel; Scrivener has no relationship
+      modeling at all; Obsidian writers get it only by bolting on a
+      separate plugin (ExcaliBrain, built on Dataview + Excalidraw,
+      specifically because Dataview's query tables can't draw a picture).
+      Independent single-purpose apps (NarraGraph, WriCo's drag-and-connect
+      canvas, BUBU OC's "Relationship Web") exist purely to fill this gap
+      alongside a writer's main tool — evidence the need is real enough
+      that writers adopt a whole extra app for it. Novella already ships a
+      Relationship web natively (the existing location-map item below
+      calls it out as "the existing Relationship web," already built) but
+      first-run and marketing copy don't say competitors need a bolt-on
+      app for the identical job. Cheap copy win, groups with the other
+      "say X louder" items below.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -994,6 +1121,19 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       round rather than assume either way. No new incidents found for
       Sudowrite (status page explicitly reads "August 2026: No incidents
       reported") or Dabble.
+      Research round 42 (2026-09-04) didn't re-run the full four-pillar
+      compound check (the round-33 owner question on cadence stays
+      unanswered) but found adjacent reinforcing evidence from a different
+      angle: a November 2025 XDA-Developers piece on writing novels in
+      Obsidian recommends a five-plugin stack (Novel Word Count, Typewriter
+      Mode, ProZen, Word Sprint, Longform) just to reassemble progress
+      tracking, distraction-free drafting, sprint timing, and compile into
+      something Scrivener-like — two of the five (Typewriter Mode, ProZen)
+      solve the identical focused-drafting job redundantly, because no
+      single plugin does it. Confirms the fragmentation problem extends
+      inside the drafting experience itself, not just across writing,
+      planning, tasks and timer as separate apps — Novella already ships
+      all of it as one surface.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent
@@ -1368,6 +1508,58 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-09-04 — Research round 42 (autopilot; no code). Housekeeping
+  first: working tree clean, local `main` was 2 commits behind
+  `origin/main` (rounds 40-41 hadn't been fast-forwarded into this
+  container's ref yet) — fixed with a plain fast-forward, no conflict.
+  Continued round 41's cadence break rather than reverting to it:
+  dispatched four parallel interaction-mechanics deep dives into
+  surfaces round 41 hadn't touched, each checked against Novella's own
+  code before being written up. (1) Corkboard/storyboard/outlining
+  mechanics: Scrivener forks its corkboard into a Grid mode (drag
+  immediately reorders the manuscript) and a Freeform mode (drag has no
+  effect until an explicit Commit) rather than overloading one gesture
+  with both jobs, and a Literature & Latte forum thread names a
+  specific, unaddressed clutter complaint — auto-populated card text
+  with no per-card override. (2) Character/worldbuilding template
+  design: NovelCrafter's real differentiator turns out to be a
+  per-field AI-visibility toggle (Always/Never/NSFW-only) on Codex
+  Details fields, sharper than the blanket tags-exclusion fix already
+  queued; a Reedsy review of Campfire's prescriptive character/location
+  panels found they "encourage procrastination" via blank-panel guilt,
+  a caution for our own codex-template item; and no competitor checked
+  combines structured character fields with an automatic relationship
+  graph — Novella already ships a Relationship web natively, which
+  competitors either lack entirely or bolt on via a third-party
+  single-purpose app. (3) What writers assemble themselves in Notion vs.
+  Obsidian, studied separately per the standing research brief: both
+  ecosystems independently rebuild a "queryable story bible" —
+  Dataview/YAML on one side, paid relational-database templates
+  ($8-50) on the other — converging on the same underserved job
+  (characters/scenes/locations/chapters as linked, filterable entities)
+  from two structurally opposite platforms, the strongest single signal
+  this round. (4) Dashboard/onboarding/import: the highest-value finding
+  of the round — Dabble ships no manuscript import at all, which
+  Reedsy's own comparison piece calls "likely the top reason Scrivener
+  users aren't switching over," while NovelCrafter's import flow shows a
+  structure-detection preview (act/chapter/scene counts) before
+  anything is committed; checked our own code and confirmed Novella has
+  paste-cleanup but no whole-manuscript import at all. Four new "Next
+  up" items came out of this (a manuscript import flow with a preview-
+  before-commit step, ranked high as a genuine acquisition-moment gap;
+  a corkboard freeform/commit-mode and per-card-override fix; a
+  structured Codex-relations field type; a "say the Relationship-web
+  advantage louder" copy item) plus three sharpened existing items (the
+  tags-leak-into-AI-prompt fix, now scoped as a per-field visibility
+  flag; the NovelCrafter-parity item's codex-template sub-point, now
+  carrying the over-templating caution; the four-app-bundle item, with
+  a reinforcing note on Obsidian's five-plugin drafting stack). Did NOT
+  re-run the four-pillar bundle check or the litigation-date tracking
+  this round, by design, for the ninth round running — both remain
+  exhaustively covered and the round-33 owner question on cadence stays
+  open. Full notes, evidence-type breakdown, and source lists in
+  RESEARCH.md Round 42.
 
 - 2026-09-03 — Research round 41 (autopilot; no code). Housekeeping
   first: working tree clean, local `main` matched `origin/main` exactly
