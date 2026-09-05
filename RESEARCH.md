@@ -5853,3 +5853,539 @@ surfaces instead.
 - ilampadmanabhan.medium.com (NovelCrafter review, April 2026;
   NovelCrafter/type.ai comparison, Feb 2026), codingem.com
 - hjsmithwilliams.substack.com ("The No-Fluff Guide to Scrivener")
+
+# Round 43 (2026-09-05) — task/kanban, search depth, focus mode, outlining templates
+
+Housekeeping first: working tree clean at session start; local ref already
+matched `origin/main` exactly (no stale-ref fast-forward needed this time,
+unlike round 42).
+
+**Continuing the round 41-42 cadence break a third time.** Both prior
+rounds found parallel interaction-mechanics deep dives more productive
+than the old four-pillar/litigation news cadence, so this round repeats
+the shape with four more previously-unexplored surfaces: (1) task and
+project management — the one pillar of the four-app thesis that had
+never gotten its own dedicated pass, only surfaced incidentally inside
+four-pillar bundle checks; (2) search depth and command-palette design,
+checked directly against Novella's own `palette.ts`/`CommandPalette.tsx`;
+(3) focus-mode/distraction-free-writing mechanics, checked directly
+against Novella's own `App.tsx` focus-mode implementation; (4) outlining
+and story-structure-template mechanics (Save the Cat, Hero's Journey,
+Snowflake). The four-pillar bundle check and both litigation-date
+trackers were again deliberately not re-run — round 33's still-unanswered
+owner question on whether to keep running the bundle check every round
+now stands at a tenth round without a decision either way.
+
+## Pass 1 — Task and project management: the pillar with no dedicated pass yet
+
+**Checked our own code first.** `src/core/tasks.ts` and
+`src/ui/TasksPanel.tsx` confirm Novella's task system today is a Markdown
+checklist parser (`- [ ] text`) with optional `## Heading` grouping,
+surfaced as one flat panel across the vault — tick, add, rename, archive,
+all rewriting the note body directly, nothing stored separately. There is
+**no board/kanban view, no per-scene stage model, and no drag-between-
+columns interaction** — a task lives inside whatever note it was typed
+in, grouped only by whatever heading the writer happened to write above
+it.
+
+**Finding (official capability): Scrivener already ships a three-layer
+status system — Icon, Label, and Status — richer than anything else
+found in a dedicated writing tool, and writers visibly repurpose it into
+a revision pipeline by hand.** All three are independently customizable,
+visible simultaneously across Binder, Corkboard (Status renders as a
+stamp on the card) and Outliner (a sortable column)
+(literatureandlatte.com/blog/three-ways-to-mark-the-status-of-items-in-
+your-scrivener-project, official). Multiple independent author blogs
+(Story Empire, Writer Unboxed, Writers in the Storm) exist purely to
+explain how to rename the default Status values into a draft→revise→
+final pipeline — a small cottage industry of "how to turn this dropdown
+into the kanban I actually want," which is itself evidence of real,
+unmet demand for a board rather than a label.
+
+**Finding (official capability + feature request, sharpens the existing
+scene-status sub-item directly): Dabble's own ribbon/icon status flags
+are visibly insufficient to its own users.** Dabble recently shipped
+customizable ribbons/icons on chapters and scenes to flag revision
+status, plus (in 3.0) track changes, comments and editor review copies
+(dabblewriter.com/features, official). But a live request on Dabble's
+own feedback board asks for more than decorative icons: "it would be
+great to use tags or a text field to track the status of each scene
+(draft 2, revision 1, etc.)" (dabble.featureupvote.com). A competitor
+that already tried the lightweight "icon = status" approach still has
+users asking for a real structured field — decorative status flags are
+not the same job as a filterable, board-able status.
+
+**Finding (official capability, absence): NovelCrafter's Plan view has no
+kanban and no per-scene task object either, and the team's own September
+2025 update says core reordering mechanics are still unfinished.**
+Grid/Matrix/Outline are the three views (novelcrafter.com/help/docs/plan/
+the-plan-interface, official) — none is a status board. NovelCrafter's
+own community update names "flexible moving and creating of acts/
+chapters/scenes" as still in progress
+(novelcrafter.com/blog/2025-09-community-update, official) — even
+manuscript-structure drag-and-drop isn't fully solved in the tool most
+often cited as Novella's closest AI-native competitor, let alone a task
+board on top of it. Open ground, not catch-up.
+
+**Finding (observed user behavior, the strongest cross-app convergence of
+this pass): the revision-pipeline kanban writers build by hand in Trello
+and Notion has a consistent shape — Planning/Draft/Revision/Edit/Final,
+or a more granular pass-by-pass version of the same thing — and it
+already resembles exactly what round 41 scoped for the scene-status
+sub-item.** Two independent, non-commercial, first-person accounts
+(Hillary DePiano, 2018, hillarydepiano.com; Melissa Wiley, 2019,
+medium.com) describe scene/chapter cards moving Rough Draft → Revising →
+Finished, both explicitly warning against too many columns ("less is
+easier to manage" — DePiano). A more recent aggregator (scribecount.com,
+2025/2026) documents the production-pipeline version real indie authors
+run: In Progress → With Editor → Awaiting Cover Art → Formatted →
+Uploaded → Live. A search-result-summarized pass-by-pass version (not
+independently re-verified, treat as lower confidence) names: Scene/
+Chapter Edits → Content Revisions → Out for Beta Reading → Finished by
+Beta Readers → Incorporating Feedback → Line Edits → Completed — close to
+exactly the "draft → self-edit → beta feedback addressed → copy-edit →
+final" shape round 41 already scoped from spreadsheet sources. Two
+independently-arrived-at pipelines (spreadsheet culture in round 41,
+Trello/Notion culture here) converging on the same stage list is
+stronger evidence for that exact shape than either alone.
+
+**Finding (official capability, named templates): Notion's own
+marketplace sells the identical pipeline as a purchasable product,
+reinforcing real demand.** "W.I.P. — Advanced System for Novel Writers"
+runs a kanban of Planning/Draft/Revision/Edit/Final stages
+(notionthings.com), and community roundups (gridfiti.com, 2026) list
+further named templates ("Scriborg") with per-chapter completion
+progress bars. Consistent with round 42's Notion-template findings —
+writers pay for someone else's pre-built version of this exact board
+rather than assemble one from scratch.
+
+**Finding (recurring complaint, the sharpest validation of the whole
+"one app" thesis found this round): the complaint about generic task
+tools is never "kanban boards are bad" — it's specifically "the board
+doesn't know what a chapter is," producing duplicate data entry that
+goes stale.** Two independent 2025/2026 sources converge on near-
+identical framing: "A character's age appears in the cast database, a
+chapter page, and a timeline note. You update two and forget the third"
+(novelos.studio); "Writers do not work in databases. They work in
+characters, scenes, threads, locations, and worlds... [Notion] does not
+automatically become a novel studio" (storyflow.so). **Flag:** both
+sources are themselves competing novel-planning-tool vendors making the
+case for their own product, so the specific wording is persuasive copy —
+but the underlying pain (duplicate entry, staleness) is independently
+corroborated by Dabble's own users asking for a real status field
+(above) and matches a pattern round 42 already logged for Notion/
+Obsidian story-bible DIY-ing generally. The actionable takeaway is
+architectural, not cosmetic: a Novella task board's cards must be
+*generated from* the actual chapter/scene object (title, live word
+count, POV already on the note) rather than a hand-typed duplicate
+description a writer has to keep in sync — exactly the trap every
+generic tool falls into and exactly what a native tool can avoid by
+construction.
+
+**Finding (official capability + user testimonial, directly extends the
+existing comment-to-task idea): BetaBooks already ships the beta-reader-
+comment-to-task mechanic round 41 only sketched, as a three-way triage,
+not a binary.** "Sort and filter your feedback by reader, chapter, or
+keyword, turn it into your personal todo list," with every comment
+categorized **To Do / Consider / Ignore** (betabooks.co, official). A
+user testimonial credits this triage specifically with making "the hard
+slog of editing so much easier." This is a working precedent for the
+exact mechanic already named in the NovelCrafter-parity item's scene-
+status sub-point ("a comment flagged as needing action should be
+promotable to a task") — but it sharpens the shape from a single
+"promote to task" action into a three-state triage, which matters
+because "Ignore" is doing real work: it lets a writer dismiss a comment
+without deleting it or leaving it looking unaddressed. No dedicated
+novel-writing app (NovelCrafter, Dabble, Scrivener, Campfire) offers this
+themselves — it currently requires a fourth, single-purpose paid tool
+stacked on top of the writing app and the task tracker, a clean
+three-to-one consolidation opportunity once Novella's inline comments
+(item above) ship.
+
+Actioned as a sharpening pass on the existing NovelCrafter-parity item's
+scene-status sub-point below — not a new item, since round 41 already
+scoped the shape correctly and this round's job was to supply the
+concrete evidence for exactly what shape to build.
+
+## Pass 2 — Search depth and command-palette design
+
+**Checked our own code first.** `src/ui/palette.ts` and
+`src/ui/CommandPalette.tsx` confirm Ctrl+K today indexes exactly two
+things: app commands, and note **titles** (`label: n.title` for every
+chapter and note) — ranked by a clean tiered matcher (prefix → word-start
+→ substring → subsequence). It never touches note bodies. A chapter that
+mentions a location fifteen times in its prose is invisible to Ctrl+K
+unless the writer remembers its title.
+
+**Finding (official capability, the most directly comparable precedent
+found): Dabble's Quick Open already searches titles, then full manuscript
+body text, then notes, with snippet context — the exact feature Ctrl+K
+is missing.** Cmd/Ctrl+K opens a palette that fuzzy-matches document
+titles first, falls through to full body text and notes, shows a
+highlighted snippet plus a breadcrumb path per hit, and deliberately
+excludes trash/empty documents while sinking archived items to the
+bottom (dabblewriter.com/docs/writing-editing/command-palette, official).
+This is not a general-purpose tool's feature bleeding into writing
+software — it's a direct competitor in the same category that has
+already shipped the deeper version of a feature Novella ships the
+shallow version of.
+
+**Finding (official capability, dated 2025-2026): Obsidian's core search
+has query-operator depth no fiction-specific tool in this survey comes
+close to.** `file:`, `path:`, `tag:`, `line:`/`block:`/`section:`-scoped
+matching, `task:`/`task-todo:`/`task-done:`, boolean OR/exclusion,
+parenthetical nesting, and full regex delimited by `/.../` that combines
+with operators (obsidian.md/help/plugins/search, official, verified by
+direct fetch). Separately, Obsidian 1.9 shipped **Bases** as a core
+plugin (early access May 2025) — a `.base` file format giving live,
+editable table/card views filtered and grouped by frontmatter properties,
+effectively obsoleting the third-party Dataview plugin for most users
+(dandylyons.net; deepwiki.com/obsidianmd/obsidian-help/5.1-introduction-
+to-bases). The 2025-2026 trend in the wider category is toward
+structured, filterable metadata views, not just full-text search — a
+useful directional signal for the existing structured-Codex-relations
+item (round 42) rather than a new item on its own.
+
+**Finding (recurring complaint + official moderator response, a concrete
+anti-pattern to avoid): Scrivener deliberately does not auto-reveal a
+search hit inside a collapsed Binder, and this is a known, still-current
+complaint, not a bug.** A Literature & Latte forum thread
+(forum.literatureandlatte.com/t/locating-binder-items-when-the-binder-
+is-closed-or-when-its-folders-are-closed/40394) has a user reporting that
+finding an item via search doesn't reveal it in a collapsed Binder tree;
+L&L's own moderator "AmberV" confirms this is intentional in Scrivener 3
+("removed... because it essentially meant one had no control over the
+collapse state of their folders if they ever used search"), with the
+workaround being a separate manual command (Reveal in Binder). This is
+the exact "found it in search, now dig it out of my own outline"
+friction a keyboard-first tool must not import — jumping to a Ctrl+K
+result should auto-reveal it in whatever tree/outline is open without a
+second keystroke, and Scrivener's explicit trade-off is worth naming as
+the anti-pattern, not silently repeating it.
+
+**Finding (official capability, absence, moderate confidence): no
+evidence NovelCrafter's Codex search spans multiple entries or unifies
+with manuscript search.** NovelCrafter's own Codex Details docs
+(novelcrafter.com/help/docs/codex/codex-details) mention only a
+search-within-one-entry's-custom-fields feature, scoped to a single
+detail modal — nothing describing a cross-entry or codex+manuscript
+unified search was found anywhere, official or third-party. A secondary,
+not-independently-fetched review snippet suggests the Codex's
+categorization can feel "overwhelming" to search through quickly — flagged
+explicitly as low-confidence, since the source article itself couldn't
+be fetched directly.
+
+**Finding (expert/practitioner opinion, an architecture decision worth
+naming rather than defaulting into): command-palette design literature
+treats "search" and "run a command" as related but distinct jobs, and
+recommends context-aware, weighted ranking over flat fuzzy match.** A
+widely-cited command-palette design essay (solomon.io/designing-command-
+palettes) argues palettes are "for doing things... for taking action"
+and work best as peers to search rather than nested inside it, with
+context-awareness (pre-populating the current record) as the real power
+move. Superhuman's own engineering writeup
+(blog.superhuman.com/how-to-build-a-remarkable-command-palette)
+recommends weighted relevance plus recency/frequency multipliers, and
+insists every menu/button action have a matching palette command for
+parity. Two real, validated architectures exist in the wild — Notion/
+Dabble merge navigation and actions into one list (Novella's current
+model), Obsidian splits them (Cmd/Ctrl+P for commands, Cmd/Ctrl+O for
+Quick Switcher) — worth flagging as a real fork in the road rather than
+assuming the merged model is simply correct as project scale grows.
+
+**Smaller finding, worth folding in cheaply: type.ai graduates its slash
+commands to direct hotkeys once a writer knows them** (⌘, for Write
+Sentence, ⌘. for Write Paragraph, etc. — type.ai/blog/writing-with-AI-
+commands, official), letting the same action be discovered via "/" and
+later executed without opening the menu at all. Novella's existing slash
+commands (shipped 2026-07-22) have no such graduation path — cheap,
+low-risk addition once this item is picked up, not worth its own
+roadmap line.
+
+Actioned as a new roadmap item below: unify Ctrl+K search across
+manuscript body text, codex entries and notes (not titles alone), with
+snippet context, auto-reveal-in-tree, and a stated ranking rule
+(title-match, then body-match, weighted by recency) rather than an
+unweighted fuzzy match across everything.
+
+## Pass 3 — Focus mode and distraction-free writing
+
+**Checked our own code first.** `src/App.tsx` (the `Ctrl/Cmd+Shift+F`
+toggle, `Esc` to exit) and `src/ui/app.css` confirm Novella's focus mode
+is a hard-isolation model: `body.focus-mode` sets `display:none` on the
+titlebar, every side pane (Inspector included) and the resizer, then
+widens and caps the editor at `46rem`. **No typewriter scrolling, no
+sentence/paragraph dimming, and no way to glance at any panel without
+fully leaving focus mode exist today.**
+
+**Finding (official + observed user behavior): Obsidian writers install
+Typewriter Mode and ProZen together because they solve two genuinely
+different jobs, not the same job twice — and Typewriter Mode, the
+line-mechanics half, is roughly 3x more adopted.** Typewriter Mode
+(github.com/davisriedel/obsidian-typewriter-mode) does fixed-position
+current-line scrolling, current-line highlight, configurable context
+lines, paragraph/sentence dimming, line-length limiting, and an optional
+"Hemingway mode" blocking edits to earlier text. ProZen
+(github.com/cmoskvitin/obsidian-prozen) does chrome removal only — true
+fullscreen, hidden scrollbar/header/graph-controls, an adjustable
+vignette. Obsidian Stats shows Typewriter Mode at 102,422 downloads/263
+stars against ProZen's 36,950/54 (obsidianstats.com/plugins/typewriter-
+mode, /obsidian-prozen). Novella's existing focus mode is doing the
+ProZen half only (chrome removal) — the more-adopted line-mechanics half
+is the actual gap, not "add a focus mode."
+
+**Finding (official capability, the design pattern worth copying
+directly): iA Writer treats dimming and scroll behavior as an explicit
+three-way selector, not one hardcoded combination.** Sentence
+(dim all but the current sentence), Paragraph (dim all but the current
+paragraph), and Typewriter (no dimming, just vertical centering) are
+independently selectable (ia.net/writer/support/editor/focus-mode,
+official). FocusWriter and Ulysses converge on the same two-axis shape
+from a different direction — FocusWriter lets a writer choose how much
+stays undimmed (one line / three lines / a paragraph)
+(bigtechquestion.com, dedoimedo.com), and Ulysses separately configures
+"Fixed Scrolling" anchor position (top/middle/bottom/variable)
+independent of highlight granularity (kindlepreneur.com/ulysses-review,
+thesweetsetup.com). Three independently-built tools landing on the same
+"granularity × anchor-position, both user-set" shape is real convergence
+evidence, not an arbitrary implementation choice — Novella should mirror
+the two-axis design rather than ship one fixed combination.
+
+**Finding (recurring complaint, a real caution against a naive port):
+typewriter scrolling is documented as polarizing, and specifically bad
+during editing rather than fresh drafting.** A long-running Scrivener
+discussion thread (organizingcreativity.com/2011/08/typewriter-
+scrolling-in-scrivener) has multiple writers calling the recenter-on-
+every-keystroke behavior "verbal motion sickness," worst specifically
+when revising rather than drafting fresh — only one commenter in the
+thread wanted it on by default. Separately, Ulysses' own 2.6 update
+reportedly broke "Fixed Scrolling" as a shipped feature with no committed
+fix timeline (secondary-sourced via kindlepreneur.com and related review
+coverage — the original bug tracker wasn't directly fetched, so treat
+with moderate confidence). If Novella ships typewriter scrolling it
+should default off, be a one-keystroke toggle, and ideally be
+edit-mode-aware — suppressing recentering during heavy revision activity
+rather than always-on.
+
+**Finding (official capability, the single most directly actionable
+finding of this pass): Scrivener already solved the exact "isolation vs.
+reference" tension Novella's current focus mode doesn't address, with a
+floating overlay that never exits Composition Mode.** Multiple
+independent sources (jenterpstra.com/blog/view-reference-materials-in-
+scrivener; gwenhernandez.com/2011/02/01/tech-tuesday-full-screen-in-
+scrivener-2-x) describe clicking Inspector, or opening a research item,
+while in Composition Mode: it pops a floating window over the writing
+surface without leaving the mode, and "Page Position" lets the writer
+shift the editing column left or right so the floating panel doesn't
+cover it. This is a real, shipped answer — not a hypothetical — to "I
+want distraction-free prose and a glance at my outline/codex without
+leaving focus mode," and it's the precise inverse of Novella's current
+`display:none`-on-every-pane approach. Round 42's Obsidian
+plugin-stacking finding (writers running two separate distraction tools)
+is indirect evidence writers work around this same tension when a tool
+doesn't solve it; Scrivener's overlay is the concrete, precedented
+solution to build toward instead.
+
+**Finding (marketing fluff, flagged explicitly): none of NovelCrafter,
+Dabble, or Campfire's focus-mode coverage goes past adjectives.**
+NovelCrafter's own docs list "Focus mode" as one labeled item in an
+interface diagram with zero mechanical detail
+(novelcrafter.com/help/docs/write/the-write-interface); third-party
+"reviews" repeat phrases like "clean writing environment" and "sleek as
+it gets" without describing an actual interaction, reading as SEO/
+affiliate content recycling vendor copy rather than firsthand use.
+Dabble's "everything else fades away" claim (automateed.com) is a
+specific behavioral claim but unverified against Dabble's own docs
+directly. type.ai: no focus-mode coverage found at all this pass. Useful
+competitively — none of the three appears to have shipped or been
+reviewed for iA-Writer-caliber focus mechanics, so a well-executed,
+precisely-described focus mode is a differentiator against this specific
+competitor set, not just against Scrivener or iA Writer.
+
+Actioned as a new roadmap item below: a granularity × anchor-position
+typewriter/dimming control (off by default), plus a floating peek panel
+for codex/outline reachable without leaving focus mode.
+
+## Pass 4 — Outlining and story-structure template mechanics
+
+**Checked our own code first.** `src/ui/PlotGrid.tsx` confirms Novella
+already has the NovelCrafter-Matrix-equivalent structural view (chapters
+as rows, plot threads as columns, the manuscript itself as the leftmost
+draggable column) — a solid foundation. **No story-structure templates
+(Save the Cat, Hero's Journey, Snowflake, three-act) exist anywhere in
+the codebase** — grepped for beat-sheet/structure-template terms and
+found nothing.
+
+**Finding (official capability): Plottr's structure templates are
+pre-populated scene cards on a timeline — editable, re-savable as custom
+templates — but the manuscript link is one-way export, not a live
+sync.** 30+ templates prepopulate the Timeline with a structure's beats
+as cards holding summary/notes/goal/conflict/metadata; a writer can save
+any timeline as a reusable Custom Timeline Template
+(docs.plottr.com/article/149-custom-timeline-templates, official).
+Plottr's own features page describes only export to Word/Scrivener,
+never a bidirectional live link back from drafted prose
+(plottr.com/features, official). A real answer to "how should a template
+populate structure," but not to "how does structure stay attached to
+what's actually been drafted" — that stays open ground.
+
+**Finding (observed user behavior, echoed by a competing vendor's
+marketing but corroborated structurally): the two-app plan/draft split is
+real, and stale structure once drafting starts is the documented
+failure mode.** The standard workflow described across sources is: plan
+fully in Plottr, export once to Scrivener, return to Plottr only at act
+breaks (storyflow.so/blog/scrivener-vs-plottr-for-plotting-a-novel — flag:
+Storyflow is itself a competing AI-planning tool, so its "many writers
+stop updating around chapter twelve" framing is persuasive copy, not a
+neutral survey — but the underlying export-only mechanism it's describing
+is independently confirmed by Plottr's own docs above). A single-app,
+live-linked structure view is the direct answer to a two-app pattern this
+research keeps finding in different clothing (Pass 1's Trello/Notion
+split, round 42's Obsidian plugin-stacking).
+
+**Finding (official capability, absence): Dabble's Plot Grid ships no
+named structure templates at all, and reviewers note this as a real gap
+against Plottr specifically — but it does get real, partial
+bidirectionality that Plottr doesn't.** Dabble's grid is blank by
+default; reviewers describe it as providing "no guidance beyond the
+basics" against Plottr's more scaffolded approach
+(dabblewriter.com/articles/dabble-vs-plottr, official comparison).
+Once linked to a book, the grid gains a Scenes column and "reordering
+scenes in your manuscript reorders the grid to match" — one-way,
+manuscript-is-truth (dabblewriter.com/docs/planning-story-notes/plot-
+grid-overview, official); dragging a plot-point card does not reorder
+the manuscript, and grid rows that map to real scenes can't be deleted
+from the grid side. This is the closest existing precedent for the
+question round 42's corkboard item already raised (does a structural
+view's drag ever get to be authoritative over manuscript order, or only
+the reverse) — Dabble proves partial bidirectionality is buildable, but
+the remaining asymmetry is exactly the ceiling Novella could clear.
+
+**Finding (official capability, a naming collision worth heading off):
+NovelCrafter's "beat" means something completely different from a
+structural beat, and even NovelCrafter's own docs blur the two senses.**
+A NovelCrafter "beat" is a short `/`-command AI-generation instruction —
+roughly one AI completion (~500 words), several per scene
+(novelcrafter.com/help/faq/plan/where-do-i-put-my-scene-chapter-act-
+book-summary-what-about-my-beats, official) — not a Save-the-Cat-style
+plot point. NovelCrafter ships no structural templates at all; act-level
+summaries live in free-text Codex entries or snippets. If Novella ever
+names an AI-assist feature "beat" alongside a structural "beat" (Save the
+Cat sense), the two senses need explicit disambiguation in the UI — even
+the market's own AI-native leader conflates the words across its own
+docs.
+
+**Finding (recurring complaint, directly parallel to an already-logged
+Campfire finding): prescriptive structure templates read as homework, not
+help, and this shows up independently in both indie-author essay culture
+and software reviews.** Chuck Wendig's widely-cited "The Save The Cat
+Conundrum" (terribleminds.com/ramble/2018/07/11) is the canonical
+statement of the complaint; separately, Plottr's own Capterra reviews
+include "reminded them of outline formats teachers forced on them,"
+"Nobody thinks like this," and template customization described as "more
+tedious" than freeform work (capterra.com/reviews/264561/Plottr). This is
+the outlining-specific instance of exactly the pattern round 42 already
+logged for Campfire's rigid attribute panels ("a pretty uninspiring page
+full of blank spaces" that "encourage procrastination") — a second,
+independent domain producing the identical failure mode is stronger
+evidence for the same build caution: any structure template Novella
+ships must be optional and diagnostic (a checklist to consult), never a
+gating wizard a new project is pressured through.
+
+**Finding (observed user behavior, real demand signal): Notion's
+marketplace sells Save the Cat and Snowflake templates as multi-database
+systems, priced $10-30, evidence writers pay for a structure they won't
+build themselves.** Named templates include a "Save the Cat Beat Sheet
+Plot Outline Template," a "Snowflake Plot Outline Template" ("8 connected
+databases for characters, scenes, worldbuilding, and research"), and
+StoryFlint's broader "Storyteller OS" (notion.com/templates/save-the-
+cat-plot-outline, /snowflake-method-outline, /storyteller-os, official
+marketplace listings). Consistent with round 42's Notion-template
+findings elsewhere in this research — the relational (beat↔scene↔
+character) structure they're selling is worth studying as a data model,
+even though Notion's own cross-linking stays manual with no drag-affects-
+both mechanic.
+
+**Finding (official capability, absence, a gap even in the incumbent):
+Scrivener ships zero native beat-sheet templates — every Save the Cat
+structure in its ecosystem is user-built or third-party, never part of
+Literature & Latte's own template set.** L&L's own blog covers *how to
+manually build* a Save the Cat binder (literatureandlatte.com/blog/
+outline-your-nanowrimo-novel-using-the-save-the-cat-story-structure,
+official) rather than shipping the structure; the actual ready-made
+binders in circulation are personal-blog downloads (Jen Terpstra, Jami
+Gold), not L&L templates. A first-party, built-in named-structure
+template (not a community hack) is a low-effort differentiator against
+the market's most entrenched incumbent specifically.
+
+Actioned as a new roadmap item below, scoped narrowly per the build
+caution above: optional, skippable story-structure starting scaffolds
+(Save the Cat, three-act, Hero's Journey) that pre-populate PlotGrid/
+Corkboard entries as a diagnostic checklist, never a gate a new project
+must clear — grouped with, and cross-referencing, the existing corkboard
+freeform/commit-mode item, since both turn on the same underlying
+question of when a structural view gets to be authoritative over
+manuscript order.
+
+## What changed in "Next up"
+
+New items: unify Ctrl+K search across manuscript body text, codex
+entries and notes (not titles alone), with snippet context and
+auto-reveal-in-tree; a typewriter-scroll/dimming control shaped as
+granularity × anchor-position (off by default) plus a floating
+peek-without-leaving-focus-mode panel for codex/outline; optional,
+skippable story-structure starting scaffolds for PlotGrid/Corkboard.
+Sharpened existing items: the NovelCrafter-parity item's scene-status
+sub-point now has a concrete column-name precedent (Planning/Draft/
+Revision/Edit/Final, cross-validated by two independent culture's
+DIY pipelines), the "card must be generated from the real chapter
+object, never a hand-typed duplicate" build principle, and BetaBooks'
+To Do/Consider/Ignore triage as the concrete shape for comment-to-task
+promotion. Did not touch the litigation-date tracking or the four-pillar
+bundle recheck this round, by design, for the third round running.
+
+## Round 43 sources
+
+- literatureandlatte.com/blog/three-ways-to-mark-the-status-of-items-in-
+  your-scrivener-project, /blog/outline-your-nanowrimo-novel-using-the-
+  save-the-cat-story-structure (both official)
+- dabblewriter.com/features, /docs/writing-editing/command-palette,
+  /docs/planning-story-notes/plot-grid-overview,
+  /articles/dabble-vs-plottr (all official), dabble.featureupvote.com
+- novelcrafter.com/help/docs/plan/the-plan-interface,
+  /help/docs/codex/codex-details, /help/docs/write/the-write-interface,
+  /help/faq/plan/where-do-i-put-my-scene-chapter-act-book-summary-what-
+  about-my-beats, /blog/2025-09-community-update (all official)
+- hillarydepiano.com/2018/08/kanban-for-writers-organize-book-releases-
+  revisions-more-with-project-management-boards/,
+  melissawiley.medium.com (2019), scribecount.com/author-resource/
+  writing-tools-for-authors/organization-tools
+- notionthings.com/portfolio-item/advanced-novel-writing-system/,
+  gridfiti.com/notion-templates-for-writers/,
+  notion.com/templates/save-the-cat-plot-outline, /snowflake-method-
+  outline, /storyteller-os
+- novelos.studio/blog/notion-alternatives-novel/, storyflow.so/blog/
+  best-notion-alternatives-writers-2026, /blog/scrivener-vs-plottr-for-
+  plotting-a-novel
+- betabooks.co (official)
+- obsidian.md/help/plugins/search (official, direct fetch),
+  dandylyons.net (Obsidian Bases), deepwiki.com/obsidianmd/obsidian-help
+- forum.literatureandlatte.com/t/locating-binder-items-when-the-binder-
+  is-closed-or-when-its-folders-are-closed/40394
+- solomon.io/designing-command-palettes,
+  blog.superhuman.com/how-to-build-a-remarkable-command-palette
+- type.ai/blog/writing-with-AI-commands (official)
+- github.com/davisriedel/obsidian-typewriter-mode,
+  github.com/cmoskvitin/obsidian-prozen, obsidianstats.com/plugins/
+  typewriter-mode, /obsidian-prozen
+- ia.net/writer/support/editor/focus-mode (official)
+- organizingcreativity.com/2011/08/typewriter-scrolling-in-scrivener,
+  kindlepreneur.com/ulysses-review, thesweetsetup.com
+- jenterpstra.com/blog/view-reference-materials-in-scrivener,
+  /blog/save-the-cat-plotting-scrivener-template,
+  gwenhernandez.com/2011/02/01/tech-tuesday-full-screen-in-scrivener-2-x
+- bigtechquestion.com/2018/07/13/review/focuswriter-review-free-word-
+  processor, dedoimedo.com
+- docs.plottr.com/article/149-custom-timeline-templates,
+  plottr.com/features/, capterra.com/reviews/264561/Plottr
+- terribleminds.com/ramble/2018/07/11/the-save-the-cat-conundrum/
