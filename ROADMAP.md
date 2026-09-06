@@ -224,6 +224,94 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       reply/read-unread, a history drawer, and a per-comment visibility
       scope — not a Word-style balloon that only flags that something
       changed.
+- [ ] **Suggest-mode editing (track changes), reusing the diff engine we
+      already ship, before real-time co-authoring** — research round 44
+      (2026-09-06): a dedicated pass on collaboration and hand-off
+      editing — the "second app" job the comments item above doesn't
+      cover, since comments annotate but don't let an editor rewrite a
+      sentence and have the writer accept or reject the exact wording.
+      Checked our own code: `diffWords()`/`diffParagraphs()` in
+      `src/ui/diff.ts` already compute word-level insertions/deletions and
+      drive both the History panel and reword-in-place's accept/reject UI
+      — the hard part of track changes, representing an edit as
+      accept/reject-able runs, is already built and proven, just never
+      exposed as an editing mode a second person can turn on. Dabble 3.0
+      ships the target shape: a Track Changes toggle
+      (Cmd/Ctrl+Opt/Alt+E) turns edits into suggestions instead of silent
+      rewrites, with three review views — Original (read-only),
+      Difference, Suggestions — plus four collaborator roles (Co-Author:
+      full edit, Editor: suggest + comment, Reviewer: comment only,
+      Reader: view only) (dabblewriter.com/docs/reference/
+      whats-new-in-3, help.dabblewriter.com/en/articles/5734670-
+      co-authoring-in-dabble, both official). NovelCrafter also ships
+      invite-based collaboration (novelcrafter.com/help/docs/app/
+      collaboration-and-coauthoring, official) but its own docs are
+      explicit about the ceiling: "you will not see changes made by
+      others immediately," and the team "doesn't recommend working on
+      the novel at the same time... not actual real-time cowriting" —
+      collaboration there means hand-off editing, not live co-authoring,
+      despite being marketed as collaboration. Scrivener has no
+      real-time collaboration at all, and one writer's own account of
+      the resulting workaround is exactly the second-app pattern this
+      research keeps finding: "Google Docs excels in collaboration...
+      Scrivener has no real-time collaboration," which is why the same
+      author keeps a separate Google Docs project specifically for
+      anything where "collaboration... [is a] priorit[y] over structural
+      complexity" (hjsmithwilliams.substack.com/p/google-docs-vs-
+      scrivener-what-i-use). The honest scope split, given the thesis's
+      local-first, no-server default: **suggest-mode editing is a local,
+      single-file feature buildable now** — mark a pass over the
+      manuscript as pending insertions/deletions against the diff engine
+      already shipped, review and accept/reject them inline, no network
+      required, useful the moment a writer emails a chapter to an editor
+      or hands off a shared folder. **Real-time co-authoring — Dabble's
+      actual selling point — needs the sync backend scoped in
+      PLAN-sync.md and stays blocked on the same three owner decisions
+      already pending there.** Build the local half first; it already
+      collapses the specific "I need Google Docs for this" moment
+      without waiting on sync.
+- [ ] **A structured Brainstorm mode in the Ideas role, grounded in real
+      Codex/manuscript context** — research round 44 (2026-09-06):
+      checked our own `src/ai/roles.ts` — "Ideas & brainstorming" already
+      exists as a role that prefers the cheap local model (the owner's
+      own "Ollama for Ideas, Claude for Drafting" mapping), but it is a
+      model-routing label only; grepped `src/ai` and the UI for any
+      dedicated brainstorming workflow and found none — a writer wanting
+      ideas has to ask conversationally in Chat with no structure at
+      all. Sudowrite's Brainstorm tool is the direct, well-documented
+      precedent: pick a category (Dialogue, Characters, World building,
+      Plot points, Names, Places, Objects, Descriptions, or a custom
+      "Something else"), enter a seed prompt, generate a batch, thumbs-up
+      keeps a suggestion to a Keepers List saved in the document's
+      History, thumbs-down clears it to make room for a new one
+      (docs.sudowrite.com/using-sudowrite/1ow1qkGqof9rtcyGnrWUBS/
+      brainstorm/5xJUutV75BLU6u9LZndcDs, official). The finding that
+      matters most is the tool's own documented limitation, not its
+      feature list: **"Brainstorm works independently... it doesn't see
+      your Story Bible details"** — generated ideas aren't grounded in
+      the writer's actual characters, established names, or plot, and a
+      kept idea has no path back into the project except manual
+      copy-paste (same official doc). This is exactly the kind of gap
+      Novella can close by construction rather than compete
+      feature-for-feature: `src/ai/context.ts` already assembles real
+      Codex entries and scene context for every generation, so a Novella
+      Brainstorm mode fed through that same pipeline would generate
+      ideas that already know the cast and world — something the
+      market's own brainstorming specialist explicitly does not do.
+      Independent reviewer coverage supports the category-based
+      batch-and-triage shape itself (a hands-on review testing Sudowrite
+      against a 40k-word manuscript says the Story Bible "provided dozens
+      of creative and helpful ideas,"
+      ilampadmanabhan.medium.com/sudowrite-review) while also documenting
+      the failure mode a context-grounded version specifically avoids
+      (the same source reports Sudowrite "missed characters, changed
+      names, invented arcs" during complex reorganizations — evidence the
+      underlying generation needs grounding, not just a nicer triage UI,
+      to stop inventing details that contradict the Codex). Scope:
+      category picker (reuse the slash-command menu pattern already
+      shipped) → seed prompt → batch generation through the existing
+      context pipeline → thumbs-style keep/discard, with a kept idea
+      landing as a Codex stub or task rather than a copy-paste dead end.
 - [ ] **Auto-detect codex mentions in manuscript prose, and let an
       unrecognized name become a Codex entry inline** — research round 41
       (2026-09-03), a deliberate pass at competitor interaction mechanics
@@ -1678,6 +1766,78 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-09-06 — Research round 44 (autopilot; no code). Housekeeping:
+  working tree clean; local branch was one commit ahead of `origin/main`
+  (round 43's commit had landed on the working branch but hadn't reached
+  `main` yet) — carried forward and pushed together with this round
+  rather than treated as a conflict. Two dedicated passes on surfaces
+  without prior coverage: (1) Collaboration and track changes — checked
+  our own code and confirmed Novella has zero human-to-human
+  collaboration of any kind; found Dabble 3.0's real synchronous
+  co-authoring plus a genuine Track Changes suggest-mode (Original/
+  Difference/Suggestions views, four collaborator roles) as the target
+  shape, NovelCrafter's own docs disclaiming real-time cowriting despite
+  marketing "collaboration," and a working writer's own account of
+  keeping a parallel Google Docs workflow specifically because Scrivener
+  has no real-time collaboration — the clearest documented "second app"
+  case found yet. The build angle: our own `diffWords()`/
+  `diffParagraphs()` in `src/ui/diff.ts` already do the hard part
+  (word-level accept/reject runs), just never exposed as a suggest-mode a
+  second person can turn on. Scoped honestly against `PLAN-sync.md`:
+  suggest-mode editing is local and buildable now; real-time co-authoring
+  stays blocked on the sync plan's three owner decisions. (2) AI
+  brainstorming as its own job — checked our own "Ideas & brainstorming"
+  role (a model-routing label only, no dedicated workflow) and found
+  Sudowrite's Brainstorm tool as the direct precedent (category picker,
+  seed prompt, thumbs up/down keeper list) — but its own docs admit it
+  "works independently... doesn't see your Story Bible details," a
+  documented gap Novella's existing `context.ts` pipeline (already
+  assembling real Codex entries per generation) could close by
+  construction rather than compete feature-for-feature. Two new "Next
+  up" items, placed directly after the inline-comments item. Also
+  backfilled round 43's missing Shipped-log entry below, left out by the
+  prior run. Full notes in RESEARCH.md Round 44.
+
+- 2026-09-05 — Research round 43 (autopilot; no code). Backfilled by
+  round 44 — this entry was missed by the run that produced it.
+  Housekeeping: working tree clean, local ref already matched
+  `origin/main`. Continued the round 41-42 interaction-mechanics cadence
+  a third time with four passes, each checked against Novella's own code
+  first: (1) Task/project management, the one pillar of the four-app
+  thesis with no dedicated pass yet — our own task system is a flat
+  Markdown checklist with no board/kanban; Scrivener's three-layer
+  Icon/Label/Status system is the richest native precedent found, and two
+  independent cultures' DIY revision-pipeline kanbans (spreadsheet
+  trackers, hand-built Trello/Notion boards) converge on the same
+  Planning/Draft/Revision/Edit/Final stage list; BetaBooks' To Do/
+  Consider/Ignore triage sharpens the existing comment-to-task idea. (2)
+  Search depth and command-palette design — our own Ctrl+K indexes titles
+  and commands only, never note bodies; Dabble's Quick Open already ships
+  the deeper version (titles → body text → notes, with snippets), and
+  Scrivener's deliberate non-auto-reveal of a search hit inside a
+  collapsed Binder is a documented anti-pattern to avoid repeating. (3)
+  Focus mode — ours is hard-isolation `display:none` with no typewriter
+  scrolling or dimming; Obsidian writers install two separate plugins
+  (Typewriter Mode + ProZen) because neither alone covers both jobs, iA
+  Writer's three-way Sentence/Paragraph/Typewriter selector is the design
+  pattern to copy, and Scrivener's floating-overlay Composition Mode
+  already solves the isolation-vs-reference tension ours doesn't address.
+  (4) Outlining/story-structure templates — our own PlotGrid has no
+  templates at all; Plottr's structure templates are export-only, never
+  live-linked back to the manuscript, and the "prescriptive templates
+  read as homework" failure mode already logged for Campfire recurs
+  independently in outlining-specific sources. Three new "Next up" items:
+  unified Ctrl+K search across manuscript body text, codex entries and
+  notes with snippet context and auto-reveal-in-tree; a typewriter-
+  scroll/dimming control (granularity × anchor-position, off by default)
+  plus a floating focus-mode peek panel; optional, skippable
+  story-structure starting scaffolds for PlotGrid/Corkboard. Sharpened
+  the NovelCrafter-parity item's scene-status sub-point with the
+  concrete column-name precedent and the BetaBooks triage shape. Did not
+  re-run the four-pillar bundle check or litigation-date tracking, by
+  design, for the third round running. Full notes in RESEARCH.md Round
+  43.
 
 - 2026-09-04 — Research round 42 (autopilot; no code). Housekeeping
   first: working tree clean, local `main` was 2 commits behind

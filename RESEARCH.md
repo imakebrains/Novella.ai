@@ -6388,4 +6388,181 @@ bundle recheck this round, by design, for the third round running.
   processor, dedoimedo.com
 - docs.plottr.com/article/149-custom-timeline-templates,
   plottr.com/features/, capterra.com/reviews/264561/Plottr
+
+# Round 44 (2026-09-06) — collaboration/track changes, and a context-blind AI brainstorm gap
+
+Housekeeping first: working tree was clean at session start. `main` was
+one commit *behind* this session's branch (round 43's commit had landed
+on the working branch but had not yet reached `origin/main`) — carried
+forward and pushed together with this round rather than treated as a
+conflict.
+
+**Two focused passes this round, continuing the interaction-mechanics
+cadence rounds 41-43 established, rather than the older four-pillar/
+litigation-news sweep.** Two topics from the task brief's checklist had
+not had a dedicated pass yet: collaboration/review workflows (comments,
+round 7/41, cover async annotation but not synchronous co-editing or
+hand-off review), and AI brainstorming specifically (as distinct from
+drafting/chat, which rounds 8-43 cover extensively).
+
+## Pass 1 — Collaboration, track changes, and the Google Docs "second app" pattern
+
+**Checked our own code first.** Grepped for "collab"/"co-author"/"track
+change" across `src/`: the only hits are a code comment in
+`ProjectsPanel.tsx` about restoring a project "from another machine, a
+backup, or a collaborator" (opening a folder, not a live feature) and the
+"co-author" AI role label in `src/ai/chatCore.ts`/`roles.ts` (an AI
+persona, not a human one). **Novella has no human-to-human collaboration
+feature of any kind today** — no invite/share, no suggest-mode editing,
+no role-based access.
+
+**Finding (official capability, the target shape): Dabble 3.0 ships real
+synchronous co-authoring plus a genuine track-changes mode, not just
+sharing.** Changes sync automatically across authors in real time; a
+Track Changes toggle (Cmd/Ctrl+Opt/Alt+E) turns edits into suggestions
+instead of silent rewrites, reviewed via three status-bar views —
+Original (read-only), Difference, Suggestions; four roles gate access —
+Co-Author (full edit), Editor (suggest + comment), Reviewer (comment
+only), Reader (view only) — separate from Review Copies, which use their
+own Friend/Beta Reader/Editor invite types already logged in round 41 for
+the comments item (dabblewriter.com/docs/reference/whats-new-in-3,
+help.dabblewriter.com/en/articles/5734670-co-authoring-in-dabble, both
+official).
+
+**Finding (official capability, a documented ceiling worth naming
+precisely): NovelCrafter markets "Collaboration and Coauthoring" but its
+own docs disclaim the real-time half.** Invite by email, grant
+viewer/editor access, no paid plan needed to view — but "you will not see
+changes made by others immediately," and the team explicitly "doesn't
+recommend working on the novel at the same time... not actual real-time
+cowriting," positioning it instead as part of an editing/revision handoff
+(novelcrafter.com/help/docs/app/collaboration-and-coauthoring, official).
+Worth remembering next time a "NovelCrafter already has collaboration"
+assumption comes up — it has hand-off sharing, not co-authoring in the
+sense Dabble or Google Docs mean it.
+
+**Finding (official capability, absence) + observed user behavior, the
+clearest "second app" case this research has found: Scrivener has zero
+real-time collaboration, and a working writer's own account of the
+resulting tool split names it directly.** "Google Docs excels in
+collaboration, while Scrivener is favored for organizing long-form
+projects... Scrivener has no real-time collaboration"; the same author
+keeps a parallel Google Docs workflow specifically for "novellas, guides,
+and Substack content" because it's "faster, simpler, and integrates with
+everything," while separately flagging Scrivener's Dropbox-only sync as
+"fragile. Treat it like an unreliable uncle" and the compile system as
+prompting writers to ask "why is Scrivener trying to destroy my life"
+(hjsmithwilliams.substack.com/p/google-docs-vs-scrivener-what-i-use).
+Distinct source from the "No-Fluff Guide to Scrivener" piece by the same
+author already cited in round 42.
+
+**The build angle that matters: the hard part of track changes is
+already shipped, unused for this job.** `src/ui/diff.ts`'s
+`diffWords()`/`diffParagraphs()` already compute word-level
+insertion/deletion runs and drive both the History panel's diff view and
+reword-in-place's accept/reject interaction. Representing an edit as
+accept/reject-able runs — the actual hard part of "track changes" — is
+proven code, not new work; what's missing is exposing it as an editing
+mode a second person's pass can turn on, rather than only a read-only
+comparison of two saved states.
+
+**Scope honesty check against the thesis's local-first, no-server
+default:** Dabble's *actual* differentiator is the real-time sync layer,
+which is exactly what `PLAN-sync.md` already scopes and leaves blocked on
+three owner decisions (hosting, key custody, phasing) — round 44 does not
+relitigate that plan or its blockers. Suggest-mode editing, by contrast,
+needs no network at all: it's a single-file feature (mark a pass as
+pending changes against a diff, review, accept/reject) that collapses
+the specific "I need Google Docs for this" moment on its own, without
+waiting on sync. Actioned as a new roadmap item scoped exactly that way —
+build the local half now, gate real-time co-authoring behind PLAN-sync's
+resolution.
+
+## Pass 2 — AI brainstorming, checked as its own job rather than folded into "chat"
+
+**Checked our own code first.** `src/ai/roles.ts` already names "Ideas &
+brainstorming" as one of five roles (Drafting/Ideas/Research/Critique/
+Quick), mapped to the owner's own "Ollama for Ideas, Claude for
+Drafting, ChatGPT for Research" preference — confirming Novella already
+ships the per-task model hot-swap that research round 17 (2026-08-03)
+only flagged as "worth studying whether it's a real writer need," without
+realizing it was already built. But it is a model-routing label only:
+grepped `src/ai/generate.ts` and the UI for a dedicated brainstorming
+workflow (category picker, batch generation, keep/discard) and found
+none — a writer wanting ideas today has to ask conversationally in Chat
+with no structure.
+
+**Finding (official capability, the direct precedent): Sudowrite's
+Brainstorm tool is category-based, batch-and-triage, not chat.** Pick a
+category — Dialogue, Characters, World building, Plot points, Names,
+Places, Objects, Descriptions, Article ideas, Tweets, or a custom
+"Something else" — enter a seed prompt, generate a batch; thumbs-up saves
+a suggestion to a Keepers List stored in the document's History panel,
+thumbs-down clears it to make room for a fresh one
+(docs.sudowrite.com/using-sudowrite/1ow1qkGqof9rtcyGnrWUBS/brainstorm/
+5xJUutV75BLU6u9LZndcDs, official, direct fetch).
+
+**Finding (official capability, the limitation that matters more than
+the feature list): Sudowrite's own docs state Brainstorm runs
+context-blind.** Direct quote: "Brainstorm works independently...that
+means it doesn't see your Story Bible details." Generated ideas aren't
+grounded in the writer's actual characters, established names, or plot,
+and a kept idea has no path back into the project except manual
+copy-paste — the docs describe retrieving ideas from History but nothing
+about inserting them into the Story Bible or manuscript directly (same
+source). This is the single most actionable finding of the pass: it's a
+gap in the market's own dedicated brainstorming tool, not a missing
+feature Novella would be first to attempt.
+
+**Finding (reviewer opinion, supports the batch-and-triage shape): a
+hands-on review testing Sudowrite against a real 40,000-word manuscript
+says the Story Bible/Brainstorm combination "provided dozens of creative
+and helpful ideas"** and calls the Story Bible "indispensable for keeping
+world-building consistent across a 100k word series" once the reviewer
+learned to use it correctly — after a reported three-day learning curve
+(ilampadmanabhan.medium.com/sudowrite-review). The same review documents
+the failure mode grounding would specifically prevent: Sudowrite
+sometimes "missed characters, changed names, invented arcs, and got stuck
+in loops" during complex chapter reorganizations, and "forgets details
+like character descriptions even when they're in the Story Bible." Read
+together: the batch/triage interaction pattern is real and well-liked;
+the ungrounded generation underneath it is the documented weak point.
+
+**Why this beats a feature-parity build:** Novella already assembles real
+Codex entries and scene context for every generation through
+`src/ai/context.ts` (the same pipeline `src/ai/roles.ts`'s "Ideas" role
+already prefers routing to a cheap local model for). A Brainstorm mode
+built on that existing pipeline generates ideas that already know the
+cast and world by construction — closing exactly the gap the market's own
+brainstorming specialist documents about itself, not chasing a feature
+Sudowrite already does well. Actioned as a new roadmap item: category
+picker (reusing the slash-command menu pattern already shipped) → seed
+prompt → batch generation through the existing context pipeline →
+keep/discard triage, with a kept idea landing as a Codex stub or task
+rather than a copy-paste dead end.
+
+## What changed in "Next up"
+
+Two new items, placed directly after the existing inline-comments item
+since both are extensions of the same "manuscript feedback and
+collaboration" job comments only partly covers: suggest-mode editing
+(track changes) reusing the existing diff engine, scoped honestly against
+PLAN-sync so real-time co-authoring stays blocked on the right thing
+rather than being conflated with a buildable-now local feature; and a
+structured, Codex-grounded Brainstorm mode in the existing Ideas role,
+built to close a documented gap in Sudowrite's own Brainstorm tool rather
+than to match a feature list. No existing item was reprioritized or
+rewritten this round — both additions are genuinely new surfaces, not
+sharpening passes on prior findings.
+
+## Round 44 sources
+
+- dabblewriter.com/docs/reference/whats-new-in-3,
+  help.dabblewriter.com/en/articles/5734670-co-authoring-in-dabble
+  (both official)
+- novelcrafter.com/help/docs/app/collaboration-and-coauthoring (official)
+- hjsmithwilliams.substack.com/p/google-docs-vs-scrivener-what-i-use
+- docs.sudowrite.com/using-sudowrite/1ow1qkGqof9rtcyGnrWUBS/brainstorm/
+  5xJUutV75BLU6u9LZndcDs (official, direct fetch)
+- ilampadmanabhan.medium.com/sudowrite-review
 - terribleminds.com/ramble/2018/07/11/the-save-the-cat-conundrum/
