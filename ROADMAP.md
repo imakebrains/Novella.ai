@@ -175,6 +175,26 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       board IS when it is not a view of chapters, and whether the mode
       switch survives. Scope it with the owner before moving code.
 
+      Research round 45 (2026-09-07) adds a concrete, shipped precedent
+      for "a project home that isn't chapters," rather than inventing
+      the category from nothing: Campfire's per-project dashboard shows
+      pinned articles, a recent-changes feed, and other writer-chosen
+      widgets, deliberately separate from any single module like
+      manuscript or Characters (kindlepreneur.com's Campfire review,
+      official capability). Independently, Notion's popular novel-
+      planning templates (surveyed via gridfiti.com's roundup and
+      several individual template listings) converge on the same
+      non-obvious shape from a completely different tool ecosystem: the
+      "home" page is not a stats dashboard but a table-of-contents hub
+      with a couple of ambient tools bolted on — a sprint timer, a
+      progress bar, cover-art/moodboard links — offering several views
+      onto the same underlying data (by act, by timeline, as an
+      overview) rather than one fixed layout. Two independent lineages
+      converging on "hub of views + a couple of ambient tools, not a
+      numbers dashboard" is stronger evidence than either alone, and is
+      worth having in the room when this item's information-architecture
+      question is scoped with the owner — not a decision made for them.
+
 - [ ] **Conversational onboarding presentation** (WITH-OWNER — round 5 item 7).
       The "Style me" mechanism shipped 2026-08-20 and derives a real style
       from a real sample. What has not shipped is the Lingrow feeling the
@@ -183,6 +203,36 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       pieces exist (FirstRunWizard's four steps, the intro's motion system);
       this is a presentation pass over them, and it is taste, so it wants
       the owner in the room.
+
+      Research round 45 (2026-09-07) de-risks the mechanism itself,
+      without touching the taste call: the "answers visibly reshape the
+      app as you go" pattern this item is built on now has independent
+      precedent beyond Lingrow. A 2026-dated teardown of Cal AI's
+      onboarding (tasu.ai/library/cal-ai) documents a 32-screen flow
+      where every answer triggers a live animation — progress bars,
+      graphs and numbers updating in place — ending in a plan-generation
+      screen that draws an animated projected-outcome curve from the
+      user's own answers before any paywall; MyFitnessPal and Duolingo
+      are repeatedly cited by independent 2026 UX-strategy write-ups
+      (userpilot.com, adapty.io) as the older canonical examples of the
+      same mechanic. Those same sources converge on one rule stated
+      almost verbatim across independent authors: "if a user's answers
+      never appear to influence anything, they notice." That's now
+      three-plus independent products validating the pattern, not one
+      app's idiosyncrasy — the design bar this item already meets
+      technically (the 0.3ms accent-color repaint) is chasing a
+      well-established convention, which should make it an easier
+      owner sign-off when its time comes. Separately, a general
+      first-run guardrail worth carrying into whichever screen precedes
+      this one: NovelCrafter's worst onboarding wound (recurring
+      complaint, 2+ independent reviews) is that its most consequential
+      settings — AI provider, model, API key — are also its first-run
+      gate, and Scrivener's worst wound is a single early, hard-to-undo
+      template choice that causes documented "anxiety." Novella already
+      avoids the API-key trap by design (no key required, Ollama
+      local); the general lesson is to keep whatever this onboarding
+      flow asks small and reversible, never a consequential, hard-to-
+      undo choice this early.
 
 - [x] **Slash commands in the editor** — shipped 2026-07-22.
 - [x] **Writing sprints (the fourth app)** — shipped 2026-07-23.
@@ -312,6 +362,53 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       shipped) → seed prompt → batch generation through the existing
       context pipeline → thumbs-style keep/discard, with a kept idea
       landing as a Codex stub or task rather than a copy-paste dead end.
+- [ ] **Mobile: verify against the cursor-jump-on-save failure class,
+      make any offline/sync gap visible rather than silent, and add a
+      fast idea-capture path distinct from full drafting** — research
+      round 45 (2026-09-07): the mobile-responsive pass (Phase C,
+      shipped 2026-08-20) got the layout working but explicitly left
+      "the live transition between layouts... not verified"; this
+      round's dedicated mobile/offline pass across five competitors
+      sharpens exactly what that verification needs to check before
+      more mobile work (including the WITH-OWNER onboarding item
+      above, explicitly sequenced to land after mobile is solid)
+      builds on top of it. Two unrelated apps independently show the
+      same bug class: Campfire Write's App Store reviews report the
+      cursor jumping to the top of the document on Enter/Return past
+      roughly 2,500 words, present since at least 2023 and still
+      reported in 2026-dated review summaries despite a claimed 2024
+      "complete overhaul"; Sudowrite's own mobile Story Bible fields
+      independently exhibit cursor-jumping severe enough that official
+      guidance is "edit on desktop instead" (docs.sudowrite.com,
+      official). Two independently-built apps hitting the identical
+      failure mode in a mobile text field is evidence of a structural
+      risk in autosave-on-keystroke-plus-touch-input architectures, not
+      app-specific incompetence — a named test case Novella's
+      CodeMirror editor plus autosave path should be run against on a
+      real touch device before calling the mobile/responsive gate
+      solid. Separately, Campfire reviewers report desktop content
+      that "doesn't always transfer over to mobile, even if I sync it
+      before signing off" — a silent partial sync, worse than an
+      outright block because the writer has no signal anything is
+      missing; NovelCrafter's more honest alternative (block outright,
+      state plainly "no connection, no offline mode yet") is the
+      better failure mode of the two. Design principle worth adopting
+      explicitly: any offline/sync degradation in Novella's mode-gated
+      PWA must surface a visible state — a banner, a sync-pending
+      badge — never a quiet gap between what's on desktop and what's
+      on the phone. Separately, a weaker but repeated signal across
+      independent writer-app roundups: mobile's best-supported job is
+      fast idea/note capture ("ideas come at unexpected times... the
+      easiest way to save them before they slip away"), not sustained
+      drafting — every competitor checked (NovelCrafter, Sudowrite,
+      Dabble, Campfire) ships mobile as a shrunk desktop editor rather
+      than a capture-first surface. A one-tap, keyboard-first
+      quick-capture entry (a note that routes into the right
+      project/scene later, rather than a full editor session) would be
+      a genuinely different mobile thesis than "responsive," and is
+      cheap relative to a native app. Full findings, including a
+      correction to this repo's own round-40 Campfire version claim,
+      in RESEARCH.md Round 45.
 - [ ] **Auto-detect codex mentions in manuscript prose, and let an
       unrecognized name become a Codex entry inline** — research round 41
       (2026-09-03), a deliberate pass at competitor interaction mechanics
@@ -370,6 +467,46 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       rather than a hardcoded exclusion list, since a writer may
       reasonably want some custom fields in AI context (a character's
       speech quirks) and others (a private note-to-self) never sent.
+
+      Research round 45 (2026-09-07) extends this item's scope beyond
+      manuscript chapters: checked our own `vault.ts` — Novella
+      already computes real backlinks for explicit `[[ ]]` links
+      (`backlinksOf()`, surfaced in the Inspector's Links tab) and
+      already has a generic `"note"` type distinct from the structured
+      Codex categories, i.e. a free-form research-bucket area already
+      exists in the data model — but the passive detection this item
+      proposes for manuscript prose has no equivalent for loose notes,
+      so a research note that mentions "Wren" five times surfaces
+      nothing either. NovelCrafter's Snippets → Codex promotion
+      workflow (four deliberate promotion methods: manual entry, text
+      selection, extract, quick create — novelcrafter.com/help/faq/
+      snippets/uses-of-snippets, official) is the clearest precedent
+      for treating loose notes as a staging area that later becomes
+      structured, and is worth matching. Obsidian's unlinked-mentions
+      panel is genuinely used by novelists as a passive consistency
+      check while drafting — a documented pattern, not just a general
+      PKM habit — but draws recurring complaints for lacking scope/
+      filtering and for not scrolling in sync with the note being
+      edited (forum.obsidian.md/t/expanding-the-usefulness-of-
+      unlinked-mentions/40633) — the build spec for doing it better:
+      scope surfacing to the note currently open, filter to actual
+      Codex entities rather than every string match. One explicit
+      build caution: do not build a full backlink graph *among* loose
+      notes as a headline feature — the strongest source found this
+      round (zettelkasten.de/posts/backlinks-are-bad-links, "Backlinking
+      Is Not Very Useful — Often Even Harmful") argues automatic
+      backlinks without an asserted relationship are noise, not
+      insight, which is exactly why Novella's existing link-plus-
+      relationship-label Codex relation field (see the item below) is
+      already the better version of that idea. Keep any note-level
+      surfacing passive and scoped, not a second graph feature. Also
+      worth naming as the real design risk: Scrivener's Research
+      folder is well-reviewed in principle but multiple independent
+      accounts describe real-world underuse — set up once, rarely
+      reopened, because it sits outside the writer's moment-to-moment
+      loop — so a Novella research area only pays for itself if it
+      surfaces itself while drafting rather than requiring the writer
+      to go looking for it.
 - [ ] **A deliberate manuscript import flow — .docx/Markdown in, with a
       preview before anything touches the vault** — research round 42
       (2026-09-04): a dedicated pass on the "switching from another tool"
@@ -793,6 +930,63 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       easy). Scope as an optional structured "relation" field type on
       Codex entries (link + relationship label), not a full database/
       relation system — keep it flat, per the standing guardrail.
+
+      Research round 45 (2026-09-07) turns this from a single relation-
+      field ask into a full field-TYPE-system spec, and finds the
+      original scope was too narrow. NovelCrafter's Codex "Details"
+      system (novelcrafter.com/help/docs/codex/codex-details, official)
+      supports exactly four field types — Line (single-line text), Text
+      (multi-paragraph), Dropdown (user-defined options, with a
+      per-field toggle for whether the value shows next to the entry
+      name in the sidebar), and Codex Reference (a link to another
+      entry, explicitly documented as NOT merging the referenced
+      entry's own data into AI context — a pointer, not an inline
+      merge). Each Detail is defined once via a "Details Manager" and
+      attached to a Codex *type* (Character, Location, ...), so every
+      entry of that type inherits the same field set — a real, working
+      per-category template, not ad hoc per-entry fields. This beats
+      Scrivener on a specific, sourced point: a Literature & Latte
+      moderator confirms Scrivener's custom metadata is project-global,
+      not scoped per document type — a user who asked for different
+      fields on Characters vs. Scenes vs. Locations in one project was
+      told plainly "you can't have a document display specific ones,
+      while another document displays others"
+      (forum.literatureandlatte.com/t/different-custom-metadata-for-
+      different-scrivener-items/138391, official moderator answer) —
+      the workarounds offered were cosmetic (per-view column layouts,
+      emoji-in-title hacks, separate projects per collection). Scrivener
+      3 does add two field types NovelCrafter lacks — checkbox and
+      date — worth folding in as a strict superset: text, long-text,
+      select/dropdown, checkbox, date, and relation-to-entry. This also
+      confirms and sharpens round 42's per-field AI-visibility finding
+      with the exact wording: each Detail carries Always Visible /
+      Never Included / NSFW-only (the last exists specifically for
+      content like autopsy reports or character preferences a writer
+      wants recorded but not always sent to the model) — field-level,
+      not entry-level, and the single most concretely superior piece of
+      NovelCrafter's design found across this round's research.
+
+      Build caution, sharpened with sources on both sides of the
+      tension round 42 already named for Campfire: over-templating
+      isn't only a Campfire problem — a Plottr customer testimonial
+      independently names World Anvil's default schema "comprehensive
+      but not overwhelming (like World Anvil)" as the overwhelming
+      comparison point (plottr.com/series-bible-software) — but the
+      opposite failure is equally real and independently documented: a
+      2025 Obsidian-for-fiction-writers guide states plainly "most
+      writers abandon it within a week" from "the blank-slate problem"
+      of having to build every field themselves
+      (loreteller.com/learn/obsidian-fiction-writers-guide). Plottr's
+      own shipped answer — 20+ starter templates plus unlimited custom
+      attributes, the writer's choice which to use — is the one
+      product found this round that structurally splits the difference
+      rather than picking a side, and is the design precedent to copy:
+      ship default field templates per category, but make every field
+      deletable and every category startable blank. This item is now a
+      concrete, buildable data-model spec rather than an open-ended
+      "structured relations" idea, and it's the foundation the
+      NovelCrafter-parity item's codex-template sub-point below already
+      depends on.
 - [ ] **Voice-matching from the writer's own prose, not just style templates**
       — research round 11 (2026-07-28): checked our own Upload style flow
       (`InspectorPane.tsx`) — it imports a .txt/.md file as the literal body
@@ -1392,6 +1586,19 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       inside the drafting experience itself, not just across writing,
       planning, tasks and timer as separate apps — Novella already ships
       all of it as one surface.
+      Correction flagged by research round 45 (2026-09-07): round 40's
+      entry above states Campfire Write "shipped a real version bump,
+      v1.4.0 (≈2026-08-27), confirmed via the real campfirewriting.com
+      App Store listing." A round-45 mobile/offline research pass
+      re-checked Campfire's current App Store and Google Play listings
+      directly and found the top version on both stores is **1.3.2**
+      (iOS updated 2026-08-23, Android released 2026-07-08) — no
+      1.4.0 release found anywhere. One of the two checks is wrong; not
+      resolved here, since round 45 didn't have round 40's original
+      screenshot/fetch to compare against. Re-verify directly against
+      the live App Store/Play Store listing before citing either
+      version number in copy, and don't assume either round's claim
+      over the other without a fresh check.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent
@@ -1766,6 +1973,59 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-09-07 — Research round 45 (autopilot; no code). Housekeeping:
+  working tree clean at session start; the working branch
+  (`claude/exciting-cerf-otkgj3`) matched its own remote exactly, two
+  commits ahead of `origin/main` (rounds 43-44 committed there but not
+  yet merged into `main`) — this session's git-operations policy keeps
+  work on that branch rather than pushing straight to `main`, so this
+  round's commit lands there too rather than resolving that gap.
+  Four parallel deep-dive passes this round, on the four areas from
+  the standing research brief's checklist that hadn't had a dedicated
+  pass in rounds 41-44: (1) mobile and offline behavior — found the
+  same cursor-jump-on-save bug independently in Campfire's (since
+  2023, still reported in 2026) and Sudowrite's (mobile Story Bible
+  fields) native apps, evidence of a structural risk in
+  autosave-plus-touch-input architectures worth testing Novella's own
+  editor against; a silent-partial-sync complaint on Campfire framed
+  against NovelCrafter's more honest "no offline mode yet" block; and
+  a repeated signal that mobile's best-served job is fast idea capture,
+  not shrunk full drafting — also surfaced a probable error in this
+  log's own round-40 entry (Campfire's current App Store version reads
+  1.3.2, not the v1.4.0 claimed there; flagged, not resolved). (2)
+  dashboard/settings/onboarding — Campfire's per-project dashboard and
+  Notion's "hub of views plus ambient tools" template pattern both
+  independently model "a project home that isn't chapters," concrete
+  ammunition for the parked split-the-Board item; Cal AI's 2026
+  live-updating onboarding and repeated industry framing
+  ("if answers never visibly influence anything, users notice") de-risk
+  the parked conversational-onboarding item's mechanism. (3) Codex
+  field-type systems — NovelCrafter's exact four Detail types (Line/
+  Text/Dropdown/Codex Reference) and category-scoped Details Manager
+  beat Scrivener's confirmed project-global (not per-type) custom
+  metadata; independent over-templating (Campfire, now also World
+  Anvil) and under-templating (Obsidian, "abandon it within a week")
+  failure modes both hold, with Plottr's default-templates-plus-
+  unlimited-custom-attributes as the one product that splits the
+  difference — expanded the "Structured relations between Codex
+  entries" item from a single relation field into a full field-type
+  spec. (4) the research bucket — checked our own `vault.ts` and found
+  Novella already computes real backlinks for explicit `[[ ]]` links
+  and already has a generic free-form `"note"` type, but no passive
+  mention-detection for loose notes the way the existing auto-detect-
+  codex-mentions item proposes for manuscript prose; NovelCrafter's
+  Snippets-to-Codex promotion flow is the precedent to match, with an
+  explicit caution (backed by a Zettelkasten-community argument against
+  low-context automatic backlinks) not to build a full backlink graph
+  among notes as its own feature. One net-new item (mobile reliability
+  and a fast-capture path), no wholly new items from passes 2-4 —
+  their findings were folded into three existing items (split-the-Board,
+  conversational onboarding, structured Codex relations) and the
+  auto-detect-codex-mentions item, plus a correction flagged on the
+  no-outage item, per the roadmap's own instruction to strengthen
+  existing items over creating near-duplicates. Full notes in
+  RESEARCH.md Round 45.
 
 - 2026-09-06 — Research round 44 (autopilot; no code). Housekeeping:
   working tree clean; local branch was one commit ahead of `origin/main`

@@ -6566,3 +6566,611 @@ sharpening passes on prior findings.
   5xJUutV75BLU6u9LZndcDs (official, direct fetch)
 - ilampadmanabhan.medium.com/sudowrite-review
 - terribleminds.com/ramble/2018/07/11/the-save-the-cat-conundrum/
+
+# Round 45 (2026-09-07) — mobile/offline, dashboard precedent, Codex field types, and the research-bucket honesty check
+
+Housekeeping first: working tree was clean at session start. The working
+branch (`claude/exciting-cerf-otkgj3`) matched its own remote exactly and
+sits two commits ahead of `origin/main` (rounds 43-44 landed on the branch
+but haven't been merged into `main`) — this session's git-operations
+policy keeps work on that branch rather than pushing directly to `main`,
+so this round's commit continues there rather than closing that gap.
+
+**Four parallel passes this round, continuing the interaction-mechanics
+cadence rounds 41-44 established.** The task brief's long checklist still
+had four areas with no dedicated pass: mobile/offline behavior; dashboard/
+home-screen/settings/onboarding design; the Codex "Details" system as a
+field-TYPE system rather than a single relation field; and the loose-notes/
+research-storage/backlinks job distinct from the structured Codex. Each
+pass was briefed not to re-litigate the four-pillar bundle check or the
+litigation-date tracking (both exhaustively covered through round 40 and
+untouched since, by design) and not to re-research anything rounds 41-44
+already covered (codex mention-detection in manuscript prose, task/kanban,
+search, focus mode, outlining templates, corkboard modes, character-
+template design, Notion-vs-Obsidian DIY story bibles, manuscript import,
+collaboration/track-changes, AI brainstorming).
+
+## Pass 1 — Mobile and offline behavior across the category
+
+**Finding (official capability, corrects an assumption in this round's own
+brief): NovelCrafter has no offline mode of any kind, by explicit design,
+with no ETA.** Its own help center: "Right now you can only use
+Novelcrafter with an active internet connection... there is still many
+things that have to be done to finally make the switch. Currently there is
+no ETA" (novelcrafter.com/help/faq/general/can-i-use-nc-in-ofline-mode,
+last updated Feb 6, 2025, still the live answer). Corroborated
+independently by a dated review: "no offline mode, no native desktop or
+mobile app... browser-based only" (ilampadmanabhan.medium.com, April 2026)
+— **recurring**, two independent sources. A writer who loses signal gets a
+dead app, not a degraded local mode; NovelCrafter isn't a PWA with
+offline caching, just a responsive website.
+
+**Finding (official capability, documented parity gap): Sudowrite's mobile
+app is a deliberately lighter client, not a peer of desktop.** Official
+docs (docs.sudowrite.com) state mobile cannot create Visualize images,
+cannot generate new characters/Synopsis-from-Braindump/Worldbuilding
+elements in Story Bible, cannot create Series folders or change canonical
+timelines ("Full series management currently requires the web app"), and
+has no trash-recovery for deleted projects. **Recurring complaint,
+confirmed by both official docs and independent reviews:** cursor jumping
+in Story Bible text fields (synopsis/characters/worldbuilding/outline)
+while editing on mobile, severe enough that the standing workaround is
+"make changes on desktop instead"; a 4-star App Store review states
+plainly that "the write button to have ai help, everything that I enjoyed
+from the desktop version isn't available" on mobile — reviewer opinion
+that matches the documented gap exactly.
+
+**Finding (official capability, but flags a discrepancy against this
+round's own brief): Dabble's downloadable desktop app may still exist
+alongside its PWA push, not fully retired as round 30's log entry
+stated.** Dabble's own "What's New in 3.0" changelog
+(dabblewriter.com/docs/reference/whats-new-in-3) reads: "The downloadable
+desktop app is still there too, for Windows, Mac, and Linux, if that's
+what you'd rather run." Dabble 3.0 (launched 2026-07-14, confirmed via a
+"Dabble 3.0 Live Launch" event) is PWA-first with real offline support
+("Progressive Web Apps work offline and sync with the server whenever
+they are online") and real-time multi-editor sync avoiding conflicted-copy
+problems by design (CRDT-style architecture, not resolve-after-the-fact).
+**Flagging, not asserting either way:** whether the native desktop app is
+actually gone is now genuinely unclear between round 30's finding and this
+one — a direct re-check of Dabble's own download page belongs in a future
+round before citing "Dabble retired its desktop app" in copy again.
+
+**Finding (recurring complaint, the clearest multi-year pattern in this
+pass): Scrivener + Dropbox sync produces real, repeated, sometimes severe
+data loss, and the community's own standing advice is to triple-back-up
+as a hedge against the sync layer itself.** Literature & Latte's own
+support explains conflicts arise from interrupting sync or opening a
+project mid-sync, and that Scrivener "does its best to resolve all
+conflicts... won't create conflicted copies... where one file is
+unambiguously newer than the other" — but when it can't tell, Dropbox
+creates a conflicted copy, and manual (not automatic) sync is the
+recommended mitigation specifically so Scrivener keeps control of
+reconciliation. Independent community reports describe "losing months of
+work when Scrivener files got inexplicably deleted," called "a common
+issue." This is the single clearest recurring complaint of the whole pass
+— the same failure mode (interrupted/overlapping Dropbox sync →
+corrupted or vanished project) recurs across years of independent reports.
+Scrivener's own offline story is otherwise the most mature of the group —
+fully native, works entirely offline, syncs on reconnect — the failure is
+specifically in the sync layer, not the offline editing itself.
+
+**Finding (recurring complaint, and a version-number correction to this
+repo's own round-40 log entry): Campfire Write's cursor-jump-on-save bug
+is multi-year and still reported in 2026, and the app's current version
+is 1.3.2, not the 1.4.0 this repo's round 40 claimed.** Reviewer gabbi99
+(Aug 2023, 4★): "Every time I hit enter/return it jumps up to the top...
+when my chapters are past the 2500 word count, its quite the pain to have
+to scroll all the way back down." Aggregated 2026-dated review summaries
+report the same complaint persisting despite a claimed 2024 "complete
+overhaul." A second, distinct recurring failure mode — data loss on save
+— has two independent reports: "I've lost whole chapters sometimes because
+it glitched while saving" (reviewer \_lIIZ, Aug 2023) and "the app crashes
+CONSTANTLY you will lose work you thought was safe" (reviewer
+ApesStongPancakes, Mar 2023). A third, distinct failure — silent partial
+sync — has its own independent report: "my notes in the desktop version
+don't always transfer over to mobile, even if I sync it before signing
+off" (reviewer BettyBond451/gabbi99). **Version correction:** this
+round's direct check of Campfire's current App Store (updated 2026-08-23)
+and Google Play (released 2026-07-08) listings finds the top version on
+both stores is **1.3.2** — no 1.4.0 release found anywhere, contradicting
+round 40's log entry, which claimed "Campfire Write shipped a real version
+bump, v1.4.0 (≈2026-08-27), confirmed via the real campfirewriting.com
+App Store listing." One of the two checks is wrong; not resolved here
+since this round didn't have round 40's original screenshot to compare
+against — flagged in the "no-outage" roadmap item for a future direct
+re-check rather than silently overwritten.
+
+**Finding (official/structural): Obsidian is the strongest offline story
+alongside Scrivener, but its sync is either paid or a community
+workaround, and roughly 30% of desktop plugins have no mobile
+implementation.** Obsidian Sync costs ~$4-10/user/month; free
+alternatives (iCloud natively, or Dropbox/Google Drive/Syncthing via
+community plugins) exist and are commonly used by writers but inherit
+whatever conflict behavior the underlying cloud provider has — the same
+class of problem Scrivener has via Dropbox. The ~30% plugin-compatibility
+gap on mobile is structural (a plugin author must opt in), and matters
+specifically because prior rounds' Obsidian-novelist-setup findings
+(round 42's five-plugin drafting stack, e.g.) are largely DIY plugin
+assemblies that may simply not run on a phone at all.
+
+**Finding (pattern claim from aggregated secondary sources, moderate
+confidence): mobile's best-supported job across the category is fast idea
+capture, not sustained drafting, and every competitor checked ships mobile
+as a shrunk desktop editor instead.** Independent writer-app roundups
+converge on framing like "ideas come at unexpected times... the easiest
+way to save them before they slip away is to use a phone," crediting
+zero-friction capture tools (Drafts, not novel-specific) for adding no
+friction before the first keystroke. "Novelist" (novelist-app.com) is
+called out as unusual specifically for being mobile-first with desktop
+secondary. This is a real but softer signal than the recurring-complaint
+findings above — treat as suggestive, not proven.
+
+**Implication for Novella.** Novella's own mobile-responsive pass (Phase
+C, shipped 2026-08-20) collapsed the desktop three-column grid into one
+track plus drawers — the same "shrunk desktop" shape every competitor
+above chose, not a distinct capture-first mobile thesis. Phase C also
+explicitly left "the live transition between layouts... not verified" in
+a real browser. This pass turns that open verification into a concrete
+test spec: the cursor-jump-on-save bug is independently confirmed in two
+unrelated apps (Campfire, Sudowrite), which is evidence of a structural
+risk in autosave-on-keystroke-plus-touch-input architectures rather than
+app-specific incompetence — worth testing Novella's own CodeMirror editor
+against on a real touch device specifically, not just general mobile QA.
+Separately, any offline/sync degradation Novella's mode-gated PWA hits
+should surface as a visible state (a banner, a sync-pending badge) —
+NovelCrafter's honest hard-block beats Campfire's silent partial sync,
+and Novella should copy the honest failure mode, not the silent one.
+
+## Pass 2 — Dashboard/home-screen design, settings organization, onboarding
+
+**Finding (official capability, concrete click counts): Dabble's
+"bookshelf" dashboard groups projects into user-defined Collections, sorts
+the most recently touched project first, and gets a writer back into
+active work in one click.** (dabblewriter.com/docs/getting-started/
+the-dashboard, official). View switcher filters Active/Templates/
+Archived/Trashed, the latter two appearing only once populated —
+progressive disclosure by content, not a settings toggle. Reviewer
+opinion (thewritepractice.com, kindlepreneur.com) repeatedly calls it
+"clean" and "practically no learning curve."
+
+**Finding (official capability, a documented first-party admission of
+dashboard failure and correction): Sudowrite's own November 2024
+changelog describes walking its homepage back from clutter toward
+minimalism.** "Project Folders Are Here! Plus a Cleaner Homepage" states
+the prior sidebar of resource links and banners "created unnecessary
+distractions"; the fix moved resources into a dismissible card, made
+search "effectively instant," and relocated Trash into Settings, in
+service of getting "out of your way so you can stay focused on what
+matters." A first-party, dated example of a competitor correcting course
+on exactly the kind of dashboard clutter worth avoiding by default.
+
+**Finding (recurring complaint, 2+ independent sources): NovelCrafter's
+onboarding friction concentrates in settings, not a separate screen —
+BYOK setup is described as "developer work, not writer work."** Users
+report feeling they "had to be AI gurus to get started" and spent more
+time "adjusting settings and fine-tuning the system" than writing
+(ilampadmanabhan.medium.com; dreamgen.com/blog). NovelCrafter's own
+beginner guide explicitly warns new users "don't dump everything at once"
+into the empty Codex — official capability confirming the empty-Codex
+problem is real enough to need documented mitigation. Onboarding here is
+documentation-driven (an external "Ultimate Beginners Guide" course), not
+an in-app guided flow, unlike Sudowrite's in-product tour.
+
+**Finding (recurring complaint + official/documented behavior): Scrivener's
+Template Chooser is an unavoidable per-session decision screen, and expert
+consensus is to route around it.** If no project was open at last quit,
+Scrivener shows a Template Chooser (macOS)/Start Panel (Windows) every
+launch. Multiple independent writer-advice sources (ProWritingAid guide,
+Gwen Hernandez, Scrivener Classes materials) converge on "feature overload
+[is] the number one complaint," with template choice specifically causing
+anxiety — fear of picking wrong, then being afraid to delete the resulting
+scaffolding. The seasoned-user workaround, tellingly, is to recommend the
+**Blank** template — i.e., experts tell newcomers to route around
+Scrivener's own onboarding choice architecture rather than use it as
+designed.
+
+**Finding (official capability, a relevant existing precedent for the
+parked Board item): Campfire already ships a per-project dashboard
+distinct from any single module.** "Pinned articles, recent changes, and
+anything else you've elected to see here," with a left-hand asset list of
+all articles/modules (kindlepreneur.com Campfire review; campfirewriting.
+com/learn). This is structurally close to what Novella's split-the-Board
+item is reaching for: a project home that is not the manuscript view.
+
+**Finding (observed pattern across many independently-built templates):
+Notion's popular novel-planning "home pages" converge on a hub-of-views
+shape, not a stats dashboard.** Surveyed via gridfiti.com's roundup and
+individual template listings: Scriborg offers tabs to view the same WIP
+as a timeline, by acts, or as an overview, each with progress bars; the
+Novel & Fanfic Writer's Hub bundles 10 main pages/21 sub-pages behind one
+entry point with a Pomodoro timer, cover-art slot, and moodboard-link
+widgets. The consistent pattern across many independently-built templates:
+"home" is a table of contents plus a couple of ambient tools, not an
+app-style numbers dashboard.
+
+**Finding (internal tension, both sides documented, no clean resolution
+found): scaffolded empty states reduce blank-page fear but create
+clutter-anxiety later, and un-scaffolded ones avoid that but go
+undiscussed.** Scrivener's Fiction template ships sample chapter/scene
+placeholder content specifically to show structure — but this is exactly
+what produces the "afraid to delete extraneous files" anxiety documented
+above. Dabble and Sudowrite take the opposite approach (near-zero
+scaffolding, one big "Create a Project" CTA) and draw no equivalent
+complaint in sources found — though this may be under-reported rather
+than solved, since their projects also start essentially featureless.
+
+**Finding (2026-dated precedent, generalizes the parked onboarding item's
+mechanism beyond Lingrow): Cal AI's onboarding shows every answer
+visibly changing the app before any paywall, and this is now a
+multi-example, named industry pattern, not one app's idiosyncrasy.** A
+2026-dated teardown (tasu.ai/library/cal-ai) documents a 32-screen flow
+where every input triggers a live animation — progress bars, graphs and
+numbers updating in place — ending in a plan-generation screen with an
+animated projected-outcome curve drawn from the user's own answers, shown
+before any paywall. MyFitnessPal and Duolingo are repeatedly cited by
+independent 2026 UX-strategy write-ups (userpilot.com, adapty.io) as older
+canonical examples of the identical mechanic. Those sources converge on a
+rule stated almost verbatim across independent authors: "if a user's
+answers never appear to influence anything, they notice."
+
+**Implication for Novella.** Two of these findings are ammunition for the
+parked WITH-OWNER items rather than build-now items: Campfire's
+per-project dashboard plus the Notion hub-of-views pattern (two
+independent lineages, stronger together than either alone) sharpen what
+"a board that isn't chapters" could concretely look like; the Cal AI/
+MyFitnessPal/Duolingo pattern de-risks the scripted-onboarding mechanism
+the owner already approved conceptually, since it's chasing an
+established convention with 3+ independent examples now, not a Lingrow
+idiosyncrasy. A third, smaller finding is a general design guardrail
+rather than a new item: NovelCrafter's and Scrivener's worst onboarding
+wounds both trace to one early, consequential, hard-to-undo screen (an
+API-key/model choice; a project template) — Novella already avoids the
+API-key trap by design, but the general lesson (keep any first-run
+decision small and reversible) is worth carrying into whatever screen
+precedes the scripted onboarding conversation.
+
+## Pass 3 — Codex Details as a field-type system, not just a relation field
+
+**Finding (official capability, the exact spec): NovelCrafter's Codex
+Details system supports exactly four field types, defined once per Codex
+category and inherited by every entry of that type.** Line (single-line
+text), Text (multi-paragraph), Dropdown (user-defined options, with a
+per-field sidebar-visibility toggle), and Codex Reference (a link to
+another entry, explicitly documented as NOT merging the referenced
+entry's data into AI context — a pointer, not an inline merge)
+(novelcrafter.com/help/docs/codex/codex-details; novelcrafter.com/courses/
+ultimate-beginners-guide/structuring-your-codex-with-custom-details, both
+official). A global "Details Manager" attaches each Detail definition to
+one or more Codex types — a real, working, reusable per-category
+template, not ad hoc per-entry field creation.
+
+**Finding (official capability, exact wording, sharpens round 42's
+finding): each Detail carries a three-state AI-visibility setting.**
+"Always visible" / "Never included" / "NSFW-only" (the last for content
+like autopsy reports or character preferences a writer wants recorded but
+not always sent to the model) — field-level, not entry-level. This is the
+single most concretely superior piece of NovelCrafter's design found
+across this round's four passes.
+
+**Finding (recurring complaint, the inverse of Campfire's failure mode):
+NovelCrafter's Codex has a real maintenance-burden complaint distinct
+from setup friction.** A DreamGen review (dreamgen.com/blog/articles/
+novelcrafter-review) quotes a user who "spent more time configuring the
+system than writing" because Codex summaries needed constant revision for
+different scenes — upkeep friction, not blank-page setup friction.
+
+**Finding (official capability, a precise sourced limitation, direct
+counter-example for Novella's design): Scrivener's custom metadata is
+project-global, not scoped per document type, and Literature & Latte's
+own moderator confirms it as a hard limit.** A user asked for exactly the
+per-category templating NovelCrafter has (different fields for Characters
+vs. Scenes vs. Locations in one project); the moderator's answer: "Custom
+metadata is common across all documents... you can't have a document
+display specific ones, while another document displays others"
+(forum.literatureandlatte.com/t/different-custom-metadata-for-different-
+scrivener-items/138391, official). Workarounds offered were cosmetic
+(per-view column layouts, emoji-in-title hacks, separate projects). Custom
+metadata does support four types itself — free text, checkbox, value/
+option list, and date — a real superset of NovelCrafter's four on type
+variety (adds checkbox/date, lacks a relation type) even though it loses
+on scoping.
+
+**Finding (official/observed, confirms and extends prior rounds'
+Dataview finding with concrete syntax): Obsidian frontmatter conventions
+for novelists are informal and unenforced, and Dataview turns them into
+queryable tables via plain syntax.** A 2025-dated guide (loreteller.com/
+learn/obsidian-fiction-writers-guide) documents common character
+frontmatter (`type`, `role`, `age`, `first-appearance`, `status`) and a
+concrete Dataview query example:
+```
+TABLE role, age, first-appearance
+FROM "Characters"
+WHERE role = "antagonist"
+SORT first-appearance ASC
+```
+Fields are entirely hand-typed with no schema enforcement, so consistency
+depends on the writer typing the same key names every time.
+
+**Finding (recurring complaint, the named counterpart to Campfire's
+over-templating failure — under-templating): the same Loreteller guide
+states plainly "most writers abandon [Obsidian for fiction] within a
+week" due to "the blank-slate problem," warning against "spending three
+weeks building structure before writing" and recommending Scrivener
+instead for writers who want immediate usability.** A second, independent
+data point on the over-templating side: a Plottr customer testimonial
+(plottr.com/series-bible-software) names World Anvil's default schema
+"comprehensive but not overwhelming (like World Anvil)" — a second named
+app, independently criticized on the identical axis as Campfire (Reedsy
+review, round 42), strengthening that as a real recurring pattern rather
+than a single anecdote.
+
+**Finding (observed user behavior, real named template but a genuine
+research gap on the rest): Notion novel-template field schemas diverge
+wildly, from simple to deeply relational, and most marketplace templates
+resist verification without opening them inside Notion.** The one
+template verifiable in real depth — Kevin Barrett's "Ultimate Notion
+Character Template" (storyflint.com/blog/notion-character-template;
+medium.com/storyflint) — links one Characters database to seven separate
+attribute databases (Archetypes, Enneagrams, Values, Needs, Positive/
+Negative Traits, Emotions) with a rollup auto-aggregating likely emotions
+from selected traits: genuinely relational, formula-driven, but also
+eight databases of scaffolding for one character sheet. Other named
+templates (W.I.P., Storybook Master/Pro, Save the Cat beat-sheet systems)
+are confirmed to exist and to include the sections claimed, but their
+exact property lists were not extractable — Notion marketplace previews
+are JS-rendered and blocked WebFetch. **Honest gap, not a finding:**
+there is no confirmed informal-standard schema for novel Notion
+templates the way there roughly is for project-management templates; a
+future round should screenshot 3-4 paid templates from inside Notion
+directly before committing to specific rollup/formula behavior in
+Novella's design.
+
+**The synthesized design precedent: Plottr splits the difference rather
+than picking a side.** Plottr ships 20+ default character/place templates
+plus unlimited custom attributes, the writer's choice which to use — the
+one product found in this round's research that structurally resolves the
+over-templated-vs-under-templated tension rather than landing on one
+extreme.
+
+**Implication for Novella.** This substantially expands the existing
+"Structured relations between Codex entries" roadmap item, which had
+scoped only a single relation field type. The concrete build target is
+now: category-scoped custom fields (a Details-Manager-equivalent) with at
+minimum text, long-text, select/dropdown, checkbox, date, and
+relation-to-entry — a strict superset of NovelCrafter's four types,
+folding in Scrivener 3's checkbox/date — plus field-level AI-visibility
+(Always/Never/NSFW-only) matching NovelCrafter's exact mechanism. Ship
+default field templates per category, but keep every field deletable and
+every category startable blank, per the Plottr precedent — the over-
+templating risk (Campfire, now also World Anvil) and the under-templating
+risk (Obsidian) are both real and independently documented, and Novella's
+flat/no-lock-in thesis makes an all-or-nothing schema doubly risky either
+way.
+
+## Pass 4 — The research bucket: loose notes, unlinked mentions, and an honest overlap check
+
+**Checked our own code first.** `src/core/vault.ts`'s header comment
+already describes the engine as building "links, backlinks, search,
+graph" from a folder of Markdown files; `backlinksOf()` computes real
+backlinks for explicit `[[ ]]` links, surfaced in the Inspector's "Links"
+tab (`InspectorPane.tsx`). The `NoteType` union already includes a
+generic `"note"` type distinct from the structured Codex categories
+(`character`/`location`/`lore`/`faction`/`object`) and from
+`chapter`/`scene` — i.e., a free-form research-bucket area already
+exists in the data model, and real backlink computation already exists
+for explicit links. What doesn't exist: passive detection of an
+unlinked mention inside a loose note, the way the existing (round 41)
+auto-detect-codex-mentions item proposes for manuscript prose — a note
+that mentions "Wren" five times without a `[[ ]]` surfaces nothing.
+
+**Finding (observed user behavior, novelist-specific, not general PKM):
+Obsidian's unlinked-mentions panel is genuinely used by novelists as a
+passive consistency check while drafting.** (Steven Thompson, Medium,
+"Using Obsidian's Unlinked Mentions for Information Retrieval";
+corroborated by the Obsidian forum thread below). **Recurring complaint,
+2+ independent signals:** the feature is functionally weak in current
+form — no scroll-sync with the editor, no filtering ("just my series-wiki
+references," not every stray string match), no one-click "open this"
+action (forum.obsidian.md/t/expanding-the-usefulness-of-unlinked-
+mentions/40633); a community plugin (UnLime) was updated in 2025
+specifically to let users suppress unlinked-mentions noise, confirming
+the raw feature is considered noisy enough to need active suppression.
+
+**Finding (reviewer opinion, moderate confidence — leans one way but not
+unanimous): graph view is discussed by novelists more as visual
+reassurance than as a working navigation tool.** A fiction-specific
+source warns under "Common Mistakes": "New Obsidian users link
+aggressively because the graph view looks impressive with lots of
+connections" (loreteller.com) — the graph incentivizes bad linking
+hygiene rather than aiding thought. A diarist reports he "got out of the
+habit of looking at" his graph because it wasn't easy to follow
+(danallosso.substack.com). **Methodology caveat, stated honestly:**
+Reddit is not directly crawlable in this sandbox's fetch environment, so
+this pass could not pull the verbatim Reddit novelist testimony the task
+brief specifically asked for — blog/Substack/forum testimony is a
+reasonable proxy but a real gap against the original ask.
+
+**Finding (official capability, the clearest precedent for a loose-to-
+structured promotion flow): NovelCrafter has a genuine three-tier system
+— Snippets, Codex, and per-entry Notes — with a named, deliberate
+promotion path between the first two.** Snippets are explicitly
+"braindumps, kitbashing, research and notes-to-self," pinned in the
+sidebar for reference while writing/plotting/chatting; four deliberate
+promotion methods move Snippet content into the Codex (manual entry, text
+selection, extract, quick create) (novelcrafter.com/help/faq/snippets/
+uses-of-snippets, official). This is the cleanest precedent found for
+"research bucket → promote to structured entry" as a first-class,
+named workflow rather than an afterthought.
+
+**Finding (official capability + recurring complaint about underuse, the
+real design risk for any research area): Campfire has a dedicated
+Research Module (weblinks, images, PDFs, annotated videos) and a Maps
+module supporting region annotations, but Scrivener's long-established
+Research folder — while well-reviewed in principle — is documented as
+commonly underused in practice.** One source calls Research folders "one
+of Scrivener's big areas that many users do not make full use of"; a
+writer's own account describes opening it "every now and then... look at
+it, mess around a little, and close it again"
+(hjsmithwilliams.substack.com). Where it is used, it's used as advertised
+— split-screen alongside the manuscript to avoid alt-tabbing — but the
+headline risk is that a research area survives only if it stays in the
+writer's daily loop, not on how rich its file-type support is. Campfire's
+own annotation mechanics could not be verified past the capability-exists
+level — the tutorial page's body content wasn't fetchable, a gap not a
+finding.
+
+**Finding (multi-source "App A + App B, because X" pattern, confirmed in
+two directions): writers pair a drafting tool with a separate visual/
+networked tool specifically because the drafting tool's research area is
+flat, unconnected storage.** Scrivener/Obsidian (text) + Notion/Obsidian
+(networked bible) — Scrivener's research folder is "document storage, not
+a connected knowledge system" (quillandsteel.com). Scrivener/Notion +
+Milanote/Pinterest (visual) — a writer quoted preferring Milanote because
+"I like to visualize more than Scrivener allows," with Milanote
+characterized as "strong for research and moodboarding but weak as a
+primary writing environment" (paired, never a replacement). World Anvil's
+own community-suggestion board carries an open, unresolved request titled
+"Dynamic Notes - Visual boards" asking for native Milanote-style pinboard
+functionality (worldanvil.com/community/voting, 403 on direct fetch,
+existence confirmed via search) — the request itself confirms writers
+want the visual-board experience inside their story tool rather than
+switching apps. A narrower, within-one-tool variant: some novelists keep
+two separate Obsidian vaults (general PKM vs. the novel) specifically to
+avoid "cross-contamination" between personal notes and story material
+(forum.obsidian.md, "Multiple Vaults: Separate PKM from Creative
+Writing?"). Two branches of the same pattern converge on one reason:
+existing tools treat research as flat storage, not a place to think
+visually or make connections.
+
+**Finding (the round's most important caution, an honest overlap check
+against Novella's own already-planned Codex relation field): automatic
+backlinks between notes, without an asserted relationship, are argued to
+be noise rather than insight — and Novella's planned design is already
+the better version of that idea.** The strongest single source
+(zettelkasten.de/posts/backlinks-are-bad-links, "Backlinking Is Not Very
+Useful — Often Even Harmful") argues automatic backlinks connect *notes*,
+not *knowledge*: a list of titles with no explanation of *why* the
+connection matters increases cognitive load rather than reducing it,
+and meaningful linking requires the writer to assert the relationship and
+reasoning at write-time — exactly the link-plus-relationship-label
+pattern the "Structured relations between Codex entries" item (Pass 3,
+and prior rounds) already scopes. Where backlinks plausibly add value
+distinct from Codex mention-tracking, based on the pattern actually
+observed: not "which scenes mention this character" (already covered,
+round 41) but note-to-note connections among the *loose* research
+material itself before anything is structured — e.g., a worldbuilding
+sketch about a religion linking to a separate research note about a
+real-world historical analog, tracing how one idea led to another,
+independent of any Codex entity. Even NovelCrafter's Snippets model,
+the best precedent found, is a manual promotion flow, not a backlink
+graph among snippets — so this is a plausible, narrow value proposition,
+not a proven one.
+
+**Finding (inference-supported, not complaint-confirmed — an honest
+gap): demand for annotating non-text reference material (a face-claim
+photo, a map, a mood-board image) is inferable but not directly
+evidenced by a novelist complaint thread.** Campfire (annotated images/
+PDFs/video in its Research Module) and World Anvil (linkable map pins)
+both ship some version of this; a wide market of generic photo-markup
+tools (Apple Markup, Evernote's "Write Over Photo") exists because
+"circle a detail, add an arrow, handwrite a note" is a common general
+need. No source found ties this explicitly to a novelist complaining a
+writing tool lacks it — worth a smaller, targeted follow-up pass hunting
+that complaint before treating this as roadmap-ready.
+
+**Implication for Novella.** This is folded into the existing auto-
+detect-codex-mentions roadmap item rather than spun out as a new "Research
+Bucket" feature, because Novella already has both halves of the raw
+mechanism (a generic `"note"` type; real backlink computation for explicit
+links) — the actual gap is passive, scoped mention-surfacing inside loose
+notes (matching the Obsidian complaint-pattern spec: scope to the open
+note, filter to real Codex entities, no full-graph feature) plus a
+promotion path modeled on NovelCrafter's Snippets. The explicit caution
+against building a backlink graph among notes as its own pillar feature is
+the load-bearing finding of this pass — the overlap risk the task brief
+itself flagged is real, and manufacturing a distinct feature here would
+be worse than being honest that Novella's existing relation-field plan
+already covers the higher-value version of this job.
+
+## What changed in "Next up"
+
+One net-new item: **Mobile — verify against the cursor-jump-on-save
+failure class, make offline/sync gaps visible, add a fast idea-capture
+path** — placed directly after the AI-brainstorm item, since it closes
+Phase C's own explicitly-left-open verification gap and gates the
+already-parked conversational-onboarding item, which is sequenced to
+land only after mobile is solid.
+
+No other new items — this round's other three passes strengthened
+existing items rather than creating near-duplicates, per the roadmap's
+own standing instruction: the auto-detect-codex-mentions item now
+explicitly extends to loose notes (with the backlink-graph build
+caution); the "Structured relations between Codex entries" item is
+substantially expanded from a single relation-field ask into a full
+field-type-system spec (NovelCrafter's four Detail types, Scrivener's
+confirmed global-metadata limitation, the over/under-templating tension,
+Plottr's split-the-difference precedent); the two parked WITH-OWNER items
+(split-the-Board, conversational onboarding) each got a research-ammunition
+paragraph without any scope decided for the owner; and the "no-outage"
+item got a flagged, unresolved version-number discrepancy on Campfire
+Write rather than a silent overwrite of round 40's claim.
+
+## Round 45 sources
+
+- novelcrafter.com/help/faq/general/can-i-use-nc-in-ofline-mode
+- ilampadmanabhan.medium.com/novelcrafter-review-64d391c629a2
+- docs.sudowrite.com (mobile app, interface, quick-start docs)
+- apps.apple.com/us/app/sudowrite-ai-novel-writing/id6740884542
+- play.google.com/store/apps/details?id=com.humanplusplus.sudowrite
+- dabblewriter.com/blog/dabble-going-mobile
+- dabblewriter.com/docs/reference/whats-new-in-3
+- dabblewriter.com/docs/getting-started/the-dashboard
+- youtube.com/watch?v=1ScKRnwQqH0 (Dabble 3.0 Live Launch)
+- scrivener.tenderapp.com/help/kb (Dropbox syncing with iOS, troubleshooting)
+- literatureandlatte.com/forum/viewtopic.php?t=35035
+- loreteller.com/learn/scrivener-dropbox-sync
+- apps.apple.com/us/app/campfire-write-your-book/id1626123915 (reviews)
+- justuseapp.com/en/app/1626123915/campfire-write-your-book/reviews
+- campfire-write-your-book.en.uptodown.com/android/versions
+- eesel.ai/blog/obsidian-pricing
+- publish.obsidian.md/hub (mobile-compatible plugins)
+- codeculture.store/blogs/developer-culture/obsidian-mobile-problems-2025
+- xda-developers.com (5-plugin Obsidian novel-writing stack)
+- medium.com/@EightTwo_Three/can-writing-a-novel-on-your-phone-be-a-good-idea
+- thewritepractice.com/dabble-review, kindlepreneur.com/dabble-writer
+- feedback.sudowrite.com/changelog (cleaner homepage, Nov 2024)
+- dreamgen.com/blog/articles/novelcrafter-review
+- novelcrafter.com/courses/ultimate-beginners-guide/setting-up-the-codex
+- prowritingaid.com/art/1071 (Scrivener guide); gwenhernandez.com (template anxiety)
+- forum.literatureandlatte.com/t/153272 (startup/reopen behavior)
+- selfpublishing.com/campfire-writing-review, kindlepreneur.com/campfire-write-review
+- gridfiti.com/notion-templates-for-writers
+- tasu.ai/library/cal-ai
+- userpilot.com/blog/onboarding-ux-examples, adapty.io/blog (personalized onboarding)
+- apps.apple.com/us/app/lingrow-ai-language-learning/id6756194665
+- novelcrafter.com/help/docs/codex/codex-details
+- novelcrafter.com/courses/ultimate-beginners-guide/structuring-your-codex-with-custom-details
+- novelcrafter.com/help/docs/codex/codex-categories
+- storyflint.com/blog/notion-character-template, medium.com/storyflint
+- notion.com/templates/wip-advanced-system-for-novel-writers
+- notion.com/templates/save-the-cat-plot-outline
+- loreteller.com/learn/obsidian-fiction-writers-guide
+- forum.literatureandlatte.com/t/138391 (custom metadata per document type)
+- plottr.com/series-bible-software
+- writerunboxed.com/2022/02/22 (Scrivener metadata)
+- help.obsidian.md/plugins/backlinks
+- medium.com/@brickbarnblog/using-obsidians-unlinked-mentions-for-information-retrieval
+- forum.obsidian.md/t/40633 (expanding unlinked mentions), /t/79628 (multiple vaults)
+- pjordan.substack.com, knowledgeaccumulation.substack.com, danallosso.substack.com (graph view)
+- novelcrafter.com/help/faq/snippets/uses-of-snippets
+- campfirewriting.com/learn/research-tutorial
+- scribecount.com/author-resource/writing-tools-for-authors/campfire-write-for-indie-authors
+- literatureandlatte.com/blog/use-scriveners-research-folder-to-store-information-about-your-project
+- fantasy-faction.com/2016/using-scrivener-to-store-your-research-notes
+- hjsmithwilliams.substack.com/p/the-no-fluff-guide-to-scrivener
+- writerunboxed.com/2021/05/25 (Scrivener research/notes)
+- zettelkasten.de/posts/backlinks-are-bad-links
+- milanote.com/templates/creative-writing/novel-moodboard
+- worldanvil.com/community/voting (Dynamic Notes visual-board request, 403 on fetch)
+- quillandsteel.com/blogs/writing-tips/notion-vs-obsidian-worldbuilding
