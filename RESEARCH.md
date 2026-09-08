@@ -6566,3 +6566,277 @@ sharpening passes on prior findings.
   5xJUutV75BLU6u9LZndcDs (official, direct fetch)
 - ilampadmanabhan.medium.com/sudowrite-review
 - terribleminds.com/ramble/2018/07/11/the-save-the-cat-conundrum/
+
+# Round 45 (2026-09-08) — book formatting as an unexamined second-app pairing, plus a fast recheck of open threads
+
+Housekeeping first: working tree was clean at session start (`git status`
+verified before any edit). `main` and the working branch were in sync at
+the point this round's research began.
+
+Two passes this round: a deep dive on a second-app pairing this research
+program had never given a dedicated pass despite 44 prior rounds (book
+formatting/typesetting for publishing — Vellum/Atticus), and a fast
+recheck of several threads left open at the end of round 44.
+
+## Pass 1 — Vellum/Atticus and the "format in a dedicated tool" pairing
+
+**Checked our own code first.** `src/export/formats.ts`'s EPUB generator
+is one hardcoded stylesheet with no theme choice, no cover-image
+embedding, no configurable front matter beyond an auto-generated title
+page, and no scene-break styling at all. `src/export/printPdf.ts` is
+literally `window.print()` on a styled HTML page — no page numbering, no
+widow/orphan handling, no trim-size awareness. This is the honest
+baseline the rest of this pass compares against: Novella's export today
+is behind even Draft2Digital's free web formatter, not just behind the
+paid dedicated tools.
+
+**Finding (official capability): Scrivener's Compile is not missing an
+export pipeline — it has one, and has had one for years.** Literature &
+Latte's own docs describe it as "capable of producing beautiful-looking
+ebooks and PDFs suitable for self-publishing"
+(literatureandlatte.com/export-to-vellum, official).
+
+**Finding (reviewer opinion, 2026, the sharpest single characterization
+found): "Compile Is a Nightmare... a UI labyrinth that has, over
+Scrivener's eighteen-year history, spawned an entire ecosystem of
+third-party courses"** dedicated to teaching this one feature, drawing
+the real ceiling precisely: **"Scrivener can produce a functional EPUB
+and a clean DOCX. It cannot produce typeset-quality PDF"** — no drop
+caps, no widow/orphan control, one generic EPUB variant, no complete
+front/back-matter templates. Prices the two-tool workflow at $200-350+
+against Scrivener's advertised $59.99 once Vellum ($249.99) or Atticus
+($147) is added (deckle.studio/is-scrivener-worth-it-2026).
+
+**Finding (observed user behavior, official Literature & Latte forum,
+direct author quotes): a Scrivener/Vellum interoperability thread names
+exact failure modes, not a vague preference.** "[Vellum's] control of
+Widows and Orphans is better, and the overall evenness of the layout is
+a thing of beauty"; Scrivener's "printed output can be a little bit hit
+or miss when it comes to the final polish," and fixed-format inline
+blocks (in-story texts/emails) are "tricky to move across" in Compile.
+Tellingly, Literature & Latte's own response wasn't to fix Compile — it
+was to ship a dedicated "Vellum Export" compile format (style-name
+overrides added in Scrivener 3.0.3) that produces a Vellum-ready .docx.
+The vendor's own fix concedes that real formatting happens downstream, in
+Vellum (forum.literatureandlatte.com/viewtopic.php?t=52316, official
+forum).
+
+**Finding (reviewer opinion, Reedsy, dated 2026-06-02): "Vellum is the
+tool most professional indie authors use and produces the cleanest ebook
+and print formatting of any tool on the market,"** crediting curated
+chapter styles, drop caps, and scene-break ornaments looking polished
+"without any manual CSS editing" (reedsy.com/blog/guide/book-writing-
+software/vellum-software). Reading these together: this second-app
+pairing isn't about a missing feature (the pattern behind every other
+"second app" finding logged so far) — it's about the cost of expertise
+required to get equivalent results from a general-purpose renderer,
+which Vellum/Atticus collapse into a handful of pre-typeset choices.
+
+**Finding (official capability, vellum.pub/help.vellum.pub): the concrete
+Vellum interaction.** Import is Word (.docx) only, no Scrivener-native or
+plain-text path — Scrivener writers export via the dedicated Vellum
+compile format specifically to get an import-clean file. Vellum
+auto-builds a title page and TOC from the imported heading structure. A
+**Book Styles** panel of 26 curated presets applies globally and to every
+new chapter automatically, bundling drop caps, embedded fonts, and 7
+built-in scene-break dividers. Live device preview runs in Draft Mode
+(fast/approximate) and Proof Mode (accurate/slow) across a range of
+e-readers and the print layout simultaneously. One **Generate** action
+produces EPUB, MOBI, and print-ready PDF/X-1a together — though Reedsy's
+2026 review notes MOBI is increasingly vestigial since "Amazon has moved
+away from MOBI" (March 2025). Pricing: **Vellum Ebooks $199.99** vs.
+**Vellum Press $249.99** (ebook + print), Mac-only (macOS 13+), and —
+correcting a plausible assumption rather than confirming it — the
+license is restorable to an additional Mac via the purchase email
+(help.vellum.pub/restoring); no source documents a hard one-machine lock,
+only the Mac-only platform restriction. **Documented weakness,
+independently confirmed by two separate reviews:** Vellum's Ctrl+Z undoes
+individual keystrokes rather than whole edits after formatting begins —
+an oddly specific bug both Reedsy's review and Kindlepreneur's
+Atticus-vs-Vellum comparison name unprompted.
+
+**Finding (official capability + observed complaint, Atticus): the
+direct Windows-inclusive alternative, and the platform gap is a real,
+named grievance.** Atticus runs on Windows/Mac/Linux/Chromebook for a
+flat $147 one-time (ebook + print, lifetime updates, cloud backup),
+17+ themes plus a custom theme builder and 1,500+ Google Fonts vs.
+Vellum's 26 curated styles/26 fonts (scribecount.com; kindlepreneur.com/
+atticus-vs-vellum). KBoards search results surface multiple dedicated
+threads on Vellum's Windows exclusion — "Why There Will Never Be a
+Vellum For Windows," "Vellum equivalent for Windows?," a thread on
+running Vellum via MacInCloud — with the developers reportedly stating on
+their own podcast there are no Windows plans (kboards.com, thread
+existence/gist via search index; KBoards itself sat behind a bot-metering
+gateway returning HTTP 402 on direct fetch at research time, so treat as
+index-summary evidence, not verbatim quotation). Reedsy's review prices
+the MacInCloud workaround at up to $49/month in addition to Vellum's own
+cost. Kindlepreneur's head-to-head scores Atticus ahead 19-11 overall,
+with its sharpest line being a direct rebuttal of Vellum's "polished, no
+CSS needed" praise: **"All Vellum made books start to look the same"** —
+the same curation that produces consistency also produces sameness
+(kindlepreneur.com/atticus-vs-vellum, a piece the author retitled from an
+original recommendation of Vellum specifically because of the Mac-only
+lock-in and narrower style set).
+
+**Finding (reviewer opinion, recurring complaints in either tool):** a
+2026 Atticus review lists multiple independently-sourced user reports —
+PDF exports hanging/freezing across multiple days, an EPUB rejected by
+Draft2Digital on upload, chapters disappearing after a sync, Grammarly
+browser-extension conflicts, cursor-jumping while typing
+(bookdesigner.ai/guides/atticus-review). On Vellum's side, a professional
+book formatter's load-bearing framing matters more than any specific bug:
+**"Vellum is brutally literal. It formats exactly what you give it"** —
+most reported TOC/spacing/scene-break failures trace to dirty source Word
+files, not the renderer (ilayoutbooks.com/vellum-book-formatting-the-
+stuff-that-trips-people). A genuine, reproducible Vellum-side bug distinct
+from import hygiene: Parts/Volumes in the TOC lack expand/collapse carets
+and show inconsistent indentation between the print TOC and Kindle's
+slide-out menu (kboards.com, index-summary evidence).
+
+**Finding (official capability, the sharpest and most buildable single
+mechanic): Vellum's Reuse Elements solves cross-series front-matter
+consistency; Atticus does not.** Vellum's system is a linked source, not
+a copy: a dedicated Reuse Source `.vellum` file holds shared front/back
+matter; `File > Reuse Elements From` links a new book to it with
+per-element checkboxes (About the Author, Also By, copyright, blurbs);
+editing the source flags every linked book "Changed," "Update All" syncs
+them, and Vellum prompts for pending updates before Generate so a stale
+Also-By list can't ship by accident; "Detach and Edit" breaks the link
+for a book that needs a one-off override (e.g. a differing copyright
+year) (help.vellum.pub/guides/reuse, official). Atticus's own help
+center confirms only that **themes** are reapplicable across a series —
+visual consistency, not content — with no mention anywhere of reusable
+front-matter *content*, meaning an author must manually retype title
+page/copyright/dedication/Also-By text in every book of a series. Neither
+head-to-head comparison article surveyed for this round (Kindlepreneur's
+19-11 scorecard included) treats this as its own category, despite it
+being a real, load-bearing asymmetry: the cheaper, cross-platform tool
+does not fully solve series-reuse; the tool that solves it well is the
+expensive, Mac-only one.
+
+**Finding (official capability, what "good enough" already looks like
+for free): Draft2Digital's free formatter** takes a Word file with
+Heading-1 chapter markers and produces "a clean EPUB and a basic print
+PDF in minutes, with no cost and no software to learn" — consistent
+chapter headings, a working ebook TOC, selectable print trim sizes
+(bookdesigner.ai/guides/draft2digital-formatting-review;
+draft2digital.com/blog). Its own documented limitation is close to a
+precise spec of the buildable 80/20 line: scene-break dividers can
+silently disappear ("a single blank line between scenes can be ignored,
+so readers see one long run of text"), and print design is "basic," "not
+built for complex interiors." Reedsy Studio's free tier offers a
+comparable curated-template experience but with no offline mode at all —
+"you can only access Studio through an online browser"
+(builtwritten.com/blog/book-formatting-software-2026) — the opposite of
+Novella's whole thesis.
+
+**Recommendation, stated honestly against the thesis:** this is a real,
+well-evidenced second-app pairing, but a genuinely weaker fit for the
+four-app thesis than the roadmap's core items — formatting-for-
+publication is a fifth, later-lifecycle job, the same category as the
+WITH-OWNER query-tracking item already flagged. Where it earns a place is
+narrower: Novella's *existing* export feature is currently underbuilt
+relative even to free competitors, and a few clean EPUB themes, a linked
+reusable front-matter template (Vellum's best idea, cheaply portable to a
+file-based app), and a real print-PDF pipeline would let a writer
+publishing a straightforward genre novel skip Draft2Digital/Reedsy's
+browser dependency entirely and never need Vellum/Atticus short of a
+complex interior — a genuine local-first/no-subscription win, just not
+one of the four core pillars. Actioned as a new roadmap item, ranked
+below the open collaboration/brainstorming/mention-detection items but
+above the pure "say X louder" copy-only cluster.
+
+## Pass 2 — fast recheck of threads open at the end of round 44
+
+**Campfire Write bug-fix status: still unconfirmed.** Both the App Store
+and Play Store listings for the real product (campfirewriting.com; the
+"ONCE — Campfire" decoy correctly excluded again) show no version beyond
+the previously-logged v1.4.0 (~Aug 26, 2026, "Adds Spanish-language
+support and fixes a variety of issues"). No dated post-1.4.0 review was
+found explicitly confirming or denying whether the cursor-jump/
+mid-sentence-reset bug or the save-time data-loss bug are fixed — an
+aggregator (justuseapp.com) still lists the cursor-jump complaint but its
+cached content isn't reliably dated to after the release. Same
+"unresolved" status as round 44; re-check once a dated post-1.4.0 review
+actually surfaces rather than re-running the same search.
+
+**Sudowrite: one new item, one non-event.** New model option, **GPT-6
+Astra** (Sept 5, 2026 changelog), marketed for stronger continuity/Story
+Bible adherence (feedback.sudowrite.com/changelog). Status page
+(status.sudowrite.com) shows no incidents since Aug 11, 2026 — the clean
+stretch continues, reconfirming rather than changing prior tracking.
+
+**Litigation: Bartz portal confirmed open; Kadrey still unresolved.** The
+Bartz v. Anthropic settlement administrator sent claimant notices **Sept
+4, 2026** with consolidated claim data and a 30-day window to resolve
+split-claim percentage disputes, targeting initial distributions no later
+than **Nov 15, 2026** (blog.taaonline.net/2026/09/next-steps-in-bartz-v-
+anthropic-settlement-resolving-claim-percentage-differences, dated). This
+is the first confirmed resolution of the multi-round "has the claims
+portal opened yet" thread tracked since round 31. Kadrey v. Meta's
+mediation-outcome report (originally due Aug 21) still could not be
+confirmed filed — CourtListener returned a fetch error on direct docket
+access and no secondary tracker has an edition covering it; needs an
+actual PACER/docket check next round rather than another search-summary
+attempt.
+
+**Four-pillar sweep: 27th run, no match.** A fresh ProductHunt/r/writing/
+r/ObsidianMD/IndieHackers sweep for any novel-writing/worldbuilding app
+launched in the last 1-2 weeks found nothing combining real on-device AI,
+a task tracker, a focus/sprint timer, and worldbuilding — no addition to
+the standing near-miss list.
+
+**Changelog checks: NovelCrafter has gone quiet.** NovelCrafter's own
+changelog (novelcrafter.com/changelog) has no entry newer than March 21,
+2026 — roughly 5.5 months without a dated update, worth a name-check next
+round if it resumes or if other signs of a slowdown appear. Dabble and
+type.ai: no new dated entries found either way this round (type.ai's
+changelog still 404s, reconfirming prior status).
+
+## What changed in ROADMAP.md
+
+One new item added: local EPUB themes, a reusable front-matter template,
+and a real print-PDF pipeline, placed immediately before the "Say the
+export advantage louder" copy item (a natural pairing — the copy claim
+should eventually rest on a stronger feature). Three existing tracked
+items got brief, dated append-only updates rather than new items: the
+four-app-bundle item (27th recheck, NovelCrafter changelog stall noted),
+the no-outage/reliability item (Campfire v1.4.0 status, Sudowrite's new
+model and continued clean status page), and the no-training/privacy
+litigation item (Bartz portal confirmed open, Kadrey still unresolved).
+No existing item was reordered — this round's one new item is a genuinely
+new surface, and the three updates reconfirm or lightly sharpen existing
+tracking without changing relative priority.
+
+## Round 45 sources
+
+- literatureandlatte.com/export-to-vellum (official)
+- deckle.studio/is-scrivener-worth-it-2026
+- forum.literatureandlatte.com/viewtopic.php?t=52316 (official forum)
+- reedsy.com/blog/guide/book-writing-software/vellum-software (official,
+  updated 2026-06-02)
+- kindlepreneur.com/vellum-software-review, kindlepreneur.com/
+  atticus-vs-vellum
+- vellum.pub, help.vellum.pub/purchasing, help.vellum.pub/restoring,
+  help.vellum.pub/guides/reuse (all official)
+- atticus.io, intercom.help/atticus-5877e36564df (official),
+  scribecount.com/author-resource/writing-tools-for-authors/
+  atticus-writing-app
+- bookdesigner.ai/guides/atticus-review, bookdesigner.ai/guides/
+  draft2digital-formatting-review
+- builtwritten.com/blog/book-formatting-software-2026
+- ilayoutbooks.com/vellum-book-formatting-the-stuff-that-trips-people
+- skinnerbooks.com/troubleshooting-in-vellum
+- draft2digital.com/blog/draft2digital-introduces-improved-automated-
+  layout-for-print (official)
+- kboards.com (multiple threads, index-summary evidence only — direct
+  fetch blocked by a bot-metering gateway at research time)
+- apps.apple.com/us/app/campfire-write-your-book/id1626123915,
+  play.google.com/store/apps/details?id=com.campfiremobile (official
+  listings)
+- justuseapp.com/en/app/1626123915/campfire-write-your-book/reviews
+- feedback.sudowrite.com/changelog, status.sudowrite.com/incidents
+  (official)
+- blog.taaonline.net/2026/09/next-steps-in-bartz-v-anthropic-settlement-
+  resolving-claim-percentage-differences (dated)
+- novelcrafter.com/changelog (official)

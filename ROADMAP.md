@@ -1187,6 +1187,13 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       Twenty-six dedicated rechecks in, the four-pillar gap stays open on
       both sides; the round-33 owner question on whether to keep running
       this exact check every round is still unanswered.
+      Research round 45 (2026-09-08) ran the check a twenty-seventh time
+      (a fresh ProductHunt/r/writing/r/ObsidianMD/IndieHackers sweep) and
+      again found no new launch matching all four pillars — no change to
+      the near-miss list. Separately, NovelCrafter's own changelog page has
+      not posted a dated entry since March 21, 2026 (~5.5 months quiet),
+      itself worth a name-check next round if it resumes or if the product
+      shows other signs of stalling.
 - [ ] **Say the Relationship-web advantage louder** — research round 42
       (2026-09-04): checked relationship modeling across every competitor
       in this round's worldbuilding pass and found none combine structured
@@ -1392,6 +1399,17 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       inside the drafting experience itself, not just across writing,
       planning, tasks and timer as separate apps — Novella already ships
       all of it as one surface.
+      Research round 45 (2026-09-08) confirms Campfire Write shipped no
+      version beyond the previously-logged v1.4.0 (Aug 26, 2026 — "Adds
+      Spanish-language support and fixes a variety of issues"); no
+      post-release review was found explicitly confirming or denying
+      whether the cursor-jump/mid-sentence-reset or save-time data-loss
+      bugs are fixed — still unresolved, same status as round 44, re-check
+      once a dated post-1.4.0 review surfaces. Sudowrite's status page
+      remains clean since Aug 11, 2026, and shipped a new "GPT-6 Astra"
+      model option (Sept 5, 2026 changelog) marketed for stronger
+      continuity/Story Bible adherence — a model-roster update, not a
+      reliability data point either way.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent
@@ -1586,6 +1604,84 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       $14-70/month once API usage is added to its low base subscription —
       would sharpen that item's contrast if a future round can date and
       corroborate it.
+      Research round 45 (2026-09-08): the Bartz v. Anthropic claims portal
+      is confirmed open — the settlement administrator sent claimant
+      notices Sept 4, 2026 with consolidated claim data and a 30-day window
+      to resolve split-claim disputes, targeting initial distributions no
+      later than Nov 15, 2026 (blog.taaonline.net, dated). Kadrey v. Meta's
+      long-overdue mediation-outcome report (originally due Aug 21) still
+      could not be confirmed filed — CourtListener's docket returned a
+      fetch error and no secondary tracker has picked it up; re-check via a
+      direct PACER/docket lookup next round rather than search summaries.
+- [ ] **Local EPUB themes, a reusable front-matter template, and a real
+      print-PDF pipeline — close the "format in Vellum/Atticus" gap** —
+      research round 45 (2026-09-08), the first dedicated pass on book
+      formatting/typesetting as a second-app pairing. Checked our own
+      export code first: `src/export/formats.ts`'s EPUB generator is one
+      hardcoded stylesheet with no theme choice, no cover embedding, no
+      configurable front matter beyond an auto title page, and no
+      scene-break styling; `src/export/printPdf.ts` is literally
+      `window.print()` on a styled HTML page — no page numbering, no
+      widow/orphan handling, no trim-size awareness. This is behind even
+      Draft2Digital's free web formatter (clean EPUB + basic print PDF from
+      a Word file in minutes, draft2digital.com), let alone the two
+      dedicated tools writers actually pay for: Vellum ($199.99-249.99,
+      Mac-only) and Atticus ($147, cross-platform).
+
+      The evidence on *why* this pairing exists is unusually
+      well-triangulated. Literature & Latte's own docs call Scrivener's
+      Compile "capable of producing beautiful-looking ebooks and PDFs"
+      (literatureandlatte.com/export-to-vellum, official), but a 2026
+      review draws the real ceiling: "Scrivener can produce a functional
+      EPUB and a clean DOCX. It cannot produce typeset-quality PDF" (no
+      drop caps, no widow/orphan control, one generic EPUB only), pricing
+      the two-tool workflow at $200-350+ against Scrivener's advertised
+      $59.99 (deckle.studio/is-scrivener-worth-it-2026). An official
+      Literature & Latte forum thread has the real author language: Vellum's
+      "control of Widows and Orphans is better, and the overall evenness of
+      the layout is a thing of beauty," against Scrivener's "printed output
+      can be a little bit hit or miss" (forum.literatureandlatte.com/
+      viewtopic.php?t=52316) — and Literature & Latte's own fix wasn't to
+      improve Compile, it was to ship a dedicated "Vellum Export" compile
+      format: an admission from the vendor itself that real formatting
+      happens in Vellum, not Scrivener.
+
+      Atticus exists specifically because Vellum is Mac-only — a
+      documented, longstanding complaint on its own (KBoards threads titled
+      "Why There Will Never Be a Vellum For Windows"; a workaround costing
+      up to $49/month for MacInCloud access just to run Vellum on Windows,
+      per Reedsy's 2026 review). Novella is already cross-platform via
+      Tauri, so a competent formatting slice would arrive already solving
+      the single most-complained-about limitation in the category, for free.
+
+      The one Vellum mechanic worth copying outright: **Reuse Elements**, a
+      linked (not copy-pasted) front-matter source — title page, copyright,
+      dedication, Also-By content lives in one place; every book in a
+      series flags "Changed" when the source updates, "Update All" syncs
+      them, "Detach and Edit" breaks the link for a book-specific override
+      (help.vellum.pub/guides/reuse, official). Atticus has no equivalent —
+      its themes reapply across a series but front-matter *content* must be
+      manually re-typed per book, an uncontested gap in the cheaper
+      competitor. This maps naturally onto a file-based vault: a shared
+      front-matter note a series' worth of Novella projects can link to,
+      no server required.
+
+      Honest scope line, since this sits outside the four core pillars (a
+      fifth, later-lifecycle job, same category as the WITH-OWNER
+      query-tracking item below): don't chase Vellum/Atticus feature-for-
+      feature or become a desktop-publishing suite — complex interiors
+      (illustrated books, footnotes, box-set assembly) stay their
+      territory, and nobody in the category solves that well either. The
+      buildable, local-first 80/20: a handful of clean EPUB themes (real
+      drop caps, scene-break ornamentation, chapter-start pagination, cover
+      embedding), the Vellum-style linked front-matter template, and a real
+      print-PDF path (headless-Chromium print-to-PDF with actual `@page`
+      margins/numbering, replacing the live-window-print hack). That's
+      enough for a straightforward genre novel to skip Draft2Digital/
+      Reedsy's browser dependency and Vellum/Atticus entirely — a genuine
+      local-first/no-subscription win, ranked below the open collaboration/
+      brainstorming/mention-detection items above since it isn't one of the
+      four core pillars.
 - [ ] **Say the export advantage louder** — research round 7: Sudowrite
       reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
       Novella already ships all three plus one-click backup
