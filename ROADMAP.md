@@ -370,6 +370,54 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       rather than a hardcoded exclusion list, since a writer may
       reasonably want some custom fields in AI context (a character's
       speech quirks) and others (a private note-to-self) never sent.
+- [ ] **Research/reference material capture — no way to bring a PDF, image,
+      or web source into the vault as a citable note** — research round 45
+      (2026-09-09): checked our own code first — `vault.ts`'s `NoteType`
+      already includes a generic `"note"` alongside `"character"`/
+      `"location"`/etc, so the data model has an unstructured bucket. But
+      grepping `src/ui` for any PDF/webpage/URL capture path found nothing
+      at all — the only external-file intake anywhere is image-drag onto
+      board cards (shipped 2026-07-23, downscaled JPEG under
+      `.novella/images/`). A writer cannot get a research PDF, a reference
+      photo, or a saved web article into the vault as a linkable note by
+      any route. This is a real, convergent gap, not a single competitor's
+      feature: four of the six primary competitors ship a dedicated
+      surface for exactly this job, distinct from their structured
+      character/location databases. Scrivener's Research folder takes
+      PDFs, images, audio, and web-page snapshots (drag the address-bar
+      icon, or File→Import→Web Page), with four separate ways to view a
+      reference *while writing* — Split Editor, Copyholders, Inspector
+      Bookmarks, Quick Reference
+      (literatureandlatte.com/blog/use-scriveners-research-folder-to-store-
+      information-about-your-project, official; a companion Gwen Hernandez
+      post confirms writers commonly pair Scrivener with Evernote as a
+      clipper because "Evernote... often does a better job of capturing
+      Internet content than Scrivener" — a second-app pattern). Campfire
+      ships a dedicated Research module: "document important references,
+      annotate videos, and link important web pages," with tagging/
+      categorization and integration back into the manuscript and other
+      modules (campfirewriting.com/learn/research-tutorial, official).
+      Dabble's Story Notes auto-populates common folders for "anything
+      that isn't plot or your published manuscript" — explicitly including
+      "research links" alongside front/back matter and unplaced scene
+      ideas (help.dabblewriter.com/en/articles/2865424, official).
+      NovelCrafter's Snippets exist specifically for "braindumps,
+      kitbashing, research and notes-to-self," a deliberately looser
+      surface than the structured Codex
+      (novelcrafter.com/help/docs/snippets/snippets, official). Four
+      independent products converging on "writers need an unstructured
+      catch-all for outside material, separate from the structured
+      worldbuilding database" is stronger evidence than any one of them
+      alone. Scope honestly against the local-first thesis: not a browser
+      extension or live web clipper (adds a whole second install surface
+      for a job that can be done locally) — a PDF-import path that copies
+      the file into the vault (same precedent as the shipped image-drop:
+      `.novella/research/<note-id>.pdf`, referenced from a `"note"`-type
+      entry) plus a "save this link" action that stores a URL, a
+      writer-pasted excerpt, and a title as a normal note body, no live
+      fetch required. Closes a real second-app pairing (Evernote/
+      read-it-later tools alongside the manuscript app) without adding
+      network dependence.
 - [ ] **A deliberate manuscript import flow — .docx/Markdown in, with a
       preview before anything touches the vault** — research round 42
       (2026-09-04): a dedicated pass on the "switching from another tool"
@@ -1586,6 +1634,24 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       $14-70/month once API usage is added to its low base subscription —
       would sharpen that item's contrast if a future round can date and
       corroborate it.
+      Research round 45 (2026-09-09) checks both watched dates again, nine
+      days on. The Bartz claims portal: secondary coverage (blog.taaonline.net)
+      indicates the portal did open per the "end of August" guidance, and —
+      new this round — the settlement administrator reportedly sent
+      notices the week of Sept 1-4, 2026 summarizing each claimant's filed
+      claims, co-claimants per title, and claimed-percentage splits; class
+      counsel's payment guidance is unchanged (payments not before
+      year-end, staged roughly 70/30 with the second tranche running
+      through September 2027). Flagged as secondary-sourced, not verified
+      against the settlement site directly this round — confirm against
+      anthropiccopyrightsettlement.com before citing the portal-opening
+      date itself in copy. Kadrey v. Meta's mediation-outcome report (due
+      2026-08-21) is now nineteen days overdue with still no report,
+      docket entry, or tracker coverage found — the longest this item has
+      gone unresolved; worth a direct CourtListener docket check next
+      round rather than another search-only pass, since repeated search
+      misses on an active federal docket suggest the report may be
+      non-public (sealed or informal) rather than simply unindexed.
 - [ ] **Say the export advantage louder** — research round 7: Sudowrite
       reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
       Novella already ships all three plus one-click backup
@@ -1766,6 +1832,37 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-09-09 — Research round 45 (autopilot; no code). Housekeeping:
+  working tree clean at session start; `origin/main` was two commits
+  behind this branch (rounds 43-44) — carried forward, same situation
+  round 44 itself found. One dedicated pass: research/reference-material
+  capture, checked as its own job distinct from Codex (structured) and
+  Snippets-style loose notes (already covered). Grepped our own code and
+  confirmed `vault.ts`'s generic `"note"` type already exists but nothing
+  in `src/ui` can bring a PDF, photo, or saved web page into the vault —
+  the only external-file intake anywhere is image-drop on board cards.
+  Four of six primary competitors (Scrivener's Research folder with four
+  while-writing viewing modes, Campfire's dedicated Research module,
+  Dabble's Story-Notes-as-research-links, NovelCrafter's Snippets)
+  independently ship a surface for this exact job — convergence across
+  four unrelated codebases, not one product's feature list. Scoped the
+  local-first-honest version explicitly: no browser-extension clipper: a
+  local PDF-import (`.novella/research/`, same pattern as the shipped
+  image-drop) plus a "save this link" action storing a URL and a
+  writer-typed excerpt, no live fetch. New "Next up" item added after the
+  Codex AI-visibility item. Also closed out two litigation dates this
+  research has tracked since round 31/32: the Bartz v. Anthropic claims
+  portal (secondary-sourced: opened per guidance, administrator sent
+  claimant notices 2026-09-01/04 — flagged as needing primary-source
+  confirmation before use in copy) and Kadrey v. Meta's mediation-outcome
+  report (still not found anywhere, now 19 days overdue — the longest
+  this item has gone unresolved; next round should read the docket
+  directly rather than search again). Flagged, not performed: the
+  standing skills/reference-library scouting pass has lapsed since its
+  single round-1 entry (2026-08-12) despite the cadence describing it as
+  per-round — noted rather than silently skipped again, deserves its own
+  dedicated round. Full notes in RESEARCH.md Round 45.
 
 - 2026-09-06 — Research round 44 (autopilot; no code). Housekeeping:
   working tree clean; local branch was one commit ahead of `origin/main`

@@ -6566,3 +6566,165 @@ sharpening passes on prior findings.
   5xJUutV75BLU6u9LZndcDs (official, direct fetch)
 - ilampadmanabhan.medium.com/sudowrite-review
 - terribleminds.com/ramble/2018/07/11/the-save-the-cat-conundrum/
+
+# Round 45 (2026-09-09) — research/reference capture, and closing two watched litigation dates
+
+Housekeeping first: working tree was clean at session start. `origin/main`
+sat two commits behind this branch (rounds 43-44) at the start of this
+round — same situation round 44 itself found and carried forward; this
+round's commit continues on the same branch rather than treating the gap
+as a conflict.
+
+One dedicated pass this round, plus a check-in on two litigation dates
+this research has tracked since round 31/32 and left unresolved since.
+Skipped the standing skills/reference-library scouting pass (SKILLS.md
+shows only a single Round 1 entry from 2026-08-12 despite the cadence
+describing it as a per-round pass) — flagging the lapse rather than
+silently continuing to skip it or attempting a rushed pass this round;
+it deserves its own dedicated round rather than a rushed few minutes
+tacked onto a competitor-research pass.
+
+## Pass — Research and reference-material capture, checked as its own job
+
+The task brief's checklist names "notes / research storage" as a topic
+worth its own look, and a scan of prior rounds found no dedicated pass on
+it — Codex (structured worldbuilding), Snippets/Story-Notes-style loose
+capture, and *external-source* capture (a PDF, a photo, a saved web page)
+are three different jobs that get conflated in casual competitor
+descriptions. This pass isolated the third one specifically.
+
+**Checked our own code first.** `src/core/vault.ts`'s `NoteType` already
+includes a generic `"note"` value alongside the structured types
+(`"character"`, `"location"`, `"lore"`, etc.), so the vault's data model
+already has an unstructured bucket — this is not a data-model gap.
+Grepped `src/ui` for any PDF, webpage, or URL capture path and found
+none at all: the only external-file intake anywhere in the app is
+image-drag onto board cards (shipped 2026-07-23, stores a downscaled JPEG
+under `.novella/images/<note-id>.jpg`). There is no way today to bring a
+research PDF, a reference photo outside a board card, or a saved web
+article into the vault as a linkable, citable note.
+
+**Finding (official capability, richest precedent): Scrivener's Research
+folder takes PDFs, images, audio, and video, plus web-page snapshots
+either by dragging the browser's address-bar icon in or via File→Import→
+Web Page** — and once material is in, four separate ways exist to view it
+*while writing* without leaving the manuscript: Split Editor, Copyholders,
+Inspector Bookmarks, and Quick Reference
+(literatureandlatte.com/blog/use-scriveners-research-folder-to-store-
+information-about-your-project, official, direct fetch). A companion
+Gwen Hernandez post (gwenhernandez.com/2015/03/12/adding-evernote-notes-
+to-a-scrivener-project) states plainly that "Evernote... often does a
+better job of capturing Internet content than Scrivener," and describes
+linking Evernote-clipped research into a Scrivener project rather than
+capturing it natively — a second-app pattern (research-clipper +
+manuscript app) directly analogous to every other second-app pairing this
+research has logged (Google Docs + Scrivener for collaboration, Aeon
+Timeline + writing app for chronology).
+
+**Finding (official capability): Campfire ships a dedicated Research
+module** — "document important references, annotate videos, and link
+important web pages," with a research library, tagging/categorization for
+retrieval, and integration back into the manuscript and other modules
+(campfirewriting.com/learn/research-tutorial, official, direct fetch).
+This is a first-class module alongside Characters/Locations/Timeline, not
+a repurposed corner of one of them.
+
+**Finding (official capability): Dabble's Story Notes auto-populates
+common folders for "anything that isn't plot or your published
+manuscript,"** explicitly naming research links, front/back matter, and
+unplaced scene ideas as example contents
+(help.dabblewriter.com/en/articles/2865424-organizing-the-story-notes,
+official, direct fetch).
+
+**Finding (official capability): NovelCrafter's Snippets exist
+specifically for "braindumps, kitbashing, research and notes-to-self,"**
+a deliberately looser, less-structured surface than the Codex
+(novelcrafter.com/help/docs/snippets/snippets,
+novelcrafter.com/help/faq/snippets/uses-of-snippets, both official,
+direct fetch).
+
+**Why this is a stronger finding than any one competitor's feature:**
+four of the six primary competitors researched across this project's
+44 prior rounds — Scrivener, Campfire, Dabble, NovelCrafter — each ship
+a dedicated surface for unstructured outside material, independently
+named differently (Research folder, Research module, Story Notes,
+Snippets) but solving the identical job: give a writer somewhere to put
+material that doesn't belong in the structured character/location
+database and isn't manuscript prose either. Independent convergence
+across four unrelated codebases is stronger evidence than a single
+product's marketing claim, per this project's own evidence-quality rule.
+
+**Scope check against the local-first thesis, decided rather than left
+open:** a live web clipper (browser extension, background fetch) was
+considered and rejected for this item specifically — it adds a whole
+second install surface and a live-fetch dependency for a job that has a
+simpler local answer. The buildable version, matching the precedent the
+image-drop feature already set: a PDF-import action that copies the file
+into the vault (`.novella/research/<note-id>.pdf`, referenced from a
+`"note"`-type entry, same pattern as `.novella/images/`), plus a
+"save this link" action that stores a URL, a writer-typed excerpt, and a
+title as a normal note body — no live fetch, no scraping, no network
+dependency added to the app at all. Actioned as a new roadmap item,
+placed with the other Codex/vault-adjacent worldbuilding-infrastructure
+items rather than at the bottom, since it serves the "notes-and-
+worldbuilding" pillar of the four-app thesis directly and closes a real,
+evidenced second-app pairing without compromising local-first.
+
+## Check-in — two litigation dates this research has tracked since round 31/32
+
+Not a fresh sweep of the four-pillar/news cadence (rounds 41-44
+deliberately moved off that rhythm toward interaction-mechanics passes,
+and this round continues that choice) — just closing out two specific
+open threads so they don't sit unresolved indefinitely.
+
+**Bartz v. Anthropic claims portal:** secondary coverage
+(blog.taaonline.net/2026/08/bartz-v-anthropic-when-to-expect-payments-
+next-steps) indicates the portal did open per the "end of August"
+guidance tracked since round 39, and — the new fact this round —
+the settlement administrator reportedly sent notices the week of
+2026-09-01 through 09-04 to all claimants, summarizing each claimant's
+filed claims, co-claimants per title, and claimed-percentage splits.
+Payment guidance is unchanged from round 40: not before year-end, staged
+roughly 70%/30%, second tranche running through September 2027. This is
+a search-synthesized secondary source, not a direct fetch of
+anthropiccopyrightsettlement.com itself this round — flagged as such
+rather than presented as primary-confirmed; verify against the
+settlement site directly before citing the portal-opening date itself in
+any copy.
+
+**Kadrey v. Meta mediation-outcome report** (due 2026-08-21, tracked
+since round 31): still not found by any source — CourtListener, Justia,
+McKool Smith's tracker (still stuck at its 2026-07-13 edition per prior
+rounds), and a fresh general search all came up empty. Nineteen days
+overdue as of this round, the longest this item has gone unresolved.
+Worth a direct CourtListener docket read next round rather than another
+search-only pass — repeated misses on an active federal docket across
+multiple rounds suggest the report may not be a public filing (a private
+mediation report, or one filed under seal) rather than simply unindexed
+by search.
+
+## What changed in "Next up"
+
+One new item: research/reference-material capture (PDF import + save-a-
+link), placed directly after the Codex AI-visibility item and before the
+manuscript-import-flow item, grouping it with the other Codex/vault
+worldbuilding-infrastructure findings. One existing item updated in place
+rather than duplicated: "Say the no-training/privacy advantage louder"
+gets this round's litigation check-in appended, continuing its existing
+research note rather than creating a new line.
+
+## Round 45 sources
+
+- literatureandlatte.com/blog/use-scriveners-research-folder-to-store-
+  information-about-your-project (official, direct fetch)
+- gwenhernandez.com/2015/03/12/adding-evernote-notes-to-a-scrivener-project
+- campfirewriting.com/learn/research-tutorial (official, direct fetch)
+- help.dabblewriter.com/en/articles/2865424-organizing-the-story-notes
+  (official, direct fetch)
+- novelcrafter.com/help/docs/snippets/snippets,
+  novelcrafter.com/help/faq/snippets/uses-of-snippets (both official,
+  direct fetch)
+- blog.taaonline.net/2026/08/bartz-v-anthropic-when-to-expect-payments-
+  next-steps (secondary source, litigation check-in)
+- Kadrey v. Meta docket search: courtlistener.com, law.justia.com,
+  mckoolsmith.com (no mediation-outcome report found on any)
