@@ -490,6 +490,50 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       preview text, it needs a per-card override, not only a global
       setting — the Scrivener complaint is specifically about lacking
       that override, not about the feature existing at all.
+- [ ] **A mobile quick-capture surface for the existing PWA, not a full
+      mobile editor** — research round 45 (2026-09-10): a dedicated first
+      pass on mobile UX specifically (44 prior rounds covered desktop
+      interaction mechanics but never mobile as its own topic) finds the
+      same "second app" pattern this research keeps finding, on a
+      different device. A Sudowrite user-feedback thread (76 upvotes,
+      marked "Completed" by the vendor despite the underlying complaint
+      staying open) says plainly that without decent mobile access "I
+      don't know how long I can handle... before I dip [back to Google
+      Docs]" (feedback.sudowrite.com); independent writer-community
+      commentary on note-taking apps describes Apple Notes as having
+      "quietly become the default note app for a huge number of
+      Mac/iPhone/iPad users," specifically because it has zero load time
+      for capturing a thought before it disappears
+      (becomeawritertoday.com). Two competitors that do ship real mobile
+      apps converge on the same deliberate scope, not full parity:
+      Scrivener's iOS app has no iCloud sync (Dropbox-only, called
+      "archaic in 2026" by reviewers, with a documented sync-conflict
+      data-loss report on the L&L forum) and a 2026 reviewer says they now
+      use it "only for reading drafts rather than editing"; Sudowrite's
+      own docs confirm its mobile app cannot generate new characters,
+      synopsis or worldbuilding, cannot create new AI images, and keeps
+      deleted-project recovery web-only — generation and anything
+      destructive stay desktop-only by design, while editing and reading
+      existing content work everywhere (docs.sudowrite.com, official).
+      Checked our own state: Novella already ships a responsive PWA (Plan
+      phase C, 2026-08-20) that renders the full editor down to phone
+      width with touch fixes, but it has no dedicated fast-capture entry
+      point — a phone-width Novella still opens the full multi-panel
+      editor, not a from-launch text box. The actionable shape, following
+      the Scrivener/Sudowrite scoping pattern rather than attempting full
+      mobile parity: a quick-capture mode reachable in the fewest possible
+      taps from PWA launch — text (and eventually voice) straight into a
+      per-vault Inbox note, synced through the storage adapter already
+      shipped, triaged into the manuscript or Codex later on desktop.
+      This is the specific on-the-go capture job every competitor's
+      mobile app is currently losing to Apple Notes, not a request to
+      build full mobile editing. Weaker, unconfirmed threads from the same
+      pass, not actioned: Dabble's blog claims full desktop/mobile PWA
+      feature parity, but this is vendor-only marketing with no
+      third-party mobile review found to check it against; Obsidian- and
+      Notion-for-writers mobile experiences returned too little direct
+      evidence this round to say anything confident — worth a dedicated
+      forum-only pass later rather than treating silence as "no problem."
 - [ ] **Submission/query tracking for querying novelists** (WITH-OWNER —
       scope decision, not a build). Research round 41 (2026-09-03):
       querying novelists and short-fiction writers maintain a wholly
@@ -634,7 +678,23 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       exactly like Notion but better." Next concrete gaps: block-style
       hover handles in the editor, inline databases-as-tables on notes,
       synced project sidebar collapse, cover images on note headers.
-      One gap per run, verified live.
+      One gap per run, verified live. Guardrail from research round 45
+      (2026-09-10): a dedicated onboarding/dashboard pass found the single
+      most repeated complaint about feature-rich competitors is a
+      dashboard-density problem, not a missing-feature one — at least four
+      independent NovelCrafter reviews call its all-panels-visible
+      dashboard "overwhelming," one comparing it to "Photoshop... [versus]
+      simpler tools like Canva," and NovelCrafter's own team has had to
+      build a bundled tutorial layer to compensate; Scrivener draws the
+      identical complaint a decade running ("a cliff," "sitting in a
+      cockpit when all you wanted was to drive to the grocery store").
+      Novella's quiet first-run (editor-first, every panel one click away,
+      no dashboard by default) is the opposite bet, and this is
+      third-party evidence it's the right one. Guard it explicitly as this
+      item adds density: parity with Notion's information density is not
+      the goal if it means surfacing AI-provider panels, Codex, sprint
+      timer and settings simultaneously by default the way NovelCrafter
+      does — add the density behind clicks, not into the first screen.
 - [ ] **NovelCrafter-parity pass, ongoing** — codex entry templates per
       type (character sheets with fields), chat-with-your-book mode,
       scene status labels (draft/revised/done) surfaced on cards and
@@ -764,6 +824,28 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       not just that per-type templates should exist. When this sub-item is
       built, keep fields optional and collapsible with a light empty
       state, not a full form every new entry is pressured to fill in.
+      Research round 45 (2026-09-10) sharpens the fix, not just the
+      diagnosis: three unrelated tools independently converge on the same
+      countermeasure to first-entry blank-page friction, each a different
+      mechanism for the same job. Obsidian's starter-vault convention
+      ships "folders, note templates and filled example notes, so you can
+      see how the system behaves before you commit" rather than an empty
+      canvas (moderate confidence — single source, fetch blocked, read via
+      search snippet); a Notion novel-template author tells writers
+      outright "don't fear emptiness... never fill up the database for the
+      sake of making it nice" (brendanshih.substack.com); and
+      NovelCrafter's own beginner guide for Codex setup avoids a rigid
+      template entirely, offering four low-commitment entry paths (manual,
+      text-selection auto-populate, bulk extract, "Quick Create" with
+      defaults) and telling users to treat entries as "living documents"
+      they can leave incomplete (novelcrafter.com/courses/
+      ultimate-beginners-guide/setting-up-the-codex, official). None of the
+      three fixes this with a prettier blank form — worked examples,
+      explicit permission to skip, and partial/incremental entry are three
+      different levers on the same underlying job (lower the perceived
+      commitment of the first entry), and Novella's Codex empty state
+      should borrow from more than one: a pre-filled example entry visible
+      on first open, not just optional fields.
 - [ ] **Structured relations between Codex entries, not just prose fields
       and tags** — research round 42 (2026-09-04): the strongest
       cross-platform pattern this round wasn't a single competitor
@@ -1586,6 +1668,21 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       $14-70/month once API usage is added to its low base subscription —
       would sharpen that item's contrast if a future round can date and
       corroborate it.
+      Research round 45 (2026-09-10) resolves the pending "end of August"
+      claims-portal question directly: it's open and active. A Sept 4,
+      2026 TAA/Authors Advocate post (blog.taaonline.net) confirms
+      claimants received per-work notices that week covering claim
+      amounts and any disputed-percentage splits — some works see
+      publishers claiming 85-100% of the payout, and authors are told
+      explicitly they "do not have to accept" that split — with each
+      qualifying work currently drawing roughly $2,203.56 from the fund
+      and distributions targeted for "no later than November 15, 2026"
+      for works where all rightsholders agree. A concrete, dated,
+      per-work dollar figure is a sharper citable number than the prior
+      "$1.5B settlement" headline alone if copy ever wants one. Kadrey v.
+      Meta's mediation-outcome report (due Aug 21) is now three weeks
+      overdue with nothing found on any tracked source — still
+      unresolved, re-check next round rather than assume either outcome.
 - [ ] **Say the export advantage louder** — research round 7: Sudowrite
       reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
       Novella already ships all three plus one-click backup

@@ -6566,3 +6566,289 @@ sharpening passes on prior findings.
   5xJUutV75BLU6u9LZndcDs (official, direct fetch)
 - ilampadmanabhan.medium.com/sudowrite-review
 - terribleminds.com/ramble/2018/07/11/the-save-the-cat-conundrum/
+
+# Round 45 (2026-09-10) — mobile UX and onboarding/dashboard design, two first-ever dedicated passes
+
+Housekeeping first: working tree was clean at session start. `main` was
+two commits behind this session's branch (rounds 43 and 44 had landed on
+prior working-branch commits but had not yet reached `origin/main`) —
+carried forward and pushed together with this round rather than treated
+as a conflict.
+
+**Two focused passes this round, picking topics from the task brief's
+checklist that have genuinely never had a dedicated pass in 44 prior
+rounds.** Mobile functionality has only ever come up as a side effect of
+the responsive-PWA build (Plan phase C) and the four-pillar competitor
+checks — never researched as its own topic. Onboarding was researched
+once (the type.ai/Lingrow conversational-chat comparison, round 5/27,
+already built as "Style me"), but dashboards, home screens and empty
+states specifically — separate jobs from a chat-style onboarding flow —
+had not been.
+
+## Pass 1 — Mobile UX: capture wins the job competitors keep losing
+
+**Checked our own state first.** Novella has no native mobile app but
+does ship a responsive PWA (Plan phase C, 2026-08-20) — the editor
+renders correctly down to phone width with touch fixes keyed on
+`(hover: none)`. It has no dedicated fast-capture entry point: opening
+the PWA on a phone lands in the same full multi-panel editor as desktop,
+not a from-launch text box.
+
+**Finding (recurring complaint + observed behavior, the strongest of the
+pass): writers default to OS-native capture tools when a writing app's
+mobile story is weak, and this looks like a real, if indirectly
+evidenced, "second app" pattern.** A Sudowrite user-feedback thread (76
+upvotes, marked "Completed" by the vendor despite the underlying
+complaint staying open) states plainly: without better mobile access "I
+don't know how long I can handle a lack of timeline or communication on
+mobile accessibility before I dip [back to Google Docs]"
+(feedback.sudowrite.com/p/mobile-functionality-andor-mobile-app).
+Independent writer-community commentary on note-taking tools describes
+Apple Notes as having "quietly become the default note app for a huge
+number of Mac/iPhone/iPad users" and Voice Memos as the zero-friction
+capture tool for a thought before it disappears
+(becomeawritertoday.com/note-taking-apps). Neither source alone proves a
+trend; together they describe a consistent shape — writers don't wait for
+their primary tool's mobile app to be good, they reach for whatever
+OS-native tool has zero load time, then reconcile manually later.
+
+**Finding (official capability, a real design precedent worth copying):
+the two competitors with genuine mobile apps both deliberately scope
+mobile down, and the split is the same in both cases.** Scrivener's iOS
+app has no iCloud sync — Dropbox-only, "promised years ago" and never
+shipped, called "archaic in 2026" by a 2026 reviewer, with a Literature &
+Latte forum thread (forum.literatureandlatte.com/t/scrivener-ios-
+syncing-via-dropbox-continues-to-crash-the-app/47181) documenting a
+sync-conflict crash and at least one reported data-loss incident; the
+same reviewer says they now use iOS Scrivener "only for reading drafts
+rather than editing." Sudowrite's own docs
+(docs.sudowrite.com/using-sudowrite/1ow1qkGqof9rtcyGnrWUBS/
+mobile-app-overview/4MxYzYduLSPQ3VpoP6dyxo, official) confirm its mobile
+app explicitly cannot generate new characters, synopsis, or worldbuilding,
+cannot create new Visualize images, cannot manage series folders, and
+keeps deleted-project trash/recovery web-only — while editing and reading
+already-created content works everywhere. Read together: generation and
+anything destructive or irreversible stay desktop-only by design in both
+products; editing and reading existing content is the mobile job. This is
+a defensible, already-converged-on split, not a guess.
+
+**Finding (recurring complaint, moderate confidence, unconfirmed as
+current): Campfire's long-tracked mobile cursor-jump and save-time
+data-loss bugs could not be confirmed fixed or unfixed this round.** App
+Store reviews describe both symptoms, one noting "saving issues persist
+despite app updates," but the dated reviews retrievable this pass skew
+old (2023) and a changelog fetch for a plausible-looking "Campfire"
+update URL turned out to be an unrelated same-named chat product — a
+collision worth flagging so it isn't mistaken for a real lead again.
+Google Play shows an app update dated 2026-09-06 with no changelog text
+found. Leave this thread open for a direct, dated App Store re-check next
+round rather than citing either "still broken" or "fixed" from this pass.
+
+**Finding (official capability, single-source, unconfirmed): Dabble's
+"full feature parity" mobile PWA claim has no independent corroboration.**
+Dabble's own blog (dabblewriter.com/blog/dabble-going-mobile) asserts
+every desktop feature is available on mobile with offline support and
+touch-redesigned screens, but PWAs don't generate App Store reviews and
+no third-party review of the mobile PWA specifically was found. Treat as
+vendor marketing, not a verified benchmark, until spot-checked directly.
+
+**Weak/inconclusive, flagged rather than dropped:** targeted searches for
+Obsidian- and Notion-for-writers mobile experiences (Longform on mobile,
+Obsidian Sync complaints, novel-template mobile usability) returned only
+generic sync-setup guides, not fiction-writer-specific complaints or
+praise. This is an evidence gap, not a "no problems exist" finding — a
+forum/Reddit-only pass would be needed to close it. Also: search results
+for "NovelCrafter mobile app" surfaced App Store/Play Store listings
+(App Store ID 6759069936, Play package `com.novel.lpu`) that may not be
+novelcrafter.com's own product — don't cite these without verifying
+developer identity first.
+
+**Why this beats chasing full mobile parity:** the pattern across
+Scrivener, Sudowrite, and the Notes/Voice-Memos evidence sorts mobile
+need into three tiers, in descending order of how well any competitor
+currently serves it — (1) capture, poorly served everywhere and
+currently won by OS-native tools; (2) read/light-edit of existing
+content, the tier every serious competitor has converged on as "good
+enough"; (3) full generative/structural work, deliberately kept
+desktop-only even by an AI-native competitor. For a Tauri app with a
+responsive PWA but no capture-optimized surface, the highest-leverage
+first move is a fast, few-taps capture mode into a per-vault Inbox note,
+not a fuller mobile editor — the specific job every competitor's mobile
+app is currently losing to Apple Notes. Actioned as a new roadmap item,
+scoped to that capture surface only, following the Scrivener/Sudowrite
+generation-stays-desktop pattern for anything beyond it.
+
+## Pass 2 — Onboarding, dashboards, and empty states
+
+**Checked our own state first.** Novella's current first-run (shipped
+2026-07-23) opens straight into the editor on a seed chapter with no
+project-home dashboard and no metadata form — Codex/Tools are one
+labeled click away, pane choices remembered. A FirstRunWizard exists with
+four steps and a skip path (the "Style me" mechanism from round 5,
+already built and separate from what this pass researched).
+
+**Finding (recurring complaint, four independent sources, the strongest
+of the pass): "overwhelming on first contact" is the single most repeated
+complaint about feature-rich competitors, and it traces to the dashboard,
+not to any one feature.** At least four independent NovelCrafter reviews
+converge on the same shape — "the dashboard shows a lot of panels and
+options right from the start," compared explicitly to "Adobe Photoshop
+[versus] simpler tools like Canva" (marketingtoolpro.com/2025/07/
+novelcrafter-review, codingem.com/novelcrafter-review-2025), with one
+review literally titled "Powerful for Fiction Writers, Frustrating to Set
+Up" (ilampadmanabhan.medium.com/novelcrafter-review-64d391c629a2).
+NovelCrafter's own response was to build a bundled first-steps tutorial
+and a multi-part "Ultimate Beginners Guide"
+(novelcrafter.com/help/getting-started/quick-start/first-steps-tutorial,
+official) — a tutorial layer built to compensate for a dashboard that
+overwhelms, not a redesign of the dashboard itself. Scrivener draws the
+identical complaint a decade running — "a cliff," "sitting in a cockpit
+when all you wanted was to drive to the grocery store"
+(bindercraft.net/blog/scrivener-review,
+io.bikegremlin.com/31401/scrivener-rant-not-review) — with the same
+fix: an official tutorial project bundled into every new document.
+**Novella's quiet, editor-first first-run is the opposite bet from both,
+and this is third-party evidence it's the right one** — actioned as a
+guardrail note on the Notion-parity item, since that's the item most at
+risk of recreating this exact failure as it adds density.
+
+**Finding (official capability description, Dabble's dashboard is a
+project shelf, not a stats console): the "recognition," not "review,"
+job.** Dabble's dashboard is explicitly described in its own docs as
+"every project you're working on, lined up and waiting, with the one you
+touched last sitting out front," grouped into collections, with a
+lightweight word-count summary in a sidebar card
+(dabblewriter.com/docs/getting-started/the-dashboard, official) — not a
+stats-heavy landing page. Reviews call the interface user-friendly but
+still note "the software can be overly complex at times" for new users
+(kindlepreneur.com/dabble-writer, allyaldridge.com/dabble-writer-review)
+— even the more restrained dashboard model draws some of the same
+complaint, just less often than NovelCrafter's. Relevant only if Novella
+ever adds multi-project switching (it currently doesn't): the evidence
+favors a lightweight recents/shelf view over a stats-heavy dashboard if
+that's ever built — word count and goals belong inside a project, not
+gating the door to it. Not actioned as a roadmap item; noted for when
+multi-project support is scoped, since no current demand signal for it
+was found this round.
+
+**Finding (reviewer opinion + inference, corroborates and sharpens the
+existing round-42 Campfire empty-state finding): three unrelated tools
+independently converge on the same countermeasure to blank-page
+first-entry friction, and none of them is "fewer fields."** Obsidian's
+starter-vault convention ships "folders, note templates and filled
+example notes, so you can see how the system behaves before you commit"
+rather than an empty canvas (moderate confidence — single source, direct
+fetch blocked, read via search snippet only). A Notion novel-template
+author gives writers explicit permission instead: "don't fear
+emptiness... never fill up the database for the sake of making it nice"
+(brendanshih.substack.com/p/free-notion-books-template). NovelCrafter's
+own Codex setup guide skips a rigid template altogether, offering four
+low-commitment entry paths (manual, text-selection auto-populate, bulk
+extract, "Quick Create" with defaults) and telling users to treat entries
+as "living documents" they're free to leave incomplete
+(novelcrafter.com/courses/ultimate-beginners-guide/
+setting-up-the-codex, official). Worked examples, explicit permission to
+skip, and incremental partial entry are three different levers on the
+same underlying job — lower the perceived commitment of the first entry
+— and none of them is a prettier blank form, which is what round 42 found
+Campfire actually shipped. Actioned as a strengthening note on the
+existing NovelCrafter-parity item's codex-templates sub-item, not a new
+item.
+
+**Finding (absence of evidence, flagged rather than skipped): no source
+surfaced any documented complaint or praise about settings organization
+specifically**, across NovelCrafter, Dabble, Scrivener, or Campfire —
+targeted searches returned only generic AI-feature-toggle articles.
+Stated plainly as an open question rather than answered: a future pass
+would need to look directly at each app's settings screen (docs,
+screenshots, a hands-on account) rather than review-mine for this, since
+review-mining specifically came up empty here.
+
+**Finding (official capability, a real differentiator worth stating
+confidently): Novella's seed-chapter first-run already skips a metadata
+gate that multiple competitors still require.** NovelCrafter requires
+naming the book, author/pen name, series and language before the project
+exists at all (novelcrafter.com/help/getting-started/quick-start/
+creating-your-first-novel, official) — though its own docs tell new
+users to "create a test novel... so you can learn the features without
+fear of 'messing up,'" which is itself a tell that the metadata gate
+creates real hesitation the docs are working around rather than removing.
+Novella already sidesteps this by opening into a real (if placeholder)
+seed chapter with no form first — worth stating as a confirmed advantage
+in future first-run copy rather than a hedge.
+
+## Dated-news check-ins
+
+A few short, bounded checks on threads this roadmap actively tracks with
+"re-check next round" flags, not full re-runs of the four-pillar
+competitor sweep (round 33's still-unanswered owner question on that
+cadence stands). **Bartz v. Anthropic**: the pending "portal opens by end
+of August" question resolves — a Sept 4, 2026 TAA/Authors Advocate post
+(blog.taaonline.net/2026/09/next-steps-in-bartz-v-anthropic-settlement-
+resolving-claim-percentage-differences) confirms claimants received
+per-work notices that week, with each qualifying work currently drawing
+roughly $2,203.56 and distributions targeted "no later than November 15,
+2026" for works where all rightsholders agree; some works show publishers
+claiming 85-100% of the payout, with authors told explicitly they "do not
+have to accept" that split. Actioned as an update on the existing
+no-training/privacy-advantage item. **Kadrey v. Meta**: the mediation-
+outcome report (due Aug 21) is now three weeks overdue with nothing found
+on any tracked source (CourtListener, McKool Smith's tracker, National
+Law Review) — still genuinely unresolved, not just unchecked; re-check
+next round. **Sudowrite**: added Claude Fable 5.1 (Sept 2, pitched on
+"fewer false refusals") and GPT-6 Astra (Sept 5) per its own changelog
+(feedback.sudowrite.com/changelog) — minor, not actioned as a roadmap
+change, but worth having on file as continued reinforcement of the
+already-logged "no gatekeeper" contrast with a genuinely local model.
+**NovelCrafter, Dabble**: no dated news found past what's already logged.
+**Campfire**: see Pass 1's mobile finding above — version bump dated but
+changelog content unconfirmed.
+
+## What changed in "Next up"
+
+One new item: a mobile quick-capture surface for the existing PWA,
+scoped specifically to the on-the-go capture job (not full mobile
+editing), placed after the corkboard item and before submission tracking
+— a genuine, previously-unresearched gap with converging evidence from
+three independent angles (a competitor feedback thread, independent
+writer-tool commentary, and the Scrivener/Sudowrite scoping precedent),
+but appropriately below the higher-confidence, more-scoped items above it
+since it implies a new UI surface rather than wiring up existing pieces.
+Two existing items strengthened with new research notes rather than
+duplicated: the NovelCrafter-parity item's codex-templates sub-item
+(three-tool convergence on how to fix blank-entry friction, not just that
+it's a problem) and the Notion-parity item (a dashboard-density guardrail
+citing four independent NovelCrafter/Scrivener "overwhelming" reviews).
+One tracked litigation item updated with a resolved status: the
+no-training/privacy-advantage item's Bartz claims-portal thread. No item
+was reprioritized or rewritten — every change this round is either a new
+item or an additive research note on an existing one.
+
+## Round 45 sources
+
+- feedback.sudowrite.com/p/mobile-functionality-andor-mobile-app
+- becomeawritertoday.com/note-taking-apps
+- docs.sudowrite.com/using-sudowrite/1ow1qkGqof9rtcyGnrWUBS/
+  mobile-app-overview/4MxYzYduLSPQ3VpoP6dyxo (official)
+- forum.literatureandlatte.com/t/scrivener-ios-syncing-via-dropbox-
+  continues-to-crash-the-app/47181
+- dabblewriter.com/blog/dabble-going-mobile (official)
+- apps.apple.com/us/app/campfire-write-your-book/id1626123915 (reviews)
+- marketingtoolpro.com/2025/07/novelcrafter-review
+- codingem.com/novelcrafter-review-2025-the-best-ai-fiction-writing-platform
+- ilampadmanabhan.medium.com/novelcrafter-review-64d391c629a2
+- novelcrafter.com/help/getting-started/quick-start/first-steps-tutorial
+  (official)
+- novelcrafter.com/help/getting-started/quick-start/creating-your-first-novel
+  (official)
+- novelcrafter.com/courses/ultimate-beginners-guide/setting-up-the-codex
+  (official)
+- bindercraft.net/blog/scrivener-review
+- io.bikegremlin.com/31401/scrivener-rant-not-review
+- dabblewriter.com/docs/getting-started/the-dashboard (official)
+- kindlepreneur.com/dabble-writer
+- allyaldridge.com/dabble-writer-review
+- brendanshih.substack.com/p/free-notion-books-template
+- blog.taaonline.net/2026/09/next-steps-in-bartz-v-anthropic-settlement-
+  resolving-claim-percentage-differences
+- feedback.sudowrite.com/changelog (official)
