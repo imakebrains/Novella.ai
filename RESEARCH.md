@@ -6566,3 +6566,238 @@ sharpening passes on prior findings.
   5xJUutV75BLU6u9LZndcDs (official, direct fetch)
 - ilampadmanabhan.medium.com/sudowrite-review
 - terribleminds.com/ramble/2018/07/11/the-save-the-cat-conundrum/
+
+# Round 45 (2026-09-11) — deadline-pacing mechanics, Aeon Timeline as a "second app," litigation/model housekeeping
+
+Housekeeping first: working tree was clean at session start. `origin/main`
+was two commits behind the session's working branch (rounds 43 and 44 had
+already landed on the branch but not reached `main`) — consistent with
+round 44's note that this environment's git operations are pinned to a
+dedicated branch rather than `main` directly; treated as continuity, not a
+conflict, same as round 44 did for round 43.
+
+**Two dedicated interaction-mechanics passes, continuing the cadence
+rounds 41-44 established** (a focused deep-dive per round rather than a
+broad news sweep), plus light housekeeping on three long-running watches.
+
+## Pass 1 — Deadline-based word-count pacing: the actual mechanics of the tool writers substitute for a flat daily goal
+
+**Checked our own code first.** `src/state/sessions.ts` and
+`src/ui/GoalMeter.tsx`: `profile.dailyGoal` is one flat number. There is no
+project target, no deadline, no day-of-week weighting, and no
+recalculation logic of any kind — a writer either meets today's fixed
+number or doesn't. The streak/net-words design is genuinely good, though:
+`recordProgress()` tracks *net* words added against a per-day baseline, so
+a heavy editing day that nets negative isn't scored as failure. The file's
+own header comment already states the reasoning explicitly: "deletion is
+work too, and a tool that only rewards padding is training the wrong
+habit." This turns out to matter directly (see Dabble finding below).
+
+**Finding (official capability, direct quote, the core mechanic):
+Pacemaker's daily quota is not fixed — it auto-recalculates the whole
+remaining plan on every miss or overshoot.** A 2026 review states the
+mechanism plainly: "if you miss a day or two – or, better yet, manage to
+write extra words at some point! – Pacemaker will automatically re-adjust
+your entire plan to keep you on track" (mtgberman.substack.com/p/on-
+pacemaker-the-best-word-count, direct quote from a hands-on review). A
+second independent review confirms the same behavior in different words:
+"if you miss your goal one day, you can catch up and still meet your
+deadline... your goals adapt to how much progress you've made"
+(jemmapollari.com/pacemaker-review-writing-goal-tool-for-authors). A third
+(onelitplace.com/writing-app-review-pacemaker-for-planning-word-count-
+tracking) adds the setup mechanic these two assume: "you plug in the
+project you're working on, the number of words you want to hit, and the
+deadline you want to hit it by, and it'll tell you how many words you have
+to write per day."
+
+**Finding (official capability): a "pacing style" is a separate,
+explicit choice, not a hidden default.** The Berman review names one
+concrete style — "bite the bullet" front-loads word count early and tapers
+as the deadline nears — implying Pacemaker treats pacing shape as a
+setting, not a fixed algorithm. The same review lists day-level
+exclusions as a first-class feature: "the platform accommodates specific
+date parameters, letting users skip weekends, vacations, holidays, and
+adjust intensity for particular periods" — quotas are computed only across
+days the writer says they'll actually write.
+
+**Finding (official capability, independent corroboration from a second,
+unrelated codebase): TrackBear converges on the identical shape.**
+TrackBear (github.com/dispatchrabbi/trackbear, MIT-licensed, actively
+released, free) tracks "words, chapters, pages, scenes, lines, and time,"
+supports multiple simultaneous projects, and lets a writer "weight" days
+so that "weekends, holidays, and even just days when you have a doctor
+appointment" pull less quota automatically — the same deadline + per-day
+weighting + auto-adjustment mechanic Pacemaker ships, arrived at
+independently. Two structurally unrelated tools (one paid/hosted, one
+free/open-source) converging on the same mechanic is stronger evidence
+than either alone that this is the actual job, not one vendor's design
+taste.
+
+**Finding (official capability + recurring feature request, why this
+belongs inside the drafting app itself, not only a bolt-on tracker):
+Dabble already ships a version of this natively.** A 2026 review
+(thewritepractice.com/dabble-review) confirms Dabble's built-in
+goal-setting supports "days off" and "dynamically update[s] goals if you
+miss a day or exceed targets" — the same deadline-recalculation shape,
+built into a drafting app rather than a separate tool. But Dabble's own
+feature-request board carries a live, specific complaint this design
+creates: "Turn off Negative Word Count"
+(dabble.featureupvote.com/suggestions/7670) — users report being
+"punished" for a real editing/pantsing process where deleting text (a
+negative delta) counts against the daily goal. **This is the exact failure
+mode Novella's own `sessions.ts` already avoids by design** (net words,
+explicitly reasoned as "deletion is work too" in the file's own header
+comment) — a rare case in this research where checking our own code
+first turned up a real, already-shipped advantage over a named
+competitor's documented complaint, not a gap to close.
+
+**Why this is a real "second app" finding, not a novelty request.**
+Research round 14 (2026-07-31) already documented writers "stitching
+together separate trackers (Pacemaker, Trackbear, 4theWords)" after
+NaNoWriMo's shutdown, but scoped the finding as a *naming/copy* gap —
+"we already ship the exact feature this audience wants... the gap is
+entirely in naming." Checking Pacemaker and TrackBear's actual mechanics
+this round shows that framing was wrong: the daily-goal/streak system
+Novella ships (flat number, no deadline) is a materially different,
+simpler tool than what these two apps actually do (deadline-driven,
+day-weighted, self-adjusting). The round-14 item is corrected in place
+rather than left standing uncorrected — see "What changed in ROADMAP.md"
+below.
+
+**Build scope, since the underlying math is almost entirely pure logic.**
+Extend `profile` with an optional project target word count, a deadline
+date, and excluded weekdays/specific dates. Compute today's quota as
+`remaining words / remaining eligible days between now and the deadline`,
+recalculated fresh on every load rather than stored and drifting — this
+one formula *is* the auto-recalculation Pacemaker/TrackBear both do, no
+extra bookkeeping required. Keep the existing flat `dailyGoal` mode
+available rather than replacing it: Pacemaker's own pacing-style toggle
+exists specifically because a single rigid formula doesn't fit every
+writer's process, and some writers genuinely want a flat number with no
+deadline pressure at all. The deadline math, day-exclusion filtering, and
+recalculation formula are all unit-testable without a browser, same as
+the existing streak-computation tests in `test-units.ts`; only the
+settings surface for entering a deadline/target/excluded-days needs UI.
+
+## Pass 2 — Aeon Timeline: the actual "second app" the task brief names directly, and what it does that a bare "timeline exists" comparison misses
+
+The existing Timeline roadmap item (round 10, 2026-07-27) compared Novella
+only against Campfire's Timeline module. This pass checks the specific
+app the research brief itself names as a known writing-app pairing —
+"writing app + Aeon Timeline" — to get past feature-name comparison into
+actual interaction mechanics and real user complaints, per this round's
+brief.
+
+**Finding (observed user behavior, primary-sourced, confirms the
+"second app" framing directly): writers run Aeon Timeline as a *third*
+app alongside two others, specifically for chronology.** A Literature &
+Latte forum thread (forum.literatureandlatte.com/t/scrivener-obsidian-and-
+aeon-timeline-oh-my/147060) and a working novelist's own blog post
+(annelyle.com/blog/2022-10-16-how-i-use-aeon-timeline-part-1) both
+describe the same three-app stack: Scrivener for drafting, Obsidian as a
+story bible/linking tool, and Aeon Timeline specifically because neither
+of the other two tracks story-internal chronology. The forum poster's own
+words: "I use Aeon Timeline for outlining and tracking the many aspects of
+my story (even story beats)."
+
+**Finding (official capability, three concrete mechanics worth building
+toward, not just "a timeline exists"):**
+1. **Custom/fictional calendars.** Aeon Timeline lets a writer redefine
+   days, months and year length entirely rather than assuming the
+   Gregorian calendar (annelyle.com: "View → Show Settings → Calendar &
+   Date → Edit Calendar to completely customise days, months and so on").
+   Matters specifically for fantasy/sci-fi worldbuilding, where an
+   in-world date field that's silently Gregorian is wrong by construction.
+2. **Causative links between events, not just chronological order.** The
+   same source demonstrates events linked by cause ("the opening scene is
+   now diverging into two separate storylines"), letting a writer trace
+   *why* something happened across the timeline — a different axis than
+   plot-thread columns (which Novella's `PlotGrid.tsx` already has).
+3. **Auto-computed hierarchical scene position.** A forum poster describes
+   Aeon Timeline automatically labeling "each novel, chapter, scene, and
+   subscene with a position, such as 'Scene 1.2.4'" as events are placed —
+   derived from structure, never hand-typed.
+
+**Finding (recurring complaint, the sharper design opportunity): Aeon
+Timeline's own reported flaw is complexity and sync fragility, not a
+missing feature.** A Writer Unboxed review is titled, tellingly, "Can You
+Be Too Organized? A Writer's Review of Aeon Timeline Software"
+(writerunboxed.com/2022/03/30/can-you-be-too-organized-a-writers-review-
+of-aeon-timeline-software/ — the page itself 403'd on direct fetch, so
+this is corroborated via independent secondary search results rather than
+directly quoted); those results describe the UI as "overcrowded and
+clunky" with "an intimidating... learning curve," and one forum poster
+reports the manual Scrivener-sync "broke down after 3 months" of drift.
+Anne Lyle's own workflow post independently confirms the sync is manual
+and failure-prone by design, not just occasionally: she instructs herself
+to "sync Timeline both **before** and **after** you make changes" to avoid
+conflicts, and notes the Scrivener-side metadata fields "**must** be text
+fields, not dates, otherwise the sync won't work" — a brittle setup
+requirement, not a one-time click.
+
+**Why this beats matching Aeon Timeline's feature list.** A Novella
+timeline sharing one vault with the manuscript has no second copy of the
+data to drift or a manual sync ritual to forget — the structural advantage
+is real and available by construction, not something to build separately.
+The build recommendation is therefore to aim for Aeon Timeline's three
+mechanics above (custom calendars, causative links, auto-derived scene
+position) inside a much simpler, always-in-sync UI, rather than trying to
+match its full power at the cost of its own most-reported flaw.
+
+## Housekeeping: three watch closures/updates
+
+- **Bartz v. Anthropic claims portal — resolved.** Tracked since round 36
+  as "not yet open despite 'end of August' guidance." A September 2026
+  post (blog.taaonline.net) reports the settlement administrator sent
+  consolidated-claim notices to claimants on 2026-09-04 — which could only
+  happen after the portal opened — closing this specific watch. Payments
+  themselves are still guided no sooner than "at least year-end," per
+  round 40's last check; that half remains open for a later round.
+- **Sudowrite shipped Claude Fable 5.1** (feedback.sudowrite.com/changelog/
+  new-ai-model-claude-fable-51, official, 2026-09-02): "fewer false
+  refusals," pitched specifically as less likely "to balk at legitimate
+  story content like dark themes, violence, and romantic content." Checked
+  `src/ai/models.ts` — still lists only `claude-fable-5`, no 5.1 entry.
+  Folded into the existing Fable-blurb roadmap item as a now-missing
+  catalog entry, not just an underselling-blurb problem, and flagged as a
+  fresh, dated data point for the "no gatekeeper" local-AI item (a cloud
+  provider now marketing the identical "doesn't refuse legitimate dark
+  fiction" pitch a genuinely local model gets structurally).
+- **Kadrey v. Meta mediation-outcome report** — not re-checked this round;
+  last status (round 40) was ten days overdue with nothing found. Deprior-
+  itized in favor of the two interaction-mechanics passes above; re-check
+  next news-focused round rather than assume resolved either way.
+
+## What changed in ROADMAP.md
+
+One new item: deadline-based, day-weighted word-count pacing, placed
+after the AI-Brainstorm item (round 44) since both are comparably
+substantial, mostly-pure-logic builds that directly serve the task/goal
+pillar of the four-app thesis. A correction, not a duplicate, was appended
+to the round-14 "NaNoWriMo audience" item: its claim that "we already ship
+the exact feature this audience wants" no longer holds now that Pacemaker
+and TrackBear's actual mechanics have been checked directly, so the item
+now says to sequence the copy *after* the build rather than instead of
+it. The existing round-10 Timeline item was strengthened in place with
+Aeon Timeline's concrete mechanics and its own most-reported flaw, per the
+standing rule to update rather than duplicate when new evidence sharpens
+an item already on the list. The Fable-blurb item picked up the missing
+5.1 catalog entry. The no-training/privacy item picked up the Bartz
+portal closure. No item was reprioritized beyond the corrections above.
+
+## Round 45 sources
+
+- pacemaker.press/faq (official, page did not return descriptive content
+  on direct fetch — relied on independent review quotations instead)
+- mtgberman.substack.com/p/on-pacemaker-the-best-word-count
+- jemmapollari.com/pacemaker-review-writing-goal-tool-for-authors
+- onelitplace.com/writing-app-review-pacemaker-for-planning-word-count-tracking
+- github.com/dispatchrabbi/trackbear (official, MIT)
+- thewritepractice.com/dabble-review
+- dabble.featureupvote.com/suggestions/7670 (official feature board)
+- forum.literatureandlatte.com/t/scrivener-obsidian-and-aeon-timeline-oh-my/147060
+- annelyle.com/blog/2022-10-16-how-i-use-aeon-timeline-part-1
+- writerunboxed.com/2022/03/30/can-you-be-too-organized-a-writers-review-of-aeon-timeline-software/
+  (403 on direct fetch; corroborated via independent secondary search results)
+- blog.taaonline.net/2026/09 (Bartz settlement claims-notice post)
+- feedback.sudowrite.com/changelog/new-ai-model-claude-fable-51 (official)
