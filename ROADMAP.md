@@ -404,6 +404,175 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       trying Novella with their real, in-progress novel versus a blank
       test file, which is exactly the moment the four-app thesis needs to
       win to get a writer in the door at all.
+- [ ] **Fix export/publishing formatting to actually satisfy its downstream
+      reader, not just produce a file** — research round 45 (2026-09-12): a
+      dedicated pass on export/publishing UX, an area never previously
+      given a deep-dive (the only prior coverage was a one-line "say the
+      export advantage louder" copy note from round 7, now folded into and
+      superseded by this item). Checked our own code first:
+      `src/export/{formats.ts,compile.ts,printPdf.ts}` and
+      `ExportModal.tsx`. The DOCX/EPUB/PDF export is real and more capable
+      than Dabble's (which ships no EPUB or print-ready PDF at all — "Export
+      to epub" is still an open, unresolved item on Dabble's own feature-
+      request board, dabble.featureupvote.com/suggestions/2318/export-to-
+      epub) or NovelCrafter's (whose own docs admit export "does not
+      export a fully formatted novel as seen in the interface" and font/
+      spacing choices aren't retained, docs.novelcrafter.com/en/articles/
+      9319221-how-do-i-export-my-novel, official) — but it conflates three
+      genuinely different downstream contracts into one shared preset, and
+      is missing pieces our own bundled skill files already know are
+      required. Specifics, verified against the code: the DOCX export has
+      no running header (Surname/Title/Page#) and no contact-info block on
+      page 1, both hard requirements of Shunn standard manuscript format
+      that `.claude/skills/manuscript-export/assets/shunn-format-
+      checklist.md` already documents but the exporter doesn't implement —
+      an agent-submission file we produce today would fail a strict format
+      check on exactly the details our own checklist warns about (shunn.net/
+      format, the canonical reference). No scene-break glyph exists either
+      (a blank-line paragraph break is indistinguishable from a scene
+      break in the output). No cover-image embedding anywhere (DOCX, EPUB,
+      or PDF) and no dedication/epigraph/acknowledgments front-matter
+      fields — only title + author. The PDF path is a generic ~40rem
+      browser print with no trim size, bleed, or gutter margin — it makes
+      *a* PDF, not a KDP-submittable print interior (KDP's own spec: trim
+      size plus 0.125" bleed, margins that scale with page count,
+      kdp.amazon.com/en_US/help/topic/GVBQ3CMEQW3W2VL6, official). The
+      market's actual answer to this job is a dedicated second app,
+      Vellum (vellum.pub) — Mac-only, $199.99 ebook-only or $249.99 with
+      print — and Scrivener's own maker ships a dedicated "Vellum Export"
+      Compile preset (literatureandlatte.com/export-to-vellum, official),
+      i.e. Scrivener's own vendor formally concedes Scrivener doesn't
+      finish this job. Windows authors are documented renting a virtual
+      Mac (~$1/hr via MacInCloud) specifically to run Vellum for the
+      formatting step alone before returning the files to their real
+      machine — a vivid, citable instance of the "second app" pattern this
+      research keeps finding. Kindlepreneur, the category's most-cited
+      reviewer, has publicly reversed its long-standing #1 recommendation
+      of Vellum in favor of Atticus specifically over price and the Mac-
+      only lock-in (kindlepreneur.com/vellum-software-review,
+      /atticus-vs-vellum, official reviewer coverage) — direct evidence
+      that Vellum's vulnerability is cost and platform, not formatting
+      sophistication, which sets the real bar for Novella: correctness and
+      being already-installed beats chasing Vellum's decorative flourish
+      catalog (drop caps, ornamental scene-break glyphs) as a first pass.
+      Scrivener's own Compile is the tool people already own and still
+      can't get clean output from — a Literature & Latte forum thread
+      titled "Compile is a confusing mess" documents a user unable to get
+      reliable chapter-heading-then-page-break output across four separate
+      novels, with a third poster naming the root UX cause: Section Types
+      and Section Layouts are two separate concepts a user must correctly
+      map to each other, "poorly communicated" (forum.literatureandlatte.com/
+      t/compile-is-a-confusing-mess/153286) — direct evidence a drafting
+      tool's own compile/export step can be a worse experience than doing
+      nothing and reaching for a dedicated tool instead. Build plan, in
+      priority order: (1) fix DOCX to actually satisfy Shunn format —
+      running header, contact block, a real scene-break glyph, closing the
+      gap between our own bundled checklist and our own code; (2) split
+      export presets by *audience* (Submission/agent, Self-publish ebook,
+      Self-publish print) rather than by format alone, since an agent
+      wants Shunn's header/contact-block and no forced page break, KDP
+      ebook wants dual EPUB navigation (a visible TOC page plus a working
+      NCX/nav that populates the reader's "Go To" menu — a file can look
+      fine and still fail Amazon's automated check on the invisible half,
+      vappingo.com/word-blog/kdp-table-of-contents, official/reviewer
+      analysis) with no Shunn cruft, and KDP print wants trim-size-correct,
+      bled, gutter-aware pagination nothing like the current browser-print
+      path; (3) cover-image embedding across EPUB and print PDF, the
+      single most concrete missing capability against every competitor
+      checked; (4) real trim-size/margin/bleed controls for the print PDF,
+      starting with the two dominant novel trims (5×8", 6×9"); (5)
+      optional dedication/epigraph/acknowledgments/about-the-author
+      front-matter slots in the compile step. Verify the EPUB nav/NCX
+      against an actual Kindle Previewer pass before claiming
+      "retailer-ready" anywhere in copy — the structure looks correct by
+      inspection but hasn't been validated against Amazon's own converter,
+      which is documented to diverge from local tools.
+- [ ] **A lightweight in-world timeline and a location map/pinboard for
+      worldbuilding** — Campfire's two headline features (research rounds
+      7 and 10), sharpened by research round 45 (2026-09-12) with a full
+      interaction-mechanics pass and a concrete build spec reusing code we
+      already ship, after sitting as thin one-line stubs for 35+ rounds.
+      Reprioritized above the copy-only "say X advantage louder" items and
+      the local-model/reasoning-toggle items below, on the strength of that
+      spec and the "second app" evidence found for the timeline half
+      specifically.
+
+      **Timeline.** Checked our own code again: still nothing — no
+      chronology component, no in-world date field anywhere in the note
+      schema; the only "date" features (`CalendarTab.tsx`, `icsFeed.ts`,
+      `calendarEntries.ts`) are the writer's own real-world writing-
+      schedule calendar, a different job entirely. But the reusable
+      scaffolding is already in place and was confirmed by reading the
+      code: `Note.data` (`src/core/vault.ts`) is freeform frontmatter today
+      carrying `pov`/`synopsis` with zero core-engine changes needed to add
+      an optional `when:` field the same way; `PlotGrid.tsx` and
+      `Corkboard.tsx` already share one `order` field as the single source
+      of truth for manuscript sequence, which a timeline should read
+      rather than fork its own; `RelationshipWeb.tsx` is the exact
+      interaction skeleton to reuse (nodes + click-to-open + connection-
+      highlight, built from the existing link graph) with nodes placed on
+      a date axis instead of a ring. The sharpest cross-cutting finding:
+      **every tool that force-commits a writer to structure up front
+      punishes the ones who guess wrong.** Aeon Timeline — the dedicated
+      standalone tool Scrivener/NovelCrafter users pair with specifically
+      because neither ships a native timeline (a Literature & Latte forum
+      thread literally titled "Scrivener, Obsidian and Aeon Timeline, oh
+      my," forum.literatureandlatte.com/t/scrivener-obsidian-and-aeon-
+      timeline-oh-my/147060) — locks its calendar-system choice
+      permanently once events exist, forcing a full redo if the writer
+      picked wrong early (annelyle.com/blog/2022-10-16-how-i-use-aeon-
+      timeline-part-1, a working novelist's own documented workflow).
+      Campfire's Timeline requires every event to carry a specific date
+      with no way to opt for relative-only ordering, a named complaint in
+      Reedsy's hands-on review (reedsy.com/blog/guide/book-writing-
+      software/campfire-write-review). NovelCrafter has no chronology
+      timeline at all — its "timeline" is only a manuscript-navigation
+      jump-to-scene aid (docs.novelcrafter.com/en/articles/8675752-the-
+      write-interface, official) — a real gap even in the market's AI-
+      native leader. The best answer found isn't a commercial product at
+      all: **StoryLine**, a free community Obsidian plugin
+      (storyline.pixero.com), gives an instant Reading-Order/Chronological-
+      Order toggle on the same scene cards, swimlanes by POV or location,
+      and ten explicit non-linear-narrative tags (flashback, parallel,
+      frame, dream) that suppress false "out of order" warnings instead of
+      fighting the writer's structure — looser and more forgiving than
+      either commercial tool, and the pattern to copy directly. Build
+      plan: an optional `when:` field nothing requires; a Reading-Order/
+      Chronological-Order toggle over the same cards already in Corkboard/
+      PlotGrid rather than a new note type or a forked ordering field;
+      free swimlanes by `pov` (already on every card, so this is close to
+      free); a small set of optional non-linear tags instead of an error
+      state for "out of order." This also strengthens the Continuity
+      inspector: today's "unordered chapters" check only knows manuscript
+      order, never in-world date order, so a flashback-heavy or multi-POV
+      book gets no help at all today.
+
+      **Location map.** Reuses `src/state/cardImages.ts`'s existing per-
+      note image read/write/cache/undo pipeline (already wired into
+      `Corkboard.tsx`'s drag-and-drop), re-keyed to a map ID rather than a
+      note ID, for the map background image itself; a pin is just a link
+      that opens the location's existing codex note the same way
+      `RelationshipWeb`'s node click already does — no new modal or
+      article type required. Campfire's Maps (pin any image, link a pin to
+      any codex article including nested sub-maps, zones, layers, a
+      distance ruler) and World Anvil's Maps (the same core mechanic plus
+      custom pin-icon HTML) are both well-liked — Reedsy rates Campfire's
+      as one of its standout, hard-to-replicate features — but World
+      Anvil's broader UI draws independent "clunky"/"confusing" complaints
+      even from users who like the maps specifically
+      (rmarcher.com/world-anvil-review-my-5-favorite-features), and neither
+      tool can generate a map — both require artwork the writer already
+      owns. NovelCrafter has no map feature of any kind either. Build v1
+      as pin + label + link-to-codex-entry only — skip zones, layers,
+      custom icon markup, and a unit-based ruler, which read as exactly
+      the advanced-tier complexity behind the "clunky" complaints above.
+      **Caution, consistent with the pattern this research keeps finding
+      for rigid competitor structure (Save the Cat templates, Campfire's
+      attribute panels):** never require a location note to carry map
+      coordinates before it works as a normal codex entry, and let the map
+      view degrade to an empty state (the way `RelationshipWeb` already
+      does — "Nothing to map yet") rather than gating any existing
+      functionality behind "add it to the map first."
 - [ ] **Reword-in-place: keyboard-first accept/reject, and a compare view
       for several alternatives at once** — research round 41 (2026-09-03):
       checked `src/ui/RewordPopover.tsx` — the only key it handles is
@@ -864,27 +1033,6 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       working out a plot problem in Chat. Grepped `src/ai` for
       "reasoning"/"thinking" — no matches; every request is treated
       identically regardless of model or task.
-- [ ] **Location map / pinboard for codex locations** — research round 7:
-      Campfire's headline feature (maps + timelines linked to the
-      manuscript) is what fantasy/sci-fi reviewers rate it 4/5 for. Pin
-      codex location entries onto an uploaded map image; reuses the
-      card-image upload path already shipped for board cards. Worldbuilding
-      counterpart to the existing Relationship web.
-- [ ] **Timeline view for story chronology** — research round 10
-      (2026-07-27): Campfire's Timeline module plots events, scenes and
-      character appearances on one or more horizontal timelines, explicitly
-      pitched at dual-timeline and multi-POV books where story-internal
-      order and manuscript order diverge; its Arcs module links the same
-      events to per-character development arcs. Verified we have nothing
-      like it — grepped the codebase and the only "timeline" hits are an
-      agent example prompt and unrelated seed text, no feature. This is
-      the chronology counterpart to the location-map item above (both
-      Campfire headline features, both unbuilt) and doubles as a stronger
-      Continuity inspector: today's "unordered chapters" check only knows
-      manuscript order, not in-world date order for flashback-heavy or
-      multi-POV books. Lower priority than the map since it's a bigger
-      surface (needs an in-world date field on scenes), but the same
-      genre-fiction audience wants both.
 - [ ] **Say the four-app bundle louder, not just "local AI, no subscription"**
       — research round 11 (2026-07-28): three new products (LocalProse,
       Novel Mage, Noveling) now market themselves in nearly the same words
@@ -1586,18 +1734,15 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       $14-70/month once API usage is added to its low base subscription —
       would sharpen that item's contrast if a future round can date and
       corroborate it.
-- [ ] **Say the export advantage louder** — research round 7: Sudowrite
-      reviews specifically dock it for shipping no PDF/EPUB/DOCX export;
-      Novella already ships all three plus one-click backup
-      (`src/export/formats.ts`) and the export modal / first-run copy
-      doesn't say so. Cheap copy win, low priority.
 - [ ] **Say the performance/battery advantage louder** — research round 8:
       2026 Dabble reviews call it out by name as a CPU hog that "ran a
       user's laptop battery down really quickly," a direct cost of being a
       browser-tab app. Novella is a native Tauri process with a local
       vault, not a browser tab — first-run/marketing copy doesn't currently
-      make this contrast. Cheap copy win, low priority, pairs with the
-      export-advantage item above. Research round 30 (2026-08-15) confirms
+      make this contrast. Cheap copy win, low priority. (The former "say
+      the export advantage louder" item that used to pair with this one
+      was superseded by research round 45's export/publishing-formatting
+      item, ranked much higher, above.) Research round 30 (2026-08-15) confirms
       and sharpens the case round 29 flagged but couldn't date: Dabble 3.0
       (launched July 13, 2026 — real-time co-authoring, working track
       changes, Time Machine version history, review copies for beta
@@ -1766,6 +1911,51 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-09-12 — Research round 45 (autopilot; no code). Housekeeping first:
+  working tree was clean at session start; local `main` was 2 commits
+  behind `origin/main` (rounds 43-44 hadn't reached this container's ref
+  yet) — fixed with a plain fast-forward, no conflict. Gap note: round 44
+  ran 2026-09-06; nothing touched the repo for 6 days until this round,
+  similar to round 40's week-long gap. Continued the rounds 41-44
+  interaction-mechanics cadence with two dedicated parallel passes on
+  surfaces that had sat as thin, un-deepened stubs or gone entirely
+  unexamined: (1) Export/publishing-formatting UX, an area with zero
+  prior dedicated research (the only previous coverage was a one-line
+  "say the export advantage louder" copy note from round 7) — checked our
+  own `src/export/{formats.ts,compile.ts,printPdf.ts}`/`ExportModal.tsx`
+  and found real but incomplete DOCX/EPUB/PDF export that conflates three
+  different downstream contracts (agent submission, KDP ebook, KDP print)
+  into one shared preset, is missing pieces our own bundled Shunn-format
+  checklist already documents (running header, contact block, scene-break
+  glyph), and has no cover-image embedding or trim-size-aware print PDF
+  anywhere. Found Vellum ($199-249, Mac-only) as the market's actual
+  second-app answer to this job, with Scrivener's own maker shipping a
+  dedicated "Vellum Export" Compile preset — the drafting tool's own
+  vendor conceding it doesn't finish the job — and Kindlepreneur's public
+  reversal away from recommending Vellum (price/platform lock-in, not
+  formatting quality) as evidence of where the real competitive opening
+  is. Replaced the old copy-only export item with a fully-scoped,
+  five-step build item, ranked high, right after the manuscript-import
+  item. (2) Timeline and location-map worldbuilding views — Campfire's
+  two remaining unbuilt headline features (rounds 7 and 10), still
+  one-line stubs after 35+ rounds — got a full interaction-mechanics pass
+  for the first time. Checked our own code again: still nothing built,
+  but confirmed real reusable scaffolding (`Note.data` freeform
+  frontmatter, the shared `order` field `PlotGrid`/`Corkboard` already
+  use, `RelationshipWeb.tsx`'s node/click-to-open/highlight skeleton,
+  `cardImages.ts`'s per-note image pipeline). Found Aeon Timeline's
+  permanently-locked calendar choice and Campfire's mandatory per-event
+  dating as the sharpest cautionary pattern (rigid up-front structure
+  punishes writers who guess wrong), and a free community Obsidian
+  plugin, StoryLine, as the best answer found anywhere — an instant
+  Reading-Order/Chronological-Order toggle with optional non-linear tags
+  rather than a forced single axis. Merged both worldbuilding items into
+  one sharpened, reprioritized entry with a concrete build spec for each
+  half, moved up above the local-model/reasoning-toggle items. Did not
+  re-run the four-pillar bundle check or litigation-date tracking this
+  round, by design, for the fifth round running. Full notes, evidence-type
+  breakdown, and source lists in RESEARCH.md Round 45.
 
 - 2026-09-06 — Research round 44 (autopilot; no code). Housekeeping:
   working tree clean; local branch was one commit ahead of `origin/main`

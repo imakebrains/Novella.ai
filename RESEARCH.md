@@ -6566,3 +6566,312 @@ sharpening passes on prior findings.
   5xJUutV75BLU6u9LZndcDs (official, direct fetch)
 - ilampadmanabhan.medium.com/sudowrite-review
 - terribleminds.com/ramble/2018/07/11/the-save-the-cat-conundrum/
+
+# Round 45 (2026-09-12) — export/publishing formatting, and the two remaining Campfire headline features
+
+Housekeeping first: working tree was clean at session start. Local `main`
+was 2 commits behind `origin/main` (rounds 43-44 hadn't reached this
+container's ref yet) — fixed with a plain fast-forward, no conflict. Gap
+note: round 44 ran 2026-09-06; nothing touched the repo for 6 days until
+this round, the second week-plus gap on record after round 40's.
+
+**Two focused passes this round, continuing the interaction-mechanics
+cadence rounds 41-44 established.** Both topics were chosen because they
+had never had a real deep-dive despite sitting in the backlog for a long
+time: export/publishing-formatting UX (previously only a one-line copy
+note), and timeline/location-map worldbuilding views (previously two
+one-line stubs from rounds 7 and 10 that 35+ subsequent rounds never
+revisited).
+
+## Pass 1 — Export and publishing-formatting UX
+
+**Checked our own code first.** `src/export/formats.ts`, `compile.ts`,
+`printPdf.ts`, and `ExportModal.tsx` confirm Novella ships real
+Markdown/DOCX/EPUB export and a browser-print PDF path, with per-project
+settings persisted to `.novella/export.json`. This is a genuine floor —
+more than Dabble ships (see below) — but it is one shared preset (title,
+author, skip-empty-chapters, format choice) rather than per-audience
+presets, and several concrete requirements are simply absent: no running
+header or contact-info block on the DOCX (both hard requirements of Shunn
+standard manuscript format — checked against our own bundled
+`.claude/skills/manuscript-export/assets/shunn-format-checklist.md`,
+which documents these requirements that the exporter itself doesn't
+implement), no scene-break glyph (a blank-line paragraph break is
+indistinguishable from a scene break in output), no cover-image embedding
+anywhere, no dedication/epigraph/acknowledgments front-matter fields, and
+the PDF path is a generic ~40rem browser-print window with no trim size,
+bleed, or gutter margin — it produces *a* PDF, not a KDP-submittable print
+interior.
+
+**Finding (official capability, the market's actual second app): Vellum
+is the dominant standalone book-formatting tool, and Scrivener's own
+maker formally concedes Scrivener doesn't finish this job.** The
+documented workflow is consistently draft in Scrivener/Word/Google Docs →
+export clean DOCX → import into Vellum → pick a book-style template → get
+a live WYSIWYG preview → generate KDP/Apple/Kobo/Draft2Digital-ready
+ebook files plus a print-ready PDF simultaneously
+(scribecount.com/author-resource/writing-tools-for-authors/vellum-
+editing-app). Literature & Latte ships a dedicated "Vellum Export"
+Compile preset inside Scrivener itself
+(literatureandlatte.com/export-to-vellum, official) — the drafting tool's
+own vendor building a bridge to the formatting tool is about as direct an
+admission as this research finds anywhere that the drafting app doesn't
+finish the job on its own.
+
+**Finding (recurring complaint, a vivid instance of the "second app"
+pattern): Windows authors rent a virtual Mac specifically to run Vellum
+for the formatting step alone.** Vellum is Mac-only, priced $199.99
+(ebook only) or $249.99 (ebook + print), with a $99.99 upgrade path
+between tiers (help.vellum.pub/purchasing, official). Multiple sources
+document Windows-based authors using MacInCloud (~$1/hr) purely to access
+Vellum for final formatting before returning files to their real machine
+(authorshelpkit.com/scrivener-vs-vellum-which-tool-is-essential-for-
+writing-and-formatting-your-novel) — a cost and workflow tax that exists
+for no reason other than one specific step of publishing having no
+cross-platform, already-installed answer.
+
+**Finding (reviewer opinion, sharpens where Novella's real opening is):
+Kindlepreneur has publicly reversed its long-standing #1 recommendation
+of Vellum, now favoring Atticus specifically over price and platform
+lock-in, while conceding Atticus does "the same thing if not better" on
+core formatting** (kindlepreneur.com/vellum-software-review,
+/atticus-vs-vellum, official reviewer coverage). This matters more than
+it first appears: it means Vellum's vulnerability is cost and OS
+exclusivity, not formatting sophistication — the bar for Novella to clear
+isn't matching Vellum's drop-cap library and ornamental scene-break
+catalog, it's being correct, free, and already-installed for the large
+tier of authors who find Vellum's price/lock-in the actual objection.
+
+**Finding (recurring complaint, the tool people already own also fails
+them): a Literature & Latte forum thread titled "Compile is a confusing
+mess" documents a user unable to get reliable chapter-heading-then-
+page-break output across four separate novels**, with unexplained page
+breaks appearing between heading and body text and Scrivener's own
+"Scene" layout selection reportedly reverting to "Chapter Heading" layout
+unprompted (forum.literatureandlatte.com/t/compile-is-a-confusing-
+mess/153286). A third poster in the same thread names the specific root
+UX cause: Section Types and Section Layouts are two separate concepts a
+user must correctly map to each other, and the relationship between them
+is "poorly communicated." This is evidence that a drafting tool's own
+export/compile step can itself be worse than no export step at all —
+exactly why "clean DOCX out, then into Vellum/Atticus" is the two-step
+norm rather than Scrivener's Compile being a genuine endpoint.
+
+**Finding (official capability, documented limitations, absence): both
+other direct competitors explicitly punt on formatting.** NovelCrafter's
+own docs state export "does not export a fully formatted novel as seen in
+the interface" — font size and paragraph spacing are not retained
+(docs.novelcrafter.com/en/articles/9319221-how-do-i-export-my-novel,
+official) — and its own FAQ points users toward Atticus or Vellum next.
+Dabble exports to Word, Google Docs, web, or Markdown only — **no EPUB
+and no print-ready PDF at all** — with "Export to epub" still sitting as
+an open, unresolved public feature request on Dabble's own roadmap board
+(dabble.featureupvote.com/suggestions/2318/export-to-epub), and Reedsy's
+own review calls this out directly as a reason a Dabble user must budget
+for a separate formatting tool or service
+(reedsy.com/studio/resources/dabble-writing-review). Novella's baseline —
+three real formats with per-format presets already scaffolded — is
+already ahead of two of three direct competitors on raw capability; the
+gap that matters is quality/completeness against a specific downstream
+consumer's rules, not format count.
+
+**Finding (official capability, defines what "good" actually requires):
+retailer- and agent-readiness are specific, checkable rule sets, not
+vague quality bars.** Shunn standard manuscript format
+(shunn.net/format, the canonical reference, cross-checked against our own
+bundled checklist) requires a contact-info block and approximate word
+count on page 1, no header on page 1 but a running "Surname / TITLE /
+page#" header on every page after, and a specific centered-`#` scene-break
+convention. KDP ebook requires two separate, independently-checkable
+navigation structures — a visible in-book TOC page *and* a working
+NCX/nav document that populates the reading app's "Go To" menu, since a
+file can look fine and still fail Amazon's automated quality check on the
+invisible half alone (vappingo.com/word-blog/kdp-table-of-contents).
+KDP print requires trim-size-correct pagination with bleed (e.g. a 6×9"
+book becomes 6.125×9.25" once 0.125" bleed is added) and margins that
+scale with page count (kdp.amazon.com/en_US/help/topic/GVBQ3CMEQW3W2VL6,
+official). Novella's current single "Word (.docx)" preset satisfies none
+of these three rule sets completely and conflates them into one shared
+settings blob — the fix is audience-specific presets, not a bigger single
+preset.
+
+**Why this beats a "ship more formats" build:** the underlying job was
+never "export a file," it's "produce a file that satisfies one specific
+downstream consumer's checkable rules" — an agent, a retailer's automated
+ebook validator, or a print-on-demand press each want a different,
+specific thing from the same manuscript. Actioned as a new roadmap item,
+replacing the old copy-only "say the export advantage louder" note
+entirely rather than sitting alongside it: fix DOCX to actually satisfy
+Shunn format; split presets by audience (Submission / Self-publish ebook
+/ Self-publish print) instead of by format; add cover-image embedding;
+add real trim-size/margin/bleed controls to the print PDF; add optional
+front/back-matter fields; and verify the EPUB nav/NCX against an actual
+Kindle Previewer pass before claiming "retailer-ready" in any copy.
+
+## Pass 2 — Timeline and location-map worldbuilding views
+
+**Checked our own code first, a second time** (rounds 7 and 10 first
+confirmed the absence; this pass verified it still holds and looked for
+reusable scaffolding). No chronology component and no in-world date field
+exist anywhere in the note schema — the only "date" hits
+(`CalendarTab.tsx`, `icsFeed.ts`, `calendarEntries.ts`, `sessions.ts`) are
+the writer's own real-world writing-schedule calendar, a different job
+entirely. No map/pinboard exists either; `location` is only a codex note
+type with no coordinate field or image-canvas concept. But real reusable
+scaffolding is already in place: `Note.data` (`src/core/vault.ts`) is
+freeform frontmatter today, carrying `pov`/`synopsis` with zero
+core-engine changes needed to add an optional `when:` field the same way;
+`PlotGrid.tsx` and `Corkboard.tsx` already share one `order` field as the
+single source of truth for manuscript sequence; `RelationshipWeb.tsx` is
+a deterministic, non-physics SVG graph (nodes + click-to-open +
+connection-highlight, built from the existing link graph) that is
+close to the exact interaction skeleton either feature needs; and
+`src/state/cardImages.ts` is a working per-note image
+read/write/cache/undo pipeline already wired into `Corkboard.tsx`'s
+drag-and-drop, transferable to a map background image with a different
+key scheme.
+
+**Finding (official capability): Campfire's Timeline plots events on one
+or more horizontal timelines with an Arcs module linking the same events
+to per-character development lines** (campfirewriting.com/timeline-maker,
+/learn/arcs-tutorial, official). **Finding (recurring complaint,
+reviewer opinion): Campfire's Timeline requires every event to carry a
+specific date, with no way to opt for relative-only ordering** — a named
+frustration in Reedsy's hands-on review, alongside praise for how well it
+catches travel-time and sequencing inconsistencies once populated
+(reedsy.com/blog/guide/book-writing-software/campfire-write-review).
+
+**Finding (observed user behavior, the clearest "second app" case for
+chronology specifically): Aeon Timeline is a dedicated standalone tool
+novelists pair with Scrivener precisely because Scrivener has no native
+timeline**, syncing bidirectionally with Scrivener's binder rather than
+duplicating scene data, and supporting custom (including non-terrestrial)
+calendars with automatic date math — a Literature & Latte forum thread is
+literally titled "Scrivener, Obsidian and Aeon Timeline, oh my"
+(forum.literatureandlatte.com/t/scrivener-obsidian-and-aeon-timeline-oh-
+my/147060). **Finding (recurring complaint, the sharpest cautionary
+pattern of the round): Aeon Timeline's calendar-system choice becomes
+immutable once events exist**, forcing a full redo if the writer guessed
+wrong early, on top of a documented steep learning curve and a sync path
+that can silently corrupt data without a manual backup first
+(annelyle.com/blog/2022-10-16-how-i-use-aeon-timeline-part-1, a working
+novelist's own detailed workflow account). Read together with Campfire's
+mandatory-dating complaint above, the pattern is consistent: **tools that
+force a writer to commit to chronological structure up front punish the
+ones who guess wrong**, which is the single most important build
+constraint this pass surfaced.
+
+**Finding (official capability, absence): NovelCrafter has no in-world
+chronology timeline at all** — its "timeline" feature is a
+manuscript-navigation jump-to-scene aid, reading-order only
+(docs.novelcrafter.com/en/articles/8675752-the-write-interface, official)
+— a real gap even in the market's AI-native leader.
+
+**Finding (observed user behavior, the strongest single data point of
+the pass): the best chronology implementation found anywhere is a free
+community Obsidian plugin, not a commercial product.** StoryLine
+(storyline.pixero.com) gives an instant Reading-Order/Chronological-Order
+toggle over the same scene cards, swimlanes grouped by POV/location/tag,
+and ten explicit non-linear-narrative tags (flashback, parallel, frame,
+dream, etc.) that suppress false "out of order" warnings instead of
+fighting the writer's actual structure — a looser, more forgiving design
+than either commercial tool above, built by a writer for writers because
+nothing else gave them this. A second plugin, Radial Timeline
+(community.obsidian.md/plugins/radial-timeline), overlays four
+simultaneous timelines (manuscript order, chronology, writing progress,
+revision stage) in one radial view — evidence the underlying demand runs
+deeper than a single linear axis.
+
+**Finding (official capability): Plottr's Timeline stacks plotlines
+(main plot, subplots, individual character arcs) as parallel rows on a
+shared time axis**, with scene cards linking to Characters/Places/Tags
+and a Filter control isolating one character or place's scenes across the
+whole board (docs.plottr.com/article/54-timeline-overview,
+plottr.com/timeline-creation, official).
+
+**Finding (official capability): Campfire's Maps let a writer upload any
+image as a map base and drop pins that link to any codex article,
+including nested sub-maps, with zones, layers, and a distance ruler**
+(campfirewriting.com/interactive-maps, /learn/maps-tutorial, official).
+**Finding (reviewer opinion): Reedsy rates this as one of Campfire's
+standout, hard-to-replicate features**, while also noting Campfire cannot
+generate a map itself — the writer must already own or commission the
+artwork. **Finding (official capability, mixed reviewer opinion): World
+Anvil's Maps use the same core pin-on-image mechanic plus custom pin-icon
+HTML for bespoke styling**, and while its maps specifically draw
+enthusiasm, independent reviewers separately describe World Anvil's
+*broader* UI as "clunky" or "confusing in general"
+(rmarcher.com/world-anvil-review-my-5-favorite-features) — a caution that
+advanced-tier complexity (zones, layers, custom markup) is where
+goodwill toward this kind of feature erodes, not the core pin-and-link
+mechanic itself. NovelCrafter has no map feature of any kind either.
+
+**Why this beats a feature-parity build:** the underlying job in both
+halves is continuity-checking under complexity a writer's memory can't
+hold — event/date sequencing across multi-POV or flashback structure, and
+spatial/travel-time consistency across a fictional geography — and both
+jobs currently pull writers into a named second app (Aeon Timeline
+explicitly; a physical map, PDF, or World Anvil for geography). Actioned
+as one merged roadmap item (previously two separate one-line stubs from
+rounds 7 and 10 that had never been deepened): an optional `when:` field
+nothing requires, a Reading-Order/Chronological-Order toggle over the
+existing Corkboard/PlotGrid cards rather than a new note type, free
+swimlanes by the `pov` field already on every card, and a small set of
+optional non-linear tags instead of an "out of order" error state, for
+the timeline half; a map-image field on location notes reusing
+`cardImages.ts`'s pipeline, with pins as plain links into the existing
+codex (no new modal or article type), explicitly scoped to skip zones/
+layers/custom-icon complexity for a first pass, for the map half.
+
+## What changed in "Next up"
+
+Replaced the old one-line "say the export advantage louder" copy item
+with a fully-scoped, five-step export/publishing-formatting build item
+(fix Shunn-format DOCX gaps; split presets by audience; add cover-image
+embedding; add trim-size-aware print PDF; add front/back-matter fields),
+placed high, directly after the manuscript-import item — both are
+acquisition/completion-moment features with a named, priced competitor
+tool behind them (Vellum, $199-249). Merged the two separate one-line
+Location-map (round 7) and Timeline (round 10) stubs into a single
+sharpened item with a concrete, code-reuse-aware build spec for each
+half, moved up above the local-model/reasoning-toggle items on the
+strength of that spec and the Aeon Timeline "second app" evidence found
+for the chronology half specifically. Did not re-run the four-pillar
+bundle check or litigation-date tracking this round, by design, for the
+fifth round running.
+
+## Round 45 sources
+
+- literatureandlatte.com/export-to-vellum (official)
+- scribecount.com/author-resource/writing-tools-for-authors/vellum-editing-app
+- authorshelpkit.com/scrivener-vs-vellum-which-tool-is-essential-for-writing-and-formatting-your-novel
+- ebookpbook.com/2026/04/15/drop-caps-self-published-books
+- vellum.pub, help.vellum.pub/purchasing (official)
+- kindlepreneur.com/vellum-software-review, /atticus-vs-vellum, /vellum-alternatives
+- forum.literatureandlatte.com/t/compile-is-a-confusing-mess/153286
+- literatureandlatte.com/forum/viewtopic.php?t=54041
+- docs.novelcrafter.com/en/articles/9319221-how-do-i-export-my-novel (official)
+- novelcrafter.com/help/faq/export/format-for-export (official)
+- reedsy.com/studio/resources/dabble-writing-review
+- dabblewriter.com/docs/import-export-printing/export-your-manuscript (official)
+- dabble.featureupvote.com/suggestions/2318/export-to-epub
+- kdp.amazon.com/en_US/help/topic/GVBQ3CMEQW3W2VL6, /G201857950 (official)
+- vappingo.com/word-blog/kdp-table-of-contents
+- shunn.net/format
+- campfirewriting.com/timeline-maker, /learn/timeline-tutorial, /learn/arcs-tutorial,
+  /interactive-maps, /learn/maps-tutorial (official)
+- reedsy.com/blog/guide/book-writing-software/campfire-write-review
+- kindlepreneur.com/campfire-write-review, /campfire-vs-world-anvil
+- forum.literatureandlatte.com/t/scrivener-obsidian-and-aeon-timeline-oh-my/147060
+- annelyle.com/blog/2022-10-16-how-i-use-aeon-timeline-part-1
+- mizkit.com/aeon-timeline-scrivener-a-how-to-for-syncing
+- docs.plottr.com/article/54-timeline-overview, plottr.com/timeline-creation (official)
+- worldanvil.com/learn/map-making, /learn/map-making/maps (official)
+- rmarcher.com/world-anvil-review-my-5-favorite-features
+- storyline.pixero.com
+- community.obsidian.md/plugins/radial-timeline
+- novelcrafter.com/features/codex, docs.novelcrafter.com/en/articles/8675752-the-write-interface (official)
+- Internal: src/export/{formats.ts,compile.ts,printPdf.ts}, src/ui/ExportModal.tsx,
+  .claude/skills/manuscript-export/assets/{shunn-format-checklist.md,kdp-epub-checklist.md}
+- Internal: src/ui/{RelationshipWeb.tsx,CodexPane.tsx,Corkboard.tsx,PlotGrid.tsx,
+  QuickCreate.tsx,CalendarTab.tsx}, src/state/cardImages.ts, src/core/vault.ts
