@@ -6875,3 +6875,219 @@ fifth round running.
   .claude/skills/manuscript-export/assets/{shunn-format-checklist.md,kdp-epub-checklist.md}
 - Internal: src/ui/{RelationshipWeb.tsx,CodexPane.tsx,Corkboard.tsx,PlotGrid.tsx,
   QuickCreate.tsx,CalendarTab.tsx}, src/state/cardImages.ts, src/core/vault.ts
+
+# Round 46 (2026-09-13) — a quantified answer on gamification, and two "planning tools that don't actually reach the AI" cases
+
+Housekeeping first: working tree was clean at session start. Local branch
+was already even with `origin/main`, both sitting on round 45's commit —
+no fast-forward needed, the shortest gap between rounds on record (one
+day). Given how much ground rounds 41-45 already covered in depth, this
+round deliberately stayed narrow: three focused findings, each either
+closing a gap a prior round explicitly flagged as open, or adding a
+genuinely new class of evidence to an existing item — rather than a broad
+re-sweep. Did not re-run the four-pillar bundle check, the Bartz/Kadrey
+litigation-date tracking, or the SKILLS.md scouting standing pass this
+round; scope stayed on the assigned competitor/UX research task.
+
+## Finding 1 — Campfire's gamification shipped, and it has a number: 22% retention lift
+
+Round 21 (2026-08-07) logged Campfire's "State of the Campfire: 2026"
+roadmap page naming streaks/achievements/challenges as a stated 2026
+priority, with no confirmed ship date and no way to verify it from a
+primary source at the time (the page was 403-blocked to direct fetch; the
+content came from a search snippet). Round 41 (2026-09-03), during the
+dashboard/onboarding pass, explicitly flagged the adjacent question as
+open: "No source in this pass surfaced concrete streak/word-count-widget
+complaints — that gap is unresearched, not evidence widgets are well-liked
+either way." This round closes both.
+
+**Finding (official capability, confirmed shipped): Campfire's
+streaks/achievements/challenges gamification is live, built on Trophy.so's
+gamification platform, not homegrown.** A Trophy.so customer case study
+(trophy.so/customers/campfire) states Campfire — "the platform for book
+lovers and storytellers helping over 300,000 authors write over 200M words
+a year" — integrated Trophy in about an hour specifically to "encourage
+authors to build a weekly writing habit."
+
+**Finding (official capability + quantified metric, the strongest single
+data point of the round): the case study reports a 22% lift in 14-day
+retention** attributable to the streak/gamification integration, plus
+"overwhelmingly positive" customer response — email open rates on
+streak-related notifications exceeding 60%, with some authors replying to
+automated emails asking Campfire to keep sending them because they
+appreciate the encouragement. This should be read as vendor marketing
+(Trophy.so is selling its own platform on the strength of this case study)
+rather than a neutral academic study — but it is a named client, a
+specific number, and a specific mechanism, which is a meaningfully
+stronger evidence class than the "reviewer opinion" or "feature exists"
+tiers most gamification claims in this space fall into. Treat the 22%
+figure as directionally credible, not as an audited statistic.
+
+**Finding (official capability, roadmap signal): the case study names
+Campfire's next two planned gamification mechanics — a streak-freeze
+(pause a streak for a limited period without losing it) and a monthly
+author leaderboard** creating "healthy competition between writers." The
+leaderboard is a poor fit for Novella (single-writer, local-first, no
+hosted community to rank against) and isn't actioned. The streak-freeze is
+a different story: it's a well-known pattern (popularized by Duolingo)
+addressing a specific, well-understood demotivation failure mode — an
+otherwise-consistent user misses one day for a reason outside their
+control (illness, travel, a genuine emergency) and the *entire* accumulated
+streak resets to zero, which reads as punitive rather than motivating and
+can cause the user to abandon the habit-tracking mechanic altogether
+rather than restart it.
+
+**Checked our own code.** `src/state/sessions.ts`'s `computeStreak()`
+walks backward day by day and breaks the count at the first day that
+didn't meet the goal (or had zero words, with no goal set) — a hard
+streak, no forgiveness. The only softening that exists is `bestStreak`, a
+separate high-water mark that survives a break as a "best you've ever
+done" stat, but does nothing to prevent the live streak's own reset.
+
+**Why this matters against the thesis:** the sprint timer + daily-goal/
+streak system, shipped 2026-07-23, is explicitly named in ROADMAP.md as
+"the fourth app" — the piece of the four-pillar bundle (writing +
+worldbuilding + tasks + sprint/goal tracking) that 26+ dedicated rechecks
+across this entire research cadence have never found a competitor
+matching alongside real local AI and worldbuilding. A quantified case
+study confirming that a *competitor is now actively investing in and
+measuring* the exact same mechanic sharpens rather than weakens that
+finding — it's independent validation that the mechanic itself is worth
+having, not evidence Novella is behind (Novella shipped its own version
+over a month before this case study surfaced). The specific, cheap,
+local-only addition it points at — a streak-freeze/grace-day mechanic — is
+actioned as a new CLOUD-OK roadmap item, since it needs no server, no
+account, and no design-taste call, just a small change to
+`computeStreak()`'s break condition and a banked-grace-days counter
+alongside `bestStreak`.
+
+## Finding 2 — NovelCrafter's own planning tools don't reach its AI either
+
+Round 44 (2026-09-06) found Sudowrite's own documentation conceding
+"Brainstorm works independently... it doesn't see your Story Bible
+details" — a competitor's flagship AI ideation tool generating content
+disconnected from the character/world data the writer has already entered
+elsewhere in the same app. This round finds the identical failure shape in
+a second, independent competitor and product surface.
+
+**Finding (reviewer opinion, hands-on test, single named source): a
+Medium review (ilampadmanabhan.medium.com/novelcrafter-review, April 2026)
+reports directly testing NovelCrafter's Outline Import and Chapter
+Management tools against its AI generation and finding they "do not
+influence the generated content in any measurable way."** The review's
+own framing: "the time users spend preparing outlines, metadata, and acts
+is completely wasted, as none of that information is used by the AI
+model." The same review separately criticizes the BYOK setup flow (a
+non-technical writer has to create an API-provider account, generate a
+key, and paste it in with no guidance) and states plainly that "there is
+no disclaimer or warning about these technical limitations anywhere
+during sign-up or payment" — a paying user has no way to discover, before
+committing money and setup time, that the planning surface they're being
+sold doesn't do what its presence implies.
+
+Direct fetch of the Medium article itself returned HTTP 403 (Medium blocks
+direct fetches from this environment, consistent with the egress pattern
+logged since round 22); this finding rests on the WebSearch tool's own
+synthesis of the article rather than a direct read, so treat the exact
+wording as approximate even though the substance — tested directly,
+reported as a measurable non-effect — reads as a genuine hands-on finding
+rather than a marketing claim.
+
+**Why this is the same finding as round 44's, not a coincidence:** two
+unrelated competitors, in two unrelated feature areas (freeform
+brainstorming vs. structured outline/chapter planning), both ship a
+planning UI that *looks* connected to AI generation but isn't wired to it
+in practice. This is exactly the trap `src/ai/context.ts`'s existing
+pipeline — which assembles real Codex entries and scene context into every
+generation prompt today — avoids by construction, for the surfaces that
+already use it. Folded as reinforcement into the existing round-44
+Brainstorm item rather than filed as a new item, per the "strengthen an
+existing item with new evidence" rule; the actionable takeaway is a
+framing note for whenever an AI-facing planning feature ships: the claim
+worth making isn't "we have planning tools," every competitor checked in
+this research has those — it's "the planning tools are the ones the AI
+actually reads," which as of this round is a claim two direct competitors
+cannot make about their own most-marketed planning surfaces.
+
+## Finding 3 — Scrivener's Dropbox sync conflicts are a multi-year structural pattern, not a dated incident
+
+The "no-outage/can't-lose-your-work" item has tracked dated, single-quarter
+incidents for Sudowrite (two-plus status-page outages), Dabble (a
+large-book-deletion report, a backlogged-support acknowledgment), and
+Campfire (a persistent cursor-jump/mid-sentence-reset bug, later a
+save-time data-loss report) — plus one unconfirmed, still-unresolved
+Scrivener external-drive save-failure thread from 2026-08-21 that never
+progressed past "one report, not a pattern." This round finds a different,
+older, and more clearly structural Scrivener failure mode that the
+existing tracking hadn't captured.
+
+**Finding (recurring complaint, three separate dated threads, no staff
+resolution in any of them): Literature & Latte's own forum shows
+Scrivener iOS↔Mac/Windows Dropbox sync conflicts recurring across at least
+three years with no architectural fix.** Checked three threads directly:
+"Constant Sync Conflicts" (forum.literatureandlatte.com/t/constant-sync-
+conflicts/130300, Oct 2022) — a user reports persistent conflicts despite
+never opening projects on two devices at once, self-resolves by manually
+forcing Dropbox to finish syncing before switching devices, no L&L staff
+reply. "Sync is abysmal" (forum.literatureandlatte.com/t/sync-is-
+abysmal/142764, Sept 2024) — the poster states a forum search turns up
+"MANY gripes about this," describes syncing as "just awful" with "no
+improvements over the years"; two community members (not staff) offer the
+same class of manual-workaround advice; the deeper issue is left
+unaddressed. "Error moving mobile files to project package" (forum.
+literatureandlatte.com/t/error-when-syncing-macos-scrivener-with-ios-
+error-moving-mobile-files-to-project-package/147454, May 2025) — sync
+enters a fail-and-reprompt loop; the poster self-resolves by manually
+opening the project package's internal Mobile folder and hand-applying the
+conflicting files; again, no staff response in the thread.
+
+**Why this is a distinct evidence class, not a restatement of what's
+already tracked:** every incident already logged for Sudowrite/Dabble/
+Campfire is a *dated, bounded* event — a status-page outage window, a
+specific buggy release. This is the opposite pattern: the same root
+mechanism (a file-based, Dropbox-mediated exchange rather than a real-time
+sync protocol) producing conflicts under ordinary use, recurring under
+different surface symptoms for three-plus years, with the fix in every
+case being the *user's* changed behavior, never a vendor patch. It's also
+a different risk shape than an outage: an outage is visible and bounded (a
+writer knows the service is down); a silent sync conflict can mean a
+device quietly has the wrong version of a chapter until the writer
+happens to notice — the more dangerous failure mode of the two, since data
+can diverge without any error being shown at the moment it happens.
+
+Folded into the existing no-outage/data-loss item rather than filed
+separately, with an explicit forward-looking note: Novella doesn't
+currently ship its own multi-device sync (PLAN-sync.md's three owner
+decisions are still pending), but when it does, this is the specific
+architecture to design away from — a "last sync wins, silently" merge over
+a passive file exchange — not a hypothetical concern to rediscover later.
+
+## What changed in "Next up"
+
+Added one new item: a local, CLOUD-OK streak-freeze/grace-day mechanic for
+`src/state/sessions.ts`'s existing hard streak, placed after the
+story-structure-scaffolds item and before the ongoing Notion-parity pass,
+citing the Trophy.so/Campfire retention case study as the evidence a real
+metric moves on this mechanic. Strengthened two existing items rather than
+creating duplicates: the round-44 Brainstorm item gained the NovelCrafter
+Outline/Chapter-Management non-effect finding as a second instance of the
+same "planning tools disconnected from AI" failure; the no-outage/
+data-loss item gained the three-thread Scrivener Dropbox sync-conflict
+pattern as a structural (not dated-incident) risk class, with a forward
+note for Novella's own eventual sync design.
+
+## Round 46 sources
+
+- trophy.so/customers/campfire (official vendor case study)
+- trophy.so/features/streaks, trophy.so/blog/when-your-app-needs-streak-feature
+- ilampadmanabhan.medium.com/novelcrafter-review-64d391c629a2 (via WebSearch
+  synthesis; direct fetch 403'd, consistent with egress pattern since round 22)
+- forum.literatureandlatte.com/t/constant-sync-conflicts/130300
+- forum.literatureandlatte.com/t/sync-is-abysmal/142764
+- forum.literatureandlatte.com/t/error-when-syncing-macos-scrivener-with-ios-error-moving-mobile-files-to-project-package/147454
+- dabble.featureupvote.com/suggestions/288414/app-for-mobile-ios-and-android
+  (checked, 403'd to direct fetch; not used as a citable finding — Dabble's
+  own PWA-only mobile distribution, confirmed shipped in round 30, likely
+  supersedes this open request, but that supersession isn't confirmed from
+  a primary source, so it's noted here only as a lead not pursued further)
+- Internal: src/state/sessions.ts, src/ui/{GoalMeter.tsx,GoalsTab.tsx}
