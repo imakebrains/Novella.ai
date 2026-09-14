@@ -334,6 +334,48 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       any AI-facing planning feature (this Brainstorm mode included) ships:
       Novella's claim isn't "we also have planning tools," it's "our
       planning tools are the ones the AI actually reads."
+- [ ] **Verify AI-generated prose against the Codex after generation, not
+      just feed the Codex in as reference beforehand** — research round 47
+      (2026-09-14): checked our own code. `src/ai/context.ts` assembles real
+      Codex entries and scene context into every prompt, but `generate()`
+      in `src/ai/generate.ts` returns whatever text comes back with zero
+      check against that same context afterward. The only fact-checking
+      Novella ships, `checkContinuity()` in `src/analysis/continuity.ts`, is
+      purely structural — dangling wiki-links, near-duplicate names, chapter
+      order, POV resolution — it has no concept of a semantic fact ("this
+      character has green eyes") and never specifically re-checks freshly
+      generated text. A competing vendor's own comparison piece
+      (novarrium.com — self-interested, it names its own product the sole
+      "survivor" of a 25-chapter test; read the ranking as marketing, not
+      neutral evidence) still documents a mechanism worth taking seriously
+      on its own merits: feeding a model reference material is passive —
+      under generation pressure the model can and does contradict it — and
+      every tool it tested works exactly that way, including "NovelCrafter's
+      well-organized Codex structure," which "cannot prevent AI from
+      contradicting stored information." That specific claim about
+      NovelCrafter isn't just vendor say-so: round 46 (2026-09-13, a
+      hands-on reviewer with nothing to sell) independently found
+      NovelCrafter's own planning tools "do not influence the generated
+      content in any measurable way." Two unrelated sources — a
+      competitor's marketing page and an independent reviewer — converge on
+      the same failure from different angles: reference-only context,
+      however well-organized, is not enforcement. Sudowrite's Story Bible
+      (round 44's already-logged Brainstorm-mode gap) and NovelAI's
+      keyword-triggered lorebook both work the same passive way. Novella's
+      `context.ts` pipeline is exactly this pattern today: assembled
+      reference, never checked afterward. The opportunity is not a rewrite
+      of the AI pipeline — it's a deterministic, local, no-extra-model pass
+      in the same spirit as the existing Continuity inspector: extract
+      simple facts already sitting in the Codex (a stated name, an already-
+      resolved relationship) and flag newly generated text that contradicts
+      one, the same click-to-open-the-note, provable-from-the-files trust
+      `checkContinuity()` already earns — additive after `generate()`
+      returns, no core-engine change. Scope conservatively at first: the
+      same class of contradiction the deterministic tier already catches
+      (name mismatches, resolved-entity conflicts), not full semantic
+      fact-checking, which needs its own design pass. Ranks beside the
+      Brainstorm-mode item above since both extend `context.ts` — that one
+      grounds what goes into a generation, this grounds what comes out.
 - [ ] **Auto-detect codex mentions in manuscript prose, and let an
       unrecognized name become a Codex entry inline** — research round 41
       (2026-09-03), a deliberate pass at competitor interaction mechanics
@@ -985,6 +1027,17 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       not just that per-type templates should exist. When this sub-item is
       built, keep fields optional and collapsible with a light empty
       state, not a full form every new entry is pressured to fill in.
+      Research round 47 (2026-09-14) adds a concrete number to the
+      chat-with-your-book gap round 13 already flagged: NovelCrafter's own
+      Chat interface reads back roughly the last 25 messages of history
+      only, a limit its own support attributes to an old 8k-token-context
+      era and describes as under active review — a hard, stated ceiling a
+      local Codex-grounded chat mode doesn't need to inherit. A second,
+      independent 2026 review separately reports NovelCrafter's chat
+      sometimes can't see a scene's own text even when the scene is open
+      and has content — a live-context bug, not just a design limit.
+      Worth leading any future chat-with-your-book copy with reliability
+      of context, not merely its existence.
 - [ ] **Structured relations between Codex entries, not just prose fields
       and tags** — research round 42 (2026-09-04): the strongest
       cross-platform pattern this round wasn't a single competitor
@@ -1014,6 +1067,21 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       easy). Scope as an optional structured "relation" field type on
       Codex entries (link + relationship label), not a full database/
       relation system — keep it flat, per the standing guardrail.
+      Research round 47 (2026-09-14) adds a live example of relation-by-
+      suggestion worth borrowing the shape of, not the mechanism: Sudowrite's
+      Canvas 2.0 places character/location/plot cards on a spatial canvas
+      and has the model read card proximity to propose a relationship label
+      ("knows," "wants," "fears," "betrayed by") between them, which the
+      writer keeps or discards rather than hand-typing every edge. Sudowrite's
+      own feedback board carries a standing, upvoted request (feedback.
+      sudowrite.com, "Make Canvas work more like a mind-map") to make this
+      connection mechanic more explicit — evidence writers want the
+      AI-suggests-the-relation half specifically, not just cards on a board.
+      Worth an AI-suggests, writer-confirms interaction on top of the
+      structured relation field above once it's built, while keeping the
+      field itself flat, optional, and usable by hand with no model
+      required — Canvas's suggestion mechanic is a UX idea to borrow, not a
+      dependency to add.
 - [ ] **Voice-matching from the writer's own prose, not just style templates**
       — research round 11 (2026-07-28): checked our own Upload style flow
       (`InspectorPane.tsx`) — it imports a .txt/.md file as the literal body
@@ -1387,6 +1455,17 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       Twenty-six dedicated rechecks in, the four-pillar gap stays open on
       both sides; the round-33 owner question on whether to keep running
       this exact check every round is still unanswered.
+      Research round 47 (2026-09-14) closes that question out rather than
+      let it lapse an eleventh silent round: adopting rounds 41-46's own
+      practice as the standing rule going forward, this exact compound
+      check is retired from every-round cadence after 26 consecutive
+      negative rechecks. Revisit it opportunistically, only when a
+      plausible new local-AI-plus-worldbuilding entrant surfaces during
+      other research (as PlotForge Desktop, Scríob, LocalProse, NovelMage,
+      StoryLine, and Novel Forge AI all did), not on a fixed schedule —
+      this is a call about research cadence, not a product decision, so it
+      doesn't need to wait on the owner the way the WITH-OWNER items above
+      do.
 - [ ] **Say the Relationship-web advantage louder** — research round 42
       (2026-09-04): checked relationship modeling across every competitor
       in this round's worldbuilding pass and found none combine structured
@@ -1405,6 +1484,14 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       first-run and marketing copy don't say competitors need a bolt-on
       app for the identical job. Cheap copy win, groups with the other
       "say X louder" items below.
+      Research round 47 (2026-09-14) adds a sharper, second instance:
+      Sudowrite's own Canvas 2.0 — its answer to this exact job — draws
+      documented complaints that it "can feel unstructured" for organizing
+      characters and worldbuilding, with at least one reviewer reporting
+      they "returned to Google Docs for more complex planning." A paying
+      competitor's users hit the wall Novella's RelationshipWeb already
+      clears natively. Strengthens the copy case from "nobody else has
+      this" to "the closest attempt draws its own users' complaints."
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -1624,6 +1711,24 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       still blocked on the three pending owner decisions) — when it does,
       this is the specific failure mode to design away from, not a
       Dropbox-style "whoever synced last wins, hope you notice" merge.
+      Research round 47 (2026-09-14) adds a fourth cloud tool to the
+      pattern, and a new failure mode within it: LivingWriter's own
+      Trustpilot reviews report its cross-device sync "completely deleting
+      and replacing chapters with other chapters," with one user calling it
+      "the last straw," plus a separately reported case of inconsistent
+      mobile/desktop sync where the phone app doesn't reflect what was just
+      written on desktop. LivingWriter's own support response points
+      writers at Chapter Version History's "Recover Deleted" action, which
+      restores a whole deleted chapter but nothing for a partial corruption
+      inside one. Same shape as round 46's Scrivener finding above — a
+      structural sync mechanism, not a one-off bug — for a different tool
+      and a sharper symptom: silent data loss, not just conflict friction.
+      A second, separate LivingWriter point worth carrying alongside it:
+      sharing a manuscript for comment or edit requires every collaborator
+      to hold their own LivingWriter account — the opposite of the plain-
+      file, no-account-needed hand-off a local vault already gives away
+      for free. Fourth unrelated cloud tool, fourth distinct flavor of the
+      same structural risk.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent

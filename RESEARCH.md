@@ -7091,3 +7091,200 @@ note for Novella's own eventual sync design.
   supersedes this open request, but that supersession isn't confirmed from
   a primary source, so it's noted here only as a lead not pursued further)
 - Internal: src/state/sessions.ts, src/ui/{GoalMeter.tsx,GoalsTab.tsx}
+
+# Round 47 (2026-09-14) — a passive-reference-vs-enforcement gap in AI grounding, a fourth reliability instance, and a Canvas 2.0 relationship-suggestion pattern
+
+Housekeeping first: working tree was clean at session start. The local
+branch (`claude/exciting-cerf-9mpyl5`) already carried rounds 45-46 two
+commits ahead of `origin/main`, which is itself still sitting at round 44 —
+every prior scheduled run in this environment pushed to its own
+throwaway `claude/exciting-cerf-*` branch rather than `main` (17 such
+branches exist on `origin`, none merged), so `main`'s copy of both files is
+three rounds stale. Continuing this round from the most advanced state
+(this branch, which already has 45-46) rather than from `main`, and
+flagging the branch/merge situation in the run's final report rather than
+silently pushing past it again. Scope stayed on competitor/UX research;
+no application code touched.
+
+## Finding 1 — "reference" is not "enforcement": a checkable gap in how every competitor grounds AI generation, Novella included
+
+**Finding (reviewer opinion / vendor marketing, read with an explicit
+caveat): a competing product's own comparison piece (novarrium.com/blog/
+ai-writing-tools-keep-contradicting-themselves) tested ChatGPT, Sudowrite,
+NovelAI, and NovelCrafter across a 25+ chapter continuity test and reports
+only its own product held up.** This source is self-interested — it names
+its own product the sole survivor and is explicitly selling a "Logic-
+Locking" feature — so the ranking itself is marketing, not neutral
+evidence, and is not treated as one. What's worth taking from it is the
+specific, checkable mechanism it describes for *why* the others failed,
+because that mechanism is independently corroborable: reference material
+fed to a model (a story bible, a Codex) is *passive* — the model can and
+does contradict it under generation pressure, especially once relevant
+detail falls into the "lost in the middle" of a long context rather than
+its start or end. The piece states plainly that "NovelCrafter's
+well-organized Codex structure cannot prevent AI from contradicting stored
+information" and that Sudowrite's Story Bible works by "passive
+reference... the AI can ignore stored facts."
+
+**Why the NovelCrafter claim specifically isn't just vendor say-so:**
+round 46 (2026-09-13) already found, from a hands-on reviewer with nothing
+to sell (ilampadmanabhan.medium.com/novelcrafter-review), that
+NovelCrafter's Outline Import and Chapter Management tools "do not
+influence the generated content in any measurable way." That's a different
+planning surface (structural outline/chapter metadata, not the Codex), but
+the same underlying failure — a context surface that looks wired to
+generation but doesn't reliably constrain it. Two unrelated sources, a
+competing vendor's marketing page and an independent reviewer, converging
+on the same shape of gap from two different angles is stronger evidence
+than either alone, even accounting for the first source's obvious bias.
+
+**Checked our own code, and the gap is real here too.** `src/ai/context.ts`
+assembles real Codex entries and scene context into every generation
+prompt — the mechanism this whole research cadence has repeatedly praised
+as the thing that makes Novella's planning tools "the ones the AI actually
+reads," most recently in round 46's finding 2. But `generate()` in
+`src/ai/generate.ts` returns whatever text a provider sends back with zero
+check against that same context afterward — there's no post-generation
+step at all. `checkContinuity()` in `src/analysis/continuity.ts`, the only
+fact-checking Novella ships, is purely structural: dangling wiki-links,
+near-duplicate names, chapter order, an unresolved POV field. It has no
+concept of a semantic fact ("this character has green eyes," "this city is
+on an island") and isn't scoped to freshly generated text specifically —
+it would find the same class of problem whether a human or the AI typed
+it, and it doesn't try to find contradictions in prose content at all.
+Novella's own grounding pipeline is, today, exactly the "passive
+reference" pattern named as everyone else's weak point.
+
+**Why this is worth a roadmap item rather than a copy note:** grounding
+generation *input* in real context (what `context.ts` already does, and
+what the round-44/46 Brainstorm-mode item is about) and verifying
+generation *output* against that same context are two different halves of
+the same job, and every competitor checked — including us — has only
+built the first half. The realistic scope is not a semantic-understanding
+system: it's a small, deterministic, local pass in the same spirit as
+`checkContinuity()` — extract the same kind of simple, already-resolved
+facts the Codex already holds (a name, an established relationship) and
+flag newly generated text that contradicts one, additively after
+`generate()` returns, no core-engine change. Filed as a new item, ranked
+beside the Brainstorm-mode item since both extend `context.ts` from
+opposite ends.
+
+## Finding 2 — LivingWriter's cloud sync deletes chapters: a fourth instance of the reliability pattern, and a new symptom
+
+The no-outage/data-loss item has tracked dated incidents for Sudowrite
+(status-page outages), Dabble (a large-book-deletion report), Campfire (a
+cursor-jump/mid-sentence-reset bug, later a save-time data-loss report),
+and, as of round 46, a multi-year *structural* Scrivener Dropbox
+sync-conflict pattern. This round finds a fourth, different tool hitting
+the same class of failure, with the sharpest symptom of the four so far.
+
+**Finding (recurring complaint, Trustpilot reviews): LivingWriter's
+cross-device sync has "completely deleted and replaced chapters with other
+chapters,"** with one reviewer calling it "the last straw" after repeated
+occurrences. A separate complaint reports inconsistent mobile/desktop
+sync — the phone app not reflecting content just written on desktop, an
+availability problem distinct from the deletion bug. LivingWriter's own
+support guidance points affected writers at Chapter Version History's
+"Recover Deleted" action, which restores an entire deleted chapter but has
+no mechanism for a partial corruption inside one that wasn't fully
+deleted.
+
+**Finding (official capability, a lock-in point worth noting alongside
+this): sharing a LivingWriter manuscript for comment or edit requires every
+collaborator to hold their own LivingWriter account** — the opposite of
+handing someone a plain file, which a local vault already does for free
+and which needs no account on either end.
+
+**Why this reinforces rather than restates round 46's Scrivener finding:**
+this is a different tool and a different root cause (a cloud sync service
+actively overwriting local state, not a Dropbox-mediated file exchange
+producing conflicts) landing on the same conclusion — real-time or
+near-real-time cloud sync, across four unrelated products now, keeps
+producing the exact failure mode a local-only vault cannot have because
+there is no second copy to diverge from. Folded into the existing item as
+its fourth instance rather than filed separately.
+
+## Finding 3 — Sudowrite Canvas 2.0's proximity-based relationship suggestion, and its own users' complaint about it
+
+**Finding (official capability): Sudowrite's Canvas 2.0 places character,
+location, and plot cards on a spatial canvas and has the model read card
+*proximity* to propose a relationship label between them** ("knows,"
+"wants," "fears," "betrayed by") rather than requiring the writer to
+declare every connection by hand. **Finding (feature request, Sudowrite's
+own feedback board): a standing, upvoted request titled "Make Canvas work
+more like a mind-map" (feedback.sudowrite.com) asks specifically to make
+this card-to-card connection mechanic more explicit** — evidence that
+writers want the AI-suggests-the-relation half of this on purpose, not
+just cards that can be dragged near each other. **Finding (reviewer
+opinion): at least one reviewer reports Canvas "can feel unstructured" for
+organizing characters and worldbuilding and says they "returned to Google
+Docs for more complex planning"** — Sudowrite's own paying users hitting a
+wall Novella's existing native RelationshipWeb already clears.
+
+Two actions from this, one build-relevant and one copy-relevant. Build: the
+existing "structured relations between Codex entries" item (round 42)
+should consider an AI-suggests, writer-confirms interaction on top of the
+plain relation field it already scopes — proximity or co-mention as a
+signal the model proposes a relationship label from, kept fully optional
+and never a dependency for the field working by hand. Copy: the existing
+"say the Relationship-web advantage louder" item goes from "nobody else has
+this" to "the closest competitor attempt draws its own paying users'
+complaints" — a sharper, more specific claim.
+
+## Two smaller items folded into existing entries
+
+**NovelCrafter's Chat message-history cap.** A concrete number for the
+chat-with-your-book gap round 13 first flagged: NovelCrafter's own Chat
+interface reads back roughly the last 25 messages of history only, a limit
+its own support attributes to an old 8k-token-context era and describes as
+under active review. A second, independent 2026 review separately reports
+the chat sometimes can't see a scene's own text even when the scene is
+open and has content — a live bug, not just a design ceiling. Folded into
+the NovelCrafter-parity item.
+
+**Closing the round-33 flag.** Round 33 (2026-08-18) asked whether to keep
+re-running the four-pillar competitor-bundle check (local AI + task
+tracker + focus/sprint timer + worldbuilding, one app) every round after
+19 straight negative results; rounds 41-46 already stopped running it in
+practice without an explicit ruling either way, and it sat unresolved for
+13 more rounds. This round closes it rather than let an eleventh silent
+lapse stand: adopting rounds 41-46's own practice as the going-forward
+rule. The check is retired from every-round cadence after 26 consecutive
+negative rechecks and gets revisited only opportunistically, when a
+plausible new entrant surfaces during other research — a process call
+about research cadence, not a product decision, so it didn't need to wait
+on the owner.
+
+## What changed in "Next up"
+
+Added one new item: verify AI-generated prose against the Codex after
+generation, not just feed it in as reference beforehand — placed beside
+the round-44/46 Brainstorm-mode item. Strengthened four existing items
+rather than creating duplicates: the no-outage/data-loss item gained
+LivingWriter as a fourth reliability instance; the structured-Codex-
+relations item (round 42) gained Sudowrite Canvas 2.0's proximity-
+suggestion pattern as a UX idea to borrow; the Relationship-web copy item
+(round 42) gained Canvas 2.0's own user complaints as sharper evidence;
+the NovelCrafter-parity item gained the Chat 25-message cap. Closed the
+round-33 process flag on the four-pillar check's cadence in the roadmap
+text itself rather than just noting it here.
+
+## Round 47 sources
+
+- novarrium.com/blog/ai-writing-tools-keep-contradicting-themselves
+  (competing vendor's own comparison; ranking read as marketing, not
+  neutral evidence — see Finding 1's caveat)
+- feedback.sudowrite.com/p/make-canvas-work-more-like-a-mind-map-6
+- docs.sudowrite.com/using-sudowrite/.../canvas (official Canvas docs)
+- trustpilot.com/review/livingwriter.com
+- guides.livingwriter.com/desktop-app-+-web-version/recover-deleted-content
+- ilampadmanabhan.medium.com/novelcrafter-review-64d391c629a2 (via
+  WebSearch synthesis; direct fetch 403's, consistent with the egress
+  pattern since round 22 — re-confirms round 46's citation of the same
+  source for a different finding)
+- novelcrafter.com/help (Chat interface message-history-limit note)
+- Internal: src/ai/context.ts, src/ai/generate.ts, src/analysis/continuity.ts
+- Internal (repo/branch state): `git log`, `git ls-remote origin`,
+  `git branch -a` — confirmed `origin/main` at round 44's commit, this
+  session's branch at round 46's, and 17 unmerged `claude/exciting-cerf-*`
+  branches on `origin` from prior scheduled runs
