@@ -7091,3 +7091,399 @@ note for Novella's own eventual sync design.
   supersedes this open request, but that supersession isn't confirmed from
   a primary source, so it's noted here only as a lead not pursued further)
 - Internal: src/state/sessions.ts, src/ui/{GoalMeter.tsx,GoalsTab.tsx}
+
+# Round 47 (2026-09-15) — inline-continuation UX, sync-conflict handling, and beta-reader platforms in depth
+
+Housekeeping first: working tree confirmed clean at session start on branch
+`claude/exciting-cerf-eaddhf`, one commit ahead of round 46's. No repair
+needed.
+
+**Four angles picked from the operator brief's candidate list, each
+verified genuinely unexplored before committing to it.** Skipped "dashboard/
+home-screen design patterns" (round 42 pass 4 already ran a dedicated pass
+on exactly this — dashboard praise axis, onboarding tutorial-fatigue,
+settings sprawl, empty-state templates) and downgraded "mobile/tablet
+writing app UX" after an initial check found round 41 pass 4 had already
+run a dedicated pass and explicitly concluded "this isn't a build item
+now" given Novella's Tauri architecture and already-shipped responsive
+pass — a fresh spot-check this round (NovelCrafter, Scrivener iOS) found
+the same shape again (mobile as a stripped companion/viewer, not a peer
+editing surface) with nothing new enough to overturn that conclusion,
+except one data point folded into the sync-conflict pass below instead of
+standing alone. The four angles that survived the unexplored-check: (1)
+AI inline-continuation/ghost-text UX — distinct from the already-logged
+reword-in-place item, which replaces *selected* text, not text extending
+forward from the cursor; (2) offline/multi-device sync-conflict handling
+across Obsidian Sync and Notion specifically, extending round 46's
+Scrivener-only finding to the two other sync models writers actually live
+with; (3) beta-reader/ARC workflow tools past the comment-anchoring
+mechanic already logged (round 41's Dabble spec, round 43's BetaBooks
+triage); (4) Notion/Obsidian linked-views and rollups for scene/chapter
+tracking, checked as distinct from the already-logged structured-Codex-
+relations item (that one is about linking entities; this is about views
+over one dataset).
+
+## Pass 1 — AI inline-continuation UX: three real shapes, and Novella's own is a fourth, heavier one
+
+**Checked our own code first.** `InspectorPane.tsx`'s "Continue the scene
+(default)" style is the only path today for "extend the prose from where
+I stopped": open the Inspector pane, confirm (or change) a style, click
+Generate, watch one candidate stream into a separate Output panel, then
+click a single Accept button that calls `insertIntoEditor()` to drop the
+whole block in at the cursor at once. No inline preview inside the
+document itself, no multiple candidates to compare, and no keyboard path
+of any kind — a pane switch plus two clicks minimum for the single most
+basic "writes with you" action in the product.
+
+**Finding (official capability, direct fetch): Sudowrite's Write is a
+multi-candidate, side-panel review model, and its own docs specify the
+mechanic precisely.** Cursor at the end of existing prose, click Write, up
+to 20,000 words of preceding context read, 1-6 cards generated (roughly
+50-2,000 words each, both length and count configurable through Write
+Settings) into the History panel, shown unstacked so cards can be compared
+side by side; one click inserts a card, alternatives can be starred or
+discarded; Auto/Guided/Tone Shift modes plus a Creativity slider (Least =
+predictable, Most = license to diverge) control each generation
+(docs.sudowrite.com/using-sudowrite/1ow1qkGqof9rtcyGnrWUBS/write/
+pvxUvbQqYybfEosqx1sXjY, official, direct fetch — confirms and sharpens the
+"autocomplete on steroids" framing several review sites use more loosely).
+
+**Finding (reviewer opinion, direct fetch, a real cost of the card/menu
+shape specifically): a hands-on review names the learning-curve and
+customization cost of Sudowrite's system directly.** thewritepractice.com's
+review: "Opening Sudowrite for the first time can feel a little
+intimidating. The layout is simple, but there are so many features that it
+takes a while to understand how they all fit together" — resolved only
+after "watched the introductory video on YouTube, which runs about an hour
+long... Once I understood the flow, everything started to click." The same
+review: "writers who like to customize every part of their process might
+find Sudowrite a little restrictive. The tools are powerful, but they work
+best when you follow the system it has built rather than shaping it
+entirely to your own methods." Read together with the mechanic above: the
+richest of the three shapes found this round is also the one with a
+documented up-front cost, which matters directly for how Novella should
+scope its own version — see synthesis below.
+
+**Finding (official/reviewer, a lighter-weight shape): NovelAI is a
+one-keystroke, single-continuation model with persistent context levers,
+not a card panel.** "You type a paragraph, hit Tab or the generate button,
+and it continues from your prose... you don't ask it to write a story —
+you write alongside it," steered by three always-available levers — Memory
+(persistent facts always in context), an Author's Note (inserted near the
+most recent text as a steering note), and a keyword-triggered Lorebook
+(docs.novelai.net/en/text/editor/storysettings/, official, corroborated by
+reviewer summaries). No menu, no card comparison — the lightest of the
+three shapes, and structurally the closest to what a single "continue"
+keybinding in Novella should feel like. Documented limitation worth
+carrying forward if a whole-manuscript memory feature is ever scoped: "the
+model never actually 'read' your book; it only sees a sliding window of
+recent text, so a relationship you set up in chapter 3 is just gone by
+chapter 25 unless you re-feed it" — the same token-economy tradeoff
+Novella's own `context.ts` already makes deliberately, now independently
+confirmed as the same constraint a dedicated fiction-generation product
+lives with too.
+
+**Finding (official capability + recurring complaint, the shape to avoid
+as a default): true inline ghost-text is well-documented, both its appeal
+and its specific, sourced downside for fiction.** A light grey suggestion
+appears inline as you type; Tab accepts it; continuing to type past it
+makes it disappear and recalculate rather than blocking input
+(gentext.ai/blog/en/ghost-text-autocomplete-academic-writing/, describing
+the Copilot-derived pattern applied to long-form prose specifically). The
+same source states the pattern's real ceiling plainly: "closer to a smart
+sentence completion than to a full draft generator... good at
+continuation, not invention," and can "absolutely flatten voice if you let
+it dictate too much" — explicitly naming writing "where voice and
+originality matter more than conventional structure" (i.e. fiction) as
+where it feels most "intrusive." Corroborated from the coding-tool side of
+the identical UI pattern: a VS Code/Copilot GitHub issue reports ghost
+text "interfering... in a highly disruptive way" with other completions
+when it fires uninvited (github.com/microsoft/vscode issue 320940), and a
+separate GitHub Community discussion is users actively seeking a toggle to
+disable inline suggestions while keeping the assistant available on demand
+elsewhere, such as a chat panel (github.com/orgs/community/discussions/
+138225). Read together, the object of complaint is specifically "appears
+without being asked, all the time," not generation-on-request — real
+evidence against defaulting Novella's own continuation feature to
+always-on background suggestion.
+
+**Synthesis and build recommendation (inference, built from the sourced
+facts above):** three real, distinct shapes exist in the wild, and
+Novella's current implementation is a fourth, heavier one that borrows the
+worst of each — a pane switch like Sudowrite's menu-driven model, but only
+one candidate; a side panel like Sudowrite's, but no comparison; nothing
+resembling NovelAI's single keystroke or Copilot's inline stream. The
+best-evidenced target is NovelAI's shape specifically, not the more
+feature-rich Sudowrite shape and not literal always-on ghost text: a
+single keybinding at the cursor streams one candidate directly into the
+document, inline, discarded with Escape or kept with Enter/Tab — reusing
+the exact `generate()` streaming call and `insertIntoEditor()` helper
+`InspectorPane.tsx` already has, so this is interaction wiring over a
+proven pipeline, not new AI plumbing. The multi-candidate card review
+Sudowrite ships well is worth keeping as a distinct, explicitly-invoked
+"give me options" action rather than promoting it to the default path,
+since the default path is exactly where the sourced intrusiveness
+complaint above would land if it fired unasked. Actioned as a new roadmap
+item, placed directly after the existing reword-in-place item since both
+are inline-AI-interaction mechanics on text already in the document.
+
+## Pass 2 — Sync-conflict handling: Obsidian and Notion, extending round 46's Scrivener-only finding
+
+**Why this pass, and what it adds.** Round 46 found a real, structural,
+multi-year Scrivener iOS↔Dropbox sync-conflict pattern from three forum
+threads, with an explicit forward note that Novella's own eventual sync
+(PLAN-sync.md, still blocked on three owner decisions) should design away
+from that failure mode. This pass widens the check to the two other sync
+models a writer moving files between devices actually lives with day to
+day — Obsidian Sync (a paid, official first-party sync product, distinct
+from the community-plugin ecosystem already covered elsewhere in this
+research) and Notion (the benchmark general-purpose tool the thesis
+already measures itself against) — to see whether PLAN-sync.md's own
+design choice sits where the evidence says it should.
+
+**Finding (official capability, a default worth naming precisely):
+Obsidian Sync's default Markdown-conflict behavior is silent
+auto-merge, not the safer alternative it also offers.** For Markdown
+files, "Automatically merge" is the default — Obsidian Sync combines both
+devices' changes into one file using a diff-match-patch algorithm, with no
+conflict surfaced to the writer at all. A safer "Create conflict file"
+mode exists — writes a new file named
+`original-note-name (Conflicted copy device-name YYYYMMDDHHMM).md`,
+leaving the remote version untouched — but it is opt-in, added only in
+Obsidian 1.9.7, and must be set per device rather than once globally
+(obsidian.md/help/sync/troubleshoot, official, direct fetch). Non-Markdown
+files (canvases and similar) skip merging entirely and use pure
+last-modified-wins.
+
+**Finding (recurring complaint, confirms the default is a real pain
+point): a live Obsidian forum thread asks for exactly the safer behavior
+to become the default, not an opt-in.** "Robust Sync Conflict Resolution"
+(forum.obsidian.md/t/robust-sync-conflict-resolution/93544) — a user
+request, still open, that the auto-merge default is silently combining
+edits in ways they'd rather see flagged. This confirms the silent-merge
+default is a named, current friction point in a product that otherwise
+offers the right behavior as a buried setting, not a hypothetical concern.
+
+**Finding (official/reviewer-adjacent analysis, the least safe of the
+three checked): Notion resolves conflicts at the block level in favor of
+whichever edit reaches the server last, with no conflict surfaced at all
+in the normal case.** "There is no merge screen, no side-by-side
+comparison, and no message telling either [device] that a conflict
+occurred. One version simply replaces the other... the person whose edit
+lost the race often has no reason to suspect anything happened, because
+the page looks complete and current from where they are sitting"
+(backups.so/blog/notion-offline-sync-conflicts-data-loss, corroborated
+independently by thomasjfrank.com/notion-offline-mode-the-ultimate-guide/
+and wisechecker.com/notion-pages-out-of-sync-between-devices/). Notion
+occasionally creates a duplicate page suffixed "(Conflict)" instead of
+overwriting silently, but this is inconsistent, not a designed fallback —
+worse than Obsidian's default (a real merge attempt, if a silent one) and
+categorically worse than Obsidian's opt-in safe mode (no artifact, no
+warning, no copy of the loser).
+
+**Finding (recurring complaint, quantified instance, reinforces round
+46's Scrivener finding rather than adding a new product): an independent
+2026 review gives round 46's structural Scrivener sync-conflict pattern a
+concrete, bounded number.** "Users have experienced sync conflicts where
+they lost an hour of writing on the iPad" (elephas.app/blog/
+scrivener-review) — the same file-exchange-race mechanism round 46
+documented across three forum threads, now with a specific, citable cost
+instead of only "conflicts recur."
+
+**Synthesis (inference, drawn from the three sourced facts above): three
+real products sit at three different points on the same risk spectrum,
+and PLAN-sync.md's own design already committed to the safe end none of
+them defaults to.** Notion (silent overwrite, no artifact, no opt-out) is
+worst; Obsidian (silent auto-merge by default, but a real opt-in safe mode
+exists) is better but still ships the risky choice as the default; both
+compare unfavorably to `PLAN-sync.md`'s existing, pre-committed design —
+"never merged silently... both versions are kept... Boring, provable,
+loses nothing" — which is exactly Obsidian's *non-default* safe mode, made
+mandatory rather than opt-in. This round's evidence is direct validation
+that the plan picked the right end of a real, observed spectrum before any
+of this evidence existed — worth keeping in mind specifically as a caution
+against ever softening it later: a future "just auto-merge the easy cases"
+feature request is the precise direction that produced the still-open
+Obsidian forum complaint above, from a product that otherwise ships the
+correct opt-in behavior and still gets this specific complaint about its
+default. Folded into the existing no-outage/data-loss roadmap item as
+reinforcement rather than filed separately, since round 46 already
+established the item's scope and forward note — this pass supplies
+corroborating evidence from two more products, not a new claim.
+
+## Pass 3 — Beta-reader/ARC platforms in depth: what a comment thread still doesn't cover
+
+**Why this pass, and what it adds past rounds 41/43.** Round 41 supplied
+the interaction spec for comment-anchoring itself (Dabble 3.0's Review
+Copies: anchor-survives-edit, resolve/reply, role-scoped visibility) and
+round 43 added BetaBooks' To Do/Consider/Ignore comment-to-task triage.
+Neither round asked the broader question this pass targets: once
+Novella's own inline-comments ship, what does the beta-reader/ARC category
+as a whole still do that a comment thread on a manuscript, however well
+built, structurally can't?
+
+**Finding (observed user behavior + reviewer synthesis, the strongest
+single source of the pass): an indie author's own hands-on comparison of
+every major beta-reader platform, written specifically because none of
+them did the whole job, supplies both the category survey and its own
+stated reason for building a fifth tool.** theindielab.net/p/i-looked-
+at-every-beta-reader-platform reviews BetaBooks (minimal, strong triage,
+but no EPUB import, no multi-pen-name support, no NDA workflow),
+BetaReader.io (a public marketplace where unknown readers browse and
+request access to a manuscript, plus chapter-level engagement/drop-off
+analytics showing which chapter is losing readers — a different kind of
+information than any single reader's comment; but a severely outdated
+Android app, 2.8/5 stars, recurring login failures), StoryOrigin (a
+marketing platform — newsletter swaps, ARC distribution — with beta
+reading as a secondary module), and Scribophile (a karma-based critique
+community since 2008, closer to a workshop than a beta-reading tool).
+
+**Finding (official capability, a mechanic with a real tradeoff, directly
+relevant to the round-41 "bandwagon effect" finding): StoryOrigin's
+chapter-gating is the literal mirror image of Dabble's role-scoped
+visibility solution to the same underlying problem.** A reader must
+submit feedback on the current chapter before the next one unlocks —
+guarding against a reader ghosting halfway through, and structurally
+preventing any reader from seeing another reader's comments, since nothing
+is shared between them at all. The cost: comments are capped at 240
+characters and there is no reader-to-reader communication of any kind
+(same source). Round 41 logged Dabble's answer to cross-reader
+contamination as role-scoped default-invisible comment threads; StoryOrigin
+solves the identical problem by removing inter-reader visibility
+structurally rather than defaulting it off — a data point for how rigid a
+fix can get before it costs something else (here, comment length and any
+possibility of readers discussing a shared reaction).
+
+**Finding (observed user behavior, the most actionable finding of the
+pass): the same source's own stated reason for building a fifth platform
+rather than adopting any of the four it surveyed is four specific,
+recurring gaps.** Verbatim framing: multi-pen-name data isolation, formal
+NDA/agreement gates before sharing a manuscript with a stranger, feedback
+categorized by type at the moment a reader submits it (rather than sorted
+manually afterward), and AI-assisted synthesis once feedback volume gets
+large enough that reading every comment individually stops scaling.
+
+**Why this splits cleanly against the thesis (inference, applying the
+existing WITH-OWNER scope-question pattern already used for submission/
+query tracking):** the pen-name/NDA/stranger-distribution half of this
+list is a different job than Novella's core loop — it requires managing
+other people's access to a manuscript hosted somewhere, which needs a
+server Novella structurally doesn't have today, the identical scope
+question already flagged WITH-OWNER for submission/query tracking. But the
+AI-synthesis gap needs zero new infrastructure and is squarely on-thesis:
+once comments exist as real, anchored data on the manuscript (this item,
+already scoped), a local model already in the app can cluster and
+summarize them across many readers at once — "3 readers stumbled at the
+reveal in chapter 7," "the pacing complaint clusters around chapters 4-6"
+— the exact "read the whole pile so I don't have to" job this survey found
+every platform's own users still doing by hand, because none of the four
+platforms checked ships it themselves. Folded as a follow-on sub-point
+into the existing inline-comments roadmap item rather than filed as a new
+one, scoped explicitly as a "Summarize feedback" action to build once
+comments ship, reusing the same context-assembly pipeline the round-44
+Brainstorm item already plans to reuse — not expanded into that item's own
+first build, which should stay focused on the anchoring/resolve/reply
+mechanic round 41 already spec'd.
+
+## Pass 4 — Notion/Obsidian linked-views and rollups: a views question, not a relations question
+
+**Checked our own code first, to confirm this is genuinely distinct from
+the already-logged structured-Codex-relations item.** `TableView.tsx` is
+one fixed-column (order/title/words/tasks/tags), single-sort view with
+nothing save-able; Corkboard and PlotGrid are two more fixed views over
+the same note set. Three views already exist — ahead of what most DIY
+Notion setups manage without real configuration effort — but none is
+filterable or group-able, and no view configuration can be saved as a
+named, reusable slice (e.g. "just Wren's POV scenes," "just the
+Bramblewood subplot").
+
+**Finding (official capability, direct fetch): Notion's "linked view" is
+exactly this missing mechanic — the same database shown filtered/grouped
+differently on different pages, with zero data duplication.** Direct
+quote from a vendor deep-dive of a sold Notion novel-planning system: "a
+linked view of the Books database filtered to only show books with their
+Status property set to 'In progress'" (storyflint.com/blog/
+storyteller-os-deep-dive, official vendor source, direct fetch). The same
+fetch confirms the system's relation properties connect 23 separate
+databases and that a character page displays a filtered linked view of a
+Details database scoped to that one character — reinforcing, not
+duplicating, the round-42 structured-relations finding, since relations
+are the *data model* and linked views are the *display* built on top of
+it; Novella already has the display half (three views) without the
+data-model half most of the relations item still targets.
+
+**Weaker findings, flagged explicitly rather than folded in as equally
+strong: computed rollups specifically (subplot-pacing distribution,
+character-appearance counts) came back thinner on direct-fetch
+verification than an initial WebSearch synthesis suggested.** Two sources
+were checked directly to confirm a WebSearch-summarized claim about
+subplot-distribution and character-count rollups: storyflint.com/blog/
+notion-rollups (direct fetch) documents only two concrete rollup examples
+— a chapter-completion-count rollup on a Novels↔Chapters relation, and a
+tag-classification rollup on a Library↔Tags relation — neither matching
+the more specific claim; and gwuwi.com/2026/03/15/how-to-draft-a-novel-
+using-relational-notion-databases-as-an-obsidian-alternative/ (direct
+fetch) describes the *intent* to build subplot/character tracking via
+tags but explicitly calls its own database "pretty sparse... still
+evolving," with no rollup formulas shown. Treat "linked filtered views"
+as the confirmed, citable pattern this round, and "computed rollups for
+pacing/character-distribution analysis" as a real but unverified extension
+of it — worth a future round's direct-fetch check on a richer example
+(the earlier WebSearch synthesis may have been summarizing marketing copy
+rather than an actual screenshot or worked example) rather than citing it
+as confirmed now.
+
+**Actioned as a smaller addition, not a new item:** folded into the
+existing "Notion-parity pass, ongoing" roadmap item's inline-databases-
+as-tables gap, scoped narrowly per the evidence above — a save-able
+filter/group-by over Novella's three existing views, not a new view type
+or a rollup/formula system.
+
+## What changed in ROADMAP.md
+
+One new item, three strengthened existing items — no wholly new bullet
+duplicates prior work, per this round's own unexplored-first check. New:
+a one-keystroke inline-continuation feature (NovelAI's single-keybinding
+shape, not Sudowrite's card panel or literal always-on ghost text),
+placed directly after the existing reword-in-place item since both are
+inline-AI-interaction mechanics on text already in the document.
+Strengthened: (1) the inline-comments item gains a beta-reader-platform
+depth pass, with an AI feedback-synthesis follow-on sub-point actioned as
+on-thesis and buildable once comments ship, and the pen-name/NDA/
+distribution half explicitly flagged out of scope the same way
+submission/query tracking already is; (2) the no-outage/data-loss item
+gains Obsidian Sync's and Notion's own conflict-handling defaults as
+corroborating evidence that `PLAN-sync.md`'s existing "never merge
+silently" design already sits at the safe end of a real, observed
+spectrum, with an explicit caution against ever softening it toward
+auto-merge later; (3) the Notion-parity pass item gains a sharpened,
+views-not-relations framing for its inline-databases-as-tables gap, with
+the weaker rollup evidence flagged explicitly rather than overstated. Did
+not touch the four-pillar bundle check or the two litigation-date
+trackers this round — both remain exhaustively covered from rounds 15-40
+and out of this round's assigned scope.
+
+## Round 47 sources
+
+- docs.sudowrite.com/using-sudowrite/1ow1qkGqof9rtcyGnrWUBS/write/
+  pvxUvbQqYybfEosqx1sXjY (official, direct fetch)
+- thewritepractice.com/sudowrite-review/ (direct fetch)
+- docs.novelai.net/en/text/editor/storysettings/ (official)
+- gentext.ai/blog/en/ghost-text-autocomplete-academic-writing/ (direct
+  fetch)
+- github.com/microsoft/vscode issue 320940, github.com/orgs/community/
+  discussions/138225
+- obsidian.md/help/sync/troubleshoot (official, direct fetch)
+- forum.obsidian.md/t/robust-sync-conflict-resolution/93544
+- backups.so/blog/notion-offline-sync-conflicts-data-loss,
+  thomasjfrank.com/notion-offline-mode-the-ultimate-guide/,
+  wisechecker.com/notion-pages-out-of-sync-between-devices/
+- elephas.app/blog/scrivener-review
+- theindielab.net/p/i-looked-at-every-beta-reader-platform (direct fetch)
+- betabooks.co (official, prior round; re-checked for continuity)
+- storyflint.com/blog/storyteller-os-deep-dive (official vendor, direct
+  fetch), storyflint.com/blog/notion-rollups (direct fetch)
+- gwuwi.com/2026/03/15/how-to-draft-a-novel-using-relational-notion-
+  databases-as-an-obsidian-alternative/ (direct fetch)
+- Internal: src/ui/{InspectorPane.tsx,TableView.tsx,Corkboard.tsx,
+  PlotGrid.tsx,EditorPane.tsx,RewordPopover.tsx}

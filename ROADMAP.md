@@ -223,7 +223,44 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       on surrounding content rather than raw character offsets, resolve/
       reply/read-unread, a history drawer, and a per-comment visibility
       scope — not a Word-style balloon that only flags that something
-      changed.
+      changed. Research round 47 (2026-09-15) goes past comment-anchoring
+      into the beta-reader/ARC platform category as a whole (BetaBooks'
+      triage mechanic was already logged in round 43; this pass surveyed
+      the rest of the category to find what a comment thread still
+      doesn't cover), via an indie author's own hands-on comparison of
+      every major platform (theindielab.net/p/i-looked-at-every-
+      beta-reader-platform) written specifically because none of them did
+      the whole job. Confirms comment-anchoring is necessary but not
+      sufficient: BetaReader.io adds a public marketplace of unknown
+      readers plus chapter-level engagement/drop-off analytics — which
+      chapter is losing readers, not just what one reader said about it;
+      StoryOrigin gates each chapter behind completed feedback on the
+      one before it (a reader can't advance without submitting), at the
+      cost of a 240-character comment cap and zero reader-to-reader
+      visibility — the literal mirror image of the round-41 "bandwagon
+      effect" complaint, solved by removing cross-reader discussion
+      entirely rather than scoping it. The source's own reason for
+      building a fifth tool rather than adopting any of the four surveyed
+      is the more useful finding: four gaps recur across every platform it
+      checked — multi-pen-name data isolation, formal NDA/agreement gates
+      before sharing a manuscript with a stranger, feedback categorized by
+      type at the moment a reader submits it rather than sorted after the
+      fact, and **AI-assisted synthesis once feedback volume gets too
+      large to read comment-by-comment**. Judged against the thesis, the
+      first two are a different job than Novella's — managing outside
+      readers' access to a manuscript hosted somewhere needs a server
+      Novella doesn't have, the same scope question already flagged
+      WITH-OWNER for submission/query tracking below — but the AI-synthesis
+      gap is squarely on-thesis and needs no new infrastructure: once this
+      item's comments exist as real, anchored data on the manuscript, a
+      local model already in the app can cluster and summarize them ("3
+      readers stumbled at the reveal in chapter 7," "the pacing complaint
+      clusters around chapters 4-6") — the exact "read the whole pile so I
+      don't have to" job this survey found every beta-reader platform's own
+      users still doing by hand. Scope as a follow-on "Summarize feedback"
+      action once comments ship, reusing the same context-assembly
+      pipeline the Brainstorm item below already plans to reuse, rather
+      than folding it into this item's own initial build.
 - [ ] **Suggest-mode editing (track changes), reusing the diff engine we
       already ship, before real-time co-authoring** — research round 44
       (2026-09-06): a dedicated pass on collaboration and hand-off
@@ -615,6 +652,93 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       candidate at a time). Two small, independent improvements to a
       feature we already ship: add the keyboard scheme first (cheap, no
       design risk), then consider a "compare" toggle for a browsing pass.
+- [ ] **A one-keystroke "continue from here" that streams inline, not into
+      a side panel** — research round 47 (2026-09-15): a dedicated pass on
+      inline-completion UX, a mechanic distinct from reword-in-place above
+      (that item replaces *selected* text; this one is about extending
+      prose forward from the cursor, the single most basic "writes with
+      you" action and one Novella currently makes the heaviest of any
+      competitor checked). Checked our own code first: `InspectorPane.tsx`'s
+      "Continue the scene (default)" style is the only way to do this
+      today — it requires opening the Inspector pane, confirming a style
+      choice, clicking Generate, watching a single candidate stream into a
+      separate Output panel, then clicking one Accept button that calls
+      `insertIntoEditor()` to drop the whole block in at once. No inline
+      preview in the document itself, no multiple candidates, no keyboard
+      path at all. Three genuinely different shapes exist in the market,
+      and ours matches none of them:
+
+      **Multi-candidate, side-panel review (Sudowrite's Write).** Official
+      docs confirm the mechanic precisely: click Write with the cursor at
+      the end of existing prose, it reads up to 20,000 words of preceding
+      context, and generates 1-6 cards (roughly 50-2,000 words each,
+      length and count both configurable) into the History panel, shown
+      unstacked for side-by-side comparison; a card is inserted with one
+      click, alternatives can be starred or discarded, and Auto/Guided/
+      Tone Shift modes plus a Creativity slider control how far each card
+      deviates from established prose (docs.sudowrite.com/using-sudowrite/
+      1ow1qkGqof9rtcyGnrWUBS/write/pvxUvbQqYybfEosqx1sXjY, official, direct
+      fetch). This is the most feature-rich of the three shapes and the
+      one closest to what Novella already half-builds — but it's also the
+      one reviewers name a real learning-curve cost for: thewritepractice.com's
+      hands-on review says "opening Sudowrite for the first time can feel
+      a little intimidating... there are so many features that it takes a
+      while to understand how they all fit together," needed a full
+      hour-long onboarding video before "everything started to click," and
+      separately notes "writers who like to customize every part of their
+      process might find Sudowrite a little restrictive... [the tools]
+      work best when you follow the system it has built."
+
+      **One-keystroke, single continuation (NovelAI).** "You type a
+      paragraph, hit Tab or the generate button, and it continues from
+      your prose... you don't ask it to write a story — you write
+      alongside it," steered by three always-available context levers —
+      Memory (persistent facts), an Author's Note (inserted near the most
+      recent text), and a keyword-triggered Lorebook
+      (docs.novelai.net/en/text/editor/storysettings/, official, plus
+      corroborating reviewer summaries). No card panel, no menu — the
+      lightest-weight of the three shapes, and the one closest in spirit
+      to what a "continue" keybinding in Novella should feel like.
+
+      **True inline ghost-text (GitHub Copilot's pattern, now spreading to
+      prose tools).** A light grey suggestion appears inline as you type;
+      Tab accepts it, continuing to type past it makes it disappear and
+      recalculate, so it never blocks normal typing (gentext.ai/blog/en/
+      ghost-text-autocomplete-academic-writing/, describing the pattern
+      applied to long-form writing specifically). The same source is
+      explicit about where this pattern's own limits are, which matters
+      more here than the mechanic itself: it's "closer to a smart sentence
+      completion than a full draft generator... good at continuation, not
+      invention," and can "absolutely flatten voice if you let it dictate
+      too much" — feeling "intrusive" specifically in writing "where voice
+      and originality matter more than conventional structure," i.e.
+      exactly the fiction use case Novella is built for. Corroborated from
+      the coding-tool side of the same pattern: VS Code/Copilot users
+      report ghost text "interfering... in a highly disruptive way" with
+      other completions when it fires uninvited (github.com/microsoft/
+      vscode issue 320940) and actively seek a way to disable inline
+      suggestions while keeping the assistant available on demand
+      elsewhere, such as a chat panel (github.com/orgs/community/
+      discussions/138225) — real evidence that "always-on, appears
+      without being asked" is the specific part of ghost text people
+      object to, not generation-on-request itself.
+
+      **Synthesis and build recommendation:** the sourced downside of
+      literal always-on ghost text (voice-flattening, intrusiveness,
+      wanting an off switch) is a direct argument against building
+      Novella's version that way, and it would also be a second UI
+      surface competing with the wiki-link/slash-command autocomplete
+      `EditorPane.tsx` already runs. The cheaper, better-evidenced target
+      is NovelAI's shape: a single keybinding (e.g. Ctrl+Enter at the end
+      of a paragraph) that streams a candidate directly into the document
+      at the cursor, inline, not to a side panel — Escape discards it,
+      Enter/Tab keeps it — reusing the same `generate()` streaming call
+      and `insertIntoEditor()` helper `InspectorPane.tsx` already has, so
+      this is UI wiring over a proven pipeline, not new AI plumbing. Leave
+      the multi-candidate card review as a distinct, opt-in "give me
+      options" action (closer to Sudowrite's shape) rather than the
+      default path, since the default path is exactly where the
+      intrusiveness complaint above would land if it streamed unasked.
 - [ ] **Give the Chat panel a visible, persistent "pinned constraints"
       surface, separate from the conversation itself** — research round 41
       (2026-09-03): a detailed Sudowrite iOS App Store review (reviewer
@@ -855,7 +979,34 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       exactly like Notion but better." Next concrete gaps: block-style
       hover handles in the editor, inline databases-as-tables on notes,
       synced project sidebar collapse, cover images on note headers.
-      One gap per run, verified live.
+      One gap per run, verified live. Research round 47 (2026-09-15)
+      sharpens the inline-databases-as-tables gap, distinct from the
+      structured-Codex-relations item above (that one is about linking
+      entities; this is about *views* over one dataset). Checked our own
+      code: `TableView.tsx` is a single fixed-column, single-sort view
+      (order/title/words/tasks/tags, click a header to sort, nothing
+      save-able), and Corkboard/PlotGrid are two more fixed views over the
+      same note set — three views already, ahead of what most DIY Notion
+      setups manage without real configuration work. But none of the
+      three is filterable or group-able, while a Notion "linked view" is
+      exactly that: the same database shown filtered/grouped differently
+      on different pages with zero data duplication — e.g. "a linked view
+      of the Books database filtered to only show books with Status set
+      to 'In progress'" (storyflint.com/blog/storyteller-os-deep-dive,
+      official vendor deep-dive, direct quote). Two other sources checked
+      for a richer rollup mechanic specifically (subplot-pacing or
+      character-appearance-count rollups) came back thinner than expected
+      on specifics (storyflint.com/blog/notion-rollups only documents a
+      chapter-completion-count rollup and a tag-classification rollup;
+      gwuwi.com/2026/03/15/how-to-draft-a-novel-using-relational-
+      notion-databases-as-an-obsidian-alternative/ describes the intent
+      but calls its own database "sparse" and "still evolving") — treat
+      "linked filtered views" as the confirmed, citable pattern and
+      computed rollups as a real but less-evidenced extension of it, not
+      equally proven. A lighter, more concrete addition than the relations
+      item once Table view is revisited: a save-able filter/group-by
+      (by POV, by tag, by status) over the views we already have, not a
+      new view type or a rollup/formula system.
 - [ ] **NovelCrafter-parity pass, ongoing** — codex entry templates per
       type (character sheets with fields), chat-with-your-book mode,
       scene status labels (draft/revised/done) surfaced on cards and
@@ -1624,6 +1775,45 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       still blocked on the three pending owner decisions) — when it does,
       this is the specific failure mode to design away from, not a
       Dropbox-style "whoever synced last wins, hope you notice" merge.
+      Research round 47 (2026-09-15) widens that caution past Scrivener to
+      the two other sync models writers actually live with day to day, and
+      finds they sit on the same risk spectrum PLAN-sync.md already picked
+      the safe end of. Obsidian Sync's *default* behavior for Markdown
+      files is "Automatically merge" — it combines both devices' edits
+      into one file using a diff-match-patch algorithm with no conflict
+      shown to the writer at all; a separate, safer "Create conflict file"
+      mode (writes a `(Conflicted copy device-name timestamp).md` file and
+      leaves the remote version alone) exists only as an opt-in choice
+      that must be set per device, added in Obsidian 1.9.7
+      (obsidian.md/help/sync/troubleshoot, official). A live Obsidian forum
+      thread requesting exactly this as a *default* change
+      (forum.obsidian.md/t/robust-sync-conflict-resolution/93544) confirms
+      the silent-auto-merge default is a real, named pain point, not a
+      hypothetical. Notion is worse and has no opt-in fix at all: conflicts
+      resolve at the block level in favor of whichever edit reaches the
+      server last, with "no merge screen, no side-by-side comparison, and
+      no message telling either [device] a conflict occurred" — the losing
+      edit is silently overwritten and looks complete and current to the
+      person who lost it (backups.so/blog/notion-offline-sync-conflicts-
+      data-loss, corroborated by thomasjfrank.com and wisechecker.com).
+      Scrivener's own iOS↔Dropbox exchange, already logged as a
+      multi-year structural pattern in round 46, gets a concrete quantified
+      instance this round: an independent 2026 review reports "users have
+      experienced sync conflicts where they lost an hour of writing on the
+      iPad" (elephas.app/blog/scrivener-review) — a bounded, citable
+      instance of the exact "diverges silently until the writer happens to
+      notice" risk round 46 named as the more dangerous failure mode.
+      Three real products, three points on the same spectrum — Notion
+      (silent overwrite, no artifact, no opt-out), Obsidian (silent
+      auto-merge by default, a safer mode exists but isn't it), Scrivener
+      (no conflict UI of any kind, documented real data loss) — and
+      PLAN-sync.md's design ("never merged silently... both versions are
+      kept... boring, provable, loses nothing") already sits at the safe
+      end none of the three defaults to. Worth keeping front of mind for
+      whichever future round scopes sync implementation: a later feature
+      request to "just auto-merge the easy cases" is the exact softening
+      that produced Obsidian's own forum complaint above, from a product
+      that otherwise ships the right opt-in behavior.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent
@@ -1995,6 +2185,45 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-09-15 — Research round 47 (autopilot; no code). Housekeeping first:
+  working tree confirmed clean at session start on branch
+  `claude/exciting-cerf-eaddhf`, one commit ahead of round 46's. Four
+  angles researched, each checked against rounds 40-46 first to confirm
+  they were genuinely unexplored: (1) AI inline-continuation/ghost-text
+  UX — checked `InspectorPane.tsx`'s "Continue the scene" style (a pane
+  switch, one candidate, one Accept button, no keyboard path) against
+  three real market shapes (Sudowrite's multi-card side-panel review,
+  NovelAI's one-keystroke single continuation, true inline ghost-text
+  à la Copilot) and found ours heavier than all three; new roadmap item
+  targets NovelAI's lighter shape specifically, not Sudowrite's richer one
+  or always-on ghost text, the latter having sourced downsides
+  (voice-flattening, intrusiveness) for fiction specifically. (2)
+  Sync-conflict handling, extending round 46's Scrivener-only finding to
+  Obsidian Sync (silent auto-merge by default; a safer opt-in mode exists
+  but isn't the default) and Notion (silent last-write-wins with no
+  conflict UI at all, the least safe of three checked) — both
+  corroborate, rather than change, `PLAN-sync.md`'s existing "never merge
+  silently" design; folded into the no-outage/data-loss item as
+  reinforcement. (3) Beta-reader/ARC platforms past comment-anchoring —
+  a hands-on multi-platform comparison (theindielab.net) names four
+  recurring gaps (pen-name isolation, NDA gates, point-of-entry feedback
+  categorization, AI-assisted synthesis across readers); the pen-name/NDA
+  half is out of thesis scope (needs a server, like submission tracking
+  already flagged), but AI feedback-synthesis is on-thesis and buildable
+  once comments ship — folded into the inline-comments item as a
+  follow-on sub-point. (4) Notion/Obsidian linked-views for scene/chapter
+  tracking, checked as distinct from the structured-relations item
+  already logged (views vs. entity-linking) — checked our own
+  `TableView.tsx`/`Corkboard.tsx`/`PlotGrid.tsx` (three fixed views,
+  nothing filterable or save-able) against Notion's linked-view pattern;
+  folded a narrow addition (save-able filter/group-by) into the
+  Notion-parity item, with a candidate rollup mechanic flagged explicitly
+  as weaker evidence rather than overstated. Skipped dashboard/home-screen
+  design (round 42 already ran a dedicated pass) and downgraded mobile/
+  tablet UX after confirming round 41 already covered it and concluded
+  "not actionable now" for Novella's Tauri architecture. Full notes,
+  evidence-type breakdown, and source list in RESEARCH.md Round 47.
 
 - 2026-09-13 — Research round 46 (autopilot; no code). Housekeeping first:
   working tree was clean at session start; local branch was already even
