@@ -7091,3 +7091,362 @@ note for Novella's own eventual sync design.
   supersedes this open request, but that supersession isn't confirmed from
   a primary source, so it's noted here only as a lead not pursued further)
 - Internal: src/state/sessions.ts, src/ui/{GoalMeter.tsx,GoalsTab.tsx}
+
+# Round 47 (2026-09-16) — Notion's real database mechanic, four distinct mobile failure modes, and a litigation thread finally resolves
+
+Housekeeping first: working tree was clean at session start; local branch
+was already even with `origin/main` at round 46's commit (2026-09-13, three
+days prior), no fast-forward needed. Given 46 prior rounds have covered
+comments, track changes, brainstorming, codex-mention detection, import,
+export, timeline/maps, search, focus mode, corkboard modes, story-structure
+templates, streak gamification, and a four-pillar competitive bundle check
+run 26+ times, this round deliberately dispatched three parallel passes at
+genuinely unexamined or thin surfaces rather than a broad re-sweep: dashboard/
+settings/database design, mobile app UX specifically, and a dated-news
+housekeeping sweep closing threads round 46 left open. Did not re-run the
+four-pillar bundle check (would be a 27th identical negative result) or the
+SKILLS.md scouting standing pass this round.
+
+## Pass 1 — Dashboard, settings, and Notion's actual database mechanic
+
+**Finding (reviewer opinion vs. official capability, contrasted): the
+"too many options at once" dashboard failure is real and documented, and
+Dabble's deliberately minimal dashboard is the evidenced counter-example.**
+A 2026 hands-on NovelCrafter review reports "20+ buttons and screens
+explaining how to use the tool" and "no obvious 'start here' path" once
+tutorials are skipped (ilampadmanabhan.medium.com/novelcrafter-review — via
+search-snippet only, direct fetch 403'd, flagged), echoed by a second,
+independent source calling the setup "overwhelming for beginners"
+(toolworthy.ai/tool/novelcrafter). Dabble's own docs describe its dashboard
+as a "bookshelf" where "the one you touched last sit[s] out front," with a
+sidebar "welcome card showing project and word counts"
+(dabblewriter.com/docs/getting-started/the-dashboard, official), and
+independent reviewers reward it directly: "clean and distraction-free...
+practically no learning curve" (kindlepreneur.com/dabble-writer). Obsidian
+ships no dashboard at all, and the community response — a "Homepage" plugin
+family and downloadable dashboard templates stitching together "today's
+tasks... recent edits and quick links" (github.com/Rainbell129/
+Obsidian-Homepage; vaultorial.com/homepage-dashboard) — is observed user
+behavior confirming writers want exactly this narrow "resume + today's
+numbers + quick links" screen even when their tool doesn't provide it.
+Scrivener's version of the same failure sits one step earlier, at template
+selection: "this step causes the most anxiety in new Scrivener users,"
+per repeated how-to-author advice to skip templates and start blank
+(squibler.io/learn/templates/scrivener-templates).
+
+Checked our own code and product decisions: Novella's "Quiet first run"
+(shipped 2026-07-23) already opens directly on the seed chapter with no
+intermediate screen at all — closer to Dabble's praised minimalism than to
+NovelCrafter's documented overwhelm, and this finding is a validation of
+that existing decision, not a case to build a dashboard. It did surface one
+small, real, code-verified gap: `GoalMeter`/`SessionSummary`
+(`src/ui/GoalMeter.tsx`) is rendered only inside `GoalsTab.tsx` and
+`SettingsModal.tsx`, never in the main titlebar or editor chrome — so
+seeing today's word count costs a tab-switch that Dabble's sidebar card
+avoids in zero clicks. Filed as a small, low-priority "Next up" item:
+surface the existing value somewhere already visible, not a new screen.
+
+**Finding (recurring complaint, weaker evidence, filed as a note rather than
+a roadmap item): settings are scattered by task, not by user mental model,
+across the two apps checked with public complaint threads.** NovelCrafter
+splits AI-behavior settings at least three ways — account-level "General
+Settings," a separate "AI Connections" screen, and per-prompt "Model" tabs
+with an "Experimental Features" area for things like "Customize AI
+Thinking" (novelcrafter.com/help/docs/models/thinking-settings;
+/ai-connections/lm-studio, both official) — documented structure, not
+itself a complaint, but a task-scattered model worth noting. Scrivener has
+two live forum threads: one from a user unable to find Preferences at all
+(traced to Apple silently renaming "Preferences" to "Settings" in newer
+macOS, forum.literatureandlatte.com/t/i-cant-find-scrivener-
+preferences/134622) and one from a user who "always find[s] it very hard to
+figure out what the settings are actually changing"
+(forum.literatureandlatte.com/t/finding-the-correct-setting-in-appearance-
+editor/140216) — a legibility complaint distinct from a findability one. No
+settings-search-box pattern was found in NovelCrafter, Dabble, Scrivener, or
+Campfire's public docs/reviews (absence noted, not proof none exists).
+Not strong enough evidence on its own for a roadmap item — filed as a design
+caution: as Novella absorbs more of NovelCrafter's AI tooling, Scrivener's
+compile options, and Dabble's plotting screens, it inherits the risk of the
+same settings-sprawl unless "how does AI behave in this scene" and "how does
+this pane render" are deliberately kept in predictable, singular homes.
+
+**Finding (official capability + observed template-author behavior,
+converging across two independent ecosystems — the strongest finding of the
+round): Notion's inline database is one dataset rendered as several
+simultaneous, independent live views, and real novel-planning templates
+lean on exactly that mechanic.** Notion's board/table/gallery views filter,
+sort, and group the *same* underlying database rows rather than holding
+separate copies (notion.com/help/boards, official). StoryFlint's guide
+documents moving a scene database through a Kanban board grouped by writing
+stage, and the same scene records rendered again as a gallery of "digital
+scene cards" (medium.com/storyflint/13-ways-to-use-notion-for-writing-your-
+story; storyflint.com/blog/notion-for-writing). A purchasable "Story Bible"
+template on Notion's own marketplace connects a scenes database to plot-line
+and chapter databases as one interactive board, with relations surfacing
+"what characters are part of a particular race or group" across databases
+without re-typing anything (notion.com/templates/story-bible-continuity-
+tracker-for-novelists-book-writer; jenterpstra.com/complete-novel-
+template-2-notion). Critically, this pattern is not Notion-specific:
+Obsidian shipped its own first-party (not plugin) answer, **Bases**, in
+v1.9-1.10 — "a saved view definition that collects notes matching a filter
+and displays their properties as columns," with table/card/list/map views
+over the same note set (medium.com/@lennart.dde/obsidian-cheat-sheet-
+bases-vs-dataview; locul.ai/blog/obsidian-bases-plugin) — a second,
+structurally opposite ecosystem (plain Markdown files vs. Notion's
+proprietary blocks) independently converging on "multiple live structured
+views over the same underlying records," which is materially stronger
+evidence than either platform alone. This directly names the mechanic
+Novella's own Notion-parity item has gestured at since round 6 as "inline
+databases-as-tables on notes" without a real spec — promoted into its own
+fully-scoped roadmap item, placed beside the existing structured-Codex-
+relations item, since the two are the read (views) and write (relations)
+halves of the same underlying idea: Codex entries as queryable, linked data,
+not just prose in folders.
+
+## Pass 2 — Mobile UX across five competitors: four distinct failure modes
+
+**Note on source access:** Reddit was unreachable for the entire pass — every
+direct fetch and domain-scoped WebSearch query against reddit.com,
+old.reddit.com, and specific subreddits (r/writing, r/scrivener, r/PubTips)
+returned nothing. This is a real gap in the "second app" mobile-workaround
+angle (e.g. "I use Notes app, then paste into Scrivener later") — flagged as
+under-evidenced rather than asserted from a thinner substitute source.
+
+**Finding (reviewer opinion + two independent verified App Store reviews):
+Scrivener's iOS sync architecture, not a missing feature, is the mobile
+failure — and it has a citable number.** A 2026 hands-on review states the
+iOS app "syncs only through Dropbox," and for large projects "creates
+hundreds of thousands of little files that have to sync... at over 1GB in
+size, that can take more than two hours" (kimaireviews.com/reviews/
+scrivener-review). Independently, a verified App Store review ("rebeccambp,"
+4★) confirms the identical failure mode from lived multi-device use —
+multi-hour syncs "even for single-word edits" on a 1.15GB project — and
+recommends the mobile app "for small/simple projects only"; a second review
+("Jeremagi," 4★) separately describes an older synced file overwriting a
+newer one across devices, with iCloud implicated (both from App Store,
+Scrivener 3). This is a mobile-specific instance of the same Dropbox-
+mediated-sync architecture round 46 already logged as a multi-year
+structural risk (three forum threads, 2022/2024/2025, no staff fix) — same
+root cause, now with a concrete, quotable cost figure ("2+ hours to sync one
+word") rather than an abstract "conflicts happen" framing. Folded into the
+existing no-outage/data-loss roadmap item as reinforcement with the new
+number, not filed separately.
+
+**Finding (official capability, internally contradictory — informative on
+its own): Sudowrite's documentation disagrees with itself about what its
+mobile app can do.** One doc page, "Mobile App Overview," claims full
+document editing and Story Bible access on mobile, with only generative
+Story Bible actions excluded (docs.sudowrite.com/mobile-app-overview,
+official). A second page, "Is there a mobile app?," describes a narrower
+"companion app" scoped to Smart Dictation and Chat, explicitly excluding
+Write and Rewrite (docs.sudowrite.com/is-there-a-mobile-app, official). A
+Nov 2025 App Store review corroborates the narrower reality: "the write
+button to have AI help, everything that I enjoyed... isn't available" on
+the phone app, with the developer replying they're "actively working on the
+app" (App Store, Sudowrite). Sudowrite is visibly mid-transition on mobile
+scope faster than its own docs track — a data point for accuracy in
+Novella's own mobile-capability messaging, not an actioned gap.
+
+**Finding (official capability + a second corroborating dated App Store
+review): Campfire's mobile app has a live wifi/save-time chapter-loss bug,
+now confirmed by a second independent report.** A reviewer notes Campfire's
+mobile app ("CF Creators") doesn't include all desktop modules
+(scribecount.com/author-resource/writing-tools-for-authors/campfire-write-
+for-indie-authors), and a fresh Aug 18, 2026 App Store review (4★, "Best
+Writing Tool") reports "lost chapters due to saving glitches during wifi
+use," explicitly requesting "offline mode" (App Store, Campfire — Write
+Your Book). This is the same failure mode round 35-36 already logged (a
+save-time glitch causing chapter loss, one instance "today while working on
+wifi") — not a new bug, but a second, independently dated report confirming
+it's still live five-plus weeks later, not a one-off already patched.
+Folded into the existing no-outage item as corroboration.
+
+**Finding (official marketing claim vs. a live user-facing feature-request
+board entry — a genuine build-verification caution): Dabble's "full mobile
+parity" claim has at least one confirmed, touch-specific break.** Dabble
+positions its PWA as full desktop-mobile feature parity, but a live entry on
+its own feature-request board reports "cannot move Plotlines and Plot Cards
+around on Android phones, even though this functionality works on iPad,
+Macbook, and PC" (dabble.featureupvote.com/suggestions/539972 — title/
+snippet only, direct fetch 403'd, flagged). This is precisely the class of
+bug CLAUDE.md already documents Novella having hit and fixed once (the
+`(hover: none)`-gated touch fixes from Plan phase C, and the standing "no
+`transition` on `grid-template-columns`" trap) — a competitor's own PWA
+shipped responsive breakpoints without finishing the touch-interaction
+layer for its core planning surface. Actioned as a verification caution
+inside the new mobile copy item: test Corkboard/PlotGrid drag-and-reorder
+against real touch input, not just viewport width, before claiming parity
+in copy.
+
+**Finding (reviewer opinion + official help-doc behavior): NovelCrafter has
+no native mobile app, and its unoptimized small-screen layout defaults to
+showing the Codex instead of the manuscript editor.** "NovelCrafter
+currently has no native desktop or mobile app... it works on mobile
+browsers but isn't optimized for it" (ilampadmanabhan.medium.com/
+novelcrafter-review — search-snippet only, flagged). NovelCrafter's own
+help docs confirm the specific default: "If you are on a mobile device or
+have a small screen, you might only see the codex, and not any other
+interface" (novelcrafter.com/help/docs/codex/the-codex, official) — the
+reference/lookup surface crowds out the writing surface by default, needing
+a manual toggle to reach it. Distinct failure mode from Scrivener's
+(sync cost) and Campfire's (save reliability): this one is a genuine
+responsive-design miss, not an infrastructure limitation. Novella already
+solved the equivalent problem in Plan phase C (the three-column grid
+collapsing to one track, titlebar triage) — this finding is useful as
+concrete comparison language for copy, not a build gap.
+
+**Synthesis:** four competitors, four independently documented, different
+mobile failure modes (Scrivener: sync architecture; NovelCrafter: responsive
+design; Campfire: save reliability on live wifi; Dabble: touch-interaction
+layer specifically) against a shipped Novella mobile pass that already
+avoided its own equivalent of at least the NovelCrafter and Dabble classes
+of bug. Added as a new "say it louder" roadmap copy item with the
+build-verification caution attached, rather than four separate items.
+
+## Pass 3 — Dated-news housekeeping sweep
+
+**Litigation (resolves a long-open thread): the Bartz v. Anthropic claims
+portal has opened.** Checked directly against anthropiccopyrightsettlement.com
+(official settlement-administrator site, highest-confidence source
+available): claim-information notices (Claim Number + PIN) went out to
+claimants Sept 2-4, 2026; a 60-day window (extended from an original 30
+days) is open now for submitting additional allocation information; first
+payment distribution for uncontested/agreed-allocation claims is targeted
+for Nov 15, 2026 or before, with disputed-allocation works following in
+later distributions — corroborated by secondary legal-blog coverage
+(blog.taaonline.net, authorsguild.org). This resolves the round-40 open
+question (portal not yet opened as of 2026-08-31) roughly on the "end of
+August" schedule Class Counsel had guided. **Kadrey v. Meta's mediation-
+outcome report, due Aug 21, 2026, remains unresolved** — CourtListener shows
+the docket still active as of Sept 15, 2026, but no source surfaced the
+report's actual content; closing this needs a docket-level (PACER/
+CourtListener) pull rather than web search, which is outside this
+environment's reach. Given the Bartz timeline now has a concrete Nov 15
+payment-distribution date, the next useful litigation check is mid-November,
+not every round — the weekly re-check this thread has run for a dozen-plus
+rounds is deprioritized in the roadmap item accordingly.
+
+**Sudowrite: no September incidents, active shipping.** status.sudowrite.com
+(official, direct fetch) shows 100% uptime, "All services are online," for
+the full Sept 3-16 window. The changelog (feedback.sudowrite.com/changelog,
+official) shows real September activity: Claude Fable 5.1 added Sept 2
+(explicitly to "reduce false refusals on dark/violent/heat content" —
+folded into the local-model roadmap item as reinforcement, see below); GPT-6
+Astra added Sept 5; a mobile update (2026.26.16) fixing widely-reported
+loading issues and crashes; a Write (Guided) custom-prompt-menu text-loss
+fix; a stale-tab error fix; and a performance fix for documents with
+hundreds of comments. Meaningfully more shipping activity than round 40 saw
+as of mid-August.
+
+**Campfire: weak, conflicting version signals — status still unresolved.**
+A third-party app mirror shows "latest version 1.3.2" (older than round 40's
+logged v1.4.0), almost certainly stale mirror-indexing lag rather than a
+real regression; Google Play's own listing shows a last-update date of
+Sept 7, 2026 but no retrievable version number or changelog text via search.
+No changelog text confirming either the cursor-jump/mid-sentence-reset bug
+or the wifi/save-loss bug as fixed or still-present was found this round
+(the wifi/save-loss bug does have the fresh Aug 18 App Store corroboration
+logged in Pass 2 above, which is a different, more reliable evidence class
+than the version-number confusion here). Flagged explicitly as unresolved
+rather than guessed either way — a direct fetch of campfirewriting.com's own
+changelog/update post (not a browse-page, which returned only nav chrome
+this round) is the next step.
+
+**NovelCrafter, Dabble, Scrivener: quiet.** NovelCrafter's live changelog
+page (novelcrafter.com/changelog/, official) shows no entries since March
+21, 2026 — a genuinely quiet changelog, not a fetch failure (the page loaded
+correctly and listed historical entries). No September 2026 Dabble blog
+posts or release notes were found (search results were heavily polluted by
+an unrelated sports-betting app sharing the "Dabble" name). Scrivener has no
+new version release (still macOS 3.5.0 / Windows 3.1.6, both from 2025) but
+did publish new editorial content — a Sept 9, 2026 Literature & Latte blog
+post on compiling from iPad/iPhone — which is content, not a changelog
+entry.
+
+**type.ai: newly active with competitor-comparison content, not new
+features.** blog.type.ai (official, direct fetch) shows four new posts
+in/after the target window (Sept 2, 11, 14, 15, all byline "Ben Denny"),
+including "Best Sudowrite Alternative for Writing Books in 2026" and "Best
+NovelCrafter Alternative for Writing Books in 2026" — explicit,
+programmatic competitor-positioning SEO content, contradicting round 40's
+"mostly quiet" read of type.ai's blog. No new product features described;
+evidence type is marketing copy, not a capability announcement. Not
+actioned as a roadmap item — noted for awareness that type.ai is now
+naming NovelCrafter and Sudowrite directly in its own marketing.
+
+**New entrant sweep: nothing added to the tracked list.** One name surfaced
+worth a note but not a flag: **Inkfluence AI** (inkfluenceai.com), a
+cloud-based prompt-to-finished-ebook generator (outline → sequential chapter
+drafts with context memory → PDF/EPUB/cover/audiobook export), founded Nov
+2025, released ~April 2026, listed on AppSumo/Capterra/G2. It's a real, if
+small, product — but a one-click cloud generator with no worldbuilding
+depth, no task/timer system, and no local-first architecture sits outside
+Novella's direct competitive lane; not added to the standing near-miss
+watch list.
+
+## What changed in "Next up"
+
+Added two new items: a fully-scoped "structured multi-view blocks on
+Codex/notes" item (table/board/gallery views over the same records),
+promoted from the one-line "inline databases-as-tables on notes" gap the
+Notion-parity item has carried unbuilt since round 6, placed beside the
+existing Codex-relations item; and a "say the mobile-writing advantage
+louder" copy item covering four competitors' distinct documented mobile
+failures, with a build-verification caution to test Corkboard/PlotGrid
+touch-drag before claiming parity. Added one small, low-priority item:
+surface the existing `SessionSummary`/`GoalMeter` word-count value
+somewhere always-visible, since it's currently tab-gated. Reinforced three
+existing items with new evidence rather than duplicating: the no-outage/
+data-loss item gained Scrivener's quantified sync-time figure and a second
+Campfire wifi/save-loss corroboration; the local-model/no-gatekeeper item
+gained Sudowrite's Sept 2 Claude Fable 5.1 addition as continuing evidence
+of cloud-model refusal-patching; the no-training/privacy item gained the
+Bartz claims-portal resolution and a note to deprioritize the weekly
+litigation re-check now that a concrete Nov 15 payment date exists. Edited
+the Notion-parity item's one-line gap list to point at the new promoted
+item instead of duplicating it.
+
+## Round 47 sources
+
+- ilampadmanabhan.medium.com/novelcrafter-review (via search snippet;
+  direct fetch 403'd both times it was consulted this round)
+- toolworthy.ai/tool/novelcrafter
+- dabblewriter.com/docs/getting-started/the-dashboard (official)
+- kindlepreneur.com/dabble-writer
+- github.com/Rainbell129/Obsidian-Homepage
+- vaultorial.com/homepage-dashboard
+- squibler.io/learn/templates/scrivener-templates
+- novelcrafter.com/help/docs/models/thinking-settings (official)
+- novelcrafter.com/help/docs/ai-connections/lm-studio (official)
+- forum.literatureandlatte.com/t/i-cant-find-scrivener-preferences/134622
+- forum.literatureandlatte.com/t/finding-the-correct-setting-in-appearance-editor/140216
+- notion.com/help/boards (official)
+- notion.com/templates/story-bible-continuity-tracker-for-novelists-book-writer (official)
+- medium.com/storyflint/13-ways-to-use-notion-for-writing-your-story
+- storyflint.com/blog/notion-for-writing, /notion-relations
+- jenterpstra.com/complete-novel-template-2-notion
+- medium.com/@lennart.dde/obsidian-cheat-sheet-bases-vs-dataview
+- locul.ai/blog/obsidian-bases-plugin
+- abdulkadersafi.com/blog/dataview-vs-datacore-vs-bases
+- kimaireviews.com/reviews/scrivener-review
+- App Store: Scrivener 3 (id1310686187), reviews "rebeccambp" and "Jeremagi"
+- docs.sudowrite.com/mobile-app-overview, /is-there-a-mobile-app (official)
+- App Store: Sudowrite (id6740884542) reviews
+- scribecount.com/author-resource/writing-tools-for-authors/campfire-write-for-indie-authors
+- App Store: Campfire — Write Your Book (id1626123915)
+- dabble.featureupvote.com/suggestions/539972 (title/snippet only, 403'd)
+- novelcrafter.com/help/docs/codex/the-codex (official)
+- anthropiccopyrightsettlement.com (official)
+- blog.taaonline.net/2026/08 and /2026/09 (Bartz settlement coverage)
+- authorsguild.org/advocacy/artificial-intelligence/what-authors-need-to-know-about-the-anthropic-settlement
+- courtlistener.com/docket/67569326/kadrey-v-meta-platforms-inc
+- status.sudowrite.com (official)
+- feedback.sudowrite.com/changelog (official)
+- novelcrafter.com/changelog (official)
+- dabblewriter.com/blog
+- literatureandlatte.com/blog
+- blog.type.ai
+- play.google.com/store/apps/details?id=com.campfiremobile (Campfire)
+- campfirewriting.com/learn/state-of-the-campfire-2026 (official)
+- inkfluenceai.com, appsumo.com/products/inkfluence-ai
+- Internal: src/ui/{GoalMeter.tsx,GoalsTab.tsx,SettingsModal.tsx,CodexPane.tsx}
