@@ -334,6 +334,46 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       any AI-facing planning feature (this Brainstorm mode included) ships:
       Novella's claim isn't "we also have planning tools," it's "our
       planning tools are the ones the AI actually reads."
+- [ ] **Scope an optional, citation-grounded AI continuity tier above the
+      deterministic one already shipped** — research round 48 (2026-09-17):
+      a new entrant, PlotLens (plotlens.ai), sharpens what "AI continuity
+      checking" can mean beyond pattern-matching. It reads an uploaded
+      manuscript (docx/PDF/Scrivener export) and extracts a structured
+      story bible — characters, locations, timeline events, world rules —
+      with a sentence-level citation attached to every extracted fact, then
+      validates each new chapter against that canon and flags a
+      contradiction inline next to the passage that established it (e.g.
+      "Anna's eyes are described as green; book one chapter four
+      established hazel"), showing both passages side by side rather than a
+      bare warning (plotlens.ai/solutions/story-bible-software). This is a
+      materially different mechanism from our own Continuity inspector
+      (shipped 2026-07-23): that tier is deliberately "provable checks
+      only" — early mention via `introduced:`, near-duplicate codex names,
+      dangling links, unordered chapters, unknown POV — pattern-based
+      checks a human can verify are correct by construction, with no LLM
+      call and no chance of a hallucinated finding. PlotLens's semantic
+      fact-extraction catches a whole class of contradiction the
+      deterministic tier structurally cannot (a trait or fact restated
+      incorrectly in prose, not just a name or link mismatch) — but it
+      necessarily trades the "provably correct" guarantee for an LLM's
+      judgment call, which is exactly why its own citation-back-to-source
+      design matters: every flagged fact traces to the sentence that
+      established it, so a writer can verify the AI's claim in one click
+      rather than trust it blind. Checked our own code: Novella already has
+      the two pieces this needs and neither competitor combines —
+      `src/ai/context.ts`'s existing Codex/scene-context assembly (real
+      entries, not invented ones) and a local model with no per-request
+      cost, so a citation-grounded semantic continuity pass could run for
+      free, locally, and as often as a writer likes, versus PlotLens's own
+      upload-and-wait cloud workflow. Scope this as a clearly-labeled
+      second, optional tier alongside the existing deterministic Continuity
+      inspector — never blended into it or presented with the same
+      certainty — since the whole reason the shipped tier stays
+      trustworthy today is that every finding is mechanically provable; an
+      AI tier needs its own visual language (a citation link back to
+      source, an accept/dismiss action, never an unqualified red flag) so a
+      false positive reads as "the AI thinks," not "Novella found a bug in
+      your book."
 - [ ] **Auto-detect codex mentions in manuscript prose, and let an
       unrecognized name become a Codex entry inline** — research round 41
       (2026-09-03), a deliberate pass at competitor interaction mechanics
@@ -426,6 +466,51 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       trying Novella with their real, in-progress novel versus a blank
       test file, which is exactly the moment the four-app thesis needs to
       win to get a writer in the door at all.
+- [ ] **Multi-manuscript series support — let one project hold several
+      books sharing one codex, matching what our own architecture already
+      promises** — research round 48 (2026-09-17): checked
+      `src/state/projects.ts`'s own header comment first, since it already
+      states the intended design in plain language — "A SERIES is not an
+      exception to that rule. A series is one project containing several
+      manuscripts that share one codex, which is how a series bible
+      actually works." But checked the engine that comment describes:
+      `src/core/vault.ts`'s `inferType()` hardcodes a single `/manuscript/`
+      path substring to classify a note as a chapter — there is no support
+      for more than one manuscript folder inside a project, so the series
+      design the codebase already documents as correct has never been
+      built. This is a genuine gap between stated intent and shipped code,
+      not a hypothetical. A newly-found competitor sharpens the urgency:
+      Novellier (novellier.co.uk), a new local-first novel-writing app
+      whose positioning sits close to Novella's own (core writing suite
+      free forever — vault, chapters, references, an infinite-canvas
+      "Vineyard" board — with AI and cloud sync as optional add-on layers,
+      not requirements), ships exactly this as a named feature,
+      "Scriptorium": switch between novels inside one project, keep
+      characters/locations/plot planning shared across the whole series,
+      outline each book separately (novellier.co.uk/features/
+      scriptorium-multi-novel-projects, official). On the other side,
+      Sudowrite — the market's best-funded incumbent — doesn't have it
+      either: "Series Folders" sits as an open, unshipped item on
+      Sudowrite's own public feedback board
+      (feedback.sudowrite.com/p/series-folders), evidence this is a live,
+      unmet want from paying users of a real competitor, not a speculative
+      feature. A series or shared-universe project is exactly the kind of
+      writer this gap costs the most: today they'd need one Novella
+      project per book with no codex sharing between them, silently
+      re-typing the same character/location/lore entries in each, or
+      splitting off into a second tool (a Notion story-bible template, a
+      spreadsheet) purely to keep the cast consistent across books —
+      precisely the "second app" pattern this research keeps finding, and
+      one the codebase's own architecture comment says shouldn't exist.
+      Scope carefully against the standing local-first/flat guardrail
+      (round 6) and CLAUDE.md's never-rewrite-vault.ts rule: the natural
+      shape is a project subfolder per manuscript (`/manuscripts/book-1/`,
+      `/manuscripts/book-2/`) all reading one shared `/codex/` at the
+      project root, with `PlotGrid`/`Corkboard`/stats scoped to whichever
+      manuscript is open while Codex, backlinks and the relationship graph
+      stay project-wide — a small guarded extension to `inferType()`'s
+      path matching and the manuscript-order fields, not a rewrite of
+      `vault.ts`'s indexing model or a second isolated vault.
 - [ ] **Fix export/publishing formatting to actually satisfy its downstream
       reader, not just produce a file** — research round 45 (2026-09-12): a
       dedicated pass on export/publishing UX, an area never previously
@@ -1056,6 +1141,37 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       rather than all three at once, and keep the standing guardrail from
       round 6 in mind: this is exactly the kind of structure that makes
       Notion feel slow and buried at scale if it isn't kept flat and fast.
+- [ ] **Show a text-snippet preview on each backlink, not just a bare title
+      and count** — research round 48 (2026-09-17): checked our own
+      `InspectorPane.tsx`'s `LinksTab` — `store.vault.backlinksOf(active)`
+      already computes exactly which notes reference the open one and how
+      many times (`Backlink { note, count }` in `vault.ts`), but the panel
+      renders only a note title and a numeral; clicking is the only way to
+      see why a note is listed at all. Obsidian's equivalent, its "Linked
+      Mentions" panel, is the pattern to beat rather than only match: it
+      shows the actual surrounding sentence for every reference inline in
+      the backlinks pane, described in Obsidian's own help docs as letting
+      a user "check the context in which they are referenced"
+      (obsidian.md/help/backlinks, official) — but even that baseline has a
+      long-standing, still-open community complaint about its own
+      limitation: each preview is capped at roughly 20 words, a multi-year
+      feature request for longer previews Obsidian has never shipped
+      (forum.obsidian.md/t/longer-previews-for-backlinks-panel/1716;
+      /t/full-context-view-of-backlinks/47018). NovelCrafter's closest
+      equivalent, the Codex Relations panel, is a manually-authored
+      one-way link list (already logged in round 42's Codex-relations
+      item) rather than an automatically-surfaced in-context reference at
+      all. Novella's own backlinks panel today gives less context than
+      either — zero, versus Obsidian's imperfect-but-real 20-word snippet —
+      despite already storing enough information in the note body to
+      generate one. Cheap, contained fix: extract a short window of plain
+      text around each `[[link]]` occurrence when `backlinksOf()` walks a
+      note's body (the same text `stripWikiLinks()` in `context.ts`
+      already parses for AI context) and render it under the note title,
+      with no fixed word cap — Obsidian's own users are still asking for
+      that after years of not having it, so shipping it uncapped from day
+      one is a real, evidenced improvement over the category's own
+      best-known implementation, not just parity.
 - [ ] **Voice-matching from the writer's own prose, not just style templates**
       — research round 11 (2026-07-28): checked our own Upload style flow
       (`InspectorPane.tsx`) — it imports a .txt/.md file as the literal body
@@ -2165,6 +2281,44 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-09-17 — Research round 48 (autopilot; no code). Housekeeping first:
+  working tree clean at session start; the assigned branch already held
+  rounds 45-47 (three commits ahead of `origin/main`, consistent with the
+  last several rounds landing here before reaching `main`), no repair
+  needed. Rather than re-running the exhausted four-pillar bundle check or
+  the litigation-date tracker (the Bartz thread was explicitly deprioritized
+  to a mid-November check by round 47), this round chased three genuinely
+  unexplored angles: (1) checked our own backlinks implementation
+  (`InspectorPane.tsx`'s `LinksTab`, `vault.ts`'s `backlinksOf()`) against
+  Obsidian's Linked Mentions pattern and found Novella shows a bare
+  title+count where Obsidian shows an in-context text snippet (itself
+  still capped at ~20 words after a multi-year open feature request) —
+  Novella's panel gives less context than the category's own
+  imperfect baseline despite already having the data to do better. (2) A
+  new local-first competitor, Novellier, surfaced for the first time in
+  this cadence with a named "Scriptorium" feature — multiple novels in one
+  project sharing a codex — which led to checking our own
+  `src/state/projects.ts` and `vault.ts` directly: the project-level
+  comment already states the series design in plain language ("a series is
+  one project containing several manuscripts that share one codex"), but
+  `inferType()` only recognizes a single hardcoded `/manuscript/` path —
+  the architecture documents an intent it has never built. Sudowrite's own
+  open "Series Folders" feature-request confirms this is unmet demand from
+  a funded competitor's paying users too, not a speculative want. Added as
+  a new, fairly high-priority item scoped as a small guarded extension
+  (subfolder-per-manuscript, one shared project-root codex), never a
+  vault.ts rewrite. (3) A new AI-continuity competitor, PlotLens, extracts
+  a citation-grounded story bible from an existing manuscript and flags
+  semantic contradictions (a restated trait, not just a name/link
+  mismatch) with a click-to-verify source citation — a materially
+  different mechanism from our own deterministic-only Continuity
+  inspector. Logged as a scoping item for an optional second AI tier built
+  on the existing `context.ts` pipeline, explicit that it must never be
+  presented with the same certainty as the provable checks already
+  shipped. Three new items, each checked against our own code before being
+  written up, no duplicates of existing entries. Full notes and source
+  list in RESEARCH.md Round 48.
 
 - 2026-09-16 — Research round 47 (autopilot; no code). Housekeeping first:
   working tree clean at session start; local branch was already even with

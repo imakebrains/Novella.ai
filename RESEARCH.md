@@ -7450,3 +7450,215 @@ item instead of duplicating it.
 - campfirewriting.com/learn/state-of-the-campfire-2026 (official)
 - inkfluenceai.com, appsumo.com/products/inkfluence-ai
 - Internal: src/ui/{GoalMeter.tsx,GoalsTab.tsx,SettingsModal.tsx,CodexPane.tsx}
+
+# Round 48 (2026-09-17) — a series-support gap in our own architecture, a citation-grounded AI-continuity competitor, and backlinks with no context
+
+Housekeeping first: working tree was clean at session start; the assigned
+branch already held rounds 45-47 (three commits ahead of `origin/main`,
+consistent with the last several rounds landing on this branch before
+reaching `main` — verified via `git log origin/main..HEAD` before doing
+anything else), no repair needed. Given 47 prior rounds, the "avoid
+research loops" rule pointed away from re-running the four-pillar bundle
+check (last run round 47, explicitly a 27th identical negative result
+territory) or the litigation-date tracker (round 47 already deprioritized
+the Bartz/Kadrey thread to a mid-November check, its next payment
+milestone). Instead this round picked three angles genuinely new to the
+cadence: our own backlinks implementation checked directly against
+Obsidian's equivalent pattern; a newly-surfaced local-first competitor
+(Novellier) checked against our own project/vault architecture; and a
+newly-surfaced AI-continuity competitor (PlotLens) checked against our own
+already-shipped Continuity inspector. All three findings are grounded in
+reading our own source first, then comparing against primary competitor
+sources — not competitor claims taken at face value.
+
+## Finding 1 — Backlinks show a bare count where the category's own best-known implementation shows in-context text, and Novella currently does neither
+
+**Observed (our own code, checked directly).** `InspectorPane.tsx`'s
+`LinksTab` calls `store.vault.backlinksOf(active)`, which already returns
+exactly which notes reference the open one and how many times each
+(`export interface Backlink { note: Note; count: number; }` in
+`src/core/vault.ts`). The rendered row is `type-dot` + `note.title` + an
+optional numeral — no excerpt of the referencing text anywhere, so the
+only way to learn *why* a note is listed is to open it and search the body
+by eye.
+
+**Official capability, the pattern to beat.** Obsidian's own help docs
+describe "Linked Mentions" as showing "the relevant sections of each note
+... in a preview, [so] you can check the context in which they are
+referenced" (obsidian.md/help/backlinks) — every reference renders with
+its surrounding sentence inline in the same panel, no click required.
+
+**Recurring complaint, not a solved problem even there.** Obsidian's own
+community has an open, multi-year feature request for longer previews:
+each snippet is capped at roughly 20 words by default, with a
+still-unresolved forum thread asking for more (forum.obsidian.md/t/
+longer-previews-for-backlinks-panel/1716) and a second thread specifically
+requesting "full context" rather than a truncated snippet
+(forum.obsidian.md/t/full-context-view-of-backlinks/47018). A `Page
+preview` plugin exists as a manual workaround for seeing more, which is
+itself evidence the built-in cap is a real, felt limitation rather than a
+deliberate design choice nobody minds.
+
+**Competitor comparison.** NovelCrafter's closest equivalent, the Codex
+Relations panel (`novelcrafter.com/help/docs/codex/codex-relations`,
+official), is a manually-authored, one-way link list a writer builds by
+hand — already logged in round 42's Codex-relations item — not an
+automatically-surfaced in-context reference at all. It doesn't compete on
+this axis; Obsidian is the only real precedent found.
+
+**Inference.** Novella's panel currently gives *less* information than
+Obsidian's imperfect 20-word-capped baseline — zero context versus some —
+despite the vault already parsing note bodies closely enough
+(`stripWikiLinks()` in `src/ai/context.ts`) to generate a snippet cheaply.
+Shipping an uncapped preview would not just match Obsidian's pattern but
+beat its own most-requested, longest-unaddressed limitation. Filed as a
+new roadmap item, placed near the other Codex/notes-surface items (round
+42's relations field, round 47's multi-view blocks) since it touches the
+same reading surface.
+
+## Finding 2 — Novella's own architecture comment describes series support the vault engine has never built, and a new local-first competitor already ships it
+
+**Observed (our own code, checked directly, the headline finding this
+round).** `src/state/projects.ts` opens with an unusually explicit design
+comment: "A SERIES is not an exception to that rule. A series is one
+project containing several manuscripts that share one codex, which is how
+a series bible actually works." This reads as settled architecture, not a
+maybe. But `src/core/vault.ts`'s `inferType()` — the function that decides
+what kind of note a file is — hardcodes exactly one path check,
+`p.includes("/manuscript/")`, to classify anything under it as a chapter.
+There is no second manuscript root, no book-scoping of any kind. The
+comment describes an intent the code has never delivered on. This is the
+sharpest kind of finding this research method can produce: not "a
+competitor has X," but "our own codebase already told us the right answer
+and didn't build it."
+
+**Observed capability, a new entrant (official).** Novellier
+(novellier.co.uk), not previously logged in this research cadence, ships a
+named feature, Scriptorium, doing exactly what the comment above
+describes: "built for writers managing more than one book in the same
+project. You can switch between novels, keep shared references across the
+series, and outline each book separately"
+(novellier.co.uk/features/scriptorium-multi-novel-projects, official).
+Checked Novellier's broader positioning since it reads unusually close to
+Novella's own: "local-first novel writing software for drafting, planning,
+worldbuilding, revision, formatting, and optional AI assistance ... Cloud
+sync and AI assistance are optional layers, not requirements," core suite
+(vault, chapters, references, an infinite-canvas "Vineyard" board) "free
+and always will be," AI on a separate credit system, Windows/macOS now,
+Linux "coming soon." Its AI is credit-metered rather than a genuinely free
+local model, so it does not match Novella's zero-cost/zero-account AI
+story — but its core writing/planning/worldbuilding suite is free, local
+and already ships the multi-book architecture Novella's own comments
+aspire to. Worth a name-check on the standing four-pillar watch list even
+though this round didn't re-run that full compound check: no task tracker
+or focus/sprint timer surfaced in its feature list, so it would land at
+three-of-four if checked, same shape as the many prior near-misses.
+
+**Feature request, unmet even at the funded incumbent (evidence the gap
+is real demand, not a niche want).** Sudowrite — the best-funded product
+in this whole competitive set — has an open, unshipped "Series Folders"
+item on its own public feedback board (feedback.sudowrite.com/p/
+series-folders). A funded competitor's own paying users are asking for
+this and haven't gotten it either, which is stronger evidence of real
+demand than a single feature-request thread usually carries on its own.
+
+**Inference and scope.** A series or shared-universe writer — a large
+share of genre fiction (romance, fantasy, mystery series) — is exactly
+who this gap costs most: without it, a Novella user writing a trilogy
+either keeps three separate Novella projects with the codex re-typed in
+each (silently risking exactly the "update two, forget the third"
+inconsistency round 42's Codex-relations research already named as the
+generic-tool failure mode), or reaches for a second tool (a Notion series
+bible, a spreadsheet) purely to keep the shared cast/world consistent
+across books — the same "second app" pattern this research keeps
+independently rediscovering, this time inside Novella's own gap rather
+than a competitor's. Filed as a new, fairly high-priority roadmap item,
+scoped explicitly against CLAUDE.md's "never rewrite vault.ts" rule: a
+manuscript-subfolder-per-book layout under one shared project-root codex
+is a bounded extension to `inferType()`'s path matching, not a rewrite of
+the vault engine or a second isolated vault per book.
+
+## Finding 3 — a citation-grounded semantic continuity checker exists now, and it's a different mechanism from ours, not a better version of the same one
+
+**Observed capability, a new entrant (official).** PlotLens (plotlens.ai)
+reads an uploaded manuscript (docx, PDF, or a Scrivener export) and
+"automatically extracts every character, location, timeline event, and
+world rule into structured, searchable entity cards," with "a citation
+attached to the sentence that established every fact" — "no paraphrased
+AI summaries you have to trust... the proof is one click away"
+(plotlens.ai/solutions/story-bible-software, official). As new chapters
+are drafted (in Word, Google Docs, or Scrivener — PlotLens sits alongside
+the writer's actual tool rather than replacing it), it "highlights
+inconsistencies inline... with citations pointing to where the original
+fact was established," the worked example given being a restated physical
+trait ("Anna's eyes are described as green; book one chapter four
+established hazel"), with both the new and original passages shown side
+by side. Pricing has a free tier, no card required; the manuscript is
+described as staying private to the platform (plotlens.ai), though this
+is a cloud upload-and-process product, not a local one — a genuine
+architectural difference from Novella worth stating precisely rather than
+glossing over.
+
+**Comparison against our own shipped feature (checked directly).**
+Novella's Continuity inspector (shipped 2026-07-23) is deliberately
+"provable checks only": early mention via `introduced:` frontmatter,
+near-duplicate codex names, dangling wiki-links with counts, unordered
+chapters, unknown POV. Every one of those is a mechanical pattern match a
+human can verify is correct by inspecting the rule, with zero LLM
+involvement and therefore zero chance of a hallucinated finding. PlotLens
+solves a different, harder problem: catching a fact *restated
+incorrectly* in prose (a trait, a date, a relationship) rather than a
+name, link, or ordering mismatch — something no pattern-matching rule can
+catch, because the contradiction lives in the meaning of two sentences,
+not their surface form.
+
+**Inference, evidence type explicitly separated.** This is not "PlotLens
+does our Continuity inspector better" (a false comparison — the two solve
+different problems) but "a materially more powerful *class* of continuity
+check now exists commercially, built on exactly the kind of grounded
+context-assembly Novella already has for other AI features." Novella's
+own `src/ai/context.ts` already assembles real Codex/scene context per
+generation (the same pipeline the already-queued Brainstorm-mode item
+leans on), and a local model has no per-request cost — so a
+citation-grounded semantic pass could, in principle, run locally, for
+free, on every save, instead of PlotLens's upload-and-wait cloud
+workflow. The caution matters as much as the opportunity: an AI-based tier
+must never be visually blended with the deterministic one, precisely
+because the deterministic tier's whole value today is that a user can
+trust it completely. Filed as a new roadmap item explicitly framed as a
+second, optional, clearly-labeled tier — a citation/source-link UI
+pattern borrowed directly from PlotLens's own side-by-side design — not a
+replacement or an upgrade to the existing inspector.
+
+## What didn't get re-checked this round, and why
+
+Per the "avoid research loops" rule and round 47's own explicit
+deprioritization: the four-pillar local-AI-plus-task-tracker-plus-timer
+bundle check (26+ prior identical-result reruns) and the Bartz/Kadrey
+litigation date tracker (round 47 resolved the Bartz portal question and
+pushed the next useful check to mid-November, around the Nov 15 payment
+target) were both skipped by design, not by oversight. The SKILLS.md
+scouting standing pass was also not run this round, matching round 47's
+choice to skip it — two rounds running now; worth picking back up next
+round if it stays skipped a third time.
+
+## Round 48 sources
+
+- src/state/projects.ts, src/core/vault.ts, src/ui/InspectorPane.tsx,
+  src/ai/context.ts (internal, read directly)
+- obsidian.md/help/backlinks (official)
+- forum.obsidian.md/t/longer-previews-for-backlinks-panel/1716
+- forum.obsidian.md/t/full-context-view-of-backlinks/47018
+- forum.obsidian.md/t/show-more-context-on-backlinks-and-search-panes/1065
+- novelcrafter.com/help/docs/codex/codex-relations (official)
+- novellier.co.uk, novellier.co.uk/features/scriptorium-multi-novel-projects,
+  /features/vineyard-infinite-canvas, /features/manuscript-editor (official)
+- feedback.sudowrite.com/p/series-folders (official)
+- plotlens.ai, plotlens.ai/solutions/story-bible-software,
+  /compare/novelcrafter, /alternatives/novelium (official)
+- feedback.sudowrite.com/changelog, /changelog/new-ai-model-gpt-6-astra,
+  /changelog/new-ai-model-claude-fable-51 (official, checked but folded as
+  reinforcement only — not cited as a standalone finding this round)
+- docs.sudowrite.com/using-sudowrite/.../chapter-continuity (official,
+  dated 2025-05-01 — checked to confirm it predates this cadence rather
+  than being new; not logged as a fresh finding)
