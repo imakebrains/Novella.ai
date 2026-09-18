@@ -184,6 +184,35 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       this is a presentation pass over them, and it is taste, so it wants
       the owner in the room.
 
+      Research round 48 (2026-09-18) adds a year's worth of evidence that the
+      failure mode this item targets is real, not hypothetical. NovelCrafter's
+      "dashboard-first, tutorial-as-optional-overlay" first-run is
+      independently called overwhelming by three separate 2025-2026 reviewers
+      — "buttons everywhere, panels I didn't understand, terminology I hadn't
+      encountered... no obvious 'start here' path" (medium.com/
+      @ilampadmanabhan/novelcrafter-review, April 2026); "the technical setup
+      and steep learning curve can feel overwhelming for beginners... they
+      felt like they had to be AI gurus to get started" (dreamgen.com/blog/
+      articles/novelcrafter-review, April 2026); echoed by
+      marketingtoolpro.com's own 2025 review — the same complaint recurring
+      across a year, not a one-off. Dabble is the clean counter-example
+      proving the bar competitors clear is low: reviewers praise its
+      two-click onboarding ("you open the app and you're writing in no
+      time," reedsy.com/studio/resources/dabble-writing-review), but it does
+      not personalize from the answers it does collect — its genre question
+      doesn't auto-apply a template or theme (help.dabblewriter.com/en/
+      articles/9585026-all-things-templates). Across NovelCrafter, Dabble,
+      Scrivener (whose own template picker is separately documented as "the
+      step that causes the most anxiety in new... users,"
+      scrivenerclasses.com), Campfire, and Notion's story-bible templates,
+      none combine fast time-to-value with visible per-answer personalization
+      — the specific combination this item targets is confirmed unclaimed
+      market-wide, not just unbuilt here. One caveat: Lingrow's own
+      onboarding-screen sequence could not be re-verified this round (search
+      surfaced only its general feature marketing) — re-confirm the reference
+      directly before citing it as prior art when this item is finally
+      scoped.
+
 - [x] **Slash commands in the editor** — shipped 2026-07-22.
 - [x] **Writing sprints (the fourth app)** — shipped 2026-07-23.
 - [x] **Ctrl+K everywhere** — shipped 2026-07-23.
@@ -392,6 +421,16 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       rather than a hardcoded exclusion list, since a writer may
       reasonably want some custom fields in AI context (a character's
       speech quirks) and others (a private note-to-self) never sent.
+      Research round 48 (2026-09-18) checked three more worldbuilding tools
+      (World Anvil, LegendKeeper, Fantasia Archive) for anything resembling
+      this per-field AI-visibility control and found nothing — none of the
+      three distinguish AI-facing fields from human-facing ones at all
+      (unsurprising, since none of them ship a bundled AI). NovelCrafter's
+      Always Include/Never/NSFW-only setting remains the only instance of
+      this control found anywhere in the competitive set researched to
+      date, across two dedicated rounds now — this sharpens rather than
+      dilutes the case for building it: a genuine, unclaimed differentiator
+      for a local-AI codex specifically, not a catch-up feature.
 - [ ] **A deliberate manuscript import flow — .docx/Markdown in, with a
       preview before anything touches the vault** — research round 42
       (2026-09-04): a dedicated pass on the "switching from another tool"
@@ -700,6 +739,21 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       does Novella want to serve the actively-querying-for-an-agent
       writer, or stop at the manuscript stage? Owner call before this goes
       anywhere.
+      Research round 48 (2026-09-18) adds independent, dated corroboration
+      this is a well-documented job, not a niche one: ScribeCount's July
+      2026 author-resource guide (scribecount.com/author-resource/
+      writing-tools-for-authors/organization-tools) names query/submission
+      tracking as one tier of an explicit three-tool author stack, and Jane
+      Friedman — a leading professional-author resource — runs her own
+      dedicated system for tracking submissions, entirely separate from any
+      drafting tool (janefriedman.com/how-to-take-the-sting-out-of-
+      query-rejections). Multiple paid Notion Marketplace templates ("Query
+      Letter Tracker," "Query HQ," "Manuscript Submissions Tracker") exist
+      purely to fill this one job. This doesn't resolve the scope question
+      — it is still a step past drafting into the querying stage — but it
+      raises confidence that if Novella ever answers the owner call yes,
+      the shape to build is a named submission → market/agent → status →
+      response-time tracker, not a generic to-do repurposed for it.
 - [ ] **Ctrl+K should search manuscript body text, codex entries and notes
       — not just titles** — research round 43 (2026-09-05): checked our
       own `src/ui/palette.ts`/`CommandPalette.tsx` — the palette today
@@ -895,6 +949,51 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       differentiator that survives is local/private/no-per-token-cost, not
       "an AI that knows your book," so lead any future copy or design for
       this half of the item with that framing rather than parity alone.
+      Research round 48 (2026-09-18) closes the retrieval-design gap this
+      round-13 note left unscoped, with a concrete technical precedent
+      rather than a hunch. Checked NovelCrafter's own actual mechanism
+      (novelcrafter.com/features/codex, official) — it is curated
+      Codex-injection with a per-entry Always Include/Only-when-detected/
+      Never toggle, not automatic whole-book retrieval, and NovelCrafter's
+      own docs warn that "making every codex entry visible to the AI at all
+      times can quickly add up in terms of the context window and costs"
+      (novelcrafter.com/blog/may-2025-new-prompting-system-update,
+      official) — the same manual/curated trade-off `context.ts` already
+      encodes, now confirmed as the pragmatic industry norm even for a
+      competitor with a far bigger context budget, not a constraint unique
+      to a local 8B model. Sudowrite's Chapter Continuity feature is the
+      honest-disclosure precedent worth copying directly: it reads "up to
+      20,000 words of preceding text across up to 25 linked chapter
+      documents... your actual prose, not summaries" and caps Story Bible
+      entries at "2,000 characters" — an exact, published number, not a
+      vague "AI-aware" claim (sudowrite.com/blog/how-to-avoid-plot-holes-
+      sudowrites-chapter-continuity-feature-explained; docs.sudowrite.com/
+      using-sudowrite/1ow1qkGqof9rtcyGnrWUBS/what-is-story-bible, both
+      official). When a real whole-manuscript retrieval mode is eventually
+      scoped, Anthropic's own published Contextual Retrieval technique is
+      the concrete pattern to start from: prepend a short, once-generated,
+      cached context stamp to each chunk before embedding/indexing it (for
+      a novel: chapter, POV, and scene-position — the disambiguating signal
+      raw prose alone doesn't carry for pronouns like "the ring" or "her
+      sister") rather than embedding raw chunks — measured to cut top-20
+      retrieval failure 49% (67% with reranking) over embeddings alone
+      (anthropic.com/engineering/contextual-retrieval, official). A separate
+      2025 NAACL Findings result, cited via a 2026 chunking-strategy
+      write-up, found fixed-size (~200-word) chunking matches or beats
+      semantic chunking on retrieval/generation quality despite semantic
+      chunking's 5-15x higher ingest cost (firecrawl.dev/blog/
+      best-chunking-strategies-rag) — worth defaulting to for a local-model
+      target where ingest speed on the writer's own machine matters. No
+      open-source project doing scene/chapter-level RAG for fiction
+      specifically was found; Novella would be building close to the
+      frontier here, not copying a known pattern. Separately and cheaply
+      actionable now, before any retrieval system exists: Novella's Chat
+      panel never tells the writer what the AI actually sees. Sudowrite's
+      exact-number disclosure is the template — a one-line, plain-language
+      "the AI sees: the last ~6,000 characters of this scene, [N] referenced
+      Codex entries, and other chapters by title only" surfaced in the Chat
+      panel itself would make the existing curated design legible instead
+      of an implicit black box, at essentially the cost of a UI string.
       Research round 41 (2026-09-03) sharpens the scene-status-labels
       sub-item specifically: independent author-workflow sources (a
       published revision-tracking spreadsheet by Dax Murray; Lara
@@ -987,6 +1086,57 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       not just that per-type templates should exist. When this sub-item is
       built, keep fields optional and collapsible with a light empty
       state, not a full form every new entry is pressured to fill in.
+      Research round 48 (2026-09-18), a dedicated pass on worldbuilding
+      tools outside this survey's usual three (World Anvil, LegendKeeper,
+      Fantasia Archive), finds the same failure mode a third time,
+      independently: a May 2026 blog post states plainly that World
+      Anvil's "article templates feel like blank homework assignments"
+      (minvarpg.com/blogs/ttrpg/world-anvil-alternatives) — Campfire,
+      Plottr, and now World Anvil, three unrelated products, independently
+      produce the same procrastination-inducing empty-form complaint.
+      Dated Trustpilot reviews (Feb-Jun 2026, trustpilot.com/review/
+      worldanvil.com) corroborate Reedsy's "clunky/confusing" read on World
+      Anvil's UI at the whole-product level, not just its maps,
+      reinforcing rather than replacing this caution. Checked all three
+      tools for typed custom fields (dropdown/date/relation-type, the kind
+      NovelCrafter's Details fields carry) and found none — World Anvil,
+      LegendKeeper, and Fantasia Archive all implement templates as
+      structural page layouts around freeform text, the same shape
+      Novella's own Details fields already use; Novella isn't behind the
+      field-typing curve of this market. The real gap stays exactly where
+      round 42 placed it — the per-field AI-visibility setting is still
+      unique to NovelCrafter (see the auto-detect-mentions item above) and
+      remains the sharper, still-unclaimed thing to build. Also worth
+      carrying forward once any per-type template ships: World Anvil's
+      free tier retroactively cut its article cap (100+ down to ~42),
+      locking writers out of editing content they had already written
+      under the old limit (Ryan Lang, Oct 4 2025, Trustpilot) — a concrete,
+      dated instance of the exact cloud-lock-in risk Novella's local-first,
+      plain-file architecture is structurally immune to; worth a line in
+      comparison copy alongside round 6's standing "keep leaving easy"
+      guardrail.
+
+      A separate finding from this round's dated-news/second-app pass
+      sharpens the task-board sub-item above: ScribeCount's own
+      author-resource guide (dated 2026-07-03) names an explicit three-tool
+      author stack — writing app, task manager (Todoist/Trello), and a
+      business-OS layer — with the task-manager tier covering "draft
+      deadlines, editing milestones, cover art requests, publishing
+      platform upload dates, newsletter schedules, and marketing campaign
+      tasks" (scribecount.com/author-resource/writing-tools-for-authors/
+      organization-tools). Query-tracking specifically is significant
+      enough a job that it supports a whole dedicated third-party product
+      (QueryTracker) plus several paid Notion templates sold independently
+      of any drafting tool (janefriedman.com; multiple Notion Marketplace
+      listings) — evidence that generic to-dos won't absorb this job, only
+      named task categories will. The volume of separately-sold SKUs
+      (query tracker, beta-reader/ARC tracker, launch checklist,
+      cover-design checklist) argues Novella's task board, whenever built,
+      should let a task carry an optional category tag (query, beta-reader,
+      cover/launch) rather than staying purely freeform — a small,
+      CLOUD-OK addition distinct from the full submission-tracker scope
+      question flagged separately below, and cheap to build once the task
+      board itself is picked up.
 - [ ] **Structured relations between Codex entries, not just prose fields
       and tags** — research round 42 (2026-09-04): the strongest
       cross-platform pattern this round wasn't a single competitor
@@ -1463,6 +1613,18 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       first-run and marketing copy don't say competitors need a bolt-on
       app for the identical job. Cheap copy win, groups with the other
       "say X louder" items below.
+      Research round 48 (2026-09-18) checked two more worldbuilding tools
+      and found the same manual-relationship pattern again: World Anvil's
+      "Diplomacy Webs" and LegendKeeper's relationship canvas both require
+      the writer to hand-draw every connection on a whiteboard-style
+      surface (legendkeeper.com/world-anvil-alternative; dungeongoblin.com/
+      blog/legendkeeper2021review, dated Jul 2021) — neither derives
+      relationships automatically from links already in the text the way
+      Novella's RelationshipWeb does from existing wiki-links. Five
+      competitors now checked (NovelCrafter, Campfire, Scrivener, World
+      Anvil, LegendKeeper), zero with automatic derivation — confident
+      enough evidence to state this plainly in comparison copy rather than
+      hedge it.
 - [ ] **Say the AI-quality advantage louder against Dabble specifically** —
       research round 15 (2026-08-01): multiple 2026 reviews (Reedsy,
       WriteABookAI, Knowara) confirm Dabble ships zero generative AI — its
@@ -2165,6 +2327,39 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-09-18 — Research round 48 (autopilot; no code). Housekeeping first:
+  working tree clean at session start; local branch was already even with
+  `origin/main` at round 47's commit, no fast-forward needed. Dispatched
+  three parallel passes at genuinely unexamined ground given 47 prior
+  rounds: (1) worldbuilding tools outside the usual rotation — World
+  Anvil, LegendKeeper, Fantasia Archive — to sharpen the still-open
+  codex-entry-templates-per-type sub-item; (2) onboarding design across
+  every major competitor plus a technical dig into how "manuscript-aware
+  AI" tools actually handle long-document context, closing round 13's
+  unscoped retrieval-design question; (3) a dated-news sweep for Sept
+  16-18 plus a first dedicated look at the task-manager/calendar "second
+  app" pairing. No new top-level items added — every finding reinforced
+  an existing item instead, which the research-quality rule treats as a
+  success. Strongest findings: World Anvil independently reproduces the
+  "template = homework" failure Campfire and Plottr already showed (a
+  third product, same pattern), and its free tier retroactively cut its
+  article cap — a concrete lock-in data point; NovelCrafter's Codex and
+  Sudowrite's Chapter Continuity both turn out to be curated injection
+  with a disclosed/adjustable cap rather than true whole-book retrieval,
+  which corroborates Novella's own `context.ts` design and supplies
+  Anthropic's own published Contextual Retrieval technique as the concrete
+  pattern for a future real retrieval mode, plus a cheap, separately-
+  actionable idea (a plain "what the AI sees" disclosure in the Chat
+  panel); NovelCrafter's dashboard-first onboarding is now confirmed
+  overwhelming by three independent reviews across a year, sharpening the
+  case for the parked conversational-onboarding item; and query-tracking
+  gained independent corroboration (a July 2026 industry guide naming an
+  explicit three-tool author stack) that it's a real, well-documented job,
+  plus a task-category idea for the existing task-board sub-item. Did not
+  re-run the four-pillar bundle check (28th time would add nothing) or the
+  SKILLS.md scouting pass this round. Full notes and source lists in
+  RESEARCH.md Round 48.
 
 - 2026-09-16 — Research round 47 (autopilot; no code). Housekeeping first:
   working tree clean at session start; local branch was already even with

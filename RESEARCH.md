@@ -7450,3 +7450,381 @@ item instead of duplicating it.
 - campfirewriting.com/learn/state-of-the-campfire-2026 (official)
 - inkfluenceai.com, appsumo.com/products/inkfluence-ai
 - Internal: src/ui/{GoalMeter.tsx,GoalsTab.tsx,SettingsModal.tsx,CodexPane.tsx}
+
+# Round 48 (2026-09-18) — World Anvil's "blank homework" pattern confirmed, a concrete RAG pattern for chat-with-your-book, and query-tracking's dedicated-product evidence
+
+Housekeeping first: working tree was clean at session start; local branch
+(`claude/exciting-cerf-umfcjc`) was already even with `origin/main` at round
+47's commit (2026-09-16), no fast-forward needed. Three parallel passes,
+each aimed at genuinely unexamined ground given 47 prior rounds: (1)
+worldbuilding tools that sit outside the usual Campfire/NovelCrafter/
+Scrivener/Dabble rotation — World Anvil, LegendKeeper, Fantasia Archive —
+specifically to sharpen the still-open "codex entry templates per type"
+sub-item; (2) onboarding design across every major competitor plus a
+dedicated technical dig into how "manuscript-aware AI" tools actually
+handle long-document context, closing the retrieval-design question round
+13 left unscoped; (3) a dated-news housekeeping sweep for the Sept 16-18
+window plus a first dedicated look at the task-manager/calendar "second
+app" pairing specifically (distinct from the already-covered Aeon
+Timeline/Google Docs/Pomodoro pairings). Did not re-run the four-pillar
+bundle check (would be a 28th identical negative result) or the SKILLS.md
+scouting standing pass this round.
+
+## Pass 1 — World Anvil, LegendKeeper, Fantasia Archive: the codex-template gap, sharpened
+
+**Method note:** Reddit was fully egress-blocked for this pass (every
+direct fetch to reddit.com/old.reddit.com failed outright); World Anvil's
+own site 403'd on every direct WebFetch attempt, so its capability claims
+below rest on WebSearch snippets unless marked "direct fetch." Trustpilot,
+LegendKeeper's own pages, and the independent blogs below all fetched
+cleanly.
+
+**Finding (recurring complaint, three independent products now): the
+"template = homework" abandonment pattern is not confined to Campfire and
+Plottr — World Anvil produces it too.** A May 5, 2026 blog post states
+plainly that "article templates feel like blank homework assignments,"
+naming this alongside BBCode formatting overhead as why Dungeon Masters
+quit before running a session (minvarpg.com/blogs/ttrpg/world-anvil-
+alternatives, direct fetch). This is the first time this exact failure
+mode has been traced to World Anvil specifically rather than only
+Campfire's attribute panels (round 42) and Plottr's beat-sheet templates
+(round 43) — three unrelated products, independently arriving at the same
+complaint, is stronger evidence than any one of them alone. Extends,
+rather than replaces, round 42's existing caution on the still-open "codex
+entry templates per type" sub-item: any per-type template Novella ships
+must stay optional, collapsible, and light on empty state, never a form a
+new entry is pressured to fill in.
+
+**Finding (recurring complaint, dated, direct-fetch, high confidence):
+World Anvil's "clunky/confusing" reputation, already on file from Reedsy's
+review of its maps, reaches the whole product including its article/
+template layer.** Dated Trustpilot reviews corroborate this directly:
+"overcomplicated, overwhelming," with switching between the old and new
+editors "constantly break[ing] formatting" (Lucifer __oO, Feb 2, 2026, 1★);
+"a nightmare to navigate" (Drew Martin, Apr 17, 2026, 1★, canceled within
+three weeks); usability "flaws... especially for in-person games" (Thomas
+Paterson, Oct 25, 2025, 2★) — all trustpilot.com/review/worldanvil.com,
+direct fetch. Updates the existing Reedsy-sourced finding from "clunky
+maps" to "clunky product, including the Codex layer this sub-item is
+about."
+
+**Finding (dated, direct-fetch): World Anvil retroactively cut its free
+tier's article cap** from 100+ down to roughly 42, locking users out of
+editing content they had already written under the old limit (Ryan Lang,
+Oct 4, 2025, 1★, Trustpilot). A concrete, dated instance of the exact
+cloud-vendor lock-in risk Novella's local-first, plain-Markdown
+architecture is structurally immune to by construction — worth citing
+directly in any future lock-in/portability comparison copy, alongside
+round 6's standing "keep leaving easy" guardrail.
+
+**Finding (mixed reviewer opinion/official capability): LegendKeeper's
+"cleaner than World Anvil" pitch is real but is a speed/focus win, not a
+richer-fields win — and its relationship modeling is still manual.**
+LegendKeeper's own comparison page and docs describe templates as saved
+page layouts a GM designs once and applies at creation time
+(legendkeeper.com/world-anvil-alternative, direct fetch) — the same
+structural-template model as World Anvil, no typed (dropdown/date/
+relation) fields found in either. Relationships are handled via `@mention`
+wiki-links plus a manual whiteboard/node canvas the user has to draw
+connections on by hand (dungeongoblin.com/blog/legendkeeper2021review,
+dated Jul 6, 2021, direct fetch: "damn, this app is that good," but also
+missing icons and an initially-absent search). A lower-confidence
+search-only source describes some users calling LegendKeeper itself
+"clunky and unintuitive" for linking/formatting — "simpler than World
+Anvil" is relative, not an unqualified win. It is also cloud-subscription
+only ($9/mo or $90/yr, 14-day trial) with edits caching offline and
+syncing on reconnect rather than a true offline mode, so it doesn't fully
+clear Novella's local-first bar either, though its own pricing page does
+contractually commit to full HTML/JSON export "so you can leave...
+regardless of your subscription status" (legendkeeper.com/pricing) — a
+lock-in guardrail worth naming as a *partial* good example even from a
+cloud competitor.
+
+**Finding (observed user behavior, single well-documented account):
+Fantasia Archive is the closest structural analog to Novella's own
+local-first approach, and its real trade-offs are a live warning shape.**
+Free, open-source (GPL-3.0), fully offline, "dozens of predefined document
+types" each with typed fields and genuine two-way relationships across
+post-types (github.com/vishiri/fantasia-archive; alternativeto.net). A
+detailed dated review (Koen Martens, Apr 25, 2021, direct fetch) praises
+the relation system as "well thought through and quite intuitive" but
+flags: Electron and "quite hungry for resources," no native image/table
+support without hand-written HTML, and save/load as project export/import
+rather than continuous autosave — bad enough that the reviewer refused to
+draft actual prose in it, using LibreOffice Writer instead. The caution for
+Novella: a heavier structured schema-per-type, if built via bolt-on tooling
+rather than made additive to `vault.ts`'s existing fast, plain-Markdown
+autosave, is exactly the kind of feature that degrades the core writing
+experience it's meant to feed. Any future per-type template system must
+extend the existing engine, never fork a parallel project-file model the
+way Fantasia Archive's does.
+
+**Finding, cross-cutting: none of the three tools has typed custom fields
+either.** World Anvil, LegendKeeper, and Fantasia Archive (aside from its
+own typed post-fields, which are structural, not the dropdown/date/
+relation type NovelCrafter's Details fields carry) all implement custom
+data as freeform text inside structural templates — Novella's own
+freeform Details fields are not behind this competitor set on
+field-typing. The real, still-unclaimed gap remains exactly where round 42
+placed it: NovelCrafter's per-field AI-visibility setting (Always Include/
+Never/NSFW-only) has no match anywhere in the worldbuilding-tool market
+checked to date across two dedicated rounds now.
+
+**Not actioned, flagged for a future round:** "Grimoire" (ttrpg.bot), a
+newer AI-native TTRPG campaign tool, surfaced repeatedly in comparison
+searches with typed relationship edges and an MCP server for AI clients to
+query the graph directly — a TTRPG tool, not a novelist's story bible, so
+out of scope this round, but the one tool found with both typed relations
+and graph-native AI access. Worth a dedicated look if Novella wants a
+forward-looking rather than backward-looking worldbuilding-tool comparison
+set.
+
+## Pass 2 — Onboarding across every major competitor, and a technical answer to round 13's unscoped retrieval question
+
+**Finding (recurring complaint, three independent 2025-2026 reviews,
+strongest evidence of the round): "dashboard-first, tutorial-as-optional-
+overlay" reliably produces an overwhelmed first hour, and NovelCrafter is
+the repeated example.** "Buttons everywhere, panels I didn't understand,
+terminology I hadn't encountered... no obvious 'start here' path... the
+first hour is rough" (medium.com/@ilampadmanabhan/novelcrafter-review,
+April 2026); "the technical setup and steep learning curve can feel
+overwhelming for beginners... they felt like they had to be AI gurus to
+get started, and this led to them leaving the platform"
+(dreamgen.com/blog/articles/novelcrafter-review, April 18, 2026); a third,
+independent 2025 review (marketingtoolpro.com/novelcrafter-review) echoes
+the same read. NovelCrafter's actual mechanism is a checklist-style "First
+Steps Tutorial" overlay bolted onto the full-power dashboard
+(novelcrafter.com/help/getting-started/quick-start/first-steps-tutorial,
+official) — exposing full surface area before the user has any content,
+rather than building it up one screen at a time. This is the mechanism
+Novella's own parked, WITH-OWNER conversational-onboarding item
+(progressive reveal, one question per screen) is designed to avoid, and
+this round raises confidence the approach targets a real, repeatedly-
+documented failure, not a hypothetical one.
+
+**Finding (contrast case, official + reviewer opinion): Dabble proves the
+competitive bar is low — minimal onboarding earns praise even with zero
+personalization.** Dabble's onboarding is "just two clicks" (how-you-
+found-us, genre) and reviewers consistently reward the resulting
+simplicity: "you open the app and you're writing in no time... no bells
+and whistles to confuse or clutter" (reedsy.com/studio/resources/dabble-
+writing-review; comfortableshoesstudio.com). But the genre answer doesn't
+auto-apply anything — Dabble's genre templates are separate, manually-
+browsed items (help.dabblewriter.com/en/articles/9585026-all-things-
+templates). Across Dabble, NovelCrafter, Scrivener (whose template-picker
+step is separately documented as "the step that causes the most anxiety
+in new... users," scrivenerclasses.com), Campfire, and Notion's own Story
+Bible template (notion.com/templates/story-bible — pure template-drop,
+zero wizard), no competitor combines fast time-to-value with visible
+per-answer personalization. That specific combination — the Lingrow-style
+feeling the owner pointed at — is confirmed unclaimed market-wide, not
+just unbuilt in Novella. Caveat: Lingrow's own onboarding-screen sequence
+could not be directly re-verified this round (search surfaced only
+general feature marketing, not a documented walkthrough) — re-confirm it
+directly before citing it as prior art when this item is finally scoped.
+
+**Finding (official capability, the clearest technical unblock for round
+13's flagged gap): the industry's actual "manuscript-aware AI" mechanism
+is curated injection with a disclosed or adjustable cap, not automatic
+whole-book retrieval — and Sudowrite sets a good disclosure precedent
+worth copying.** NovelCrafter's Codex auto-injects character/location/lore
+data with a per-entry Always Include/Only-when-detected/Never toggle, and
+its own docs warn that "making every codex entry visible to the AI at all
+times can quickly add up in terms of the context window and costs"
+(novelcrafter.com/features/codex; novelcrafter.com/blog/may-2025-new-
+prompting-system-update, both official) — the same manual-curation
+trade-off Novella's own `context.ts` already encodes, now confirmed as the
+pragmatic norm even for a competitor with a far bigger context budget, not
+a constraint unique to a local 8B model. Sudowrite's Chapter Continuity
+feature discloses an exact, published number instead of a vague claim: "up
+to 20,000 words of preceding text across up to 25 linked chapter
+documents... your actual prose, not summaries," with Story Bible entries
+capped at "2,000 characters" (sudowrite.com/blog/how-to-avoid-plot-holes-
+sudowrites-chapter-continuity-feature-explained; docs.sudowrite.com/
+using-sudowrite/1ow1qkGqof9rtcyGnrWUBS/what-is-story-bible, both official)
+— a concrete template for how Novella could honestly disclose its own
+current limits in-product instead of implying whole-manuscript awareness
+it doesn't have.
+
+**Finding (technical writeup, most directly actionable for a future
+retrieval design): Anthropic's own published Contextual Retrieval
+technique is the concrete pattern to start from once a real whole-
+manuscript mode is scoped.** The method: before embedding or indexing a
+chunk, prepend a short, once-generated context stamp (what section/
+document this chunk is from and what it's about) rather than embedding
+raw prose alone — measured to cut top-20 retrieval failure by 49% (67%
+with reranking) over plain embeddings (anthropic.com/engineering/
+contextual-retrieval, official). For a novel manuscript, the direct
+translation is a per-scene or per-chapter stamp — chapter, POV, and
+scene-position — supplying the disambiguating signal raw prose doesn't
+carry for pronouns and elided references ("the ring," "her sister"). A
+separately-cited 2025 NAACL Findings result reports fixed-size (~200-word)
+chunking matching or beating semantic chunking on retrieval/generation
+quality despite semantic chunking's 5-15x higher ingest cost (via
+firecrawl.dev/blog/best-chunking-strategies-rag, 2026) — relevant for
+keeping any future pass cheap on the writer's own local hardware. No
+open-source project doing scene/chapter-level RAG specifically for
+fiction manuscripts was found; the generic Ollama-RAG repos checked
+(rag-assistant, rag-inspector, local-LLM-with-RAG on GitHub) have no
+fiction-specific chunking or continuity handling — Novella would be
+building close to the frontier here, not copying a known pattern.
+Recommendation for whenever this is picked up: prepended per-chunk
+context stamps over fixed-size chunks, not semantic/embedding-based
+splitting by default.
+
+**Small, cheaply actionable finding, separate from the retrieval design
+above:** Sudowrite's exact-number disclosure practice is copyable today,
+with zero new architecture. Novella's Chat panel never tells the writer
+what the AI actually sees. A one-line, plain-language surface ("the AI
+sees: the last ~6,000 characters of this scene, the referenced Codex
+entries, and other chapters by title only") would make the existing,
+already-correct curated design legible instead of an implicit black box —
+essentially the cost of a UI string, not a feature.
+
+## Pass 3 — Dated-news sweep (Sept 16-18) and the task-manager "second app," researched directly for the first time
+
+**Litigation and dated-news items — all checked, mostly quiet.** Sudowrite:
+status.sudowrite.com shows 100% uptime through Sept 18 with no new
+incidents; changelog's most recent entries (Sept 2 Claude Fable 5.1, Sept 5
+GPT-6 Astra) both predate this window. Campfire: round 47's version
+ambiguity is now resolved on the changelog side — the latest documented
+release is "Update 43 — Project Dashboard Refresh, Fast Element Creation &
+Spanish Language Support" (campfirewriting.com/learn/update43, Aug 19,
+2026); nothing newer exists in Campfire's own changelog index. The Google
+Play "Sept 7" update signal is very likely an unannounced patch build on
+top of Update 43 (play.google.com/appbrain.com both 403'd, so the exact
+build number stays unconfirmed). NovelCrafter: directly confirmed still
+quiet, changelog unchanged since March 21, 2026. Dabble: no September
+posts found at all. Scrivener: two September blog posts (Sept 2, Sept 9)
+are editorial content, not release notes — no new version. type.ai: active
+with four new posts (Sept 2-15, all "Best Sudowrite/NovelCrafter
+Alternative" SEO comparison content, byline Ben Denny) but no changelog
+and no new feature described. Kadrey v. Meta: the Aug 21, 2026
+mediation-outcome report remains genuinely unfound in any searchable press
+or law-firm client alert as of Sept 18 — non-expert discovery closes Sept
+21, expert discovery runs to Nov 9, which reads as the case proceeding
+toward trial rather than having settled, but this is inference, not
+confirmation; CourtListener's docket itself 403'd this round (previously
+reachable). New-entrant sweep: a ProductHunt/IndieHackers pass again found
+nothing matching the four-pillar combination (local AI + worldbuilding +
+task tracker + focus timer) — a 28th negative result had this round
+re-run the historical check, which it deliberately did not.
+
+**Finding (dated reviewer/industry opinion, the strongest evidence of this
+pass): a July 2026 industry guide names an explicit three-tool author
+stack, with the task-manager tier doing a job no writing app touches.**
+ScribeCount's own author-resource guide states plainly: "Most authors use
+two or three tools in combination — a writing environment (Scrivener,
+Dabble, LivingWriter), a task manager (Todoist, Trello), and the
+ScribeCount Author OS for the business layer" — with the task-manager tier
+covering "draft deadlines, editing milestones, cover art requests,
+publishing platform upload dates, newsletter schedules, and marketing
+campaign tasks" (scribecount.com/author-resource/writing-tools-for-
+authors/organization-tools, dated Jul 3, 2026). This is the sharpest, most
+explicit statement found to date that "writing app + task manager" is a
+settled, named pairing distinct from revision-status tracking (already
+covered in rounds 41/43) — independently corroborated by a separate guide
+(bookbarker.com) naming the identical task categories (cover design,
+editorial phases, beta-reader deadlines, marketing/outreach) over a 3-6
+month pre-launch window.
+
+**Finding (observed market behavior — dedicated product + professional-
+author precedent): query/submission tracking specifically supports a whole
+separate product category, reinforcing rather than resolving the existing
+WITH-OWNER scope question.** QueryTracker exists as a standalone dedicated
+product; Jane Friedman — a leading professional-author resource — runs her
+own separate system for tracking submissions (janefriedman.com/how-to-
+take-the-sting-out-of-query-rejections); multiple paid Notion Marketplace
+templates ("Query Letter Tracker," "Query HQ," "Manuscript Submissions
+Tracker") exist purely to fill this one job. This job's persistence as a
+whole separate product category, rather than a feature bolted onto any
+drafting tool, is strong evidence it's real and well-documented — folded
+into the existing query-tracking item as reinforcement, not a scope
+answer.
+
+**Finding (your inference from market-evidence volume): the Notion-
+template-for-authors ecosystem sells narrow, named point-solutions (query
+tracker, ARC/beta-reader tracker, launch checklist, cover-design
+checklist) as separate SKUs rather than one generic kanban** (multiple
+Gumroad/Notion listings; miblart.com/blog/notion-for-indie-writers). This
+argues that if Novella's existing flat task list ever grows a board view
+(already scoped in round 43), the cards should support an optional
+author-specific category tag — query, beta-reader, cover/launch — rather
+than staying purely freeform; a small, CLOUD-OK addition, distinct from
+the full submission-tracker scope question, which stays an owner call.
+
+**Unresolved, flagged rather than guessed:** no distinct complaint or
+feature request was found asking for deadline/task-linked calendar
+reminders as separate from Novella's existing writing-schedule calendar —
+this sub-question from the research brief came back empty despite
+dedicated search attempts. It's possible this need is already being
+absorbed by the task-manager pairing itself (the "publishing platform
+upload dates" in the ScribeCount finding above are task-manager due
+dates, not calendar events) rather than existing as its own complaint
+category. Also flagged: Reddit (r/writing, r/selfpublish, r/pubtips) was
+fully unreachable for this pass — direct fetch blocked outright, and
+WebSearch never surfaced an actual reddit.com thread URL across many query
+variations. This is a real gap in this specific finding's evidence base; a
+future round should retry with different tooling (an MCP Reddit connector,
+if one becomes available) rather than re-attempting the same blocked
+paths.
+
+## What changed in "Next up"
+
+No new top-level items added this round — every finding strengthened an
+existing item rather than opening new ground, which the research-quality
+rule treats as a success, not a shortfall. Reinforced: the codex-templates-
+per-type caution (a third independent product, World Anvil, showing the
+same "blank homework" failure, plus confirmation that field-typing isn't
+where Novella lags — the AI-visibility toggle is); the per-field
+AI-visibility item (checked three more competitors, found none with a
+match, sharpening rather than diluting the case); the Relationship-web
+advantage copy item (two more competitors confirmed manual-only
+relationship modeling); the conversational-onboarding WITH-OWNER item (a
+year of NovelCrafter reviews plus a Dabble contrast case, with a caveat
+that Lingrow's own flow needs re-verification); the chat-with-your-book
+sub-item (closes round 13's unscoped retrieval-design question with a
+concrete technical pattern, plus a small, separately-actionable "show what
+the AI sees" disclosure); and the query-tracking WITH-OWNER item
+(independent corroboration the job is real and well-documented, plus a
+task-category idea for the existing task-board sub-item). Also logged a
+new, dated lock-in data point (World Anvil's retroactive free-tier cut)
+inside the codex-templates item for future comparison copy.
+
+## Round 48 sources
+
+- minvarpg.com/blogs/ttrpg/world-anvil-alternatives (dated May 5, 2026)
+- trustpilot.com/review/worldanvil.com (dated reviews Oct 2025-Jun 2026)
+- legendkeeper.com/world-anvil-alternative, /how-to-make-templates-in-legendkeeper, /pricing
+- dungeongoblin.com/blog/legendkeeper2021review (dated Jul 6, 2021)
+- worldbuildingschool.com/legendkeeper
+- koenmartens.nl/20210425-world-building-with-fantasia-archive.html (dated Apr 25, 2021)
+- fantasiaarchive.com, github.com/vishiri/fantasia-archive
+- self-publishingschool.com/world-anvil-review (dated Nov 13, 2023)
+- ttrpg.bot/world-anvil-alternative, /campaign-knowledge-graph (Grimoire)
+- medium.com/@ilampadmanabhan/novelcrafter-review-64d391c629a2 (dated April 2026)
+- dreamgen.com/blog/articles/novelcrafter-review (dated April 18, 2026)
+- marketingtoolpro.com/novelcrafter-review
+- novelcrafter.com/help/getting-started/quick-start/first-steps-tutorial, /features/codex, /blog/may-2025-new-prompting-system-update, /changelog (all official)
+- reedsy.com/studio/resources/dabble-writing-review
+- comfortableshoesstudio.com/2021/08/review-dabble-writing-app
+- help.dabblewriter.com/en/articles/9585026-all-things-templates
+- scrivenerclasses.com/lesson/creating-a-new-project-from-a-built-in-template-4
+- notion.com/templates/story-bible
+- lingrow.io (inconclusive on onboarding-screen specifics — flagged unverified)
+- sudowrite.com/blog/how-to-avoid-plot-holes-sudowrites-chapter-continuity-feature-explained
+- docs.sudowrite.com/using-sudowrite/1ow1qkGqof9rtcyGnrWUBS/what-is-story-bible
+- anthropic.com/engineering/contextual-retrieval (official)
+- firecrawl.dev/blog/best-chunking-strategies-rag (2026)
+- github.com/amscotti/local-LLM-with-RAG, /TheAiSingularity/graphrag-local-ollama (checked, generic, no fiction-specific pattern)
+- status.sudowrite.com, feedback.sudowrite.com/changelog (official)
+- campfirewriting.com/learn/update43, /learn (official)
+- novelcrafter.com/changelog (official)
+- dabblewriter.com/blog; literatureandlatte.com/blog; blog.type.ai
+- courtlistener.com (docket, 403'd this round; law-firm alerts checked: bakerlaw.com, fisherbroyles.com, mckoolsmith.com, copyrightalliance.org, authorsguild.org, natlawreview.com)
+- producthunt.com/topics/writing-tools; novelmage.com
+- scribecount.com/author-resource/writing-tools-for-authors/organization-tools (dated Jul 3, 2026)
+- bookbarker.com/actionable-indie-book-publishing-tips-for-authors
+- janefriedman.com/how-to-take-the-sting-out-of-query-rejections
+- miblart.com/blog/notion-for-indie-writers
+- entreresource.com/notion-for-authors
