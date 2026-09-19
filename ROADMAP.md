@@ -595,6 +595,64 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       view degrade to an empty state (the way `RelationshipWeb` already
       does — "Nothing to map yet") rather than gating any existing
       functionality behind "add it to the map first."
+- [ ] **A local, per-entry reference-material attachment system — PDFs,
+      images, and text clippings filed beside a Codex entry or chapter, with
+      a link-vs-copy choice and a read-while-you-write view** — research
+      round 48 (2026-09-19). Checked our own code first: `src/state/
+      cardImages.ts` gives a board card exactly one downscaled JPEG; there is
+      no way anywhere in the app to file a PDF, a web clipping, or a folder
+      of reference photos against a Codex entry or chapter. Checked the
+      nearest direct competitor and found the same gap, not an assumed one:
+      NovelCrafter's own FAQ states verbatim "Currently, you can only assign
+      one image per codex entry" (novelcrafter.com/help/faq/codex/
+      reference-images, official), and its "Research" field is exclude-
+      from-AI text only, never a stored file — its "External" tab holds
+      outbound links (inspiration images, soundtrack, character sheets), not
+      attachments (novelcrafter.com/help/docs/codex/anatomy-codex-entry,
+      official). Dabble is weaker still (character/scene images only,
+      auto-compressed over 10MB; "Images in Story Notes" reads as a live,
+      unresolved request on its own feature board). One caution against
+      overclaiming: Campfire already markets a dedicated Research Module by
+      name — weblinks, annotated videos, PDFs, images, text notes, all
+      linkable to story elements (campfirewriting.com/learn/research-
+      tutorial, official) — so "no competitor has this" would be false; the
+      defensible claim is narrower and still holds: no local-first,
+      no-subscription competitor has a real per-entry research-attachment
+      system. Scrivener's Research folder is the most complete
+      implementation surveyed (import a copy, drag/drop, or a Scrivener-3
+      Bookmark that points at a live external file instead of freezing a
+      copy, plus split-screen editing to view a reference beside the
+      manuscript while drafting — literatureandlatte.com/blog, official) but
+      its own forum shows the "import everything" path scaling badly: one
+      project with ~9,000 imported files grew its internal structure file to
+      ~117,000 lines and visibly slowed every autosave
+      (forum.literatureandlatte.com/viewtopic.php?t=18125), a separate
+      thread reports Dropbox repeatedly throwing "conflicted copy" errors
+      once the Research folder held large 4K video files
+      (forum.literatureandlatte.com/t/issue-with-binder-bloat-and-sync-
+      errors-when-using-4k-research-videos/153207), and a forum moderator
+      confirms the Windows build doesn't index PDF text for search at all —
+      multiple official and third-party how-tos now explicitly teach
+      Bookmark-over-import specifically to dodge this, i.e. the fix is
+      taught, not solved at the architecture level. Notion and Obsidian
+      writers both hand-build this job from opposite architectures — a
+      tagged Notion "Sources" database fed by the official Web Clipper
+      browser extension linked to character/scene databases
+      (myimaginaryfriends.substack.com; sparxno.com/blog/notion-web-
+      clipper), or an Obsidian vault plus its own first-party Web Clipper
+      plus, for a minority of power users, the community Annotator plugin
+      for local-Markdown PDF/EPUB annotation
+      (github.com/elias-sundqvist/obsidian-annotator) — converging
+      independent evidence that the underlying job is real even where no
+      purpose-built fiction tool offers it, and that Notion's biggest
+      documented complaint for this specific use is the one a local-first
+      tool removes by construction: no real offline mode (dev.to/kanta13jp1;
+      xda-developers.com). Build small, not Scrivener-sized: a per-entry/
+      per-chapter local attachment list (PDF, image, text clipping), a
+      link-vs-copy choice modeled on Scrivener's Bookmark split specifically
+      to avoid its own bloat failure, and a lightweight side-by-side view —
+      not a database, not a web clipper, both out of scope for a local
+      desktop app and not where the evidence points anyway.
 - [ ] **Reword-in-place: keyboard-first accept/reject, and a compare view
       for several alternatives at once** — research round 41 (2026-09-03):
       checked `src/ui/RewordPopover.tsx` — the only key it handles is
@@ -987,6 +1045,57 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       not just that per-type templates should exist. When this sub-item is
       built, keep fields optional and collapsible with a light empty
       state, not a full form every new entry is pressured to fill in.
+      Research round 48 (2026-09-19) ran the deep competitive pass this
+      sub-item never got since it was first written in round 8, and it
+      corrects a standing assumption rather than just reinforcing one:
+      **NovelCrafter, the market's AI-native leader, explicitly markets the
+      opposite of a per-type template.** Its own Codex feature page reads,
+      verbatim, "No more one-size-fits-all templates, simply add the fields
+      you need to each entry" (novelcrafter.com/features/codex, official),
+      and its Details mechanic ships example starter suggestions, not a
+      schema — "You might not need them at first, and that's perfectly
+      fine!" (novelcrafter.com/courses/ultimate-beginners-guide/structuring-
+      your-codex-with-custom-details, official). Parity with NovelCrafter on
+      this specific point means *not* building a fixed schema. The one
+      product with a genuinely different, well-documented middle pattern is
+      Sudowrite's Story Bible character card: seven optional default fields,
+      each with its own scoped Generate/Rewrite button rather than one
+      whole-form generator, plus a "Customize" control to edit the default
+      set per Character type or create new custom types with their own
+      trait sets (docs.sudowrite.com, official). That per-type-customization
+      idea converges independently with a real user's own Campfire workflow
+      (isobellynx.com, 2022-07-25): she builds a 4-page sheet for major
+      characters and a 2-page sheet for minor ones by hand, deleting fields
+      she "eventually omit[s]... completely" rather than answering them —
+      two unrelated sources landing on the same finding, that template
+      weight should scale with how much the writer cares about the entry,
+      not be uniform per type. World Anvil draws the most consistent
+      "too-RPG, steep learning curve" complaint of any tool checked
+      (kindlepreneur.com, updated 2026-03-27) but the same review also asks
+      for *more* per-field guidance in the same breath — overwhelmed by
+      volume, wanting more structure per field — leaving the "can a writer
+      actually leave a field blank without feeling pressured" question
+      unresolved even there. Concrete build spec, five parts: (1) a small
+      starter set per type, ~4-6 fields (the existing Age/Appearance/
+      Motivation/Voice example already named here is the right size — closer
+      to Sudowrite's seven than Campfire's 100+ or World Anvil's 20+
+      templates); (2) every starter field freely deletable per-entry, the
+      single most load-bearing behavior across every complaint traced this
+      round; (3) applied as a one-click "fill in this type's usual fields"
+      action from QuickCreate, never the entry's default empty state, so a
+      new entry looks exactly as empty as it does today until the writer
+      opts in; (4) let template weight vary per *entry*, not per type, via a
+      named, reusable Details bundle applicable to any entry — the cheapest
+      version of the Sudowrite/Isobel-Lynx convergence above; (5) if local
+      AI ever touches Codex fields, prefer Sudowrite's per-field
+      Generate/Rewrite over a whole-entry generator, a natural fit for a
+      zero-cost local model and the one mechanic found that actually
+      resolves the blank-page-vs-rigid-form tension rather than just
+      softening it. Explicitly not v1 scope: a settings surface for
+      authoring custom entry-types-with-field-sets (Sudowrite's deepest
+      layer) — NovelCrafter's own ad hoc per-entry Details already cover
+      that job without a template-management layer, and it's the leader's
+      own choice not to build one.
 - [ ] **Structured relations between Codex entries, not just prose fields
       and tags** — research round 42 (2026-09-04): the strongest
       cross-platform pattern this round wasn't a single competitor
@@ -1699,6 +1808,17 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       explicitly requesting "offline mode" — not a new bug, but a second
       dated report confirming it's still live and still costing writers
       real chapters, not a one-off.
+      Research round 48 (2026-09-19) resolves round 47's version-conflict
+      flag and reinforces rather than closes the bug tracking: direct App
+      Store fetch confirms Campfire's current version is **1.4.3**, released
+      **Sept 8, 2026**, changelog text only "Bugfixes and performance
+      improvements" with no itemized fixes — the "v1.3.2" signal round 47
+      saw is confirmed stale third-party-mirror lag, not a real regression.
+      A directly-fetched, current App Store review reports chapter loss
+      recurring "during WiFi use" *after* 1.4.3 shipped — the save-time
+      chapter-loss bug tracked since round 35 is still live post-patch, not
+      fixed by a release whose own changelog gave no specifics to check
+      against.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent
@@ -1910,6 +2030,18 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       Given the Bartz timeline now has a concrete Nov 15 payment date, the
       next useful check on this litigation thread is mid-November, not
       every round — deprioritize the weekly re-check accordingly.
+      Research round 48 (2026-09-19) corrects the tracked Kadrey docket
+      number — 3:25-cv-04807-VC does not exist in CourtListener's index; the
+      real case is **3:23-cv-03417-VC** (CourtListener docket ID 67569326).
+      Direct docket/API access still returned 403/401, but the official
+      N.D. Cal. court page loaded directly and shows only a Sept 16, 2026
+      stipulation extending expert-discovery deadlines — no mediation-
+      outcome report among the visible filings, so the report due Aug 21 is
+      now a month overdue with nothing found. Given it's outside this
+      environment's reach to pull the docket directly (PACER/authenticated
+      CourtListener access would be needed) and a month has passed with no
+      surfaced content, the next check on this specific report should be
+      opportunistic — triggered by a news mention — rather than scheduled.
 - [ ] **Say the performance/battery advantage louder** — research round 8:
       2026 Dabble reviews call it out by name as a CPU hog that "ran a
       user's laptop battery down really quickly," a direct cost of being a
@@ -2165,6 +2297,31 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-09-19 — Research round 48 (autopilot; no code). Housekeeping first:
+  working tree clean at session start; local branch
+  (`claude/exciting-cerf-t3jsps`) was already even with round 47's commit,
+  no fast-forward needed. Dispatched three parallel passes: (1) reference-
+  material/research storage — a topic named in the research brief but never
+  given a dedicated pass; grep-confirmed Novella has zero attachment system
+  beyond one JPEG per board card, and checked NovelCrafter directly (one-
+  image-per-entry cap, no file storage) to confirm the gap is real and
+  competitive, not assumed — added as a new, scoped "Next up" item (local
+  PDF/image/clipping attachments per Codex entry/chapter, link-vs-copy
+  modeled on Scrivener's Bookmark mechanism to dodge Scrivener's own
+  documented file-bloat/sync-breakage problem at scale); (2) a first-ever
+  deep competitive pass on the long-standing, never-examined "codex entry
+  templates per type" sub-item, which found the standing assumption backwards
+  — NovelCrafter, the parity target, explicitly markets *not* having fixed
+  per-type templates — and replaced the vague phrasing with a five-part build
+  spec drawing on Sudowrite's per-field-AI-fill mechanic and a real user's
+  own two-tier Campfire template practice; (3) the standing dated-news sweep,
+  which resolved Campfire's version ambiguity (confirmed v1.4.3, Sept 8,
+  both tracked bugs still reported afterward), corrected a wrong Kadrey v.
+  Meta docket number, and found Reddit access still fully blocked for a
+  second consecutive round. No four-pillar bundle re-check or SKILLS.md
+  scouting pass this round. Full notes and source lists in RESEARCH.md
+  Round 48.
 
 - 2026-09-16 — Research round 47 (autopilot; no code). Housekeeping first:
   working tree clean at session start; local branch was already even with
