@@ -223,7 +223,42 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       on surrounding content rather than raw character offsets, resolve/
       reply/read-unread, a history drawer, and a per-comment visibility
       scope — not a Word-style balloon that only flags that something
-      changed.
+      changed. Research round 48 (2026-09-20) sharpens the spec past the
+      comment mechanic itself into what happens once comments exist at
+      volume: a competitive teardown of the whole beta-reader-platform
+      category (an author who evaluated BetaBooks, BetaReader.io,
+      StoryOrigin, and Scribophile before building a competitor,
+      theindielab.net/p/i-looked-at-every-beta-reader-platform) names the
+      real unmet job directly — feedback "arrives as an undifferentiated
+      pile requiring manual filtering" with no tool clustering related
+      comments together. Independently, four separate craft-advice sources
+      on processing beta feedback (setyourmuseonfire.substack.com;
+      dabblewriter.com/articles/how-to-use-beta-reader-feedback;
+      thewritepractice.com/beta-readers-feedback;
+      emmarowan.com/writing/2021/09/30/compiling-beta-reader-revision-notes)
+      converge on the same manual heuristic as the actual signal that
+      matters: "comments from several readers pointing out the same thing
+      really need your attention" — i.e. writers cross-reference the SAME
+      issue across MULTIPLE readers' separate comment threads by hand, and
+      a documented workaround (debbie-emmitt.com's free spreadsheet
+      template) exists specifically because no reviewed tool clusters
+      same-issue comments across readers natively. This is a sharper,
+      narrower target than a generic "triage" screen — BetaBooks' own
+      To Do/Consider/Ignore states (already logged above) solve labeling,
+      not clustering. Separately, a comment-permanence gap in the
+      incumbent Google Docs is real and independently corroborated
+      (waymakeros.com/learn/document-collaboration-comments-lost: a
+      resolved thread's reasoning "evaporates") — but verify before citing
+      it as a Docs gap in copy: Docs does have a native resolved/unresolved
+      comment filter (support.google.com/docs/thread/22085709), it's just
+      poorly discoverable, which is a different and weaker claim than "the
+      feature doesn't exist." When this item is built: keep a resolved
+      comment's full thread permanently searchable rather than hidden, and
+      scope a v1 clustering aid as "flag when two open comments anchor to
+      the same paragraph across different readers" rather than full
+      semantic similarity matching — cheap, reuses the anchor mechanism the
+      spec above already requires, and directly answers the one heuristic
+      every craft-advice source agrees matters most.
 - [ ] **Suggest-mode editing (track changes), reusing the diff engine we
       already ship, before real-time co-authoring** — research round 44
       (2026-09-06): a dedicated pass on collaboration and hand-off
@@ -739,6 +774,56 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       them (type.ai/blog/writing-with-AI-commands, official) — worth
       doing the same for Novella's existing slash commands rather than a
       separate roadmap line.
+- [ ] **Full keyboard navigation of the manuscript/note tree, plus a
+      discoverable, customizable shortcut sheet** (CLOUD-OK for the
+      keyboard-handling logic; live verification of tree focus/scroll
+      still wants a browser) — research round 48 (2026-09-20): the
+      sharpest single data point found this round is in-category and
+      specific, not a general inference. Dabble's own feature-request
+      board carries a live, user-authored complaint that Dabble "is very
+      mouse intensive" with no cursor-key navigation of its tree/binder,
+      no rename-in-place shortcut, no delete-key shortcut, and no way to
+      create a scene/note/folder without a mouse
+      (dabble.featureupvote.com/suggestions/19512/keyboard-shortcuts —
+      fetched via search-cache due to a 403 on direct access; re-verify the
+      live page before quoting it verbatim in external copy). This is a
+      direct competitor, in Novella's own category, criticized by its own
+      users for exactly the failure mode worth checking at home. Grepped
+      our own UI for tree-navigation keyboard handling
+      (`ArrowUp`/`ArrowDown`/`F2`/`Delete` across `src/ui/*.tsx`) and found
+      none outside `CommandPalette.tsx`'s own list and the editor's
+      Alt+↑/↓ paragraph-move — the manuscript/note tree itself has no
+      arrow-key selection, no rename-in-place shortcut, and no delete
+      shortcut today, the same gap Dabble's users are naming. Separately,
+      Obsidian's power-user culture converges on a different, useful
+      framing worth carrying into this item's design: writers describe
+      shortcuts (Command Palette, Quick Switcher, in-line link insertion)
+      as protecting *flow*, not raw speed — "avoid breaking your train of
+      thought" during drafting (ilyashabanov.substack.com/p/power-user-
+      initiation-becoming-2x, a single power-user's account, illustrative
+      not statistical) — which lines up with Novella's own "never break
+      flow" positioning rather than introducing a new one. Scrivener has
+      full custom-keybinding support but weak self-documentation of it —
+      evidenced circumstantially by at least four independent third-party
+      "Scrivener shortcuts cheat sheet" write-ups filling a gap its own
+      docs apparently don't close well enough on their own
+      (makeuseof.com/tag/scrivener-keyboard-shortcuts-cheat-sheet-mac and
+      others) — worth a caution when this item is built: ship a real,
+      in-app discoverable shortcut reference (a `?`-triggered overlay or a
+      Settings tab), not just working shortcuts nobody can find. Two
+      claims this round could NOT corroborate despite multiple search
+      attempts and should not be cited without better sourcing later: a
+      Notion-mouse-first complaint (no evidence found), and text-expander
+      tools (Espanso/TextExpander) being used specifically to work around
+      a missing app shortcut (writers clearly use them for character-name
+      snippets and, separately, as an accessibility aid, but no source
+      connected that use to a missing keyboard shortcut). Scope v1 to the
+      Dabble-shaped gap specifically: arrow-key tree navigation, F2/Enter
+      to rename in place (the rename mechanism itself already shipped —
+      research round 7 — this only wires a keyboard trigger to it), Delete
+      to remove with the existing undo toast, and a discoverable shortcut
+      sheet — not a general text-expander/snippet system, which this
+      round's evidence doesn't support building.
 - [ ] **Focus mode: a typewriter-scroll/dimming control, and a floating
       peek panel that doesn't require leaving focus mode** — research
       round 43 (2026-09-05): checked our own `App.tsx`/`app.css` — focus
@@ -1056,6 +1141,74 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       rather than all three at once, and keep the standing guardrail from
       round 6 in mind: this is exactly the kind of structure that makes
       Notion feel slow and buried at scale if it isn't kept flat and fast.
+- [ ] **A local research/reference panel — attach PDFs, images and web
+      snapshots to the project, viewable side-by-side with the manuscript
+      without leaving the editor** — research round 48 (2026-09-20): a
+      dedicated pass on where writers keep research material (interview
+      transcripts, reference photos, source articles) found this is a
+      genuine, well-evidenced "second app" job distinct from the
+      already-logged story-bible/planning use of Notion/Obsidian.
+      Scrivener's own Research folder is the strongest native precedent —
+      not because the feature is exotic, but because of *how* it's used:
+      writers lock a reference document in a Copyholder or Quick Reference
+      window next to the draft and copy quotes across "in a matter of
+      seconds" (catherinepope.com/posts/how-to-use-the-research-folder-in-
+      scrivener), and a second independent source catalogues four separate
+      ways writers arrange the split (split editor, copyholder, quick
+      reference window, Scrivenings) specifically to avoid breaking flow
+      (jenterpstra.com/blog/view-reference-materials-in-scrivener) — real
+      user effort spent tuning a viewing mode is itself evidence the
+      side-by-side arrangement is the valuable part, not mere storage.
+      Scrivener's own version has a documented cost worth beating, not
+      just matching: large PDFs/media bloat the monolithic `.scriv`
+      project file, slowing backups and sync (same source; corroborated
+      generally on the Literature & Latte forum,
+      forum.literatureandlatte.com/viewtopic.php?t=54499) — Novella's
+      per-file vault (no monolithic project blob) sidesteps this by
+      architecture if research attachments are stored as separate files
+      under `.novella/`, the same pattern `src/state/cardImages.ts`
+      already uses for card art (`.novella/images/<note-id>.jpg`), rather
+      than inlined into a note body. Checked our own code: that image
+      pipeline is the closest existing analog but is scoped to exactly one
+      downscaled JPEG per note — no PDF support, no multi-file attachment,
+      no side-by-side viewer; a research panel needs a genuinely new
+      capability, not a rename of an existing one. The competitive gap is
+      concrete: NovelCrafter's own course material frames "research" purely
+      as Codex text fields (Key Takeaways, Direct Quotes) meant to ground
+      AI prompts, not as a place to read a source PDF or photo
+      (novelcrafter.com/courses/codex-cookbook/organizing-research-notes,
+      official) — a metadata-first tool with no document/image viewer at
+      all. The "second app for research specifically" pattern is real and
+      distinct from previously-logged Notion/Obsidian findings: writers
+      independently report keeping Evernote, Obsidian, or a Google
+      Drive+Keep combo running *alongside* Scrivener purely for research
+      capture, invoking the "second brain" framing by name
+      (bowendwelle.substack.com/p/staying-sane-with-research-notes;
+      goodreads.com/author_blog_posts/9470698; two independent
+      thesiswhisperer.com posts on the same pattern in academic writing).
+      Obsidian's own first-party Web Clipper (shipped by Obsidian's CEO,
+      replacing years of third-party plugins, explicitly positioned for
+      "researchers, writers, or anyone who frequently annotates online
+      material," with highlight-persistence across return visits —
+      obsidian.md/help/web-clipper, official) is a strong signal from a
+      structurally different ecosystem that research-clipping is
+      considered core, not a nice-to-have, by a company that studies this
+      exact user base closely. A same-category (competing tool, so read as
+      persuasive rather than neutral, but the qualitative claims line up
+      with the independent sources above) comparison piece states the
+      pattern plainly: "most writers need two tools, not one" for
+      research, naming Scrivener's split-screen view as "the single most
+      useful thing any of these tools do," Obsidian as better at surfacing
+      connections but worse at manuscript handling, and Notion as fine for
+      structured metadata but "slow to search and unpleasant to read" for
+      long transcripts (storyflow.so/blog/scrivener-vs-obsidian-vs-notion-
+      vs-zotero-book-research-2026). Scope v1 narrowly: local file
+      attachment (PDF/image, stored as separate files per the cardImages
+      pattern, not inlined) surfaced in a panel that can sit beside the
+      editor — not a citation manager (that's Zotero's job, explicitly out
+      of scope per the comparison piece above) and not full-text search
+      inside attached PDFs, which is a real but separate, harder feature
+      to scope later.
 - [ ] **Voice-matching from the writer's own prose, not just style templates**
       — research round 11 (2026-07-28): checked our own Upload style flow
       (`InspectorPane.tsx`) — it imports a .txt/.md file as the literal body
@@ -1699,6 +1852,22 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       explicitly requesting "offline mode" — not a new bug, but a second
       dated report confirming it's still live and still costing writers
       real chapters, not a one-off.
+      Research round 48 (2026-09-20) directly re-read the 2026-08-21
+      external-drive save-failure thread this item has tracked as
+      unconfirmed since round 37
+      (forum.literatureandlatte.com/t/manually-saving-scriveners-projects-
+      to-an-external-drive-suddenly-stopped-working/154495, fetched
+      directly, not via search-cache): as of this check it still carries
+      zero Literature & Latte staff replies, one month after the original
+      post — only non-staff user troubleshooting (the same "kewms" already
+      logged in round 40, Aug 22 and Aug 24). Doesn't upgrade the report
+      from "one unconfirmed incident" to "a pattern" on its own, but it is
+      now citable as a second, independent kind of evidence alongside the
+      sync-conflict threads already logged: not just "Scrivener has bugs"
+      but "Scrivener's own support forum leaves a month-old data-loss-
+      adjacent report unanswered by staff" — a support-responsiveness
+      angle distinct from and additional to the reliability angle this
+      item otherwise tracks.
 - [ ] **Say the no-training/privacy advantage louder** — research round 9
       (2026-07-26): a 2026 Authorlytica survey puts numbers on author
       anxiety about AI training for the first time — 96% want consent
@@ -1910,6 +2079,28 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       Given the Bartz timeline now has a concrete Nov 15 payment date, the
       next useful check on this litigation thread is mid-November, not
       every round — deprioritize the weekly re-check accordingly.
+      Research round 48 (2026-09-20) checks both again as scheduled and
+      finds one real update: a Sept 4, 2026 Authors Guild/TAA post
+      (blog.taaonline.net, official author-advocacy coverage of the
+      settlement) reports the claims-notice mailing surfaced real
+      author/publisher disputes over payout-split percentages — some
+      publishers are reportedly claiming 85-100% of a work's payout in
+      contested cases, against a 50/50 default split, with disputed
+      claimants routed through a 30-day evidence window and, if unresolved,
+      a court-appointed Special Master. The Nov 15, 2026 target date for
+      undisputed-allocation payments is unchanged. This is a concrete,
+      citable detail worth having if copy ever engages with the settlement
+      beyond "opt out of training" — a local model sidesteps not just the
+      training question but this entire publisher-vs-author payout fight,
+      since there's no payout to fight over when nothing was sold to a
+      trainer in the first place. Kadrey v. Meta's mediation report is
+      still unresolved — CourtListener's docket remains 403-blocked to
+      direct fetch in this environment even via search-cache workarounds;
+      closing this genuinely needs a PACER/RECAP/Justia docket mirror,
+      which round 48 did not have working access to either. Per round 47's
+      own call, this thread stays deprioritized to a mid-November check
+      rather than re-attempted every round with the same blocked access
+      path.
 - [ ] **Say the performance/battery advantage louder** — research round 8:
       2026 Dabble reviews call it out by name as a CPU hog that "ran a
       user's laptop battery down really quickly," a direct cost of being a
@@ -2147,7 +2338,13 @@ GitHub `releases.atom` feeds still read fine via WebFetch, and
 `openrss.org/<url>` generates feeds for feed-less changelog pages. Research
 passes should prefer feeds over raw fetches for competitor monitoring, and
 git-scrape what matters: save fetched snapshots into the repo so `git diff`
-becomes the change detector.
+becomes the change detector. Round 48 note: CourtListener's own docket pages
+403 direct fetch even via search-cache workarounds — closing the
+still-open Kadrey v. Meta mediation-report question needs a PACER/RECAP or
+Justia docket mirror, which this environment hasn't had working access to
+across two rounds now (47, 48). Don't keep re-attempting the same blocked
+path every round; either try a mirror explicitly next time or leave the
+thread on its already-agreed mid-November check.
 
 ## Adding to this list
 
@@ -2165,6 +2362,56 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-09-20 — Research round 48 (autopilot; no code). Housekeeping first:
+  working tree clean at session start; branch was already even with
+  `origin/main` at round 47's commit (2026-09-16), no fast-forward needed.
+  Given 47 prior rounds have covered nearly every named area in the
+  standing research brief at least once, this round dispatched two
+  parallel passes deliberately aimed past the well-trodden ground: (1) a
+  narrow dated-news sweep re-checking five specific open threads (Kadrey
+  v. Meta mediation report, Bartz v. Anthropic payment timeline, five
+  competitors' changelogs, a fresh four-pillar-bundle competitor check,
+  EU AI Act enforcement status) rather than a broad re-sweep; (2) a deep
+  dive into three functional areas the prior 47 rounds had only touched
+  in passing or not at all — research/reference-material storage,
+  beta-reader feedback triage *past* the comment stage, and keyboard-first
+  workflows as a holistic pattern rather than isolated shortcuts.
+  Findings: research/reference storage is a real, well-evidenced "second
+  app" gap distinct from the already-logged Notion/Obsidian planning use —
+  Scrivener's Research folder + split-screen viewing is the strongest
+  native precedent, NovelCrafter's Codex is metadata/AI-context-only with
+  no document/image viewer at all, and writers independently name
+  Evernote/Obsidian/Google-Drive-as-research-sidecar as a genuine parallel
+  tool; added as a new, fully-scoped roadmap item reusing the
+  `cardImages.ts` per-file-in-vault pattern rather than inlining
+  attachments into notes. Beta-feedback triage past the comment stage
+  narrowed from the brief's broad framing to one high-confidence, concrete
+  gap — no reviewed tool clusters same-issue comments across multiple
+  readers, which four independent craft-advice sources converge on as the
+  single most important manual signal writers extract by hand — folded
+  into the existing inline-comments item as a sharpened build spec rather
+  than a new item, since it's the same underlying comment/anchor mechanism.
+  Keyboard-first workflows narrowed similarly: the Notion-mouse-first and
+  text-expander-as-shortcut-workaround sub-claims didn't corroborate, but
+  Dabble's own feature-request board has a direct, in-category complaint
+  about missing tree-navigation shortcuts that our own grep confirms
+  Novella has the identical gap in today — added as a new, narrowly-scoped
+  item (arrow-key tree nav, keyboard rename/delete, a discoverable
+  shortcut sheet) rather than the broader claim the brief hypothesized.
+  The news sweep found the Bartz settlement's first concrete post-portal
+  wrinkle (publisher/author payout-split disputes, some publishers
+  reportedly claiming up to 100%) and a direct re-read confirming the
+  external-drive Scrivener forum thread still has zero staff response a
+  month later — both folded into their existing items as reinforcement.
+  Kadrey v. Meta stays unresolved; CourtListener's docket access is
+  blocked in this environment across two rounds running, noted in the
+  standing source-access section rather than re-attempted a third
+  identical way. No new four-pillar-bundle competitor match (28th dry
+  recheck) and no material competitor changelog activity since round 47's
+  three-day-old baseline — both explicitly checked, neither touched, per
+  the "reconfirm without re-writing" rule. Full notes in RESEARCH.md
+  Round 48.
 
 - 2026-09-16 — Research round 47 (autopilot; no code). Housekeeping first:
   working tree clean at session start; local branch was already even with

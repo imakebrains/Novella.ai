@@ -7449,4 +7449,330 @@ item instead of duplicating it.
 - play.google.com/store/apps/details?id=com.campfiremobile (Campfire)
 - campfirewriting.com/learn/state-of-the-campfire-2026 (official)
 - inkfluenceai.com, appsumo.com/products/inkfluence-ai
+
+# Round 48 (2026-09-20) — Research/reference storage, cross-reader comment clustering, and a keyboard-navigation gap Novella shares with Dabble
+
+Housekeeping first: working tree was clean at session start; local branch
+was already even with `origin/main` at round 47's commit (2026-09-16), four
+days prior. With 47 prior rounds having covered comments, track changes,
+brainstorming, codex-mention detection, import, export, timeline/maps,
+search, focus mode, corkboard modes, story-structure templates, streak
+gamification, dashboard/settings design, Notion's database mechanic, mobile
+UX, and a four-pillar competitive bundle check run 27+ times, this round
+dispatched two parallel passes: a narrow dated-news sweep re-checking five
+specific standing threads, and a deep dive into three functional areas
+prior rounds had only grazed — research/reference-material storage,
+beta-reader feedback triage *past* the comment-anchoring stage, and
+keyboard-first workflows as a holistic pattern. Did not re-run the SKILLS.md
+scouting standing pass this round.
+
+## Pass 1 — Dated-news sweep on five standing threads
+
+**Kadrey v. Meta mediation-outcome report — still unresolved, access blocked
+rather than confirmed-absent.** The report was due 2026-08-21. CourtListener's
+docket page returned HTTP 403 to direct fetch, the same block encountered in
+round 47. McKool Smith's "AI Litigation Tracker" — the best available
+secondary source — has a "Current Edition" link still resolving to July 13,
+2026 content (a denied interlocutory-appeal motion, no mediation mention);
+their Aug 24, 2026 edition (via search snippet only) mentions only two new
+summary-judgment filings, nothing about mediation. No Law360, Reuters,
+National Law Review, or Bloomberg Law coverage of an outcome surfaced. Non-
+expert discovery closed 2026-09-21 (the day after this check) and expert
+discovery closes 2026-11-09 — the case is unambiguously still active, and a
+terse "mediation unsuccessful, proceeding to trial" filing is plausible but
+unconfirmed. This is the second consecutive round this exact access path has
+failed (see the Round 47/48 note added to ROADMAP.md's Source-access
+workaround section) — closing this needs a PACER/RECAP/Justia docket mirror
+next time, not a third identical web-search attempt.
+
+**Bartz v. Anthropic settlement — the first concrete post-portal
+complication.** Official source: blog.taaonline.net, published 2026-09-04,
+"Next Steps in Bartz v Anthropic Settlement: Resolving Claim Percentage
+Differences." The Sept 2-4 claims-notice mailing (already logged round 47)
+surfaced real author/publisher disputes over payout-split percentages —
+textbook authors were excluded from the standard 50/50 default split, and
+publishers are reportedly claiming 85-100% of payouts in some disputed
+cases. Disputed claimants get a 30-day window to submit supporting
+documentation (contracts, rights-reversion letters), negotiate directly
+with the rightsholder, or escalate to a court-appointed Special Master.
+The Nov 15, 2026 target for undisputed-allocation distributions is
+unchanged; disputed-claim payments follow in a later wave, with Anthropic's
+final $450M settlement installment due September 2027. Evidence type:
+official/semi-official (Authors Guild/TAA is closely tied to case
+administration on the plaintiffs' side but is not the court itself).
+Folded into the no-training/privacy roadmap item: a local model sidesteps
+not just the training question but this entire publisher-vs-author payout
+fight, since nothing was ever sold to a trainer to fight over.
+
+**Competitor changelogs since 2026-09-16 — quiet across the board, two
+findings worth flagging as negative results rather than gaps in the
+search.** NovelCrafter's changelog page still shows March 21, 2026 as its
+latest dated entry; its blog referenced a "Monthly Muse Issue #26 —
+September 2026" post, but that's a recurring craft-tips content series, not
+a product update. Sudowrite: status.sudowrite.com shows 100% uptime and no
+incidents for the Sept 7-20 window (page last updated 2026-09-20 10:06
+UTC); its changelog's most recent entries (GPT-6 Astra, Sept 5; Claude
+Fable 5.1, Sept 2) both predate the round-47 baseline, so nothing new.
+Dabble: dabble.featureupvote.com 403'd to direct fetch (a recurring
+pattern for this specific domain across multiple rounds now); no September
+blog posts found, though search results for "Dabble" are heavily polluted
+by an unrelated sports-betting app of the same name. Campfire: conflicting,
+low-confidence version signals (a stale third-party mirror shows v1.3.2;
+Google Play's own listing shows a Sept 7, 2026 last-update date with no
+retrievable version number or changelog text) — flagged explicitly as
+unresolved rather than guessed either way; a direct fetch of Campfire's own
+changelog/update post is the next step, since a browse-page fetch this
+round returned only nav chrome. Scrivener/Literature & Latte: no new
+version, but a new Sept 9, 2026 blog post on compiling from iPad/iPhone
+(content, not a changelog entry) — see Pass 2 below for the forum-thread
+follow-up, which is the more load-bearing finding. type.ai: four new blog
+posts (Sept 2, 11, 14, 15) are all competitor-comparison SEO content
+("Best Sudowrite Alternative," "Best NovelCrafter Alternative"), not
+product-changelog entries — confirms round 47's read that type.ai's
+renewed blog activity is marketing, not features.
+
+**Four-pillar bundle check — 28th dry recheck.** Searched ProductHunt,
+IndieHackers, and general web for a September 2026 launch combining local/
+on-device AI, worldbuilding, a task tracker, and a focus/sprint timer.
+Nothing new surfaced beyond the already-catalogued partial matches. One
+tangential name, Inkfluence AI (already logged round 47 as a cloud-based
+prompt-to-ebook generator, not a competitive-lane match), came up again but
+adds nothing new. Search coverage of ProductHunt/IndieHackers via general
+web search is acknowledged as imperfect — a direct platform crawl would be
+more authoritative but wasn't attempted this round.
+
+**EU AI Act Article 53 — enforcement machinery live, no punitive action
+taken yet.** The Commission's supervision/enforcement powers against GPAI
+providers came into force 2026-08-02 (confirmed against multiple sources;
+the roadmap's existing text already had this date correct — a discrepancy
+in this round's own search brief, not in prior research). As of Sept 15,
+2026, GPAI providers over the 10^25 FLOPs training-compute threshold
+submitted their first formal systemic-risk evaluations to the EU AI Office
+— a compliance-submission milestone, not enforcement. No fine, penalty, or
+market-withdrawal order against any named company found. Separately, the
+Digital Omnibus (Regulation 2026/1744, signed 2026-07-27) pushed the
+high-risk-AI conformity-assessment deadline to 2027-12-02 — a different
+compliance track than Article 53's GPAI-transparency duty, noted here for
+completeness but not actioned into a roadmap item; nothing here changes the
+existing copy angle.
+
+## Pass 2 — Three under-covered functional areas
+
+**Area 1 — Research/reference-material storage is a real, well-evidenced
+"second app" gap, distinct from the already-logged Notion/Obsidian
+planning use.** Scrivener's Research folder is the strongest native
+precedent, and the mechanic that matters is the *viewing* arrangement, not
+storage alone: writers lock a reference PDF in a Copyholder or Quick
+Reference window beside the draft and copy quotes across "in a matter of
+seconds" (catherinepope.com/posts/how-to-use-the-research-folder-in-
+scrivener — a professional Scrivener trainer's own account), and a second
+independent source catalogues four distinct viewing arrangements writers
+use specifically to avoid breaking flow while cross-referencing
+(jenterpstra.com/blog/view-reference-materials-in-scrivener) — real,
+observed effort spent tuning the split, which is itself evidence the
+side-by-side arrangement is the valuable part. Scrivener's own version has
+a documented, beatable cost: large PDFs/media bloat the monolithic `.scriv`
+project file, slowing backups and sync (same source; corroborated
+generally at forum.literatureandlatte.com/viewtopic.php?t=54499). Checked
+our own code: `src/state/cardImages.ts` stores exactly one downscaled JPEG
+per note at `.novella/images/<note-id>.jpg` — the closest existing analog,
+architecturally the right pattern (a separate file per attachment, not
+inlined into a note body, so Novella's per-file vault sidesteps Scrivener's
+bloat problem by construction) but scoped narrowly to card art; no PDF
+support, no multi-file attachment, no side-by-side viewer exists today.
+NovelCrafter's own course material confirms the direct competitive gap:
+"research" there means Codex text fields (Key Takeaways, Direct Quotes)
+meant to ground AI prompts, not a place to read a source document or photo
+(novelcrafter.com/courses/codex-cookbook/organizing-research-notes,
+official) — no independent review was found describing a user trying to
+put a PDF or image into NovelCrafter at all, a documented absence rather
+than a confirmed pain point, but consistent with the docs' framing. The
+"second app for research" pattern is real and distinct from the
+already-logged story-bible use of Notion/Obsidian: writers independently
+describe running Evernote, Obsidian, or a Google Drive+Keep combination
+*alongside* Scrivener purely for research capture, several invoking Tiago
+Forte's "second brain" framing by name (bowendwelle.substack.com/
+p/staying-sane-with-research-notes; goodreads.com/author_blog_posts/
+9470698 "Hello, Evernote"; goodreads.com/author_blog_posts/19014015
+"Scrivener's Research Folder"; two independent thesiswhisperer.com posts on
+the identical pattern in academic writing, evidence the pattern isn't
+fiction-specific). Obsidian's own first-party Web Clipper — shipped by
+Obsidian's CEO personally, replacing years of third-party clipper plugins,
+explicitly positioned for "researchers, writers, or anyone who frequently
+annotates online material" with highlight-persistence across return visits
+(obsidian.md/help/web-clipper, official) — is a strong signal from a
+structurally different company that research-clipping is treated as core
+retention infrastructure, not a nice-to-have; Notion's own Web Clipper
+exists too but only product-page language was found for it, no independent
+user account, a weaker evidence class. A same-category comparison piece
+(storyflow.so, itself a competing tool, so read as persuasive rather than
+neutral, but its qualitative claims line up with the independent sources
+above) states the pattern in one sentence: "most writers need two tools,
+not one" for research — Scrivener's split-screen view is "the single most
+useful thing any of these tools do," Obsidian surfaces connections better
+but handles manuscripts worse, Notion is fine for structured interview
+metadata but "slow to search and unpleasant to read" for long transcripts,
+and Zotero is citation-only and pairs with everything else. **Verdict:
+roadmap-worthy, moderate-to-high confidence.** Added as a new, fully-scoped
+item: local file attachment (PDF/image, stored as separate files per the
+cardImages pattern) surfaced in a panel viewable beside the editor — citation
+management (Zotero's job) and full-text search inside attached PDFs are both
+explicitly out of scope for v1.
+
+**Area 2 — Beta-reader feedback triage past the comment stage narrows to
+one specific, high-confidence gap: cross-reader clustering.** The generic
+"triage a pile of comments into buckets" framing turned out to be mostly
+already solved — BetaBooks' own product copy confirms a five-state
+taxonomy (To Do/Consider/Ignore/Done/Keep, richer than the three states
+previously logged), filter/sort by reader or chapter, a reading-progress
+dashboard per reader, and bidirectional navigation between a highlighted
+passage and its comment (betabooks.co, official). What no reviewed tool
+does — confirmed by a direct read of BetaBooks' own "Inline Feedback, now
+in Beta" post, which is silent on any completion-tracking or
+unaddressed-only filter for comments specifically (betabooks.co/blog/post/
+inline-feedback-now-in-beta, official but possibly incomplete/dated) — is
+cluster same-issue comments *across different readers*. A 2026 competitive
+teardown of the entire category (an author who evaluated BetaBooks,
+BetaReader.io, StoryOrigin, and Scribophile before building a competitor)
+names this directly: feedback "arrives as an undifferentiated pile
+requiring manual filtering," with "no AI synthesis assistance to help
+manage synthesis from 30+ beta readers across lengthy manuscripts"
+(theindielab.net/p/i-looked-at-every-beta-reader-platform — reviewer
+opinion, vendor-motivated since the author is now a competitor, but the
+diagnosis is independently corroborated below). Four separate craft-advice
+sources on processing beta feedback converge on the same manual heuristic
+as the real signal that matters: "comments from several readers pointing
+out the same thing really need your attention" (setyourmuseonfire.
+substack.com; dabblewriter.com/articles/how-to-use-beta-reader-feedback;
+thewritepractice.com/beta-readers-feedback; emmarowan.com/writing/2021/
+09/30/compiling-beta-reader-revision-notes) — meaning writers manually
+cross-reference the same issue across multiple readers' separate comment
+threads by hand, and a documented workaround exists specifically for this
+(a free spreadsheet template at debbie-emmitt.com built to sort feedback by
+chapter and surface cross-reader overlap). A comment-permanence complaint
+about the incumbent, Google Docs, is real and independently corroborated
+(waymakeros.com/learn/document-collaboration-comments-lost: a resolved
+thread's reasoning "evaporates") — but a correction is needed before this
+goes in copy: Google Docs does have a native resolved/unresolved comment
+filter (support.google.com/docs/thread/22085709; /thread/19788625), it's
+just poorly discoverable — the accurate claim is "hard to find," not "does
+not exist." A first-hand BetaBooks review (jamifairleigh.com/2021/01/29/
+software-review-betabooks/, dated Jan 2021, may not reflect the current
+product) describes real friction — tedious chapter-by-chapter uploads,
+mangled punctuation on paid-tier HTML uploads, minimal reporting — and the
+reviewer's eventual abandonment of the tool for Google Docs and then a
+competitor; useful as a "replacement tool broke, fell back to incumbent"
+data point but flagged as dated. **Verdict: roadmap-worthy but narrower
+than the brief hypothesized, high confidence on the specific sub-problem.**
+Folded into the existing inline-comments/margin-notes roadmap item as a
+sharpened build spec (flag same-paragraph comments from different readers;
+keep a resolved thread's full history permanently searchable) rather than
+filed as a new item, since it extends the same anchor/resolve mechanism
+that item already specs.
+
+**Area 3 — Keyboard-first workflows: one strong, in-category finding; two
+hypothesized sub-claims did not corroborate.** The single strongest data
+point in this whole pass: Dabble's own feature-request board carries a
+user-authored complaint that Dabble "is very mouse intensive," lacking
+cursor-key tree navigation, a rename shortcut, a delete shortcut, or any
+keyboard-driven way to create a scene/note/folder
+(dabble.featureupvote.com/suggestions/19512/keyboard-shortcuts — 403'd to
+direct fetch, read via search-cache summary only; re-verify the live page
+before quoting verbatim in external-facing copy). This is stronger than a
+general cross-category inference because it's in-category (a direct novel-
+writing competitor) and specific (a named list of missing shortcuts, not a
+vague "could be faster"). Checked our own UI for the same gap: grepped
+`src/ui/*.tsx` for `ArrowUp`/`ArrowDown`/`F2`/`Delete` handling and found
+none applied to the manuscript/note tree — only `CommandPalette.tsx`'s own
+internal list navigation and the editor's Alt+↑/↓ paragraph-move exist
+today. Novella has the identical gap Dabble's own users are naming.
+Obsidian's power-user culture supplies a useful framing for how to build
+this, not just that to build it: writers consistently describe keyboard
+fluency (Command Palette, Quick Switcher, inline link insertion) as
+protecting *flow* during drafting rather than raw typing speed —
+"avoid breaking your train of thought" (ilyashabanov.substack.com/p/
+power-user-initiation-becoming-2x, one power user's own account, treated as
+illustrative not statistical) — language that maps onto Novella's existing
+positioning rather than introducing a new one. Scrivener has full custom-
+keybinding support but weak self-documentation of it, evidenced
+circumstantially by at least four independent third-party "Scrivener
+keyboard shortcuts cheat sheet" write-ups (makeuseof.com/tag/scrivener-
+keyboard-shortcuts-cheat-sheet-mac and others) filling a gap its own docs
+apparently don't close on their own — an inference from the existence of
+fan-made alternatives, not a direct complaint quote, but worth a caution:
+ship a real in-app discoverable shortcut reference, not just working
+shortcuts nobody can find. Two hypothesized sub-claims from the research
+brief did NOT corroborate after multiple search attempts and should not be
+cited without better sourcing: a Notion-mouse-first complaint (nothing
+found — Notion's own Cmd/Ctrl+K palette is marketed at keyboard-driven
+power users, with no independent complaint or contrasting praise thread
+located), and text-expander tools (Espanso/TextExpander) being used
+specifically to work around a missing app shortcut (writers clearly use
+Espanso for character-name/setting snippet consistency, and separately as
+a genuine accessibility tool for a writer with dysgraphia — but no source
+connected either use to a missing keyboard shortcut in a writing app).
+**Verdict: roadmap-worthy, narrowly scoped to the corroborated Dabble-
+shaped gap.** Added as a new item: arrow-key tree navigation, F2/Enter to
+trigger the already-shipped rename-in-place mechanism, Delete with the
+existing undo toast, and a discoverable in-app shortcut sheet — explicitly
+not a text-expander/snippet system, which this round's evidence doesn't
+support building.
+
+## What changed in "Next up"
+
+Added two new items: a fully-scoped local research/reference panel (PDF/
+image attachment, split-screen viewing, reusing the `cardImages.ts`
+per-file pattern), and full keyboard navigation of the manuscript/note tree
+plus a discoverable shortcut sheet, scoped to the corroborated Dabble gap.
+Sharpened the existing inline-comments/margin-notes item with a cross-
+reader-clustering build spec and a correction (Google Docs' resolved-
+comment filter exists but is poorly discoverable — don't cite it as
+missing). Reinforced two existing items with new evidence rather than
+duplicating: the no-training/privacy item gained the Bartz settlement's
+publisher/author payout-split dispute detail, and the no-outage/data-loss
+item gained direct confirmation that the external-drive Scrivener forum
+thread still has zero staff response a month later. Added a note to the
+Source-access workaround standing section flagging that CourtListener
+access has now failed two rounds running for the Kadrey v. Meta thread —
+next attempt should try a docket mirror rather than repeat the same web
+search. Did not touch the four-pillar-bundle mega-item or the EU AI Act
+line — both reconfirmed with no material change, per the "reconfirm without
+re-writing" rule rather than padding an already-very-long item.
+
+## Round 48 sources
+
+- catherinepope.com/posts/how-to-use-the-research-folder-in-scrivener
+- jenterpstra.com/blog/view-reference-materials-in-scrivener
+- forum.literatureandlatte.com/viewtopic.php?t=54499, t=32898
+- novelcrafter.com/courses/codex-cookbook/organizing-research-notes (official)
+- bowendwelle.substack.com/p/staying-sane-with-research-notes
+- goodreads.com/author_blog_posts/9470698, /19014015
+- thesiswhisperer.com (two posts, research-notes-alongside-drafting-tool pattern)
+- obsidian.md/help/web-clipper (official); obsidian.rocks/the-obsidian-web-clipper-fixes-everything
+- storyflow.so/blog/scrivener-vs-obsidian-vs-notion-vs-zotero-book-research-2026
+- betabooks.co, /blog/post/inline-feedback-now-in-beta (official)
+- jamifairleigh.com/2021/01/29/software-review-betabooks (dated Jan 2021)
+- theindielab.net/p/i-looked-at-every-beta-reader-platform
+- setyourmuseonfire.substack.com; dabblewriter.com/articles/how-to-use-beta-reader-feedback
+- thewritepractice.com/beta-readers-feedback
+- emmarowan.com/writing/2021/09/30/compiling-beta-reader-revision-notes
+- debbie-emmitt.com/beta-reader-feedback-how-to-deal-with-it-with-free-template
+- waymakeros.com/learn/document-collaboration-comments-lost
+- support.google.com/docs/thread/22085709, /thread/19788625
+- dabble.featureupvote.com/suggestions/19512/keyboard-shortcuts (403'd, search-cache only)
+- obsidian.rocks; xda-developers.com; clickup.com/blog/obsidian-shortcuts
+- ilyashabanov.substack.com/p/power-user-initiation-becoming-2x
+- makeuseof.com/tag/scrivener-keyboard-shortcuts-cheat-sheet-mac; scribd.com; tjosvold.substack.com/p/scrivener-07-custom-keyboard-short
+- iainbroome.com/text-expanders; veroniiiica.com/espanso-text-expander
+- blog.taaonline.net (2026-09-04 post, official)
+- courtlistener.com/docket/67569326/kadrey-v-meta-platforms-inc (403'd)
+- mckoolsmith.com AI Litigation Tracker (via search snippet)
+- status.sudowrite.com, feedback.sudowrite.com/changelog (official)
+- novelcrafter.com/changelog, /blog (official)
+- dabble.featureupvote.com (403'd), dabblewriter.com/blog
+- play.google.com/store/apps/details?id=com.campfiremobile
+- literatureandlatte.com/blog
+- blog.type.ai
+- forum.literatureandlatte.com/t/manually-saving-scriveners-projects-to-an-external-drive-suddenly-stopped-working/154495 (direct read)
+- Internal: src/state/cardImages.ts, src/ui/*.tsx (grep for ArrowUp/ArrowDown/F2/Delete), src/ui/CommandPalette.tsx, src/ui/EditorPane.tsx
 - Internal: src/ui/{GoalMeter.tsx,GoalsTab.tsx,SettingsModal.tsx,CodexPane.tsx}
