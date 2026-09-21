@@ -7450,3 +7450,437 @@ item instead of duplicating it.
 - campfirewriting.com/learn/state-of-the-campfire-2026 (official)
 - inkfluenceai.com, appsumo.com/products/inkfluence-ai
 - Internal: src/ui/{GoalMeter.tsx,GoalsTab.tsx,SettingsModal.tsx,CodexPane.tsx}
+
+# Round 48 (2026-09-21) — Reference/research storage, the inline-AI selection-toolbar pattern, and a quiet-week news sweep
+
+Housekeeping first: working tree was clean at session start; local branch
+matched `origin/main` exactly at round 47's commit (2026-09-16, five days
+prior), no fast-forward needed. With 47 prior rounds behind this one, this
+round scanned RESEARCH.md for genuinely uncovered ground rather than
+re-sweeping known territory and found two: (1) "research storage" —
+where writers keep non-manuscript reference material (images, clippings,
+links) — is named explicitly in the standing research brief's topic list
+but had never received a dedicated pass; beta-reader feedback, comments,
+and the worldbuilding Codex were all deeply covered, but the plain
+"miscellaneous reference bucket" job was not. (2) The inline-AI
+selection-toolbar interaction pattern — the single most-discussed UX
+convention in AI writing tools — had been touched only in passing (the
+reword-in-place keyboard-shortcut item, round 41) and never given its own
+mechanics-first pass across competitors. Dispatched two parallel research
+agents at these, plus a third focused dated-news sweep since round 47.
+Did not re-run the four-pillar bundle check, litigation-date tracking, or
+the SKILLS.md scouting standing pass this round.
+
+## Pass 1 — Reference/research storage (non-Codex, non-manuscript material)
+
+**Per-app mechanics, evidence-typed.**
+
+*Scrivener* has the most complete native answer: a fixed, undeletable
+Research folder in the Binder, official capability, accepting any file
+type (text, PDF, image, audio, video, webpage) via drag-and-drop or
+File > Import. Organization is manual sub-foldering, no built-in tagging
+beyond Scrivener's general label/status/keyword system. Linking to the
+manuscript is view-time only — Split Editor, Copyholders, Inspector
+Bookmarks, and Quick Reference panels let a writer see a research
+document beside the manuscript and copy across, not a structured
+metadata link (literatureandlatte.com/blog/use-scriveners-research-
+folder-to-store-information-about-your-project, official;
+scrivener.tenderapp.com/help/kb/features-and-usage/the-three-root-
+folders, official). Two real, sourced complaints, both about the same
+underlying design choice: a Literature & Latte forum user asking for
+*linked* (not copied) files was told linking is disallowed "by design"
+(forum.literatureandlatte.com/viewtopic.php?t=11426); the same thread
+documents the consequence — "putting large files there is a very bad
+idea. They slow down Scrivener, the duplicates (and Backups) waste a lot
+of disk space." A well-established semi-official workaround pairs
+Scrivener with Zotero for citation management specifically, kept as a
+separate tool and reconciled at compile time
+(forum.literatureandlatte.com/t/using-scrivener-with-zotero-adding-
+sources-to-research-and-keeping-synced-with-zotero-and-other-s-z-
+workflow-tips/38835); even a Lit&Latte-affiliated blog author admits the
+pairing creates "duplication of effort" but argues it's worth it anyway
+(catherinepope.com/posts/how-to-use-the-research-folder-in-scrivener/).
+
+*NovelCrafter* has no separate research space at all — research material
+is repurposed Codex infrastructure, and this repurposing has a hard,
+documented ceiling: "Currently you can only have one image associated
+with a codex entry" (novelcrafter.com/help/faq/codex/reference-images,
+official). The closest thing to a reference bucket is a Codex entry's
+External tab, a list of outbound links — "inspiration images, YouTube
+videos, audio files, music/soundtrack links, quizzes, character sheets"
+(novelcrafter.com/help/docs/codex/anatomy-codex-entry, official) — links
+only, no stored files, no thumbnails. NovelCrafter's own "cookbook"
+prescribes a manual workaround for research specifically: one Codex entry
+per source, tagged "REF: [Title] (Year)," Custom Details fields for
+Source Type/Key Takeaways/Direct Quotes/Citation, bundled under a "Topic
+Hub" entry via Relations (novelcrafter.com/courses/codex-cookbook/
+organizing-research-notes, official) — official guidance that amounts to
+"here is how to bend our worldbuilding feature into a research feature."
+
+*Campfire* claims a Research module — weblinks, annotated videos, PDFs,
+images, text notes, tag/categorize, and stated integration back into the
+manuscript and other modules — but this round could not independently
+verify the actual add-item mechanism (file drop vs. URL paste vs. note
+creation) from any source reached; the module's own tutorial page loaded
+but its body content wasn't retrievable, and every other source found was
+marketing-level summary (selfpublishing.com, a Reedsy review). Treat
+Campfire's Research module as **weaker, unverified evidence** relative to
+the other five apps — flagged for a follow-up pass with direct product
+access rather than taken on faith. One confirmed, sourced fact: the
+Research module (along with Relationships, Arcs, Languages, Calendar) is
+not available on Campfire's mobile app at all (reedsy.com/blog/guide/
+book-writing-software/campfire-write-review) — desktop/browser only,
+consistent with round 47's broader mobile-parity findings for this app.
+
+*Dabble* has no dedicated research module; images live only inside Story
+Notes (characters, worldbuilding, "random notes and research links") and
+chapter-heading images. A comparative reviewer frames the gap directly:
+"if you're after heavy research database integration, you may likely
+outgrow Dabble... Scrivener provides a more dedicated Research folder" —
+sourced via a kindlepreneur/Reedsy search summary, not independently
+re-verified against the original page (G2's review page 403'd on direct
+fetch), so treat as medium-confidence reviewer opinion, not a verified
+quote.
+
+*type.ai* has nothing purpose-built for this job at all — a genuine
+negative finding, not a research gap. Its "Notes" feature is general
+AI-aware text storage (characters, story, world details) with inline
+image/table/code/math embedding in documents, the same treatment given to
+prose. No moodboard, no web clipper, no external-link store found
+anywhere in official sources or search summaries.
+
+*Notion* has no first-party novel feature but is the most-cited
+destination for this exact job across independent sources. Named author
+templates bundle a "Research Hub" + "Moodboard" database alongside
+outline/character tools ("Writer's Ultimate Hub,"
+prototion.com/notion-template/Writers-Ultimate-Hub; "Modern Writer,"
+via gridfiti.com/notion-templates-for-writers/). Observed user behavior,
+consistent across multiple independent blog/forum sources: a Notion page
+per book with an embedded Pinterest-board link, a music playlist, and
+quick notes, while the actual prose is drafted elsewhere (Word, Pages,
+Scrivener) — Notion functioning explicitly as the side research/
+inspiration hub, never the drafting tool. Notion's own Web Clipper (an
+official product) is used by some writers to build a tagged "reading
+list" database of clipped articles — a genuine capture mechanism this
+round found in no dedicated fiction-writing tool.
+
+*Obsidian* has no canonical research module either; recommended vault
+structures for novelists place a plain "Research" markdown folder beside
+Manuscript/Characters/Worldbuilding/Plot (e.g. the free "Novelist" vault,
+medium.com/@sakalakis/the-novelist-a-free-obsidian-vault-for-
+worldbuilding-and-novel-writing-6faafcfe82d5) with no special file/image/
+clipping handling by default. One real, purpose-built exception: Obsidian
+Clipper, an official-adjacent Chrome-extension plugin that captures web
+highlights as Markdown into notes, explicitly marketed for "researchers,
+writers, or anyone who frequently annotates online material"
+(obsidianstats.com/plugins/obsidian-clipper). Tellingly, a dedicated
+fiction-writer's Obsidian setup guide limits its own plugin
+recommendations to four (Longform, Templater, Dataview, Calendar) and
+states plainly that it provides no guidance on research-folder
+implementation at all (loreteller.com/learn/obsidian-fiction-writers-
+guide/) — even a guide written specifically for novelists in Obsidian
+treats this job as out of scope.
+
+**Strongest cross-app finding: the "second app" pattern is real, named,
+and has already produced a commercial product built around exactly this
+gap.** A comparative review frames it as a structural "three-pile
+problem" — "Research is three different piles, and most writers get
+stuck by choosing one tool for all three," concluding "most writers need
+two tools, not one. Zotero plus one of the others covers almost every
+book" (storyflow.so/blog/scrivener-vs-obsidian-vs-notion-vs-zotero-book-
+research-2026, reviewer opinion, but corroborated independently by
+Scrivener's own "duplication of effort" admission and NovelCrafter's own
+cookbook workaround). Stronger, independent validation: Milanote sells a
+dedicated "Novel Moodboard" template
+(milanote.com/templates/creative-writing/novel-moodboard) built around
+precisely the image/reference-collection job this round investigated —
+a third-party company's product decision is a materially stronger signal
+than a Novella-team hypothesis. The recurring pattern described
+independently across multiple writer-community sources is a Pinterest
+board per book for character/setting inspiration images
+(learnhowtowriteanovel.com/blog/2022/04/28/using-pinterest-to-help-with-
+character-creation/; milanote.com/guide/novel-moodboard) — "if they can
+see it, they can describe it," paraphrased across sources.
+
+**Methodology caveat, worth recording plainly:** WebSearch in this
+sandbox returned AI-summarized results rather than raw snippets for
+several queries, and direct fetches to Reddit and G2 were blocked (403 /
+tool-level refusal) despite repeated targeted queries (site:reddit.com,
+r/writing, r/scrivener, r/fantasywriters). Every "user discussion" data
+point above comes from blogs, Substack posts, official forums
+(Literature & Latte's own), and review aggregators rather than Reddit
+itself — a real coverage gap for this specific round. A future round with
+working Reddit access would likely surface more direct "second app"
+testimony than captured here; flag rather than overstate confidence in
+the current evidence base.
+
+**Roadmap action:** a new "Next up" item — a local, many-per-note
+reference gallery plus a plain link list, explicitly scoped to avoid two
+now-confirmed competitor failure modes: NovelCrafter's one-image-per-
+entry ceiling (confirmed as an identical flaw already present in our own
+`cardImages.ts`, which is one fixed path per note today) and Scrivener's
+copy-not-link project bloat. Placed beside the existing timeline/
+location-map item, both being underbuilt worldbuilding-adjacent visual
+surfaces. Deliberately scoped to exclude citation/bibliography management
+(the Zotero-pairing complaint) as a nonfiction-specific need distinct
+from the general-fiction image/clipping job this pass investigated.
+
+## Pass 2 — The inline-AI selection-toolbar interaction pattern
+
+**Per-app mechanics, evidence-typed.**
+
+*Sudowrite*'s selection menu is a single, length-adaptive popup that
+appears automatically on any text selection — no right-click, no hotkey
+(docs.sudowrite.com/using-sudowrite/1ow1qkGqof9rtcyGnrWUBS/selection-
+menu/of43eZdiHYoyCtrofDerCZ, official). A single word offers Comment,
+Describe, Quick Edit, Related Words; a longer passage adds Rewrite,
+Expand, Visualize. Write (continuation) lives on the main toolbar,
+triggered from cursor position rather than selection. Rewrite handles up
+to 6,000 words via six presets (Rephrase, Shorter, More Descriptive,
+Show-Not-Tell, More Inner Conflict, More Intense) plus Customize, output
+appearing as a card in a right-side History panel with the changed text
+highlighted in purple before an explicit Insert click — roughly three
+clicks and one dropdown for a common rewrite
+(docs.sudowrite.com/.../rewrite/9hkeezeUsCiUCG4dRdEqjS, official). Story
+Bible context is documented, not assumed, to be partial: "For passages
+under 600 words, the AI references your Synopsis for broader narrative
+context. Longer rewrites operate independently without this additional
+context" — an official, admitted context cliff, not a complaint. A
+Trustpilot review of a long-manuscript run through Sudowrite's tools ties
+directly into that cliff: "an endless comedy of errors and progressive
+corruption of the source text, characters and themes," citing "context,
+memory" problems (uk.trustpilot.com/review/www.sudowrite.com). A separate,
+official feedback-board complaint (76 upvotes, status Completed —
+meaning Sudowrite eventually fixed it) reports the toolbar "covers the
+selection, making it difficult to read, adjust, or replace titles and
+short phrases" on selections of four words or fewer
+(feedback.sudowrite.com/p/floating-or-relocated-toolbar). A comparison
+piece frames the whole multi-tool model as clutter: Sudowrite feels "like
+using Microsoft Word with twenty separate documents open instead of one
+cohesive manuscript" (ilampadmanabhan.medium.com/sudowrite-vs-type-ai-
+no-hype-just-what-helped-my-fiction-writing-feb-2026-9a21042770a7 — this
+specific article 403'd on direct fetch, quote sourced via search-result
+excerpt only, flagged lower-confidence).
+
+*NovelCrafter* has no single unified menu — three or four separate AI
+surfaces instead. Inline "Text Replacement Prompts" (community-nicknamed
+"laser tools") trigger on a minimum ~4-word selection, three default
+system prompts (Expand, Rephrase, Shorten) each with a "Tweak and
+Generate" sub-step, plus a distinctive bracketed-inline-instruction
+affordance ("[change to past tense]") not found in any other app checked
+(novelcrafter.com/help/docs/write/text-replacement-prompts,
+novelcrafter.com/courses/novelcrafter-cookbook/bracketed-instructions,
+both official; enhanced May 2025 per novelcrafter.com/blog/may-2025-new-
+prompting-system-update). Output-preview mechanism before replacement is
+genuinely undocumented — a real gap in NovelCrafter's own docs, not a
+confirmed behavior either way. Separately, a slash command in the Write
+tab surfaces "Scene Beat" generation (the Write-equivalent), and a fully
+separate Chat panel requires manually hand-picking context — "Full novel
+text and/or outline..., Acts, chapters and scenes, Snippets, Codex
+entries" — before every message (novelcrafter.com/help/docs/chat/the-
+chat-interface, official: context is opt-in, not automatic, by the docs'
+own description). A fourth surface, a kebab action menu on scene objects,
+offers utility actions like "chat with your scene." Reviewers name this
+fragmentation directly as the sharpest onboarding cost found anywhere in
+this research: "Buttons everywhere, panels I didn't understand,
+terminology I hadn't encountered" — though the same reviewer concludes
+"once it's running, there's nothing quite like it"
+(ilampadmanabhan.medium.com/novelcrafter-review-64d391c629a2, titled
+"Powerful for Fiction Writers, Frustrating to Set Up"). A second,
+independent reviewer uses almost the same language: "more of an Adobe
+Photoshop than a Canva, favoring versatility and power over simplicity"
+(kindlepreneur.com/novelcrafter-review/).
+
+*type.ai* triggers via a forward-slash command menu, with power users
+reporting they drop the slash entirely once shortcuts are memorized
+(blog.type.ai/post/writing-with-ai-commands, official). Seven flat-list
+hotkey-bound commands (Generate Content, Write Sentence, Write Paragraph,
+Write List, Continue Writing, Generate Section/Document Headline) — no
+categorization or sub-menus. No documented preview step before insertion
+anywhere in the official blog post; commands appear to insert directly,
+with the user expected to "tweak so it sounds like me" afterward — a
+meaningfully riskier insertion model than Sudowrite's card-preview-then-
+insert flow, flagged as either a real gap or an under-documented feature
+since no independent reviewer walkthrough filled in the missing detail.
+type.ai's context claim ("Type's inline commands know what's in your
+document, where your cursor is... in most cases, you don't need to
+provide any additional instructions") is vendor copy from its own blog,
+not independently verified — and notably, type.ai appears to have no
+structured story-bible concept at all; its differentiator is "read the
+whole document," not curated metadata.
+
+*Dabble* has none of this by deliberate, stated policy: "Dabble will
+never put words on the page for you. No chatbot. No 'write this scene
+for me.' No AI rewriting or summarizing your prose... a deliberate
+choice, and it's one we intend to keep" (dabblewriter.com/docs/
+reference/dabble-is-ai-free, official). Its only AI-adjacent feature is
+device-native text-to-speech ("Read to Me"), not generative. A separate,
+unrelated "dabble.ai" project surfaced in search results and should not
+be conflated with Dabble Writer (dabblewriter.com) — flagged so it isn't
+miscited downstream as "Dabble's AI feature."
+
+*Notion AI* and *Obsidian plugins*, checked as reference points outside
+fiction-writing tools specifically: Notion AI's selection popup offers a
+flat preset list (Improve Writing, Proofread, Explain, Reformat, Fix
+spelling & grammar, Change tone, Translate) plus custom prompts and
+custom team "skills," with a clean Accept/Discard/Try Again three-way
+decision after generation (notion.com/help/guides/notion-ai-for-docs,
+official). Obsidian's Text Generator plugin is command-palette-driven
+rather than a selection popup — a heavier trigger requiring an extra
+step — while a separate "Explain Selection With AI" plugin does integrate
+into the right-click context menu (github.com/nhaouari/obsidian-
+textgenerator-plugin; obsidianstats.com/plugins/explain-selection-with-
+ai). Obsidian's Smart Connections plugin is a different pattern
+entirely — an always-on side panel surfacing semantically related notes
+via a local embedding model, no API key required — whose "Smart Context"
+sub-feature targets the exact context-blindness problem this pass keeps
+finding: letting a user deliberately assemble "grounded context packages
+from their actual notes" for AI prompts (smartconnections.app/smart-
+context/).
+
+**Strongest findings for Novella, checked directly against our own
+code.** Checked `src/ui/RewordPopover.tsx`, `src/ui/rewordCore.ts`, and
+the trigger logic in `src/ui/EditorPane.tsx`:
+
+1. Novella's existing chip-then-popover trigger (a small "✦ Reword" chip
+   anchored past the selection's right edge; clicking it opens the full
+   popover 42px below) already matches Sudowrite's single-popup model
+   rather than NovelCrafter's fragmented one, and already avoids by
+   construction the specific short-selection occlusion bug that cost
+   Sudowrite a 76-upvote complaint — confirmed by reading the positioning
+   math (`coords.right - rect.left`, clamped, then offset below rather
+   than over the selection). No fix needed; recorded here so a future
+   round doesn't re-flag it.
+2. `RewordPopover`'s result stage already does preview-before-commit as a
+   comparison (styled result text plus an explicit Replace / Keep
+   original pair), the safer pattern this pass found Sudowrite uses and
+   type.ai's documentation conspicuously doesn't describe. Confirms the
+   existing shape is right; the finding is to defend it against any
+   future push toward direct insertion for speed.
+3. The real, actionable gap: `buildRewordRequest()` in `rewordCore.ts`
+   only passes ~400 characters of manuscript text immediately before and
+   after the selection, for voice-matching — it never touches
+   `buildSceneContext()` or anything else in `src/ai/context.ts`. Chat
+   and the proposed Brainstorm-mode item both go through that pipeline;
+   reword-in-place, the feature a writer reaches for most, does not.
+   Sudowrite's own 600-word Story Bible cliff and NovelCrafter's
+   manual-context Chat panel are the two competitor patterns to beat, not
+   copy — Novella's context.ts pipeline already exists and could feed
+   every reword regardless of selection length, with the result showing
+   what it used (a small trust-building label, echoing but improving on
+   Sudowrite's "Looked at" tag). Folded into the existing reword-in-place
+   "Next up" item as its new top finding, ahead of the keyboard-shortcut
+   and compare-view improvements already queued there.
+4. Interaction-design caution, not itself a build item: NovelCrafter's
+   fragmented four-surface AI access is reviewers' most-cited friction
+   point in this whole pass. Folded as a short caution into the
+   Brainstorm-mode "Next up" item — when built, it should extend the
+   existing Reword-popover/slash-command visual language rather than open
+   a separate destination.
+
+## Pass 3 — Dated news sweep since round 47 (2026-09-16)
+
+A focused changelog/release-notes sweep, not general feature research.
+Bottom line: **a normal quiet week** — nothing in the Sept 16-21 window
+rose to a new roadmap item for any of the six competitors.
+
+- **NovelCrafter**: no changelog entries since March 21, 2026
+  (novelcrafter.com/changelog, official).
+- **Sudowrite**: two model additions, both just before this window but
+  within 30 days — Sept 5, GPT-6 Astra added to Write/Draft/Plugins,
+  pitched for continuity and Story Bible adherence; Sept 2, Claude Fable
+  5.1 added ("fewer false refusals" for dark-themed content) —
+  reinforcing rather than changing the standing local-model item's case,
+  and continuing the pattern round 47 already flagged of Sudowrite
+  patching cloud-model refusal behavior via new model additions
+  (feedback.sudowrite.com/changelog, official).
+- **Dabble**: quiet; Dabble 3.0 (July 14, 2026) remains the last major
+  event, now over two months old.
+- **Scrivener**: quiet on releases (Windows 3.1.6 since Sept 2025, Mac
+  3.5.0 since Oct 2025); two Sept 15-16 blog posts reaffirm a no-AI
+  positioning stance while every other competitor adds models — editorial
+  content, not a product change (literatureandlatte.com/blog).
+- **Campfire**: no dated changelog entry found for this window; treat as
+  quiet/unverified rather than confirmed-quiet, since search results kept
+  surfacing an unrelated same-named product (the 37signals/Basecamp
+  "Campfire" chat app at once.com/campfire) — a methodology note for
+  future sweeps to filter that out explicitly.
+- **type.ai**: quiet; current site copy (premium Anthropic/OpenAI/Google
+  models, $12/month, 150k-word manuscript support) is unchanged from
+  prior rounds.
+- **Industry**: Anthropic shipped Claude Fable 5.1 and Claude Mythos 5.1
+  on Sept 1, 2026, with a pricing change (cache reads cut to 1/4 rate,
+  roughly 25% cheaper typical workloads, ~45% cheaper agentic workloads)
+  — background context for AI-model-recommendation copy, not an action
+  item on its own.
+- **Bartz v. Anthropic**: no new development strictly inside the window,
+  but a concrete deadline sits just after it — a ~$450M settlement
+  payment tranche due before Sept 25, 2026, with a second ~$930/work
+  payment expected once it clears (authorsguild.org/news/anthropic-
+  settlement-update-91-percent-of-books-claimed/; blog.taaonline.net/
+  2026/09/next-steps-in-bartz-v-anthropic-settlement-resolving-claim-
+  percentage-differences/). Flagged for the next sweep to confirm the
+  payment actually landed rather than acted on now.
+
+## Implications for Novella (round 48)
+
+Two new-or-sharpened "Next up" items, both checked against our own code
+before being written up, consistent with this research's standing rule
+of grounding every claim in something verifiable: a local reference/
+research gallery (new item, explicitly designed around two now-confirmed
+competitor failure modes rather than copying either), and a Codex-context
+wiring fix for reword-in-place (folded into the existing item, now its
+lead finding). One interaction-design caution folded into the Brainstorm-
+mode item rather than made its own entry. Nothing from the news sweep
+rose to an item — the two flagged threads (the Bartz payment date, and
+whether Sudowrite's rapid model-onboarding cadence continues) are
+calendar notes for the next round, not action items today.
+
+## Round 48 sources
+
+- literatureandlatte.com/blog/use-scriveners-research-folder-to-store-information-about-your-project (official)
+- scrivener.tenderapp.com/help/kb/features-and-usage/the-three-root-folders (official)
+- forum.literatureandlatte.com/viewtopic.php?t=11426
+- forum.literatureandlatte.com/t/using-scrivener-with-zotero-adding-sources-to-research-and-keeping-synced-with-zotero-and-other-s-z-workflow-tips/38835
+- catherinepope.com/posts/how-to-use-the-research-folder-in-scrivener/
+- novelcrafter.com/help/faq/codex/reference-images (official)
+- novelcrafter.com/help/docs/codex/anatomy-codex-entry (official)
+- novelcrafter.com/courses/codex-cookbook/organizing-research-notes (official)
+- reedsy.com/blog/guide/book-writing-software/campfire-write-review
+- prototion.com/notion-template/Writers-Ultimate-Hub
+- gridfiti.com/notion-templates-for-writers/
+- nira.com/notion-web-clipper/, sparxno.com/blog/notion-web-clipper
+- medium.com/@sakalakis/the-novelist-a-free-obsidian-vault-for-worldbuilding-and-novel-writing-6faafcfe82d5
+- obsidianstats.com/plugins/obsidian-clipper
+- loreteller.com/learn/obsidian-fiction-writers-guide/
+- storyflow.so/blog/scrivener-vs-obsidian-vs-notion-vs-zotero-book-research-2026
+- learnhowtowriteanovel.com/blog/2022/04/28/using-pinterest-to-help-with-character-creation/
+- milanote.com/guide/novel-moodboard, milanote.com/templates/creative-writing/novel-moodboard
+- docs.sudowrite.com/using-sudowrite/1ow1qkGqof9rtcyGnrWUBS/selection-menu/of43eZdiHYoyCtrofDerCZ (official)
+- docs.sudowrite.com/using-sudowrite/1ow1qkGqof9rtcyGnrWUBS/rewrite/9hkeezeUsCiUCG4dRdEqjS (official)
+- docs.sudowrite.com/using-sudowrite/1ow1qkGqof9rtcyGnrWUBS/what-is-story-bible/jmWepHcQdJetNrE991fjJC (official)
+- docs.sudowrite.com/using-sudowrite/1ow1qkGqof9rtcyGnrWUBS/canvas/pQGLNzeYo1kLhGo14rdBy6 (official)
+- feedback.sudowrite.com/p/floating-or-relocated-toolbar (official)
+- uk.trustpilot.com/review/www.sudowrite.com
+- ilampadmanabhan.medium.com/sudowrite-vs-type-ai-no-hype-just-what-helped-my-fiction-writing-feb-2026-9a21042770a7 (search excerpt only, 403'd on fetch)
+- kindlepreneur.com/sudowrite-review, thewritepractice.com/sudowrite-review
+- novelcrafter.com/help/docs/write/text-replacement-prompts (official)
+- novelcrafter.com/courses/novelcrafter-cookbook/bracketed-instructions (official)
+- novelcrafter.com/blog/may-2025-new-prompting-system-update (official)
+- novelcrafter.com/help/docs/chat/the-chat-interface (official)
+- ilampadmanabhan.medium.com/novelcrafter-review-64d391c629a2
+- kindlepreneur.com/novelcrafter-review/
+- blog.type.ai/post/writing-with-ai-commands (official), type.ai/ (official)
+- dabblewriter.com/docs/reference/dabble-is-ai-free (official)
+- notion.com/help/guides/notion-ai-for-docs (official), storylane.io/tutorials/how-to-use-notion-ai
+- github.com/nhaouari/obsidian-textgenerator-plugin
+- obsidianstats.com/plugins/explain-selection-with-ai
+- smartconnections.app/smart-context/, github.com/brianpetro/obsidian-smart-connections
+- novelcrafter.com/changelog (official)
+- feedback.sudowrite.com/changelog (official)
+- literatureandlatte.com/blog, literatureandlatte.com/scrivener/release-notes (official)
+- dabblewriter.com/docs/reference/whats-new-in-3 (official)
+- releasebot.io/updates/anthropic/claude
+- authorsguild.org/news/anthropic-settlement-update-91-percent-of-books-claimed/
+- blog.taaonline.net/2026/09/next-steps-in-bartz-v-anthropic-settlement-resolving-claim-percentage-differences/
+- Internal: src/state/cardImages.ts, src/ui/{RewordPopover.tsx,rewordCore.ts,EditorPane.tsx}, src/ai/context.ts

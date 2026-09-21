@@ -334,6 +334,22 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       any AI-facing planning feature (this Brainstorm mode included) ships:
       Novella's claim isn't "we also have planning tools," it's "our
       planning tools are the ones the AI actually reads."
+
+      Interaction caution from research round 48 (2026-09-21), a dedicated
+      pass on inline-AI UX specifically: NovelCrafter's own reviewers name
+      fragmented AI access — a manual-context Chat panel, a separate
+      slash-command scene-beat generator, inline replacement prompts, and
+      a kebab action menu, four different destinations for four different
+      jobs — as the sharpest onboarding cost found anywhere in this
+      research ("Buttons everywhere, panels I didn't understand,
+      terminology I hadn't encountered," ilampadmanabhan.medium.com/
+      novelcrafter-review-64d391c629a2), against Sudowrite's single
+      length-adaptive selection popup, which reviewers don't single out
+      as confusing in the same way. When this Brainstorm mode is built,
+      it should read as an extension of the same visual language as the
+      existing Reword popover and slash-command menu — a category picker
+      reachable from the same places, not a fifth AI destination with its
+      own panel and its own rules.
 - [ ] **Auto-detect codex mentions in manuscript prose, and let an
       unrecognized name become a Codex entry inline** — research round 41
       (2026-09-03), a deliberate pass at competitor interaction mechanics
@@ -595,6 +611,63 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       view degrade to an empty state (the way `RelationshipWeb` already
       does — "Nothing to map yet") rather than gating any existing
       functionality behind "add it to the map first."
+- [ ] **A local reference/research bucket — images, links, and clippings
+      attached to a note but not capped at one, and not a Codex field** —
+      research round 48 (2026-09-21): a dedicated pass on where writers
+      actually keep non-manuscript research material — inspiration
+      photos, clipped articles, reference links — that isn't a
+      worldbuilding entry and isn't the manuscript itself, a job listed
+      in the research brief but never given its own pass in 47 prior
+      rounds. Checked our own code first: `src/state/cardImages.ts`
+      already ships exactly the flaw this item exists to avoid — one
+      fixed path per note (`.novella/images/<note-id>.jpg`), the same
+      one-image ceiling NovelCrafter's own docs admit for a Codex entry
+      ("Currently you can only have one image associated with a codex
+      entry," novelcrafter.com/help/faq/codex/reference-images,
+      official) — a location note wants five to twenty reference photos,
+      not one portrait. NovelCrafter's own cookbook response is a
+      workaround, not a feature: create one Codex entry per source, tag
+      it "REF: [Title] (Year)," and bundle them with a "Topic Hub" entry
+      plus Relations (novelcrafter.com/courses/codex-cookbook/
+      organizing-research-notes, official) — research material forced
+      into worldbuilding infrastructure it wasn't built for. Scrivener's
+      dedicated Research folder is the closest thing to doing this right
+      (any file type, drag-and-drop, view-time Split/Copyholder/Quick-
+      Reference juxtaposition against the manuscript) but its own users
+      report the real cost of the design: files are *copied* into the
+      project, never linked, "by design" — a Literature & Latte forum
+      user asking for linking is told exactly that
+      (forum.literatureandlatte.com/viewtopic.php?t=11426) — and large
+      files "slow down Scrivener... waste a lot of disk space" (same
+      thread), a failure mode a local-first vault needs to design away
+      from at the start, not patch later. Independent confirmation the
+      gap is commercially real, not a Novella-only hypothesis: Milanote
+      sells a dedicated "Novel Moodboard" template
+      (milanote.com/templates/creative-writing/novel-moodboard) built
+      around exactly this job, and the recurring pattern across
+      independent writer-community sources is a Pinterest board per book
+      for character/setting inspiration images — a genuine second app
+      this research keeps finding no competitor writing tool collapses
+      (type.ai has nothing at all for this; Dabble's Story Notes hold
+      images only inside character/worldbuilding profiles; Campfire
+      claims a Research module but its actual add-item mechanism — file
+      drop vs. URL paste vs. note — couldn't be confirmed from any
+      source reached this round, flagged for a follow-up pass rather
+      than taken on faith). A comparative review frames the underlying
+      shape well: "Research is three different piles, and most writers
+      get stuck by choosing one tool for all three"
+      (storyflow.so/blog/scrivener-vs-obsidian-vs-notion-vs-zotero-book-
+      research-2026) — sources/citations, material/clippings,
+      thinking/connections. Keep this item scoped to the middle pile
+      (material and clippings) rather than the first (citation/
+      bibliography management, a nonfiction-specific need Scrivener's
+      own Zotero-pairing complaint is really about). Build v1 as a
+      many-per-note gallery — extend `cardImages.ts`'s pattern from one
+      fixed path to a keyed list, `.novella/references/<note-id>/
+      <ref-id>.jpg`, so existing card-image code isn't broken, just
+      generalized — plus a plain URL/link list per note, reachable from
+      any Codex entry or board card. Not a new top-level app section,
+      just the one gap in what a note can hold today.
 - [ ] **Reword-in-place: keyboard-first accept/reject, and a compare view
       for several alternatives at once** — research round 41 (2026-09-03):
       checked `src/ui/RewordPopover.tsx` — the only key it handles is
@@ -615,6 +688,48 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       candidate at a time). Two small, independent improvements to a
       feature we already ship: add the keyboard scheme first (cheap, no
       design risk), then consider a "compare" toggle for a browsing pass.
+
+      Research round 48 (2026-09-21) finds a third, higher-priority gap in
+      the same component: checked `rewordCore.ts`'s `buildRewordRequest()`
+      — it feeds the model only the ~400 characters of manuscript text
+      immediately before and after the selection, for voice-matching
+      only; it never calls `buildSceneContext()` or anything else in
+      `src/ai/context.ts`, so a reword never sees a single Codex entry.
+      Chat and the proposed Brainstorm mode above both go through that
+      pipeline; the feature a writer reaches for most — select prose, ask
+      for a rewrite — does not. This is exactly the failure mode the rest
+      of this research keeps finding in competitors, worth avoiding
+      rather than matching: Sudowrite's own docs admit Rewrite only
+      consults its Story Bible for selections under ~600 words and shows
+      nothing at all beyond that (docs.sudowrite.com/using-sudowrite/
+      1ow1qkGqof9rtcyGnrWUBS/rewrite/9hkeezeUsCiUCG4dRdEqjS, official),
+      and a Trustpilot review of a long manuscript run through Sudowrite's
+      tools describes "an endless comedy of errors and progressive
+      corruption of the source text, characters and themes" tied
+      explicitly to context/memory limits
+      (uk.trustpilot.com/review/www.sudowrite.com). NovelCrafter avoids
+      the silent version of this failure only by making context manual —
+      its Chat panel requires hand-picking which Codex entries, acts, or
+      chapters to include before every message
+      (novelcrafter.com/help/docs/chat/the-chat-interface, official),
+      accurate but adding a step to every single generation. Novella can
+      beat both without adding a step: wire `buildSceneContext()`'s
+      Codex-entry detection into `buildRewordRequest()` the same way Chat
+      already uses it, and surface what was actually used — even a
+      one-line "Used: Wren, Kastellan Bridge" above the result — the
+      trust signal Sudowrite's own "Looked at" context tag gestures at
+      but only shows for short selections. Separately checked the
+      popover's own short-selection risk, the kind that cost Sudowrite a
+      76-upvote complaint (its toolbar "covers the selection" on
+      4-word-or-fewer highlights, making it "difficult to read, adjust,
+      or replace titles and short phrases,"
+      feedback.sudowrite.com/p/floating-or-relocated-toolbar, official,
+      status Completed): Novella's two-step chip-then-popover trigger in
+      `EditorPane.tsx` already avoids this by construction — the chip
+      anchors past the selection's right edge (`coords.right`) and the
+      popover opens 42px below it, never over the highlighted text
+      itself — confirmed by reading the positioning math, no fix needed
+      here.
 - [ ] **Give the Chat panel a visible, persistent "pinned constraints"
       surface, separate from the conversation itself** — research round 41
       (2026-09-03): a detailed Sudowrite iOS App Store review (reviewer
@@ -2165,6 +2280,51 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-09-21 — Research round 48 (autopilot; no code). Housekeeping first:
+  working tree clean at session start; local branch matched `origin/main`
+  exactly at round 47's commit, no fast-forward needed. Dispatched three
+  parallel research passes, each scoped to a gap that survived a scan of
+  all 47 prior rounds' coverage: (1) "research storage" — where writers
+  keep non-manuscript reference material (images, clippings, links) —
+  a job named in the standing research brief but never given its own
+  pass; (2) the inline-AI selection-toolbar interaction pattern
+  specifically, across Sudowrite/NovelCrafter/type.ai/Dabble/Notion
+  AI/Obsidian, checked against our own `RewordPopover.tsx`/
+  `rewordCore.ts`; (3) a focused dated-news sweep for the six
+  competitors since round 47 (2026-09-16). Findings: (1) confirmed our
+  own `cardImages.ts` carries the exact one-image-per-note ceiling
+  NovelCrafter's own docs admit as a Codex-entry limitation, and found
+  independent commercial validation (Milanote's dedicated "Novel
+  Moodboard" template) that the gap is real, not a Novella-only guess —
+  added as a new, well-scoped "Next up" item placed beside the timeline/
+  location-map item. (2) found a genuine, checkable gap in our own
+  reword-in-place feature: `buildRewordRequest()` never calls
+  `buildSceneContext()`, so the feature writers reach for most gets zero
+  Codex context while Chat and the proposed Brainstorm mode both do —
+  folded into the existing reword-in-place item as its new top finding,
+  with two competitor failure modes (Sudowrite's 600-word Story Bible
+  cliff, NovelCrafter's manual per-message context picker) as the
+  patterns to beat rather than copy. Also checked and closed, in the
+  same pass: Novella's two-step chip-then-popover reword trigger already
+  avoids the short-selection toolbar-occlusion bug Sudowrite's own
+  feedback board logged (76 upvotes, since fixed) — confirmed by reading
+  `EditorPane.tsx`'s positioning math, no code change needed. Folded a
+  short interaction caution into the Brainstorm-mode item too: reviewers
+  name NovelCrafter's fragmented four-surface AI access (Chat, slash
+  scene-beat, inline replacement prompts, kebab menu) as its sharpest
+  onboarding cost, against Sudowrite's single popup — Brainstorm mode
+  should extend the existing Reword/slash-command visual language, not
+  open a fifth AI destination. (3) news sweep found a quiet week for all
+  six competitors — nothing in the Sept 16-21 window rose to a new item
+  for any of them. Two things flagged for the next sweep rather than
+  acted on now: whether the ~$450M Bartz v. Anthropic payment tranche
+  due by Sept 25, 2026 actually clears on schedule, and whether
+  Sudowrite's rapid-fire same-week onboarding of two new frontier models
+  (GPT-6 Astra Sept 5, Claude Fable 5.1 Sept 2) continues as a pattern —
+  neither is actionable today. Did not re-run the four-pillar bundle
+  check, litigation-date tracking, or the SKILLS.md scouting standing
+  pass this round. Full notes and source lists in RESEARCH.md Round 48.
 
 - 2026-09-16 — Research round 47 (autopilot; no code). Housekeeping first:
   working tree clean at session start; local branch was already even with
