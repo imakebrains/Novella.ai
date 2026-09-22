@@ -7450,3 +7450,292 @@ item instead of duplicating it.
 - campfirewriting.com/learn/state-of-the-campfire-2026 (official)
 - inkfluenceai.com, appsumo.com/products/inkfluence-ai
 - Internal: src/ui/{GoalMeter.tsx,GoalsTab.tsx,SettingsModal.tsx,CodexPane.tsx}
+
+# Round 48 (2026-09-22) — manuscript-aware AI is "reference, not enforcement" everywhere, a code-verified snapshot gap, and a dated-news sweep
+
+Housekeeping first: working tree was clean at session start, local branch
+already matched `origin/main` at round 47's commit (89ac829, 2026-09-16, six
+days prior). With 47 prior rounds already covering Notion's database
+mechanic, mobile UX across five competitors, comments, track changes,
+brainstorming, codex-mention detection, import, export, timeline/maps,
+search, focus mode, corkboard modes and story-structure templates, this
+round dispatched two research passes at genuinely under-covered angles —
+AI-context-awareness/manuscript-aware AI specifically (as opposed to chat
+features generally, which prior rounds have touched only in passing), and
+revision/version-history mechanics in more depth than round 41's single
+diff-granularity item — plus a dated-news housekeeping sweep as the brief
+suggests every few rounds. Did not re-run the four-pillar bundle check or
+the mobile/Notion sweeps round 47 just finished.
+
+## Pass 1 — Manuscript-aware AI: how competitors actually get context to the
+model, and what happens after
+
+The recurring marketing claim across this category is some version of "the
+AI knows your story." The research question worth asking after 47 rounds of
+feature-spotting is narrower and more useful: knows it *how*, and does
+anything check the output against what it claims to know?
+
+**Finding (official capability, mechanism confirmed in detail): NovelCrafter's
+Codex-to-prompt pipeline is a real, documented, priority-ordered assembly —
+and it stops at assembly.** NovelCrafter's own FAQ on how Codex context
+reaches prompts describes a four-step priority system: automatic detection of
+entries mentioned in the beat/chat message and preceding text, manually
+tagged scene-level references, the POV character added if not already
+present, and all "Always Include" entries added globally first
+(novelcrafter.com/help/faq/ai-and-prompting/codex-context-in-prompting,
+official). Relations cascade automatically — mentioning a linked entry pulls
+in its relations recursively — but two mechanics matter more than the
+headline feature: relations are **one-way only**, so a link has to be set in
+both directions to flow both ways, and even when a related entry IS added to
+context, "the relation between the two is NOT added" — the model receives
+both entries present in the prompt but is never told they're connected, let
+alone how (novelcrafter.com/courses/codex-cookbook/codex-relations,
+official). The FAQ also warns that heavy hierarchical linking can flood
+context with "hundreds of Codex entries," and that detection is name-based,
+so an entry titled a common word like "Characters" triggers unwanted
+inclusions. Nowhere in either page is there a step after generation that
+checks the output against what was assembled.
+
+**Finding (official capability, self-contradicted limitation): Sudowrite's
+Chapter Continuity — its dedicated answer to the exact "does the AI stay
+consistent" problem — is AI pattern-matching over a capped window, not
+verification against the Story Bible's structured fields.** Sudowrite's own
+blog post explaining the feature describes linking up to 25 chapter
+documents sequentially so the Write feature can read roughly 20,000 words of
+actual preceding prose (not a summary) when generating new text, catching
+character inconsistencies, timeline errors, forgotten plot threads,
+worldbuilding contradictions and character-knowledge mistakes
+(sudowrite.com/blog/how-to-avoid-plot-holes-sudowrites-chapter-continuity-
+feature-explained, official). The same post is explicit about the
+limitation that matters most here: the feature requires "manual Story Bible
+maintenance," and "errors in character cards propagate through generations"
+— because nothing checks new output against the structured character-card
+fields the Story Bible holds, only against the preceding prose text itself,
+capped at 25 chapters. Asked directly whether it replaces human proofreading,
+the post answers "Yes, but your job gets significantly easier" — a Sudowrite
+document, not a hostile reviewer, admitting the check is probabilistic
+pattern-matching, not a guarantee.
+
+**Finding (reviewer opinion, from an interested competitor — weighted
+accordingly, but consistent with the two official sources above rather than
+contradicting them): a third-party test across four tools converges on the
+identical framing.** A comparison blog run by Novarrium, a purpose-built
+"story memory" tool selling itself against exactly this gap, reports testing
+ChatGPT, Sudowrite, NovelAI and NovelCrafter across 25 chapters for
+consistency and describes all four the same way — Sudowrite's Story Bible
+"does not actively enforce consistency against it," NovelCrafter's Codex
+offers "reference without enforcement" and performs no "post-generation
+checks to verify that new content aligns with Codex entries," NovelAI's
+Lorebook needs manually maintained keyword triggers, and ChatGPT has no
+persistent memory once the context window is exceeded
+(novarrium.com/blog/ai-writing-tools-keep-contradicting-themselves). This is
+vendor marketing for a competing niche product and should be read as such —
+but it independently names the identical gap the two official sources above
+already confirm in their own documentation, which is stronger than one
+source alone. A companion Novarrium post frames the underlying user pattern
+directly: writers currently "become the consistency engine, manually
+tracking facts and feeding them to the AI," via four documented workarounds
+(chapter-summary preambles, re-pasting character sheets into every prompt,
+writing in small self-contained chunks, and custom-GPT instructions), all of
+which "still [are] limited by context and fact tracking"
+(novarrium.com/blog/ai-memory-problem-chatgpt-novel).
+
+**Finding (official capability, type.ai): whole-document awareness is a
+different, adjacent capability, and doesn't close this gap either.** Type
+Chat is marketed as "a document-aware conversation layer" backed by a 128k-
+token effective context window, with a separate "Notes" feature that holds
+character/story/world details Type takes "into consideration" when
+generating (blog.type.ai; type.ai marketing pages). This is a retrieval-depth
+improvement over selecting text manually — genuinely useful, and the
+category NovelCrafter's own reviewers say its planning tools fail at (round
+46's finding that Outline/Chapter tools "do not influence the generated
+content in any measurable way" once tested) — but nothing in type.ai's public
+materials describes a post-generation check against the Notes either. Depth
+of context and verification of output are two different axes, and every
+competitor surveyed this round only builds the first.
+
+**Implication for Novella.** Checked our own code rather than assuming: the
+shipped Continuity inspector (`src/analysis/continuity.ts`) already does the
+one thing none of these four competitors do — it runs five deterministic
+checks (early-mention, duplicate-name, dangling links, unordered chapters,
+unknown POV) as a genuine post-hoc pass over the manuscript, not a reference
+fed into a prompt and hoped for. It just doesn't yet check *facts*, only
+structure. That's the gap this round's strongest roadmap addition closes: the
+architecture to do provable, deterministic post-generation checking already
+exists and already shipped — extending it to simple structured-field facts
+(an established eye color, an established ability) would be a genuine,
+evidenced category win, not a catch-up feature, because no competitor
+surveyed across three independent sources (two official, one third-party)
+does any enforcement step at all today.
+
+## Pass 2 — Revision and version-history mechanics, checked against our own
+code
+
+**Finding (code-verified, our own repository): `state/history.ts`'s header
+comment describes a design that isn't fully built.** The file's own
+rationale says snapshots are taken "at decision points, not on a timer:
+before the assistant touches your prose, and when work is saved" — a
+deliberate rejection of keystroke-level or timer-based history in favor of
+two specific triggers. Grepping every call site of `snapshot()` and
+`snapshotById()` across the whole `src/` tree finds exactly one: in
+`ui/editorBridge.ts`, firing only "before the assistant added prose."
+`core/vault.ts`'s manual-save path has no history call anywhere in it. The
+second decision point the comment itself names — "when work is saved" — was
+never wired up. A writer who spends a long manual session revising a chapter
+by hand, with no AI involved at any point, currently has zero saved
+revisions to fall back on, no matter how much they wrote or cut that day —
+the exact case History exists to protect against, per the file's own stated
+purpose, just not the one it actually protects.
+
+**Finding (recurring feature request, dated but unaddressed — checked
+against round 47's confirmed-quiet Scrivener changelog): Scrivener users are
+still asking for the automatic-capture half of this by name.** A Literature
+& Latte "Wish List" forum thread asks for "auto snapshot every x characters
+or x minutes/hours" without manual intervention, with a specific complaint
+that Scrivener's current Snapshot model only works retroactively if the
+writer decided in advance to take one; a second poster in the same thread
+wants to "step back through a few autosave versions" and branch an alternate
+draft from a past point without having pre-planned it
+(forum.literatureandlatte.com/t/version-control-auto-snapshot-and-better-
+diff/140377). The thread is dated April/July 2024 — old enough that it would
+normally be worth checking whether it's since been fixed, per this round's
+standing instruction to compare dates against current docs — but round 47
+already confirmed Scrivener's version numbers (macOS 3.5.0/Windows 3.1.6)
+haven't moved since 2025 and there's been no new release since, so the
+request stands unaddressed today rather than stale-and-fixed.
+
+**Finding (official capability, a structurally unrelated tool converging on
+the same request): Obsidian ships exactly the automatic-capture half
+Scrivener users are asking for, as a core (non-plugin) feature.** Obsidian's
+"File recovery" plugin takes complete snapshots of every note on a
+configurable timer — 5 minutes minimum between snapshots by default, 7 days
+of retention, both adjustable under Settings → Core plugins → File recovery
+(obsidian.md/help/plugins/file-recovery, official). A community "Time
+Machine" plugin builds a browse/compare/restore UI directly on top of these
+built-in snapshots (github.com/dsebastien/obsidian-time-machine), and a
+separate community "Version Control" plugin exists specifically for writers
+who want the opposite — snapshots only when they choose, "not at a set time
+interval," explicitly framed against the automatic model
+(github.com/micmejia/obsidian-Version-Control) — meaning even inside one
+ecosystem, both philosophies have independent audiences. That's useful
+context for Novella's own choice: the existing decision-point rationale in
+`history.ts` already picked the "not a blind timer" side of that same fork
+deliberately, for a reason (avoiding an enormous, useless keystroke-level
+history) — so the fix isn't to import Obsidian's timer, it's to finish
+wiring up the second decision point the file's own comment already commits
+to.
+
+**Finding (official capability, prior round's context, re-confirmed rather
+than re-litigated): Dabble's Time Machine and NovelCrafter's Revision
+History remain restore-only.** Round 41 already established this — Dabble's
+Time Machine gives whole-project/single-document/named-checkpoint restore
+with no diff between two past states; NovelCrafter's Revision History is
+restore-only with a 30-day cap. Re-checked this round for any September
+changes and found none (NovelCrafter's changelog is confirmed quiet since
+March 21, 2026; no Dabble release notes found for September). Not re-added
+as a separate finding — noted only to confirm the round-41 diff-granularity
+item's competitive framing still holds.
+
+**Implication for Novella.** This is the rare case where the fix isn't a new
+feature at all — it's finishing a design the codebase's own comment already
+specifies, using a decision-point cadence (session start/resume, or first
+save of a calendar day) that's consistent with the file's own stated
+philosophy rather than either extreme (Scrivener's manual-only or Obsidian's
+raw timer). Filed as a new roadmap item rather than folded into the existing
+diff-granularity item, since the two are genuinely different capabilities —
+one is about *when* a version gets captured, the other about *comparing* two
+already-captured versions.
+
+## Pass 3 — Dated-news housekeeping sweep
+
+**Sudowrite: shipped a relevant update today.** The live changelog
+(feedback.sudowrite.com/changelog, official, direct fetch) shows one new
+entry dated September 22, 2026, "Faster Chat, Better Rewrite & Printing":
+Chat response times cut roughly in half via infrastructure changes, Chat
+error rates down "by 30%... reducing issues like dropped context or
+misplaced edits," Rewrite switched to Sudowrite's in-house Ballad model
+("authors are now 20% more likely to actually use the resulting Rewrite"),
+and native Ctrl/Cmd+P printing support replacing a previous blank-page bug.
+The Chat error-rate line independently corroborates this round's Pass 1
+finding and the existing pinned-constraints roadmap item from round 41 — a
+vendor's own release notes now naming "dropped context" as a real, shipped-
+against failure mode, being patched with a faster cloud model rather than an
+architectural fix. Folded into that existing item as reinforcement, not
+filed separately.
+
+**Kadrey v. Meta: still unresolved, and still outside this environment's
+reach.** Round 47 already flagged that the mediation-outcome report (due
+Aug 21, 2026) remained unconfirmed as of Sept 15. A direct fetch of the
+CourtListener docket this round returned HTTP 403 (consistent with the
+environment's egress pattern noted in prior rounds for some domains); web
+search surfaced only older February 2026 summary-judgment coverage (Meta's
+fair-use win) and no report on the mediation outcome specifically. This
+needs a docket-level PACER/CourtListener pull outside this environment's
+reach to resolve — round 47 already deprioritized the weekly re-check given
+the Bartz settlement's concrete Nov 15 payment date, and nothing this round
+changes that call.
+
+**NovelCrafter, Dabble, Scrivener: confirmed quiet, not re-flagged.**
+NovelCrafter's changelog (novelcrafter.com/changelog, official) still shows
+no entries since March 21, 2026 on a direct check this round — the same
+result as round 47, now confirmed a second time six days later rather than
+a stale single read. No September 2026 Dabble release notes or blog posts
+were found. Scrivener has had no new version release; not re-checked for new
+editorial content this round.
+
+**Campfire: version signal slightly less murky, still not fully resolved.**
+A third-party mirror (soft112.com) now shows Campfire's iOS build at v1.3.2
+with an August 23, 2026 update date — narrowing round 47's "conflicting
+version signals" flag somewhat (the mirror is now internally consistent
+with itself rather than reporting an older number than round 40's v1.4.0
+Android read), but this still doesn't reconcile the iOS 1.3.x line against
+the Android 1.4.0 figure round 40 logged, and no changelog text for either
+track was retrieved confirming the wifi/save-loss bug's status. Left flagged
+rather than resolved; the fresh Aug 18 App Store review round 47 already
+found remains the best available evidence that the bug is live.
+
+## What changed in "Next up"
+
+Added two new items: extending the shipped deterministic Continuity
+inspector to check simple structured-field facts (not just structure) —
+the strongest addition this round, since it's a category no competitor
+surveyed does at all, built on architecture Novella already shipped and
+proved safe (9 unit checks); and closing the code-verified gap between
+`state/history.ts`'s own documented snapshot design and what's actually
+wired up (only one of its two stated triggers fires today), placed beside
+the existing version-history diff item as a related but distinct capability.
+Reinforced two existing items rather than duplicating: the pinned-
+constraints Chat item (round 41) gained Sudowrite's Sept 22 changelog
+admission of a "dropped context" failure mode being patched cloud-side, the
+same failure the item already targets architecturally; the structured-Codex-
+relations item (round 42) gained the specific mechanism for why the
+relationship *label* has to reach the model as text, not just resolve as a
+link in the UI, per NovelCrafter's own documented one-way-relation gap. No
+items were reordered — both new items were placed beside their closest
+topical match (the AI-context-grounding cluster around the Brainstorm item,
+and the existing version-history item) rather than moved to the literal top,
+consistent with how rounds 41-47 have placed additions.
+
+## Round 48 sources
+
+- novelcrafter.com/help/faq/ai-and-prompting/codex-context-in-prompting (official)
+- novelcrafter.com/courses/codex-cookbook/codex-relations (official)
+- novelcrafter.com/courses/codex-cookbook/codex-scenes (official)
+- novelcrafter.com/changelog (official, re-checked)
+- sudowrite.com/blog/how-to-avoid-plot-holes-sudowrites-chapter-continuity-feature-explained (official)
+- feedback.sudowrite.com/changelog (official)
+- docs.sudowrite.com/using-sudowrite/.../what-is-story-bible (official)
+- novarrium.com/blog/ai-writing-tools-keep-contradicting-themselves (vendor-interested, flagged)
+- novarrium.com/blog/ai-memory-problem-chatgpt-novel (vendor-interested, flagged)
+- blog.type.ai; type.ai/type-vs-chatgpt; ilampadmanabhan.medium.com/type-ai-review-719f59c68dbb (search-snippet only)
+- forum.literatureandlatte.com/t/version-control-auto-snapshot-and-better-diff/140377
+- obsidian.md/help/plugins/file-recovery (official)
+- github.com/dsebastien/obsidian-time-machine
+- github.com/micmejia/obsidian-Version-Control
+- notion.com/help (free-plan version-history retention window, background check)
+- feather.so/blog/notion-version-history; restora.cc/blog/notion-version-history-and-trash-limits
+- courtlistener.com/docket/67569326/kadrey-v-meta-platforms-inc (403'd this round)
+- dabblewriter.com/blog (re-checked, no September posts found)
+- campfire-write-your-book-ios.soft112.com (third-party mirror, version signal only)
+- Internal: src/analysis/continuity.ts, src/state/history.ts, src/state/autosave.ts,
+  src/ui/editorBridge.ts, src/core/vault.ts, src/state/sessions.ts, src/ai/context.ts

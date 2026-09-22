@@ -334,6 +334,46 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       any AI-facing planning feature (this Brainstorm mode included) ships:
       Novella's claim isn't "we also have planning tools," it's "our
       planning tools are the ones the AI actually reads."
+- [ ] **Extend the deterministic Continuity inspector to check simple
+      factual claims against structured Codex fields, not just structural
+      checks** — research round 48 (2026-09-22): the shipped Continuity
+      inspector (`src/analysis/continuity.ts`) runs five checks —
+      early-mention, duplicate-name, dangling, unordered, pov-unknown —
+      and every one is structural (does X exist, is X in order), never
+      factual (does the prose ever contradict a fact the Codex itself
+      states, like an eye color or an ability). Checked what the AI-
+      context-awareness leaders actually do after generation, and none of
+      them do this either. NovelCrafter's own FAQ on how Codex context
+      reaches prompts documents automatic detection, manual tagging,
+      relation cascades and per-entry AI-visibility — but no verification
+      step once the model has answered (novelcrafter.com/help/faq/
+      ai-and-prompting/codex-context-in-prompting, official). Sudowrite's
+      Chapter Continuity — its dedicated answer to this exact problem — is
+      AI pattern-matching over up to 20,000 words across the 25 most
+      recently linked chapters, not a rule check against the Story Bible's
+      own structured character-card fields; Sudowrite's own post states
+      plainly that "errors in character cards propagate through
+      generations" because nothing verifies output against them
+      (sudowrite.com/blog/how-to-avoid-plot-holes-sudowrites-chapter-
+      continuity-feature-explained, official). A third-party comparison
+      across ChatGPT, Sudowrite, NovelAI and NovelCrafter (a vendor's own
+      competitive blog — evidence weighted accordingly, but its framing
+      lines up with the two official sources above rather than contradicts
+      them) converges on the identical description for all four: consistency
+      is treated as "a reference problem rather than [an] active
+      enforcement" one, with no "post-generation checks to verify that new
+      content aligns with" the story bible (novarrium.com/blog/
+      ai-writing-tools-keep-contradicting-themselves). Three independently
+      sourced tools, one converging gap. Novella already has the piece none
+      of them do: a deterministic-checks architecture already proven safe
+      to ship (9 unit checks, click-to-open UX, no false-positive drama)
+      and structured Codex fields to check prose against. Scope v1 as
+      narrow and provable as the existing checks — a Details field tagged
+      with a single-value fact (e.g. `eyes: brown`) triggering a scan for a
+      contradicting color-word near later mentions of that character —
+      rather than open-ended semantic contradiction detection, which would
+      need the AI itself and would stop being the deterministic tier that
+      makes the whole inspector trustworthy.
 - [ ] **Auto-detect codex mentions in manuscript prose, and let an
       unrecognized name become a Codex entry inline** — research round 41
       (2026-09-03), a deliberate pass at competitor interaction mechanics
@@ -633,7 +673,18 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       ("never change character names," "keep this in first person")
       that every generation checks against, visibly separate from the
       scrolling conversation, would prevent the same failure mode before a
-      writer ever hits it.
+      writer ever hits it. Research round 48 (2026-09-22) reinforcement:
+      Sudowrite's own Sept 22, 2026 changelog entry, "Faster Chat, Better
+      Rewrite & Printing," reports the Chat update cut error rates "by
+      30%," explicitly "reducing issues like dropped context or misplaced
+      edits" (feedback.sudowrite.com/changelog, official) — a vendor's own
+      release notes now naming the identical context-drift failure this
+      item was filed against, being patched with a faster cloud model
+      rather than a persistent-constraints UI. That's the wrong axis for a
+      local app to compete on — a visible pinned-constraints surface fixes
+      the interaction failure by construction, regardless of which model
+      answers, which is the local-first argument for building this rather
+      than waiting on someone else's model to get better at remembering.
 - [ ] **Version history: diff between any two saved points, not just each
       revision against the one before it** — research round 41
       (2026-09-03): checked `src/ui/HistoryPanel.tsx` — each revision's
@@ -654,6 +705,43 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       A real pick-any-two-points diff would beat everything on the list.
       Lower priority than the items above — a real but non-urgent
       differentiator, not a gap writers are actively leaving over.
+- [ ] **Revision history: close the gap between the file's own documented
+      design and what's actually wired up — a snapshot on manual save, not
+      only before AI edits** — research round 48 (2026-09-22), checked our
+      own code against its own comment. `src/state/history.ts`'s header
+      says snapshots are taken "at decision points, not on a timer: before
+      the assistant touches your prose, and when work is saved" — but
+      grepping every call site of `snapshot()`/`snapshotById()` across the
+      whole codebase finds exactly one, in `editorBridge.ts`, firing only
+      before the AI edits ("before the assistant added prose"). No call
+      fires on an ordinary manual save, and `core/vault.ts`'s save path has
+      no history call at all. A writer who spends a two-hour manual session
+      revising a chapter by hand and later regrets it has nothing to
+      restore — the second half of the file's own stated design was never
+      built. The cross-app evidence points at the same gap from the other
+      direction: a still-open Literature & Latte wishlist thread asks for
+      "auto snapshot every x characters or x minutes/hours" specifically
+      because Scrivener's Snapshot model requires deciding in advance to
+      save a version, with a second reply independently wanting to
+      "step back through a few autosave versions" and branch from one
+      retroactively (forum.literatureandlatte.com/t/version-control-
+      auto-snapshot-and-better-diff/140377 — dated Apr/Jul 2024, but
+      Scrivener's version hasn't moved since and round 47 already confirmed
+      the changelog is quiet, so the request stands unaddressed rather than
+      stale). Obsidian ships the automatic half natively as a core plugin:
+      "File recovery" takes full-file snapshots on a 5-minute-minimum
+      timer with 7-day retention, both configurable
+      (obsidian.md/help/plugins/file-recovery, official) — a second,
+      structurally unrelated tool independently building the exact
+      automatic-capture half Scrivener users are still asking for. Fix this
+      the way `history.ts`'s own rationale already argues for, not by
+      copying Obsidian's raw timer (which the same comment explicitly
+      reasons against — "keystroke-level history would be enormous and
+      useless"): fire a save-triggered snapshot at a real decision point
+      the app already tracks, such as session start/resume
+      (`state/sessions.ts` already has this concept) or the first save of a
+      calendar day, so a version exists without the writer ever having to
+      remember to ask for one.
 - [ ] **Corkboard: let free arrangement diverge from manuscript order, and
       let a card's face content be overridden per card** — research round
       42 (2026-09-04): Scrivener's corkboard forks into two genuinely
@@ -1015,7 +1103,22 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       structure (round 6's guardrail: stay fast, stay flat, keep leaving
       easy). Scope as an optional structured "relation" field type on
       Codex entries (link + relationship label), not a full database/
-      relation system — keep it flat, per the standing guardrail.
+      relation system — keep it flat, per the standing guardrail. Research
+      round 48 (2026-09-22) sharpens why the *label* specifically has to
+      reach the model, not just the link: NovelCrafter's own FAQ on Codex
+      context documents that relations are one-way only (a link must be
+      set in both directions to flow both ways) and that even when a
+      related entry IS pulled into context, "the relation between the two
+      is NOT added" — the AI sees both entries present but is never told
+      they're linked, let alone how, so the writer has to restate the
+      relationship as prose inside each entry for it to actually reach a
+      generation (novelcrafter.com/help/faq/ai-and-prompting/
+      codex-context-in-prompting, official). That's the concrete argument
+      for building this so the label is sent as text in the prompt itself
+      ("Rowan — sibling of Ash"), not only resolved as a link the UI
+      renders — the label is doing AI-context work, not just
+      information-architecture work, and skipping that is exactly the trap
+      NovelCrafter's own docs show it fell into.
 - [ ] **Structured multi-view blocks on Codex/notes — the same records
       readable as a table, a board, or a gallery, not three copies of the
       data** — research round 47 (2026-09-16), sharpening and promoting the
