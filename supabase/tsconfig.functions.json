@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "types": [],
+    "baseUrl": "..",
+    "paths": {
+      "npm:@anthropic-ai/sdk@0.112.4": ["node_modules/@anthropic-ai/sdk"],
+      "npm:@supabase/supabase-js@2.116.0": ["node_modules/@supabase/supabase-js"]
+    }
+  },
+  "files": ["functions/_types/deno.d.ts", "functions/ai/index.ts", "functions/billing-webhook/index.ts"]
+}
