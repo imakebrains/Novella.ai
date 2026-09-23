@@ -769,6 +769,80 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       preview text, it needs a per-card override, not only a global
       setting — the Scrivener complaint is specifically about lacking
       that override, not about the feature existing at all.
+- [ ] **Turn the Corkboard's derived card-face text into an AI-generated
+      one-line scene summary, with a whole-board "Summarize all" regenerate**
+      — research round 49 (2026-09-23), sharpening the Corkboard item above
+      rather than duplicating it. Checked `Corkboard.tsx` (line ~523): absent
+      a manually-typed `synopsis` frontmatter field, the card face already
+      falls back to `derived.stripped` — the first 220 characters of raw
+      prose. That is exactly the "really cluttered" Scrivener complaint
+      logged just above, already reproduced in our own code. Reverse
+      outlining — writing a one-line "what actually happens" note per scene
+      *after* it's drafted, specifically to see structure at a glance without
+      rereading — is a real, named revision technique
+      (btleditorial.com/2022/04/20/reverse-outline-your-novel;
+      chelseaabdullah.com/blog/reverse-outlines), and writers currently do it
+      by hand on physical index cards or in Miro: "I usually make a reverse
+      outline in Miro, or using physical post-its. But it's slow and
+      cumbersome" (maggieappleton.com/reverse-outline — a prototype that
+      automates exactly this one step with an LLM, one paragraph in, one
+      sentence out, then lets the summaries be dragged to reorder the
+      original text with a kept 1:1 mapping). Writers without a DIY prototype
+      pay a dedicated product for the same job: Fictionary's StoryTeller
+      imports a manuscript, breaks it into scenes, and evaluates each one
+      against 38 structural elements specifically so a writer can see shape
+      without rereading (fictionary.co/products/storyteller, official;
+      kindlepreneur.com/fictionary-review, independent review). A third
+      independent data point, a writer's own ChatGPT reverse-outline workflow
+      (zane.substack.com/p/reverse-outline-with-chatgpt), reports it "removed
+      a lot of creative doubt" — evidence the summary itself, not just the
+      reorganizing power, is what writers value. Checked the Literature &
+      Latte Scrivener forum for an automation request and found none
+      (forum.literatureandlatte.com/t/reverse-outlining/20145) — writers
+      there do the summarizing by hand and don't ask Scrivener to automate
+      it, which reads less like "nobody wants this" and more like nobody
+      expects a manuscript editor to offer it; the demand shows up instead as
+      a market for Miro, ChatGPT and a whole paid competitor product. Novella
+      already has every piece this needs and no competitor surveyed combines
+      them: per-scene prose already segmented in the vault, a Corkboard that
+      already renders one line of card-face text per card, and local AI with
+      no per-word cost to run a one-sentence summary across an entire
+      manuscript. Scope v1 narrow: a per-board "Summarize all" action that
+      batch-fills the existing `synopsis` frontmatter field with a one-
+      sentence AI summary of what happens in that scene, only for cards that
+      don't already have a manually-written one (never overwrite a writer's
+      own words). Same data field, same card-face UI slot, no new system —
+      and it resolves round 42's "cluttered raw prose" complaint and this
+      reverse-outline gap in the same stroke.
+- [ ] **A "Gallery" board layout — every card's reference image in one
+      visual grid, for moodboarding without leaving the project** — research
+      round 49 (2026-09-23). Building an aesthetic mood board per book is a
+      widely-practiced, named step for fantasy and romance writers
+      specifically — Pinterest boards collecting character and setting images
+      "to remind them of the feel they're aiming for"
+      (happy-writer.com/how-to-create-a-pinterest-board-for-your-novel-3-tips-
+      with-examples), a visible TikTok/Lemon8 "character mood board" culture,
+      and printable moodboard workbooks sold directly to authors
+      (dazed-designs.com/product/moodboard-and-aesthetic-prompts-interactive-
+      author-workbook) — all built and consumed entirely outside any writing
+      app. Checked what the dedicated competitors actually ship: NovelCrafter
+      caps Codex images at one per entry with no aggregate gallery across
+      entries at all (novelcrafter.com/help/faq/codex/reference-images,
+      official, checked this round — "Currently, you can only assign one
+      image per codex entry"); Campfire markets per-character mood boards
+      but nothing found in official materials confirms a whole-project
+      aggregate view, so that comparison is left open rather than claimed.
+      Novella already stores the exact asset this needs — card art (shipped
+      2026-07-23: an image per note in `.novella/images/`, lazy-hydrated,
+      rendered inline on Corkboard cards) — but only ever one note at a
+      time. `BoardLayoutToggle.tsx` already has the extension point: three
+      layouts today (Cards/Grid/Table — Web and Stats exist in the code but
+      were cut from the switch on owner feedback). A fourth **Gallery**
+      layout — the same board's existing cards, rendered as image tiles
+      only, art-first, text secondary — needs no new storage and reuses the
+      picker/toggle pattern already built for Table; it turns any board
+      (Characters, Locations) into the Pinterest-style aesthetic view writers
+      currently leave the app to build by hand.
 - [ ] **Submission/query tracking for querying novelists** (WITH-OWNER —
       scope decision, not a build). Research round 41 (2026-09-03):
       querying novelists and short-fiction writers maintain a wholly
@@ -2269,6 +2343,45 @@ scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
 
+- 2026-09-23 — Research round 49 (autopilot; no code). Grepped both research
+  files first for "reverse outlin*" and "moodboard" — zero prior hits in
+  either, confirming genuinely unexplored ground rather than re-treading
+  48 prior rounds. Findings: reverse outlining (a post-draft, one-line-per-
+  scene structural summary) is a real named revision technique writers do
+  by hand on Miro/post-its today, or pay Fictionary's StoryTeller to do as
+  a dedicated product — and `Corkboard.tsx` already renders a card-face
+  synopsis slot, currently filled with a raw-prose fallback that's the
+  exact "cluttered" complaint round 42 already logged against Scrivener.
+  Separately, fantasy/romance writers build Pinterest mood boards per book
+  as a named ritual entirely outside any writing app; NovelCrafter caps
+  Codex reference images at one per entry with no gallery, while Novella's
+  own card-art feature (shipped 2026-07-23) has the same one-note-at-a-time
+  ceiling and an unused fourth-layout extension point already sitting in
+  `BoardLayoutToggle.tsx`. Two new items added to "Next up," both placed
+  beside the round-42 Corkboard item they extend rather than reordering
+  the list; no dated-news sweep this round (round 48 ran one the day
+  before). Long-form notes and full source list in RESEARCH.md, Round 49.
+- 2026-09-22 — Research round 48 (autopilot; no code). Three independent
+  sources — two official (NovelCrafter's Codex-context FAQ, Sudowrite's own
+  blog on its Chapter Continuity feature), one vendor-authored but
+  corroborating (Novarrium) — converge on the same finding across four
+  AI-writing tools: manuscript-aware AI everywhere treats consistency as "a
+  reference problem, not an enforcement one," with no post-generation check
+  against a story bible's own structured facts. Checked our own shipped
+  Continuity inspector (`src/analysis/continuity.ts`) against that gap: its
+  five checks are all structural (does X exist, is X in order), never
+  factual — the extension no competitor has built yet. Separately caught our
+  own code contradicting its own comment: `state/history.ts`'s header
+  documents snapshots firing at two decision points, but every call site
+  across `src/` fires only one of them (before an AI edit); a purely manual
+  revision session currently saves nothing. A dated-news sweep found
+  Sudowrite's Sept 22 changelog naming "dropped context" as a real,
+  shipped-against failure — folded into the existing pinned-constraints
+  item as reinforcement rather than filed separately. Two new items added,
+  two existing items reinforced with new evidence, no reordering. Full
+  detail in RESEARCH.md, Round 48. (Logged retroactively this session —
+  the round-48 commit itself omitted this log line; working tree was clean
+  and the commit unpushed, so recorded here before pushing both.)
 - 2026-09-16 — Research round 47 (autopilot; no code). Housekeeping first:
   working tree clean at session start; local branch was already even with
   `origin/main` at round 46's commit, no fast-forward needed. Dispatched

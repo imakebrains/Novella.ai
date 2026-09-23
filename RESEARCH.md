@@ -7739,3 +7739,194 @@ consistent with how rounds 41-47 have placed additions.
 - campfire-write-your-book-ios.soft112.com (third-party mirror, version signal only)
 - Internal: src/analysis/continuity.ts, src/state/history.ts, src/state/autosave.ts,
   src/ui/editorBridge.ts, src/core/vault.ts, src/state/sessions.ts, src/ai/context.ts
+
+# Round 49 (2026-09-23) — reverse outlining as a paid-product gap, and the Pinterest moodboard writers build outside every app
+
+Prior rounds have exhaustively mined the "AI-context-awareness" and
+"structural revision" seams of the named competitor list. Round 48 alone
+covered manuscript-aware AI, revision-history triggers and Codex relations
+in depth just one day before this round started, so re-running the same
+searches a day later would mostly re-confirm what's already logged. This
+round instead went looking for two areas explicitly named in the standing
+research brief — revision technique and research/reference workflows — that
+a full-text grep of both files confirmed had never been the subject of a
+round: "reverse outlin*" and "moodboard"/"mood board" return zero prior
+hits in either file. Both turned out to be real, well-evidenced gaps.
+
+## Pass 1 — Reverse outlining: a technique writers do by hand, a job a
+whole competitor product exists to sell
+
+**Finding (established technique, independent sources converge): reverse
+outlining is a real, named post-draft revision step, distinct from
+planning.** Unlike a pre-draft outline, a reverse outline is written *after*
+a draft exists, synopsizing each scene in one line so the writer can see
+structure without rereading prose (btleditorial.com/2022/04/20/reverse-
+outline-your-novel; chelseaabdullah.com/blog/reverse-outlines). It is
+recommended specifically as the step between finishing a draft and sending
+it to beta readers — see structure problems before a reader has to find them
+for you.
+
+**Finding (observed user behavior, the "second app" pattern by name): writers
+do this by hand, off the page, because nothing in their writing app
+automates it.** A user quoted directly in a piece on LLM-assisted reverse
+outlining: "I usually make a reverse outline in Miro, or using physical
+post-its. But it's slow and cumbersome" (maggieappleton.com/reverse-outline).
+That page describes a working prototype: an LLM (GPT-3/T5-class) summarizes
+each paragraph to one sentence, displayed beside the original text in a
+split view, with the summary cards draggable to reorder the source content
+underneath them (a kept 1:1 mapping, so reordering the outline reorders the
+draft). This is architecturally the same trick Scrivener's synopsis-card
+corkboard already does manually — drag a card, its bound text moves with it
+— just with the summary generated instead of hand-typed.
+
+**Finding (official capability, a whole paid product exists for this exact
+job): Fictionary's StoryTeller imports a manuscript, segments it into
+scenes, and scores each one against 38 structural elements — specifically so
+a writer can see shape without rereading** (fictionary.co/products/
+storyteller, official). Independent reviews confirm the mechanism and its
+limits: it "doesn't track scene structure — while it tracks the overall
+novel's structure, it doesn't track individual scenes" and depends on the
+writer's own judgment to act on what it surfaces rather than prescribing
+fixes (kindlepreneur.com/fictionary-review, independent). Two structurally
+different products — a free LLM prototype and a paid commercial tool —
+converging on the same underlying job (turn a finished draft into a
+scannable structural summary) is stronger evidence than either alone.
+
+**Finding (observed user behavior, a third independent data point): a
+writer's own DIY ChatGPT reverse-outline workflow reports the summary itself,
+not just the reordering power, as the value.** The author prompts ChatGPT to
+act as a developmental editor and return, per chapter, a thematic paragraph,
+five plot-event bullets, a subtext note and a Hero's-Journey-stage
+classification (zane.substack.com/p/reverse-outline-with-chatgpt). They
+describe the result as "incredibly calming, exciting and fulfilling" because
+it "removed a lot of the creative doubt" — confirmation that having any
+structural view at all closes a real anxiety gap for discovery writers, not
+merely a convenience.
+
+**Finding (checked for an unmet request, found none — read correctly): the
+Literature & Latte Scrivener forum shows writers reverse-outlining
+successfully by hand, with no automation request.** A representative thread
+(forum.literatureandlatte.com/t/reverse-outlining/20145) has a user
+describing a fully manual synopsis-per-paragraph process and explicitly
+praising Scrivener's existing tools for supporting it ("I find Scrivener
+really helpful for this... can't imagine doing this in Word"). No one in the
+thread asks for automatic summary generation. Read alongside the Miro/
+post-its complaint and the existence of Fictionary as a paid product, the
+more likely explanation isn't "nobody wants this automated" — it's that
+nobody expects a manuscript editor to offer it, so the demand routes
+entirely around the writing app instead of into a feature request on its
+forum.
+
+**Finding (code-verified, our own repository): Novella already renders the
+exact UI slot this needs, currently filled with the wrong content.**
+Checked `Corkboard.tsx` around line 523: each card's face shows a
+`synopsis` field if one was manually typed into frontmatter, and otherwise
+falls back to `derived.stripped` — the first 220 characters of raw prose.
+This is the identical mechanism behind the "really cluttered" complaint
+already logged in the roadmap's round-42 Corkboard item (a Literature &
+Latte thread about Scrivener auto-filling card faces with raw prose instead
+of a blank or a synopsis). The fix for both is the same field: replace the
+raw-text fallback with an AI-generated one-line summary instead of either
+raw prose or a manual-only synopsis.
+
+**Implication for Novella.** No competitor surveyed across two full rounds
+now (this one and 48) combines local, no-per-word-cost AI with a manuscript
+already segmented into scenes and a corkboard UI that already has a
+summary-line slot waiting to be filled correctly. The build is narrow on
+purpose: a per-board "Summarize all" action that batch-fills the existing
+`synopsis` frontmatter field, skipping any card with a manually-written
+synopsis already present. No new data model, no new panel — the same field
+Scrivener users already fight with becomes the reverse outline instead of a
+raw-text preview.
+
+## Pass 2 — Where writers actually build their mood boards, and what the
+Codex-image feature caps out at
+
+**Finding (observed user behavior, recurring across platforms): building an
+aesthetic mood board per book is a named, widely-practiced ritual for
+fantasy and romance writers specifically, and it happens on Pinterest.** "How
+to Create a Pinterest Board for Your Novel" describes writers collecting
+character and setting images per book "to remind them of the feel they're
+aiming for" (happy-writer.com/how-to-create-a-pinterest-board-for-your-
+novel-3-tips-with-examples). The same behavior shows up independently on
+TikTok and Lemon8 as "character mood board" content, and as a paid product
+in its own right — a printable "Moodboard & Aesthetic Prompts" author
+workbook (dazed-designs.com/product/moodboard-and-aesthetic-prompts-
+interactive-author-workbook). Three unrelated surfaces (a how-to blog, a
+short-video platform, a sold PDF workbook) independently converging on the
+same ritual is meaningfully stronger evidence than a single source.
+
+**Finding (official capability, checked directly this round): NovelCrafter's
+Codex hard-caps reference images at one per entry, with no aggregate view.**
+"Currently, you can only assign one image per codex entry"
+(novelcrafter.com/help/faq/codex/reference-images, official). The FAQ page
+doesn't mention or link to any gallery/browser view across entries — a
+single-entry ceiling on a feature writers otherwise build entire Pinterest
+boards to satisfy.
+
+**Finding (official capability, evidence incomplete): Campfire markets
+per-character mood boards; a whole-project aggregate view is unconfirmed
+either way.** Campfire's character-builder page advertises "custom portraits
+& aesthetic mood boards" (campfirewriting.com/character-builder) but nothing
+retrieved this round confirms or rules out a single view spanning every
+character/location's images at once. Left as an open question rather than
+claimed as a gap — the NovelCrafter finding above is the load-bearing one.
+
+**Finding (code-verified, our own repository): Novella already stores the
+needed asset, one note at a time, with an unused extension point for the
+aggregate view.** Card art shipped 2026-07-23 — one image per note in
+`.novella/images/`, lazy-hydrated, rendered inline on Corkboard cards
+(confirmed in `Corkboard.tsx`, `card-art`/`card-art-wrap` classes). Checked
+`BoardLayoutToggle.tsx`: three layouts are switchable today (Cards/Grid/
+Table); its own comment notes Web and Stats "were cut from this switch on
+owner feedback 2026-07-23" but still exist in the codebase. The toggle is
+already built to add a fourth option cheaply.
+
+**Implication for Novella.** A "Gallery" board layout — the same board's
+existing cards rendered as image tiles, art-first — needs no new storage and
+reuses the picker/toggle pattern already proven for Table. It beats
+NovelCrafter's one-image ceiling outright and gives Novella's own
+already-shipped card-art feature the aggregate view it's never had, closing
+a ritual writers currently satisfy entirely on Pinterest.
+
+## What changed in "Next up"
+
+Added two new items, both placed immediately after the existing round-42
+Corkboard item since they extend it directly rather than opening new
+ground: (1) turning the Corkboard's card-face fallback into an AI-generated
+one-line reverse-outline summary via a per-board "Summarize all" action —
+the stronger of the two, since it resolves an already-logged UX complaint
+(round 42's "cluttered raw prose") and a category gap no competitor
+surveyed across two rounds closes, using only a data field and UI slot that
+already exist; and (2) a Gallery board layout reusing the existing card-art
+asset for an aggregate moodboard view, addressing a well-evidenced but
+currently off-app ritual and beating NovelCrafter's confirmed one-image-
+per-entry cap. No existing items were reordered or reprioritized — both
+new items sit beside their closest topical match rather than at the literal
+top, consistent with rounds 41-48. No dedicated dated-news sweep this
+round: round 48 ran one the day before, and re-checking the same handful of
+changelogs 24 hours later was judged unlikely to surface anything a single
+day would change; the next round should resume that cadence instead of
+skipping it twice.
+
+## Round 49 sources
+
+- btleditorial.com/2022/04/20/reverse-outline-your-novel (independent, editorial)
+- chelseaabdullah.com/blog/reverse-outlines (independent, author blog)
+- maggieappleton.com/reverse-outline (independent, prototype writeup + quoted user)
+- fictionary.co/products/storyteller (official)
+- kindlepreneur.com/fictionary-review (independent review)
+- zane.substack.com/p/reverse-outline-with-chatgpt (independent, first-person workflow)
+- forum.literatureandlatte.com/t/reverse-outlining/20145 (user forum, checked for
+  an unmet automation request — found none)
+- happy-writer.com/how-to-create-a-pinterest-board-for-your-novel-3-tips-with-examples
+  (independent, how-to)
+- dazed-designs.com/product/moodboard-and-aesthetic-prompts-interactive-author-workbook
+  (vendor-interested, product listing — used only as evidence the ritual is sold as a
+  product, not for any feature claim)
+- novelcrafter.com/help/faq/codex/reference-images (official)
+- campfirewriting.com/character-builder (official, marketing copy — moodboard
+  aggregate-view claim explicitly left unconfirmed)
+- storyflow.so/blog/scrivener-vs-obsidian-vs-notion-vs-zotero-book-research-2026
+  (independent, comparison — background reading, not cited as a standalone finding)
+- Internal: src/ui/Corkboard.tsx, src/ui/BoardLayoutToggle.tsx, src/core/vault.ts
