@@ -52,7 +52,12 @@ export function readDocx(bytes: Uint8Array): DocxParagraph[] {
 
 /** Concatenate a paragraph's runs, preserving emphasis as Markdown. */
 function paragraphText(p: Element): string {
-  let out = "";
+  // Word splits runs for reasons no writer sees — spellcheck state,
+  // revision ids, a cursor that once paused mid-word — so one italic
+  // word can arrive as two italic runs. Wrapping each separately gives
+  // "*Hel**lo*", which reads back as a bold marker in the middle of a
+  // word. Merge neighbours with the same formatting first.
+  const pieces: { text: string; bold: boolean; italic: boolean }[] = [];
   for (const r of Array.from(p.getElementsByTagNameNS(W_NS, "r"))) {
     let run = "";
     for (const node of Array.from(r.childNodes)) {
@@ -63,14 +68,20 @@ function paragraphText(p: Element): string {
       else if (el.localName === "br") run += "\n";
     }
     if (!run) continue;
-
-    // Emphasis is applied to the trimmed run so the markers sit against
-    // the words: " word " must become " *word* ", not "* word *".
     const bold = has(r, "b");
     const italic = has(r, "i");
-    const lead = run.match(/^\s*/)?.[0] ?? "";
-    const tail = run.match(/\s*$/)?.[0] ?? "";
-    let core = run.trim();
+    const last = pieces[pieces.length - 1];
+    if (last && last.bold === bold && last.italic === italic) last.text += run;
+    else pieces.push({ text: run, bold, italic });
+  }
+
+  let out = "";
+  for (const { text, bold, italic } of pieces) {
+    // Emphasis is applied to the trimmed run so the markers sit against
+    // the words: " word " must become " *word* ", not "* word *".
+    const lead = text.match(/^\s*/)?.[0] ?? "";
+    const tail = text.match(/\s*$/)?.[0] ?? "";
+    let core = text.trim();
     if (core) {
       if (bold && italic) core = `***${core}***`;
       else if (bold) core = `**${core}**`;
@@ -95,8 +106,10 @@ function attr(el: Element | null, local: string): string | null {
 function has(run: Element, local: string): boolean {
   const props = first(run, "rPr");
   if (!props) return false;
-  for (const child of Array.from(props.children)) {
-    if (child.namespaceURI === W_NS && child.localName === local) {
+  // childNodes rather than children: the same parser code runs under
+  // DOM implementations that only offer the former.
+  for (const child of Array.from(props.childNodes) as Element[]) {
+    if (child.nodeType === 1 && child.namespaceURI === W_NS && child.localName === local) {
       const v = attr(child as Element, "val");
       return v !== "0" && v !== "false";
     }

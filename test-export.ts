@@ -14,6 +14,13 @@ import { unzipSync, strFromU8 } from "fflate";
 import { parseInline, plainText, isSceneBreak, runsToHtml, SCENE_BREAK } from "./src/export/inline";
 import { toParagraphs, paragraphWords, type Manuscript } from "./src/export/compile";
 import { runningHeader, toDocx, toEpub, toMarkdown } from "./src/export/formats";
+import { readDocx } from "./src/import/docx";
+import { splitIntoChapters } from "./src/import/manuscript";
+import { DOMParser as XmlDomParser } from "@xmldom/xmldom";
+import { zipSync, strToU8 } from "fflate";
+
+// The importer uses the browser's DOMParser; node has none.
+(globalThis as { DOMParser?: unknown }).DOMParser ??= XmlDomParser;
 
 let failures = 0;
 let checks = 0;
@@ -136,6 +143,25 @@ async function main(): Promise<void> {
   ok("DOCX: a running header with surname and title", headers.some((h) => h.includes("Calloway / THE DRIFT BELOW /")));
   ok("DOCX: the header carries a page-number field", headers.some((h) => /PAGE/.test(h)));
   ok("DOCX: the title page is exempt from it", /<w:titlePg\/>|<w:titlePg w:val="(?:true|1)"\/>/.test(doc));
+
+  /* ---------------- import, and the round trip ---------------- */
+
+  const W = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"';
+  const docxOf = (body: string) =>
+    zipSync({ "word/document.xml": strToU8(`<?xml version="1.0"?><w:document ${W}><w:body>${body}</w:body></w:document>`) });
+  const run = (text: string, props = "") => `<w:r>${props ? `<w:rPr>${props}</w:rPr>` : ""}<w:t xml:space="preserve">${text}</w:t></w:r>`;
+
+  const split = readDocx(docxOf(`<w:p>${run("She said ")}${run("Hel", "<w:i/>")}${run("lo", "<w:i/>")}${run(" twice.")}</w:p>`));
+  check("an italic word Word split across runs imports as one", split[0]?.text, "She said *Hello* twice.");
+  const off = readDocx(docxOf(`<w:p>${run("plain", '<w:i w:val="0"/>')}${run(" ")}${run("bold", "<w:b/>")}</w:p>`));
+  check("italic switched off stays plain; bold imports", off[0]?.text, "plain **bold**");
+
+  const chapters = splitIntoChapters(readDocx((await toDocx(m)).data as Uint8Array));
+  const harbour = chapters.find((c) => c.title === "Harbour");
+  ok("round trip: the chapter comes back under its own title, without the heading's bold", !!harbour);
+  ok("round trip: the exported DOCX imports with its italics", !!harbour?.body.includes("She would *never* go **back**."));
+  ok("round trip: the scene break comes back as a break", !!harbour?.body.split(/\n\s*\n/).some((p) => isSceneBreak(p)));
+  ok("round trip: the prose after it survives", !!harbour?.body.includes("Morning came & went."));
 
   if (failures > 0) {
     console.error(`\ntest-export: ${failures} of ${checks} checks failed`);
