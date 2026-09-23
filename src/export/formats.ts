@@ -1,14 +1,17 @@
 import {
   AlignmentType,
   Document,
+  Header,
   HeadingLevel,
   PageBreak,
+  PageNumber,
   Packer,
   Paragraph,
   TextRun,
 } from "docx";
 import { zipSync, strToU8 } from "fflate";
 import type { Manuscript } from "./compile";
+import { SCENE_BREAK, parseInline, runsToHtml } from "./inline";
 
 /* Output formats.
 
@@ -63,6 +66,16 @@ export function toMarkdown(m: Manuscript): ExportResult {
 }
 
 /* ---------------- docx ---------------- */
+
+/** PURE. The standard-manuscript running header: "Surname / KEYWORD / ".
+    The page number is appended by Word. Agents sort loose pages by it,
+    which is why every submission guide insists on it. */
+export function runningHeader(author: string, title: string): string {
+  const surname = author.trim().split(/\s+/).pop()?.replace(/[^\p{L}\p{N}'’-]/gu, "") ?? "";
+  const words = title.trim().split(/\s+/).filter(Boolean);
+  const keyword = (words.length <= 3 ? words : words.slice(0, 3)).join(" ").toUpperCase();
+  return [surname, keyword].filter(Boolean).join(" / ") + " / ";
+}
 
 /* Standard manuscript format: 12pt serif, double spaced, indented
    paragraphs, chapters starting on a new page. This is the shape agents
@@ -121,12 +134,28 @@ export async function toDocx(m: Manuscript): Promise<ExportResult> {
     );
 
     chapter.paragraphs.forEach((p, pi) => {
+      if (p === SCENE_BREAK) {
+        // Manuscript format marks a scene break with a centred #, so a
+        // blank line lost at a page break can't hide it.
+        body.push(
+          new Paragraph({
+            alignment: AlignmentType.CENTER,
+            spacing: { line: DOUBLE },
+            children: [new TextRun({ text: "#", font: FONT, size: SIZE_HALF_POINTS })],
+          }),
+        );
+        return;
+      }
+      const opensScene = pi === 0 || chapter.paragraphs[pi - 1] === SCENE_BREAK;
       body.push(
         new Paragraph({
           spacing: { line: DOUBLE },
           // First paragraph of a scene isn't indented, by convention.
-          indent: pi === 0 ? undefined : { firstLine: INDENT_TWIPS },
-          children: [new TextRun({ text: p, font: FONT, size: SIZE_HALF_POINTS })],
+          indent: opensScene ? undefined : { firstLine: INDENT_TWIPS },
+          children: parseInline(p).map(
+            (run) =>
+              new TextRun({ text: run.text, italics: run.italic, bold: run.bold, font: FONT, size: SIZE_HALF_POINTS }),
+          ),
         }),
       );
     });
@@ -142,7 +171,26 @@ export async function toDocx(m: Manuscript): Promise<ExportResult> {
     sections: [
       {
         properties: {
+          // The title page carries no running header.
+          titlePage: true,
           page: { margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 } },
+        },
+        headers: {
+          first: new Header({ children: [] }),
+          default: new Header({
+            children: [
+              new Paragraph({
+                alignment: AlignmentType.RIGHT,
+                children: [
+                  new TextRun({
+                    children: [runningHeader(m.author, m.title), PageNumber.CURRENT],
+                    font: FONT,
+                    size: SIZE_HALF_POINTS,
+                  }),
+                ],
+              }),
+            ],
+          }),
         },
         children: [...title, ...body],
       },
@@ -182,6 +230,7 @@ export function toEpub(m: Manuscript): ExportResult {
 h1 { text-align: center; margin: 2em 0 1.5em; font-weight: normal; }
 p { margin: 0; text-indent: 1.5em; }
 p.first { text-indent: 0; }
+p.break { text-align: center; text-indent: 0; margin: 1em 0; }
 .title { text-align: center; margin-top: 30%; }
 .title h1 { font-size: 2em; }
 .byline { text-align: center; font-style: italic; }`,
@@ -197,7 +246,11 @@ ${m.author ? `<p class="byline">by ${escapeXml(m.author)}</p>` : ""}</div></body
 
   m.chapters.forEach((chapter, i) => {
     const paras = chapter.paragraphs
-      .map((p, pi) => `<p${pi === 0 ? ' class="first"' : ""}>${escapeXml(p)}</p>`)
+      .map((p, pi) => {
+        if (p === SCENE_BREAK) return `<p class="break">* * *</p>`;
+        const first = pi === 0 || chapter.paragraphs[pi - 1] === SCENE_BREAK;
+        return `<p${first ? ' class="first"' : ""}>${runsToHtml(parseInline(p))}</p>`;
+      })
       .join("\n");
     files[`OEBPS/chapter${i + 1}.xhtml`] = strToU8(
       `<?xml version="1.0" encoding="UTF-8"?>

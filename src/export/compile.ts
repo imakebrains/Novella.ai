@@ -2,6 +2,7 @@ import { store } from "../state/vaultStore";
 import { stripWikiLinks } from "../ai/context";
 import { bylineOf, profileStore } from "../state/profile";
 import { countWords } from "../analysis/prose";
+import { SCENE_BREAK, isSceneBreak, plainText } from "./inline";
 
 /* Turning a vault into a manuscript.
 
@@ -40,13 +41,47 @@ export function defaultTitle(): string {
   return "Untitled Manuscript";
 }
 
-function toParagraphs(body: string): string[] {
-  return stripWikiLinks(body)
-    // Markdown emphasis and headings don't belong in exported prose.
-    .replace(/^#{1,6}\s+/gm, "")
+/** PURE. A chapter body as export paragraphs.
+
+    Emphasis markers are KEPT — each format renders them (inline.ts);
+    stripping them here is how every export used to lose its italics.
+    Scene breaks are recognised before heading markers are removed,
+    because a lone `#` is the manuscript-format scene break and the
+    heading rule would otherwise eat it. Breaks at the very start or
+    end of a chapter, or doubled up, carry no meaning and are dropped. */
+export function toParagraphs(body: string): string[] {
+  const blocks = stripWikiLinks(body)
+    // Notes to self never belong in a manuscript.
+    .replace(/<!--[\s\S]*?-->/g, "")
+    // [text](url) reads as its text in prose.
+    .replace(/(?<!!)\[([^\]\n]+)\]\([^)\s]+\)/g, "$1")
+    // A break line typed flush against prose is still its own block.
+    .replace(/^[ \t]*(?:(?:\*[ \t]*){3,}|(?:-[ \t]*){3,}|(?:_[ \t]*){3,}|(?:~[ \t]*){3,}|#|§)[ \t]*$/gm, "\n$&\n")
     .split(/\n\s*\n/)
-    .map((p) => p.replace(/\s*\n\s*/g, " ").trim())
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .map((p) =>
+      isSceneBreak(p)
+        ? SCENE_BREAK
+        : p
+            .replace(/^#{1,6}\s+/gm, "")
+            .replace(/\s*\n\s*/g, " ")
+            .trim(),
+    )
     .filter(Boolean);
+
+  const out: string[] = [];
+  for (const p of blocks) {
+    if (p === SCENE_BREAK && (out.length === 0 || out[out.length - 1] === SCENE_BREAK)) continue;
+    out.push(p);
+  }
+  while (out[out.length - 1] === SCENE_BREAK) out.pop();
+  return out;
+}
+
+/** PURE. Words in export paragraphs: markup and scene breaks excluded. */
+export function paragraphWords(paragraphs: string[]): number {
+  return paragraphs.reduce((n, p) => (p === SCENE_BREAK ? n : n + countWords(plainText(p))), 0);
 }
 
 export function compileManuscript(opts: CompileOptions = {}): Manuscript {
@@ -59,7 +94,7 @@ export function compileManuscript(opts: CompileOptions = {}): Manuscript {
       return {
         title: note.title,
         paragraphs,
-        words: paragraphs.reduce((n, p) => n + countWords(p), 0),
+        words: paragraphWords(paragraphs),
       };
     })
     .filter((c) => (opts.skipEmpty ? c.paragraphs.length > 0 : true));

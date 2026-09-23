@@ -1,4 +1,5 @@
 import type { Manuscript } from "./compile";
+import { SCENE_BREAK, parseInline, runsToHtml } from "./inline";
 
 /* PDF export, the honest way: a print-formatted window and the OS
    print dialog, where "Save as PDF" lives on every platform. No PDF
@@ -16,7 +17,7 @@ export function openPrintWindow(m: Manuscript): boolean {
     .map(
       (c) =>
         `<section class="chapter"><h2>${esc(c.title)}</h2>${c.paragraphs
-          .map((p) => `<p>${esc(p)}</p>`)
+          .map((p) => (p === SCENE_BREAK ? `<p class="break">* * *</p>` : `<p>${runsToHtml(parseInline(p))}</p>`))
           .join("")}</section>`,
     )
     .join("");
@@ -32,7 +33,8 @@ export function openPrintWindow(m: Manuscript): boolean {
   h2 { font-size: 1.3rem; margin: 3rem 0 1rem; page-break-before: always; }
   .chapter:first-of-type h2 { page-break-before: avoid; }
   p { line-height: 1.7; margin: 0 0 0.2rem; text-indent: 1.5em; }
-  h2 + p { text-indent: 0; }
+  h2 + p, p.break + p { text-indent: 0; }
+  p.break { text-align: center; text-indent: 0; margin: 1rem 0; }
   @media print { .no-print { display: none; } }
   .no-print { position: fixed; top: 8px; right: 8px; font-family: system-ui;
               font-size: 12px; color: #666; background: #f2f2f2;
