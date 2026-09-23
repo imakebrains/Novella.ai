@@ -60,6 +60,11 @@ before claiming anything works.
   0x08 byte and produced a regex that compiled, read correctly and never
   matched. Use the Write tool for anything containing escapes.
   `test-repo.ts` now scans for stray control bytes.
+- **Unicode escapes don't survive the trip either.** A `\uE000` typed into a
+  tool call (Write, Edit, even a Python raw string in Bash) can arrive on
+  disk as the invisible character itself. Build the backslash at runtime
+  (`String.fromCharCode(92)`, `chr(92)`) when the escape must stay an
+  escape. `test-repo.ts` now fails on private-use characters in source.
 - **Motion defaults to `full`, on purpose.** Windows machines with OS
   animation effects off report `prefers-reduced-motion`, which silently
   flattened the whole app for months. Guard every reduced-motion block

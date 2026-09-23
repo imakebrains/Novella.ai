@@ -59,7 +59,11 @@ const VENDORED = ["writing-skills", "src-tauri" + sep + "target"];
    was authored: it was generated through a shell heredoc, the escapes
    were consumed on the way in, and the file ended up holding the raw
    bytes it exists to forbid. */
-const CONTROL = /[\x00-\x08\x0b\x0c\x0e-\x1f]/;
+// The private-use block joined 2026-09-23: \uE000-style sentinels written
+// through a tool arrived as the invisible characters themselves. Same
+// failure as the backspace, one plane up — code that works and a diff
+// that shows nothing.
+const CONTROL = /[\x00-\x08\x0b\x0c\x0e-\x1f\uE000-\uF8FF]/;
 
 function walk(dir: string, out: Found, depth = 0): void {
   // Depth cap so a loop this test has NOT yet reported cannot hang the

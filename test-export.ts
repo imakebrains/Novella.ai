@@ -63,7 +63,7 @@ async function main(): Promise<void> {
   check("an unclosed asterisk stays literal", runs("a *stray mark"), ["a *stray mark||"]);
   check("escaped asterisks are literal", runs("\\*not italic\\*"), ["*not italic*||"]);
   check("escaped underscore is literal", runs("\\_x\\_"), ["_x_||"]);
-  check("a sentinel smuggled in can't toggle anything", runs("ab"), ["ab||"]);
+  check("a sentinel smuggled in can't toggle anything", runs("a\uE002b"), ["ab||"]);
   check("plainText drops the marks", plainText("She would *never* go **back**."), "She would never go back.");
   check("html is escaped, emphasis becomes tags", runsToHtml(parseInline("*Tom & <Jerry>*")), "<em>Tom &amp; &lt;Jerry&gt;</em>");
 

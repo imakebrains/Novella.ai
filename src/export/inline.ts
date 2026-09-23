@@ -24,13 +24,13 @@ export interface Run {
 /* Private-use sentinels. They cannot come from a writer's keyboard in
    any normal way, and anything that somehow carries one is scrubbed
    first so it can't toggle formatting. */
-const B_OPEN = "";
-const B_CLOSE = "";
-const I_OPEN = "";
-const I_CLOSE = "";
-const ESC_STAR = "";
-const ESC_UNDER = "";
-const SENTINELS = /[-]/g;
+const B_OPEN = "\uE000";
+const B_CLOSE = "\uE001";
+const I_OPEN = "\uE002";
+const I_CLOSE = "\uE003";
+const ESC_STAR = "\uE004";
+const ESC_UNDER = "\uE005";
+const SENTINELS = /[\uE000-\uE005]/g;
 
 /* Underscores only count at a word boundary: `_word_` is emphasis,
    `snake_case_name` is not. Asterisks may sit inside a word
