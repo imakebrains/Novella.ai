@@ -1,5 +1,10 @@
 # PLAN: End-to-end encrypted sync (and, later, accounts)
 
+> **Superseded 2026-09-23 by [docs/CLOUD.md](docs/CLOUD.md).** The owner
+> answered the three decisions below: a hosted cloud (Supabase), each
+> writer's work private to their own account rather than end-to-end
+> encrypted, and Free / Plus / Pro plans. Kept for the reasoning.
+
 Status: **plan only — nothing here is built.** Written 2026-07-23 so the
 owner can make the three decisions at the bottom before any code exists.
 Everything above that section is engineering reality, not opinion.
