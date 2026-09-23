@@ -17,5 +17,5 @@
       "npm:@supabase/supabase-js@2.116.0": ["node_modules/@supabase/supabase-js"]
     }
   },
-  "files": ["functions/_types/deno.d.ts", "functions/ai/index.ts", "functions/billing-webhook/index.ts"]
+  "files": ["functions/_types/deno.d.ts", "functions/ai/index.ts", "functions/billing-webhook/index.ts", "functions/delete-account/index.ts"]
 }

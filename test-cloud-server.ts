@@ -39,6 +39,10 @@ import {
   originAllowed,
   validateHostedRequest,
 } from "./supabase/functions/_shared/aiCore";
+import { checkDeletion, inBatches, ownKeysOnly } from "./supabase/functions/_shared/accountCore";
+import { bookFolder, buildAccountArchive, fetchBook } from "./src/cloud/archive";
+import { sha256Hex, type RemoteFiles } from "./src/cloud/syncEngine";
+import { unzipSync, strFromU8 } from "fflate";
 import {
   SIGNATURE_TOLERANCE_SECONDS,
   decideWrite,
@@ -413,6 +417,62 @@ async function main(): Promise<void> {
     await store.setItem("novella.cloud.session", JSON.stringify(session));
     await store.removeItem("novella.cloud.session");
     ok("sign-out clears both halves", !plain.has("novella.cloud.session") && secrets.size === 0);
+  }
+
+  /* ============================================================
+     Leaving: delete the account, take everything
+     ============================================================ */
+
+  {
+    const base = { accountEmail: "Wren@Example.com", entitlement: null };
+    check("typing the email (any case) confirms", checkDeletion({ ...base, typed: " wren@example.com " }).ok, true);
+    check("anything else refuses", checkDeletion({ ...base, typed: "yes" }).ok, false);
+    check("no confirmation refuses", checkDeletion({ ...base, typed: undefined }).ok, false);
+    check("an account with no email can't self-delete", checkDeletion({ accountEmail: null, typed: "", entitlement: null }).ok, false);
+    const live = checkDeletion({ ...base, typed: "wren@example.com", entitlement: { status: "active", provider_subscription_id: "sub_1" } });
+    check("a live subscription blocks deletion with 409", live.ok ? 0 : live.status, 409);
+    ok("and says how to get out", !live.ok && live.message.includes("Cancel it"));
+    check("a past-due one blocks too", checkDeletion({ ...base, typed: "wren@example.com", entitlement: { status: "past_due", provider_subscription_id: "sub_1" } }).ok, false);
+    check("a canceled one doesn't", checkDeletion({ ...base, typed: "wren@example.com", entitlement: { status: "canceled", provider_subscription_id: "sub_1" } }).ok, true);
+    check("batches", inBatches([1, 2, 3, 4, 5], 2), [[1, 2], [3, 4], [5]]);
+    check("only keys inside the account's folder", ownKeysOnly(["u1/p/a", "u2/p/b", "u1/", "u1/../u2/x", "u10/p/c"], "u1"), ["u1/p/a"]);
+
+    const taken = new Set<string>();
+    check("folder names drop what Windows forbids", bookFolder('Tales: of "Wren"?', taken), "Tales of Wren");
+    check("and stay unique, ignoring case", bookFolder("tales of wren", taken), "tales of wren (2)");
+    check("reserved device names are made safe", bookFolder("CON", taken), "Book CON");
+    check("trailing dots go", bookFolder("Draft...", taken), "Draft");
+
+    const enc = new TextEncoder();
+    const cover = new Uint8Array([0xff, 0xd8, 0x00]);
+    const rows = [
+      { path: "Manuscript/01.md", version: 2, seq: 3, sha256: await sha256Hex(enc.encode("Café.")), size: 6, deleted: false, content: "Café.", blobKey: null, device: "Desk" },
+      { path: "old.md", version: 2, seq: 4, sha256: "", size: 0, deleted: true, content: null, blobKey: null, device: "Desk" },
+      { path: ".novella/cover.jpg", version: 1, seq: 5, sha256: await sha256Hex(cover), size: 3, deleted: false, content: null, blobKey: "k", device: "Desk" },
+    ];
+    const remote: RemoteFiles = {
+      pull: async (since) => ({ files: rows.filter((r) => r.seq > since).slice(0, 2), more: rows.filter((r) => r.seq > since).length > 2 }),
+      push: async () => ({ ok: true, version: 1, seq: 1 }),
+      putBlob: async () => "k",
+      getBlob: async () => cover,
+    };
+    const files = await fetchBook(remote);
+    check("a book downloads its live files across pages, tombstones skipped", files.map((f) => f.path), [".novella/cover.jpg", "Manuscript/01.md"]);
+
+    const zip = unzipSync(buildAccountArchive([{ name: "The Drift", files }], { theme: "vellum" }, new Date("2026-09-23T12:00:00Z")));
+    check("the archive holds each book in its folder", Object.keys(zip).sort(), ["README.txt", "The Drift/.novella/cover.jpg", "The Drift/Manuscript/01.md", "settings.json"]);
+    check("text arrives byte for byte, accents included", strFromU8(zip["The Drift/Manuscript/01.md"]!), "Café.");
+    check("settings travel", JSON.parse(strFromU8(zip["settings.json"]!)), { theme: "vellum" });
+    ok("the README says keys were never in the cloud", strFromU8(zip["README.txt"]!).includes("API keys were never stored"));
+
+    const bad: RemoteFiles = { ...remote, getBlob: async () => new Uint8Array([1]) };
+    let refused = false;
+    try {
+      await fetchBook(bad);
+    } catch {
+      refused = true;
+    }
+    ok("a damaged download refuses the export instead of saving it", refused);
   }
 
   if (failures > 0) {

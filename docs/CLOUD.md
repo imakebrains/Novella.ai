@@ -201,11 +201,16 @@ account, card or identity. In order:
    **Send one test event from Paddle's simulator and confirm a row lands
    in `entitlements`** — the payload field names in `billingCore.ts`
    have not yet been checked against a live delivery.
-9. **Before anyone outside the owner signs in**: a privacy policy and
+9. **Deploy the account-deletion function**:
+   `npx supabase functions deploy delete-account` (JWT verification on;
+   uses the same `ALLOWED_ORIGINS` secret). Writers can then delete their
+   account and every stored file from Settings, and download everything
+   first as one zip.
+10. **Before anyone outside the owner signs in**: a privacy policy and
    terms (Paddle and Google both require them), and README.md and
    SECURITY.md rewritten — both currently promise "no account, no cloud
    sync", which stops being true the day this switches on.
-10. **Upgrade Supabase to Pro** ($25/mo) before launch, for the reason
+11. **Upgrade Supabase to Pro** ($25/mo) before launch, for the reason
     in "What a subscriber costs".
 
 Also worth doing, free: turn on GitHub private vulnerability reporting

@@ -394,6 +394,29 @@ select tests.ok((select public.put_settings(0, '{"theme": "noir"}')) ->> 'ok' = 
   'B''s settings are B''s own row');
 
 -- ============================================================
+-- Leaving
+-- ============================================================
+
+select tests.login('bbbbbbbb-0000-0000-0000-000000000002');
+select tests.refused($$select public.account_blob_keys('aaaaaaaa-0000-0000-0000-000000000001')$$,
+  'permission denied', 'nobody can list another account''s stored files');
+select tests.refused($$select public.account_blob_keys('bbbbbbbb-0000-0000-0000-000000000002')$$,
+  'permission denied', 'or even their own: only the delete function may');
+
+select tests.admin();
+select tests.ok((select count(*) from public.account_blob_keys('aaaaaaaa-0000-0000-0000-000000000001')) = 4,
+  'the delete function sees every blob in the account''s folder');
+select tests.ok((select count(*) from public.account_blob_keys('bbbbbbbb-0000-0000-0000-000000000002')) = 0,
+  'and none of anybody else''s');
+
+-- Deleting B's sign-in takes every row of B's with it, and nothing of A's.
+delete from auth.users where id = 'bbbbbbbb-0000-0000-0000-000000000002';
+select tests.ok((select count(*) from public.projects where owner_id = 'bbbbbbbb-0000-0000-0000-000000000002') = 0, 'deleting an account removes its projects');
+select tests.ok((select count(*) from public.project_files where owner_id = 'bbbbbbbb-0000-0000-0000-000000000002') = 0, 'and its files');
+select tests.ok((select count(*) from public.user_settings where user_id = 'bbbbbbbb-0000-0000-0000-000000000002') = 0, 'and its settings');
+select tests.ok((select count(*) from public.projects where owner_id = 'aaaaaaaa-0000-0000-0000-000000000001') = 3, 'and leaves everyone else''s alone');
+
+-- ============================================================
 -- Signed out
 -- ============================================================
 
