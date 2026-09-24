@@ -42,13 +42,17 @@
       before it is written. A truncated download never becomes the
       writer's chapter.
 
-   Config and history under .novella/ follow rule 1 differently:
-   there is no writer-facing decision to hand over for a board layout
-   JSON, so this device's copy wins, and the cloud's is simply
-   replaced. Visible files — the book — always get the copy.
+   Config under .novella/ follows rule 1 differently: there is no
+   writer-facing decision to hand over for a board layout JSON, so this
+   device's copy wins and the cloud's is simply replaced. Two exceptions
+   hold recoverable words — revision history and the trash manifest —
+   and those are MERGED (mergers.ts): the union of both sides, so a
+   snapshot or a trashed scene never disappears because another device
+   synced first. Visible files — the book — always get the copy.
    ============================================================ */
 
 import { isTempPath, sidecarPathFor, splitPath } from "../storage/vaultSafety";
+import { defaultMergers, type FileMerger } from "./mergers";
 
 /* ------------------------------------------------------------
    Wire shapes
@@ -282,6 +286,8 @@ export type SyncEvent =
   | { type: "conflict"; path: string; copyPath: string }
   /** Deleted here, edited elsewhere — the edit was restored. */
   | { type: "restored"; path: string }
+  /** Both sides changed a history or trash file; the union is now here. */
+  | { type: "merged"; path: string }
   | { type: "limit"; limit: "projects" | "bytes" }
   | { type: "deletions-held"; paths: string[] };
 
@@ -289,6 +295,8 @@ export interface SyncResult {
   pulled: number;
   pushed: number;
   conflicts: { path: string; copyPath: string }[];
+  /** Dotfolder files whose two versions were united rather than chosen. */
+  merged: string[];
   limit: "projects" | "bytes" | null;
   heldDeletions: string[];
   /** Set when the run stopped early. Everything already done is kept;
@@ -311,6 +319,9 @@ export interface EngineOptions {
   saveState: (state: SyncState) => void | Promise<void>;
   onEvent?: (event: SyncEvent) => void;
   now?: () => Date;
+  /** Per-file merge rules for both-sides-changed dotfolder files.
+      Defaults to history and the trash manifest; [] turns merging off. */
+  mergers?: FileMerger[];
 }
 
 /* ------------------------------------------------------------
@@ -323,6 +334,7 @@ export class ProjectSync {
   private readonly saveStateFn: EngineOptions["saveState"];
   private readonly onEvent: (event: SyncEvent) => void;
   private readonly now: () => Date;
+  private readonly mergers: FileMerger[];
   private state: SyncState;
   private running: Promise<SyncResult> | null = null;
   private again = false;
@@ -336,6 +348,7 @@ export class ProjectSync {
     this.saveStateFn = opts.saveState;
     this.onEvent = opts.onEvent ?? (() => {});
     this.now = opts.now ?? (() => new Date());
+    this.mergers = opts.mergers ?? defaultMergers(() => this.now().getTime());
   }
 
   /** A copy, so a caller can't mutate what the engine trusts. */
@@ -427,7 +440,7 @@ export class ProjectSync {
   }
 
   private async round(): Promise<SyncResult> {
-    const result: SyncResult = { pulled: 0, pushed: 0, conflicts: [], limit: null, heldDeletions: [], error: null };
+    const result: SyncResult = { pulled: 0, pushed: 0, conflicts: [], merged: [], limit: null, heldDeletions: [], error: null };
     try {
       await this.pullAll(result);
       await this.pushAll(result);
@@ -556,8 +569,21 @@ export class ProjectSync {
       this.requeue(copyPath);
       result.conflicts.push({ path, copyPath });
       this.onEvent({ type: "conflict", path, copyPath });
+    } else {
+      const merger = this.mergers.find((m) => m.matches(path));
+      if (merger) {
+        const theirs = await this.fetchBody(file);
+        const merged = merger.merge(localBytes, theirs);
+        // null means one side wasn't the shape the merger understands;
+        // the ordinary rule below is safer than writing a guess.
+        if (merged) {
+          await this.local.write(path, merged);
+          result.merged.push(path);
+          this.onEvent({ type: "merged", path });
+        }
+      }
     }
-    // Ours stays in place and goes up on top of theirs.
+    // Ours (merged or not) stays in place and goes up on top of theirs.
     this.state.known[path] = { version: file.version, sha256: file.sha256, deleted: false };
     this.requeue(path);
   }

@@ -47,6 +47,8 @@ import {
   parseAccount,
 } from "./src/cloud/plans";
 import { classifyVaultFile, tempPathFor } from "./src/storage/vaultSafety";
+import { mergeHistory, mergeTrashIndex } from "./src/cloud/mergers";
+import { MAX_REVISIONS } from "./src/core/historyThin";
 
 let failures = 0;
 let checks = 0;
@@ -492,6 +494,72 @@ async function main(): Promise<void> {
     check("this device's config wins", server.text(".novella/boards.json"), '{"v":"laptop"}');
     await desk.engine.sync();
     check("and reaches the other device", desk.text(".novella/boards.json"), '{"v":"laptop"}');
+  }
+
+  /* ============================================================
+     History and the trash manifest are united, not chosen
+     ============================================================ */
+
+  {
+    const at = WHEN.getTime();
+    const rev = (n: number, reason: string) => ({ at: at - n * 60_000, body: `draft ${n}`, reason, words: 2 });
+    const hist = (...revs: ReturnType<typeof rev>[]) => JSON.stringify({ id: "ch1", title: "One", revisions: revs });
+
+    // Pure rules first.
+    const m = mergeHistory(JSON.parse(hist(rev(3, "save"), rev(1, "mine"))), JSON.parse(hist(rev(3, "save"), rev(2, "theirs"))), at);
+    check("history: the union, in time order", m?.revisions.map((r) => r.reason), ["save", "theirs", "mine"]);
+    check("history: a different note's file is not merged", mergeHistory(JSON.parse(hist(rev(1, "a"))), { id: "ch2", title: "", revisions: [] }, at), null);
+    check("history: a corrupt side is refused, not guessed", mergeHistory("nope", JSON.parse(hist(rev(1, "a"))), at), null);
+    const many = Array.from({ length: MAX_REVISIONS }, (_, i) => rev(i * 60 * 24 + 1, `d${i}`));
+    const big = mergeHistory({ id: "ch1", title: "", revisions: many }, { id: "ch1", title: "", revisions: many.map((r) => ({ ...r, at: r.at + 1 })) }, at);
+    ok("history: a union over budget is thinned like a single device's", !!big && big.revisions.length <= MAX_REVISIONS && big.revisions.length > MAX_REVISIONS / 2);
+
+    const idx = (retention: unknown, ...ids: string[]) => ({ version: 1, retention, entries: ids.map((entryId, i) => ({ entryId, trashedAt: at - i, path: `${entryId}.md`, title: entryId })) });
+    const t = mergeTrashIndex(idx(7, "a", "b"), idx(30, "b", "c"));
+    check("trash: the union of entries", t?.entries.map((e) => e.entryId).sort(), ["a", "b", "c"]);
+    check("trash: this device's retention window", t?.retention, 7);
+    check("trash: a corrupt side is refused", mergeTrashIndex({ entries: "x" }, idx(7, "a")), null);
+
+    // Then the engine, two devices apart.
+    const server = new FakeServer();
+    const desk = device(server, "Desk");
+    const laptop = device(server, "Laptop");
+    desk.write(".novella/history/ch1.json", hist(rev(9, "save")));
+    desk.write(".novella/trash/index.json", JSON.stringify(idx(7)));
+    desk.write(".novella/boards.json", '{"v":1}');
+    await desk.engine.sync();
+    await laptop.engine.sync();
+
+    desk.write(".novella/history/ch1.json", hist(rev(9, "save"), rev(5, "before the robot, desk")));
+    laptop.write(".novella/history/ch1.json", hist(rev(9, "save"), rev(4, "before the robot, laptop")));
+    desk.write(".novella/trash/index.json", JSON.stringify(idx(7, "scene-desk")));
+    laptop.write(".novella/trash/index.json", JSON.stringify(idx(30, "scene-laptop")));
+    desk.write(".novella/boards.json", '{"v":"desk"}');
+    laptop.write(".novella/boards.json", '{"v":"laptop"}');
+
+    await desk.engine.sync();
+    const r = await laptop.engine.sync();
+    check("the laptop reports the two merged files", r.merged.sort(), [".novella/history/ch1.json", ".novella/trash/index.json"]);
+    check("and no conflict copy for any of them", r.conflicts.length, 0);
+    ok("with a merged event per file", laptop.events.filter((e) => e.type === "merged").length === 2);
+    await desk.engine.sync();
+    for (const d of [desk, laptop]) {
+      const h = JSON.parse(d.text(".novella/history/ch1.json") ?? "{}") as { revisions: { reason: string }[] };
+      check(`${d.name} has both devices' snapshots`, h.revisions.map((x) => x.reason), ["save", "before the robot, desk", "before the robot, laptop"]);
+      const ti = JSON.parse(d.text(".novella/trash/index.json") ?? "{}") as { entries: { entryId: string }[] };
+      check(`${d.name} has both devices' trashed scenes`, ti.entries.map((e) => e.entryId).sort(), ["scene-desk", "scene-laptop"]);
+    }
+    check("the manifest's retention followed the device that merged", JSON.parse(laptop.text(".novella/trash/index.json") ?? "{}").retention, 30);
+    check("a board layout still goes to the device that synced second", desk.text(".novella/boards.json"), '{"v":"laptop"}');
+    check("nothing is left waiting", desk.engine.pendingCount() + laptop.engine.pendingCount(), 0);
+
+    // A corrupt history on one side: the ordinary rule, no crash.
+    desk.write(".novella/history/ch1.json", "{not json");
+    laptop.write(".novella/history/ch1.json", hist(rev(9, "save"), rev(1, "laptop again")));
+    await desk.engine.sync();
+    const bad = await laptop.engine.sync();
+    check("a corrupt side falls back to this-device-wins", [bad.error, bad.merged.length], [null, 0]);
+    check("and the laptop's file is what the cloud now holds", server.text(".novella/history/ch1.json"), hist(rev(9, "save"), rev(1, "laptop again")));
   }
 
   /* ============================================================

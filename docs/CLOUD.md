@@ -85,6 +85,12 @@ Settings files under `.novella/` don't get a copy: the device that
 syncs second keeps its version, because there is no sentence to show a
 writer about a board layout.
 
+**Revision history and the trash manifest are united, not chosen.** Both
+are lists keyed by something unique (a snapshot's millisecond, a trash
+entry's id), so when two devices changed one between syncs the engine
+writes the union of the two and no snapshot or trashed scene is lost;
+other `.novella/` files keep the device-that-synced-second rule.
+
 **A file that merely disappears is never deleted from the cloud.** Only
 a deletion Novella itself made is sent up. A folder that went missing
 is restored from the cloud, not emptied into it. More than ten
@@ -248,9 +254,8 @@ that push rather than risk a merge that loses either side's work.
 6. **Upgrade flow**: Paddle checkout opened with the writer's user id in
    `customData`, and a "Manage subscription" link to Paddle's portal.
 
-Known limitations, kept on purpose for v1: history and trash index
-files resolve conflicts by newest-device-wins rather than merging; blobs
-replaced by newer versions are not yet garbage-collected; two files
+Known limitations, kept on purpose for v1: blobs replaced by newer
+versions are not yet garbage-collected; two files
 whose paths differ only by letter case collide on Windows and macOS;
 changes arrive by polling (on open, on focus, every minute), not by
 realtime push.
