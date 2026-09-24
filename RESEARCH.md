@@ -7930,3 +7930,397 @@ skipping it twice.
 - storyflow.so/blog/scrivener-vs-obsidian-vs-notion-vs-zotero-book-research-2026
   (independent, comparison — background reading, not cited as a standalone finding)
 - Internal: src/ui/Corkboard.tsx, src/ui/BoardLayoutToggle.tsx, src/core/vault.ts
+
+
+# Round 50 (2026-09-24) — navigation/settings information architecture, and dictation/voice-to-text: two areas the research brief names but 49 prior rounds never gave a dedicated pass
+
+A full-text grep of both research files for "navigation design," "sidebar,"
+"settings organization," "dictation," and "voice-to-text" before this round
+started confirmed genuine unexplored ground — not zero prior mentions in
+every case, but zero prior *dedicated* passes. Both areas are named
+explicitly in the standing research brief's "STUDY APP DESIGN AND UX" list.
+Two parallel research passes ran this round, each also checking the
+relevant Novella source files directly rather than only competitors, so
+every finding below could be weighed against what Novella already does or
+already has stubbed.
+
+## Pass 1 — Navigation, information architecture, and sidebar design
+
+**Finding (recurring complaint, official + forum sourced): Scrivener's
+Binder is an outliner, not a file tree, and that distinction is the root of
+both its power and its most-cited disorientation complaint.** Scrivener's
+own teaching material describes the Binder as "a powerful and fully-featured
+outliner" — triangles expand/collapse, drag-and-drop reorders or nests
+depending on drop position (literatureandlatte.com/blog/5-ways-to-move-and-
+rearrange-files-and-folders-in-the-scrivener-binder; well-storied.com/blog/
+breaking-down-the-scrivener-binder, both official/independent teaching
+content). The Literature & Latte forum shows the cost of that power at
+scale: Binder selection doesn't reliably track the document actually being
+edited once Split Editor is open (forum.literatureandlatte.com/t/binder-
+navigation-not-working/41819), and a separate thread confirms Binder search
+filters the list to matches but gives no way to tell which match is the
+right one without opening it (forum.literatureandlatte.com/t/how-can-i-
+differentiate-within-the-binder/153684/6). There is no breadcrumb anywhere
+in the Binder — a writer's only way to know "where am I" in a deeply nested
+project is to read triangle state.
+
+**Finding (reviewer opinion, directly verified per this round's assignment):
+NovelCrafter's onboarding is documented, in a reviewer's own words, as "20+
+buttons and screens... no obvious 'start here' path."** A hands-on Medium
+review (April 2026, fetch blocked by 403 on direct read this round — read
+via search-result snippet, so held to slightly lower confidence than a
+directly-fetched page) describes clicking through roughly a dozen tutorial
+screens before hitting "tutorial fatigue" and Skip — which the reviewer
+calls a mistake in hindsight, because without the tutorials "the interface
+isn't self-explanatory." This is not universal: other reviews call the same
+interface "clean and intuitive" with "no steep learning curve"
+(kindlepreneur.com/novelcrafter-review) — a genuinely split reviewer
+opinion, not consensus, but the negative reports are specific rather than
+vague. NovelCrafter's own official docs (novelcrafter.com/help/docs/app/
+app-layout) confirm the underlying structure: a four-layer nav (left tools
+sidebar, a novel-navigation strip, a top mode switcher between Plan/Write/
+Chat/Review, and the main panel) — a fourth, semantically distinct
+top-level mode concept Novella's own three-pane layout doesn't have in this
+form.
+
+**Finding (official capability + inference): Notion's fix for unbounded page
+nesting is Favorites and breadcrumbs, not a depth limit, and this is the
+same fix Obsidian converges on independently.** Notion permits infinite
+nesting, but its own guidance and third-party how-tos converge on the same
+self-imposed writer rule — "most users stop at three or four levels" because
+"going too deep makes navigation slow" (notion.com/help/navigate-with-the-
+sidebar, official; ones.com/blog/manage-infinite-nesting-notion-nested-
+pages, independent). Notion's structural answer is Favorites/pinning above
+the tree, plus a breadcrumb on every page. Obsidian's stock file explorer
+has neither — a How-To Geek piece calls it "strictly a simple file tree...
+without any context," and the plugin ecosystem's response is the stronger
+evidence here, because it isn't one author's opinion, it's a *category* of
+separately-built plugins solving the identical problem: Notebook Navigator
+(unifies tags/folders/search/recents into one dual-pane view), Folder Nav
+(drill-down + breadcrumb, explicitly modeled on OS file browsers), Quick
+Switch Sidebar (keyboard-first jump without leaving the sidebar), and
+Alternative Explorer (Apple-Notes-style smart folders) — four independent
+plugins converging on the same two jobs (howtogeek.com/why-i-swapped-the-
+obsidian-sidebar-for-a-third-party-file-explorer; community.obsidian.md/
+plugins/folder-nav, /quick-switch-sidebar, /alternative-explorer;
+obsidianstats.com/tags/navigation).
+
+**Finding (official capability, lower evidentiary weight but consistent
+across two unrelated competitors): Dabble and Campfire both scope navigation
+by making unused tools genuinely absent, not just hideable.** Dabble
+separates "settings about me" (account Preferences, top-right) from
+"settings about this book" (a gear icon inside the project's own sidebar,
+above the manuscript list) — two physical locations, not two tabs of one
+modal (reedsy.com/studio/resources/dabble-writing-review;
+dabblewriter.com/dabbles-new-desktop-features). Campfire's worldbuilding
+system is modular — "users can pick and choose the modules they're
+interested in and disregard the rest" (selfpublishing.com/campfire-
+writing-review) — so an author who doesn't use Factions or Timelines never
+sees that entry in the nav at all, a data-model-level scoping mechanism
+stronger than a per-user hide toggle.
+
+**Cross-app pattern.** The same two failure modes recur independent of
+category (novel tool, PKM tool, general workspace): "I lost my place"
+(Scrivener's Binder/Split Editor desync, Obsidian's context-free flat tree)
+and "too much is visible that I don't need" (NovelCrafter's 20+-screen
+onboarding, Obsidian's entire plugin market existing as the response,
+Notion's nesting sprawl). The recurring fixes are breadcrumbs/pinning for
+the first problem and opt-in-by-construction (not just hideable) for the
+second.
+
+**Checked against our own code — a validation finding, stated plainly
+rather than manufactured into a gap.** `CodexPane.tsx` is Novella's
+Binder/explorer equivalent: a single scrollable list grouped by note type
+(manuscript first, "because that's what a writer reaches for most," per its
+own comment), each group collapsible, with a fold-all/open-all toggle, an
+in-place search filter, and a letter-index injected past 20 entries
+(`LETTER_INDEX_AT = 20`) plus a "Dangling/Unwritten" section. This is
+architecturally a flat, typed, filterable list — closer to what Obsidian's
+fix-it plugins build than to Scrivener's nested outliner — so the single
+most-cited failure mode in this whole pass (bottomless nesting disorientation)
+cannot occur in Novella's current design at all. `InspectorPane.tsx`
+(`inspectorTabs.ts`) is a second, independent nav system: a reorderable,
+hide/show tool strip that a writer can split into up to 3 panel slots
+(`MAX_SLOTS = 3`, deliberately capped per the file's own comment) — a
+VS-Code-style dockable-panel model none of the six competitors checked offer
+in their *core* navigation (Obsidian's pane-splitting is the closest
+analog, but it's a general workspace primitive, not built for a fixed tool
+registry the way Novella's is). The one real, evidenced gap relative to the
+Notion/Obsidian cross-pattern: `CodexPane` has no pinned/recents strip above
+its grouped list. Small and not urgent at current typical project sizes,
+since the flat/letter-indexed design already avoids the worse failure —
+worth doing once a vault grows large enough that re-scanning the grouped
+list every time gets old.
+
+## Pass 2 — Settings organization and progressive disclosure
+
+**Finding (reviewer opinion, widely repeated, and a settings-specific
+failure): Scrivener's Compile window is the single most-cited UX failure in
+the whole app, and reviewers' own fix is textbook progressive disclosure
+retrofitted from outside.** "Scrivener's compile window looks like the
+cockpit of a 747. You just want a Word document." (loreteller.com/learn/
+scrivener-compile-guide, independent tutorial) — "tabs, columns, checkboxes,
+dropdown menus, and terminology you've never seen before," with the same
+guide's own remediation being exactly progressive disclosure: five settings
+actually matter for a clean output; the rest can be ignored entirely. This
+is a settings surface exposing 100% of its power with 0% disclosure, fixed
+only by a third party's tutorial rather than the product itself.
+
+**Finding (official capability): Dabble and NovelCrafter both push settings
+out of a central modal rather than deepening one — two different
+decentralization strategies.** Dabble's global Preferences split into
+General/Dictionary/Advanced tabs, with per-project settings physically
+relocated to the project's own sidebar (help.dabblewriter.com/en/
+articles/4467347-getting-started-made-simple, /5757859-using-the-right-
+toolbar, both official). NovelCrafter's official docs state plainly that
+its settings "are used across all projects," and push finer configuration
+into contextual menus attached to specific objects (acts, chapters, codex
+entries) rather than a settings screen at all (novelcrafter.com/help/docs/
+app/app-layout, official) — progressive disclosure by decentralization
+rather than by hiding tabs.
+
+**Finding (authoritative UX research, not a competitor implementation
+choice — the most load-bearing citation in this pass): Nielsen Norman
+Group's own progressive-disclosure guidance sets a real, numeric failure
+threshold.** Show only the most important options initially; offer the
+rest on request — but "more than two levels of disclosure typically fails,"
+because users get lost in the disclosure hierarchy itself, the identical
+disorientation problem as Pass 1's navigation findings, just applied to
+settings (nngroup.com/articles/progressive-disclosure). Android's own
+settings design pattern gives a concrete numeric companion rule: group
+related settings into a subscreen past 15 settings, and add search once
+the hierarchy gets complex (developer.android.com/design/ui/mobile/guides/
+patterns/settings, official).
+
+**Finding (own inference, grounded in Obsidian's architecture): Obsidian's
+answer to "keep advanced features discoverable without cluttering the base
+app" is total absence by default, not a collapsed Advanced section — a
+different trade than NN/g's model, not a superior one.** A brand-new user
+never sees clutter, but a user who needs a capability the core lacks has to
+already know plugins exist as a concept and accept third-party-code risk —
+a much higher bar than revealing a collapsed section. No dedicated UX
+research was found evaluating this specific trade for Obsidian; flagged
+explicitly as inference from the architecture and Pass 1's plugin evidence,
+not a sourced claim about Obsidian's design intent.
+
+**Cross-app pattern.** Every app in this category handles the
+common-path-vs-power-user tension with one of exactly three mechanisms,
+rarely mixed within one app: tabs/categories in one settings surface
+(Novella's current model, Dabble's Preferences sub-tabs), contextual/
+decentralized settings attached to the object they affect (NovelCrafter),
+or total opt-in via plugins/extensions (Obsidian). NN/g's research suggests
+the first is safest as long as it respects the ~2-level cap and Android's
+15-settings/complex-hierarchy thresholds.
+
+**Checked against our own code — a second validation finding.**
+`SettingsModal.tsx` is a single modal with 7 flat tabs (Profile, Appearance,
+Shortcuts, Connections, Agents, Plugins, About), no nesting, no
+sub-tabs, no search box — and the file's own top comment states the intent
+directly: "Tabbed rather than one long scroll, because 'where do I change
+my pen name' and 'which model am I using' are different errands," with an
+explicit, correct argument against an account tab ("Novella has no server,
+so a login would be theatre"). At 7 top-level tabs with modest content
+each, Novella sits well below both the NN/g 2-level cap and Android's
+15-settings/search threshold — this is already a correctly-sized
+application of progressive disclosure for the app's current complexity, not
+a gap. A search-within-settings box would be solving a problem Novella
+doesn't have yet. The one real, evidenced gap: all seven tabs are
+global/account-level by design, with no per-project settings surface at
+all, unlike Dabble's structural split. Not urgent — nothing in the current
+schema is genuinely per-book rather than per-writer — but worth deciding
+the location before a genuinely per-project setting arrives with nowhere
+obvious to live.
+
+## Pass 3 — Dictation and voice-to-text for novelists
+
+Mobile app UX has been researched extensively across 49 prior rounds, but
+only from the angle of sync bugs, data loss, and feature-parity gaps — never
+from the angle of voice as an input method. A grep of both research files
+found exactly one prior touch on this topic: a passing mention of
+Sudowrite's mobile-scoped "Smart Dictation" inside an unrelated mobile-parity
+finding (RESEARCH.md, round 47). This pass treated it as unresearched
+ground and confirmed it was.
+
+**Checked against our own code first, and found an unfinished, already-
+designed stub — the most load-bearing finding of this pass.**
+`voiceNotesCapture` in `src/core/plugins.ts` is a real plugin: on-device
+Whisper model download, a settings schema for model size (base/small/
+medium), registered in `BUILTIN_PLUGINS`, description reading "Speak an
+idea; it's transcribed on-device and saved to your Notes." But
+`onEnable()`'s `run()` only fires a toast notification — no microphone
+capture, no model inference is wired up. Sitting unconnected in the same
+file is `ollamaProvider`, an already-shipped local model provider. The
+architecture for exactly the finding below — local speech-to-text chained
+to local AI cleanup — was already designed into the codebase and never
+finished.
+
+**Finding (official capability): Sudowrite's mobile app is the only
+fiction-specific product with a named, marketed dictation feature, and it's
+thinly documented even by its own reviewers.** Sudowrite's mobile companion
+scopes itself to "Smart Dictation," "Smart Dictation Enhancement," and Chat
+— explicitly excluding the Write/Rewrite tools that are its flagship
+desktop features (docs.sudowrite.com/is-there-a-mobile-app, official).
+Kindlepreneur's review confirms the feature is the mobile app's central
+focus but documents almost nothing about its actual behavior —
+punctuation handling, accuracy, fiction-specific tuning are all
+undocumented publicly. Every other competitor checked (Scrivener, Dabble,
+NovelCrafter, Campfire, Ulysses, iA Writer, type.ai) has no dedicated
+in-app dictation UI at all — all rely on OS-level dictation typed into a
+normal text field.
+
+**Finding (observed user behavior, cross-corroborated across three
+independent communities — the same "second app" shape this research keeps
+finding elsewhere): writers dictate in a separate tool, then manually
+bridge the transcript into their real writing app.** A Literature & Latte
+forum thread (forum.literatureandlatte.com/t/how-to-dictate-transcribe-
+with-whisper-chatgpt-and-save-directly-into-scrivener-on-macos-and-
+ios/149916, read in full) documents a Scrivener user building their own
+macOS Shortcuts pipeline — record, transcribe via Whisper/ChatGPT, drop
+.txt files into a synced folder, batch-import — specifically because
+"typing often distracts me from thinking" and Scrivener has no speech
+engine. An independent author-workflow piece describes the same pattern
+with Otter.ai: record, then "copy and paste relevant parts... straight
+into your manuscript" (indieauthormagazine.com/otter-ai-an-authors-
+starting-place-for-speech-to-text-software). A third independent source
+(thewritepractice.com/speech-to-text-apps-for-write) documents the same
+Just-Press-Record-then-paste-into-Ulysses/iA-Writer/Scrivener workflow.
+Three unrelated communities, same shape, no coordination between them.
+
+**Finding (recurring complaint, direct competitor, dated and official — the
+single most concrete data point in this pass): Dabble's own feedback board
+documents dictation as actively broken with Dabble specifically, unfixed
+for six years.** dabble.featureupvote.com/suggestions/65284 (official
+Dabble feedback board, filed Nov 2019, "Under consideration," still
+receiving upvotes as recently as Sept 2026): OS-level dictation that works
+everywhere else breaks specifically inside Dabble's editor — saying "new
+line" produces a literal new line in every other app, but inside Dabble it
+stops dictation entirely. This is of the same evidentiary caliber as the
+Dabble Plot Grid Android touch bug already logged elsewhere in this
+research: a competitor's own live, dated, upvoted ticket, not an inference.
+
+**Finding (fiction-specific recurring complaint): invented character and
+place names are the accuracy failure mode unique to this genre, distinct
+from general dictation complaints about accents or background noise.** A
+widely-repeated example: Dragon NaturallySpeaking turning the character name
+"Mira" into "mirror" roughly 40% of the time. Independently,
+thenovelsmithy.com/dictate-your-novel-nanowrimo notes generically that
+"fantasy and sci-fi writers may struggle to get their dictation software to
+understand" invented names, and a Writing Forums thread
+(writingforums.com, read in full) and the same NovelSmithy piece both
+independently flag punctuation-by-voice ("period," "new paragraph") as a
+second, unrelated friction point. The recurring workaround across sources:
+build a custom vocabulary (Dragon's word-learning; Otter.ai Pro's 100-name
+custom vocabulary) and treat dictated output as a rough draft requiring a
+dedicated cleanup pass, never a finished one.
+
+**Finding (accessibility framing, distinct from convenience — a different
+job-to-be-done than the findings above): RSI is a documented,
+career-level reason some writers need dictation, not a nice-to-have.** IBM
+Research's own "StoryWriter" project (research.ibm.com/publications/
+storywriter-a-speech-oriented-editor, academic/official, read in full) was
+built specifically because RSI "poses a potentially career-ending problem
+for people who write for a living," and blended speech with keyboard,
+mouse, and a foot pedal because RSI symptom variability meant speech alone
+wasn't sufficient for every writer on every day. Multiple 2026 dictation-tool
+marketing pages independently position RSI/carpal-tunnel as a distinct buyer
+segment from general productivity — vendor-interested sources, read with
+appropriate skepticism, but consistent with the academic framing. This job
+("I cannot type for long stretches") is structurally different from "I want
+to capture an idea on a walk" — if dictation ships only as a side
+notes-capture panel, it does nothing for a writer who needs to dictate the
+scene draft itself.
+
+**Finding (official capability + a dated privacy incident — the sharpest
+finding of this pass for Novella's own thesis): AI cleanup of dictated
+transcripts is a real, shipping 2026 product category, and every capable
+implementation found is cloud-only for the step that matters.** Wispr Flow,
+Speechify Dictation, and Voicy all turn a rambling spoken draft into cleaner
+prose automatically. Wispr Flow's own docs state transcription "always
+occurs on the cloud" (docs.wisprflow.ai/articles/3467817258, official) —
+even its "Privacy Mode" is a zero-retention policy, not on-device
+processing. A 2025 incident writeup (modelpiper.com/blog/wispr-flow-
+privacy-incident, investigative) documents Wispr Flow sending audio and
+screenshots to third-party infrastructure, including OpenAI, without clear
+disclosure, and banning the developer who reported it before its CTO
+apologized. MacWhisper is the closest local counterexample for raw
+transcription, but its own materials confirm the transcript still leaves
+the machine for a cloud LLM the moment its AI-cleanup features run
+(macwhisper.com). No product found across this pass does both halves — 
+on-device speech-to-text *and* on-device AI cleanup — as one local
+pipeline. This is precisely where Novella's already-stubbed architecture
+(`voiceNotesCapture` + `ollamaProvider`) and existing local-first,
+no-training positioning would land a real, currently-unclaimed advantage,
+not just a messaging one — and gives the "no-training/privacy" copy cluster
+already tracked elsewhere in this roadmap a fresh, dated, named competitor
+incident to point at if this ships.
+
+**Implication for Novella, split by job rather than treated as one
+feature.** The research distinguishes four different underlying jobs:
+capturing an idea away from the keyboard (served fine today by existing
+third-party apps plus paste — low build priority); fast at-the-desk
+dictation to compete with Dragon/Wispr Flow on raw accuracy (a losing fight
+against companies whose entire product is speech recognition — not
+recommended); RSI/accessibility (a structurally different, higher-stakes
+job than convenience — if built, dictation needs to reach the main editor
+surface, not only a side capture panel); and local dictation chained to
+local AI cleanup (the genuinely evidenced, thesis-aligned opportunity —
+finishing and wiring two pieces the codebase already anticipated, closing
+Dabble's six-year-old documented gap, collapsing the Scrivener/Otter.ai
+second-app pattern, and landing local-first exactly where Wispr Flow has a
+dated privacy incident).
+
+## What changed in "Next up"
+
+Added three items. (1) Finishing the stubbed `voiceNotesCapture` →
+`ollamaProvider` local dictation-cleanup pipeline — placed immediately after
+the round-49 Gallery board layout item, since it's the strongest new build
+opportunity this round and the most recently-added real feature item in the
+list; not reordered above already-higher-ranked, already-evidenced items
+like the round-7/41 inline comments item or the round-44 suggest-mode
+editing item. (2) A small pinned/recents strip above CodexPane's grouped
+list, and (3) a per-project settings location separate from the global
+Settings modal — both placed near the round-43 Ctrl+K item, the closest
+existing navigation/search-adjacent finding, and both marked low/cheap
+since the research found Novella's current navigation and settings designs
+are already appropriately sized for the app's current scale, not urgently
+broken. No existing items were reordered — consistent with rounds 41-49's
+practice of placing new findings by topical proximity rather than a full
+reshuffle, absent strong evidence an existing item's priority was wrong.
+
+## Round 50 sources
+
+- literatureandlatte.com/blog/5-ways-to-move-and-rearrange-files-and-folders-in-the-scrivener-binder (official)
+- well-storied.com/blog/breaking-down-the-scrivener-binder (independent)
+- forum.literatureandlatte.com/t/binder-navigation-not-working/41819 (user forum)
+- forum.literatureandlatte.com/t/how-can-i-differentiate-within-the-binder/153684/6 (user forum)
+- ilampadmanabhan.medium.com/novelcrafter-review (independent review; 403 on direct fetch, read via search snippet — lower confidence)
+- novelcrafter.com/help/docs/app/app-layout (official)
+- kindlepreneur.com/novelcrafter-review (independent review)
+- notion.com/help/navigate-with-the-sidebar (official)
+- ones.com/blog/manage-infinite-nesting-notion-nested-pages (independent)
+- howtogeek.com/why-i-swapped-the-obsidian-sidebar-for-a-third-party-file-explorer (independent)
+- community.obsidian.md/plugins/folder-nav, /quick-switch-sidebar, /alternative-explorer (official plugin listings)
+- obsidianstats.com/tags/navigation (independent, aggregator)
+- reedsy.com/studio/resources/dabble-writing-review (independent review)
+- dabblewriter.com/dabbles-new-desktop-features (official)
+- selfpublishing.com/campfire-writing-review (independent review)
+- loreteller.com/learn/scrivener-compile-guide (independent tutorial)
+- help.dabblewriter.com/en/articles/4467347-getting-started-made-simple (official)
+- help.dabblewriter.com/en/articles/5757859-using-the-right-toolbar (official)
+- nngroup.com/articles/progressive-disclosure (authoritative UX research)
+- developer.android.com/design/ui/mobile/guides/patterns/settings (official)
+- docs.sudowrite.com/is-there-a-mobile-app (official)
+- kindlepreneur.com/sudowrite-review (independent review)
+- forum.literatureandlatte.com/t/how-to-dictate-transcribe-with-whisper-chatgpt-and-save-directly-into-scrivener-on-macos-and-ios/149916 (user forum, read in full)
+- literatureandlatte.com/blog/write-with-your-voice-how-to-use-dictation-with-scrivener (official)
+- writingforums.com/threads/anyone-using-naturally-speaking-or-dragon-software-for-writing-books.206229 (user forum, read in full)
+- thenovelsmithy.com/dictate-your-novel-nanowrimo (independent)
+- indieauthormagazine.com/otter-ai-an-authors-starting-place-for-speech-to-text-software (independent)
+- dabble.featureupvote.com/suggestions/65284 (official Dabble feedback board)
+- thewritepractice.com/speech-to-text-apps-for-write (independent)
+- research.ibm.com/publications/storywriter-a-speech-oriented-editor (academic/official, read in full)
+- docs.wisprflow.ai/articles/3467817258 (official)
+- modelpiper.com/blog/wispr-flow-privacy-incident (investigative)
+- macwhisper.com (official)
+- Internal: src/ui/CodexPane.tsx, src/ui/InspectorPane.tsx, src/ui/inspectorTabs.ts,
+  src/ui/SettingsModal.tsx, src/App.tsx, src/ui/app.css, src/core/plugins.ts
