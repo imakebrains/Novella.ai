@@ -843,6 +843,84 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       picker/toggle pattern already built for Table; it turns any board
       (Characters, Locations) into the Pinterest-style aesthetic view writers
       currently leave the app to build by hand.
+- [ ] **Finish the stubbed local dictation → local AI cleanup pipeline** —
+      research round 50 (2026-09-24): a dedicated pass on dictation/
+      voice-to-text for novelists, an area with near-zero prior coverage —
+      a grep of both research files before this round found only a single
+      passing mention, Sudowrite's mobile-only "Smart Dictation" scope,
+      inside an unrelated mobile-parity finding. Checked our own code
+      first: `voiceNotesCapture` in `src/core/plugins.ts` is a real,
+      already-designed plugin stub — on-device Whisper model download, a
+      settings schema for model size (base/small/medium), registered in
+      `BUILTIN_PLUGINS` — but `onEnable()`'s `run()` only fires a toast
+      notification; no microphone capture and no model inference are
+      wired up. The architecture was already anticipated and never
+      finished.
+
+      Three independent communities converge on the identical workaround
+      this gap forces. A Literature & Latte forum thread
+      (forum.literatureandlatte.com/t/how-to-dictate-transcribe-with-
+      whisper-chatgpt-and-save-directly-into-scrivener-on-macos-and-
+      ios/149916) documents a Scrivener user building their own macOS
+      Shortcuts pipeline — record, transcribe via Whisper/ChatGPT, drop
+      .txt files into a synced folder, batch-import — because "typing
+      often distracts me from thinking" and Scrivener has no speech engine
+      of its own; an author-workflow piece independently describes the
+      same Otter.ai-record-then-copy-paste-into-the-manuscript pattern
+      (indieauthormagazine.com/otter-ai-an-authors-starting-place-for-
+      speech-to-text-software); and Dabble's own feedback board carries a
+      live, six-year-old open ticket (dabble.featureupvote.com/
+      suggestions/65284, filed 2019, still receiving upvotes in Sept 2026)
+      reporting that OS-level dictation doesn't just fail to help inside
+      Dabble's editor — saying "new line" actively **stops** dictation
+      entirely, a specific, named integration bug left unfixed for six
+      years. This is the exact "second app" shape this research keeps
+      finding elsewhere: no fiction-writing tool in the category
+      (Scrivener, Dabble, NovelCrafter, Campfire, Ulysses, iA Writer,
+      type.ai) ships competent built-in dictation; Sudowrite's mobile-only
+      "Smart Dictation" is the sole marketed exception and is thinly
+      documented even by its own reviewers.
+
+      The sharper, unclaimed half is AI cleanup of the dictated transcript
+      itself, not just capture. A 2026 product category (Wispr Flow,
+      Speechify Dictation, Voicy) now turns a rambling spoken draft into
+      cleaner prose automatically — but every one of them is cloud-only for
+      the step that matters: Wispr Flow's own docs state transcription
+      "always occurs on the cloud" (docs.wisprflow.ai/
+      articles/3467817258), and a 2025 incident
+      (modelpiper.com/blog/wispr-flow-privacy-incident) documents it
+      sending audio and screenshots to third-party infrastructure,
+      including OpenAI, without clear disclosure. MacWhisper is the
+      closest local counterexample for raw transcription, but its own
+      materials confirm the transcript still leaves the machine for a
+      cloud LLM the moment its AI-cleanup features run (macwhisper.com).
+      No product found does both halves — on-device speech-to-text *and*
+      on-device AI cleanup — as one local pipeline. Novella already has
+      both pieces unconnected: `voiceNotesCapture`'s stubbed Whisper
+      plugin, and `ollamaProvider`, an already-shipped local model
+      provider in the same file. Finishing and wiring the two together,
+      rather than building either from scratch, closes a documented
+      multi-year gap (Dabble's ticket), collapses a documented second-app
+      workflow (the Scrivener/Otter.ai pipelines), and lands the
+      local-first advantage where a real, currently-cloud-only competitor
+      (Wispr Flow) has a dated privacy incident to point at directly.
+
+      Scope note on accessibility, not just convenience: IBM Research's own
+      "StoryWriter" project (research.ibm.com/publications/storywriter-a-
+      speech-oriented-editor) was built specifically because RSI "poses a
+      potentially career-ending problem for people who write for a
+      living" — a structurally different job than "capture an idea on a
+      walk." If dictation ships only as a side notes-capture panel, it
+      does nothing for a writer who needs to dictate the scene draft
+      itself; scope the eventual UI to reach the main editor surface, not
+      only a Notes shortcut, before calling this done for that audience.
+      Fiction-specific accuracy is the one place to keep expectations
+      honest: invented character/place names sit outside any speech
+      model's training distribution (a widely-repeated example: Dragon
+      NaturallySpeaking turning "Mira" into "mirror" roughly 40% of the
+      time), so treat dictated output as a rough draft needing a cleanup
+      pass — exactly the job the local-AI-cleanup half above is for —
+      rather than promising publication-ready prose from voice alone.
 - [ ] **Submission/query tracking for querying novelists** (WITH-OWNER —
       scope decision, not a build). Research round 41 (2026-09-03):
       querying novelists and short-fiction writers maintain a wholly
@@ -901,6 +979,56 @@ keep structure FLAT (nothing buried five layers deep), and keep leaving easy
       them (type.ai/blog/writing-with-AI-commands, official) — worth
       doing the same for Novella's existing slash commands rather than a
       separate roadmap line.
+- [ ] **A small pinned/recents strip above CodexPane's grouped list** —
+      research round 50 (2026-09-24), a dedicated pass on navigation/
+      information-architecture across every competitor in this survey, an
+      area named in the standing research brief but never given its own
+      round before this one. The cross-app pattern: Scrivener's Binder (an
+      outliner with no breadcrumb — Literature & Latte's own forum
+      confirms Binder selection doesn't reliably track the open document
+      once Split Editor is in play, forum.literatureandlatte.com/t/
+      binder-navigation-not-working/41819) and Notion's unbounded page
+      nesting ("most users stop at three or four levels... going too deep
+      makes navigation slow," per Notion's own sidebar guidance,
+      notion.com/help/navigate-with-the-sidebar) are the two most-cited
+      sources of "I lost my place" across this whole survey, and both
+      platforms answer it the same way independently: Notion's Favorites,
+      and Obsidian's Bookmarks core plugin plus community add-ons built
+      for the identical job (Quick Switch Sidebar, community.obsidian.md/
+      plugins/quick-switch-sidebar) — a small pinned layer sitting above
+      the full hierarchy so a writer reaches the handful of things they
+      touch constantly without re-scanning the tree. Checked our own
+      `CodexPane.tsx`: it's already ahead of Scrivener and Notion here by
+      construction, not by accident — a flat, typed, filterable list with
+      a letter-index injected past 20 entries (`LETTER_INDEX_AT = 20`),
+      never an arbitrarily-nestable outliner, so the worst-documented
+      failure mode (bottomless nesting) can't occur at all. Worth stating
+      plainly rather than treated as a gap: at current typical project
+      sizes, no navigation rebuild is indicated by this research. The one
+      piece genuinely missing relative to the Notion/Obsidian pattern is a
+      pinned/recents affordance above the grouped list — small, cheap,
+      CLOUD-OK, and worth doing once a vault grows large enough that
+      re-scanning the grouped list every time gets old, not urgent before
+      then.
+- [ ] **A per-project settings location, separate from the global Settings
+      modal** — research round 50 (2026-09-24): Dabble structurally splits
+      "settings about me" (global Preferences: General/Dictionary/Advanced
+      tabs, reached from the account menu) from "settings about this book"
+      (a gear icon living inside the project's own sidebar, above the
+      manuscript list) — two different physical locations, not two tabs
+      of one modal (help.dabblewriter.com/en/articles/4467347-getting-
+      started-made-simple; help.dabblewriter.com/en/articles/5757859-
+      using-the-right-toolbar). Checked our own `SettingsModal.tsx`: all
+      seven tabs (Profile, Appearance, Shortcuts, Connections, Agents,
+      Plugins, About) are global/account-level by design, and the file's
+      own comment already argues correctly against an account tab
+      ("Novella has no server, so a login would be theatre") — but there
+      is no per-project settings surface of any kind. Not urgent today:
+      nothing in the current settings schema is genuinely per-book rather
+      than per-writer. Filed so the location is decided before a genuinely
+      per-project setting (a project-specific export default, or a
+      per-project AI-connection override) arrives and has nowhere obvious
+      to live, rather than as a build to pick up now. Low priority.
 - [ ] **Focus mode: a typewriter-scroll/dimming control, and a floating
       peek panel that doesn't require leaving focus mode** — research
       round 43 (2026-09-05): checked our own `App.tsx`/`app.css` — focus
@@ -2342,6 +2470,39 @@ The 2026-07-23 pass below found a shipped feature that broke at realistic
 scale; nothing but use would have caught it.
 
 ## Shipped (autopilot log)
+
+- 2026-09-24 — Research round 50 (autopilot; no code). Two areas the standing
+  research brief names but a full grep of both research files confirmed had
+  never had a dedicated round: navigation/sidebar/settings information
+  architecture, and dictation/voice-to-text. Findings: the cross-app "lost
+  my place" failure (Scrivener's Binder losing sync with Split Editor, no
+  breadcrumb; Notion's unbounded nesting) is answered everywhere else by a
+  small pinned/favorites layer above the hierarchy — Novella's own
+  `CodexPane.tsx` already avoids the worse failure by construction (flat,
+  typed, letter-indexed, never arbitrarily nestable) but has no pinned/
+  recents strip of its own. Settings: Novella's 7-tab `SettingsModal.tsx` is
+  already a correct-sized application of progressive disclosure at current
+  scale (stated plainly rather than manufacturing a gap), but has no
+  per-project settings location the way Dabble structurally separates
+  account Preferences from a per-book gear icon. Dictation: checked our own
+  `src/core/plugins.ts` and found `voiceNotesCapture` — an on-device-Whisper
+  plugin already designed down to its settings schema, registered in
+  `BUILTIN_PLUGINS`, but never wired past a toast notification — sitting
+  unconnected next to `ollamaProvider`, an already-shipped local model
+  provider in the same file. Three independent writer communities
+  (a Literature & Latte Shortcuts-to-Whisper pipeline, an Otter.ai
+  record-then-paste workflow, Dabble's own six-year-old open ticket for a
+  dictation integration bug) converge on the same second-app pattern this
+  research keeps finding elsewhere, and the sharper unclaimed half — local
+  speech-to-text chained to local AI cleanup, as one pipeline — has no
+  shipped competitor: the closest cloud product, Wispr Flow, has a dated
+  2025 privacy incident (undisclosed audio sent to third-party
+  infrastructure) that lands directly on Novella's local-first argument.
+  Added three items to Next up: finishing the stubbed dictation pipeline
+  (placed near the round-49 Gallery item), and the two smaller nav/settings
+  findings (placed near the round-43 Ctrl+K item) — none reordered above
+  existing higher-priority items, consistent with rounds 41-49's practice of
+  placing new findings by topical proximity rather than a full reshuffle.
 
 - 2026-09-23 — Research round 49 (autopilot; no code). Grepped both research
   files first for "reverse outlin*" and "moodboard" — zero prior hits in
