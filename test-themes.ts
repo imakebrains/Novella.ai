@@ -42,6 +42,7 @@ import {
   type CustomThemeColors,
 } from "./src/ui/customThemes";
 import { readableOn } from "./src/ui/personalize";
+import { readFileSync } from "node:fs";
 
 let failures = 0;
 let checks = 0;
@@ -420,6 +421,40 @@ const EMBER: CustomThemeColors = {
   const vars = themeCssVars({ bgApp: "", bgPane: "", bgEditor: "", fgPrimary: "", accent: "" });
   check("fallback: an empty palette still yields every token", Object.keys(vars).length, 28);
   check("fallback: unparseable colors land on Ember's", vars["--bg-app"], FALLBACK_COLORS.bgApp);
+}
+
+/* ---------- the shipped themes, read from theme.css ----------
+
+   The palettes above are writer-built; these are ours. Every theme's
+   muted text sat between 2.4:1 and 4.0:1 until 2026-09-24, which an
+   accessibility audit counted as 28 separate failures — all one token.
+   Read the real stylesheet so the next retune can't drift back. */
+
+{
+  const css = readFileSync(new URL("./src/ui/theme.css", import.meta.url), "utf8");
+  // Four named themes plus the :root:not([data-theme]) block that serves
+  // people whose OS prefers light before they have chosen a theme.
+  const blocks = [...css.matchAll(/:root(?:\[data-theme="(\w+)"\]|:not\(\[data-theme\]\))\s*\{([^}]+)\}/g)]
+    .map((m) => ({ name: m[1] ?? "system-light", body: m[2]! }))
+    .filter((b) => /--fg-muted/.test(b.body));
+  ok("theme.css: the four themes and the system-light block were found", blocks.length === 5);
+  for (const b of blocks) {
+    const v = (k: string): string => b.body.match(new RegExp(`${k}:\\s*(#[0-9a-f]{6})`))?.[1] ?? "";
+    // Every surface muted text is drawn on. bg-active is a pressed
+    // state and held to a softer bar.
+    const surfaces = ["--bg-app", "--bg-pane", "--bg-editor", "--bg-raised", "--bg-hover"];
+    for (const tok of ["--fg-secondary", "--fg-muted"]) {
+      for (const bg of surfaces) {
+        const ratio = contrastRatio(v(tok), v(bg));
+        ok(`theme.css ${b.name}: ${tok} on ${bg} is readable (${ratio.toFixed(2)})`, ratio >= 4.5);
+      }
+      ok(`theme.css ${b.name}: ${tok} on --bg-active stays over 3.8`, contrastRatio(v(tok), v("--bg-active")) >= 3.8);
+    }
+    ok(
+      `theme.css ${b.name}: secondary still reads stronger than muted`,
+      contrastRatio(v("--fg-secondary"), v("--bg-pane")) > contrastRatio(v("--fg-muted"), v("--bg-pane")),
+    );
+  }
 }
 
 /* ---------- report ---------- */

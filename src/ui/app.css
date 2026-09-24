@@ -1105,7 +1105,8 @@
 }
 .editor-path {
   font-size: var(--text-xs);
-  opacity: 0.75;
+  /* No opacity here: it multiplied the already-muted colour down to
+     2.4:1, the worst text on the screen. Muted is muted enough. */
 }
 
 .inspect-title {
