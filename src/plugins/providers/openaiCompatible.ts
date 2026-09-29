@@ -1,6 +1,7 @@
 import type { NovellaPlugin } from "../../core/plugins";
 import type { StreamingAIProvider } from "../runtime";
 import { isLocalHost } from "../../ai/roles";
+import { redactSecret } from "./redact";
 
 /* Any OpenAI-compatible endpoint.
 
@@ -153,7 +154,7 @@ export function makeOpenAICompatibleProvider(
         }),
       });
 
-      if (!res.ok) throw new Error(await readError(res));
+      if (!res.ok) throw new Error(redactSecret(await readError(res), cfg.apiKey));
       if (!res.body) throw new Error("Provider sent no response body");
 
       const reader = res.body.getReader();
@@ -182,7 +183,7 @@ export function makeOpenAICompatibleProvider(
           } catch {
             continue;
           }
-          if (parsed.error) throw new Error(parsed.error.message ?? "Provider error");
+          if (parsed.error) throw new Error(redactSecret(parsed.error.message ?? "Provider error", cfg.apiKey));
 
           const piece = parsed.choices?.[0]?.delta?.content;
           if (piece) {
@@ -206,7 +207,7 @@ export async function listRemoteModels(baseUrl: string, apiKey: string): Promise
   if (apiKey) headers.authorization = `Bearer ${apiKey}`;
 
   const res = await fetch(`${url}/models`, { headers });
-  if (!res.ok) throw new Error(await readError(res));
+  if (!res.ok) throw new Error(redactSecret(await readError(res), apiKey));
   const data = (await res.json()) as { data?: { id?: string }[] };
   return (data.data ?? [])
     .map((m) => m.id)

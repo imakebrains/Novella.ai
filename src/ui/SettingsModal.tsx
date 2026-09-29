@@ -54,6 +54,8 @@ import { INTRO_SWATCHES } from "./introScript";
 import { tabPrefs, useTabPrefs, type TabId } from "./inspectorTabs";
 import { toBannerDataUrl } from "../state/projects";
 import { AccountTab } from "../cloud/AccountTab";
+import { SecretField } from "./SecretField";
+import { readPlain } from "./secretFieldCore";
 import { BACKDROP_PRESETS, presetMarker } from "./backdrops";
 import {
   glowModeOf,
@@ -1542,10 +1544,7 @@ function SettingRow({
   fieldInput?: boolean;
 }) {
   const settings = pluginHost.settingsFor(pluginId);
-  const [value, setValue] = useState<string>(() => {
-    const v = settings.get(field.key);
-    return v === undefined || v === null ? "" : String(v);
-  });
+  const [value, setValue] = useState<string>(() => readPlain(settings, field));
 
   const commit = (next: string) => {
     setValue(next);
@@ -1591,6 +1590,8 @@ function SettingRow({
           onChange={(e) => commit(String(e.target.checked))}
           aria-label={field.label}
         />
+      ) : field.secret ? (
+        <SecretField settings={settings} field={field} className={fieldInput ? "field-input" : "search bare"} />
       ) : (
         <input
           className={fieldInput ? "field-input" : "search bare"}
