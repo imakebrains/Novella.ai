@@ -49,6 +49,7 @@ export const STORAGE_KEYS: KeyRule[] = [
   { key: "novella.plugin", home: "account", why: "Plugin settings; secret fields go to the keychain, not here." },
   { key: "novella.plugin.", prefix: true, home: "account", why: "Per-plugin settings, same rule." },
   { key: "novella.tasks.doneMode", home: "account", why: "How finished tasks show." },
+  { key: "novella.tasks.sort", home: "account", why: "Whether the Tasks panel orders by due date — the writer's taste, same as doneMode." },
   { key: "novella.welcomed", home: "account", why: "The welcome was seen; a second device shouldn't replay it." },
   { key: "novella.introSeen", home: "account", why: "Same, for the intro." },
   { key: "novella.tourSeen", home: "account", why: "Same, for the tour." },

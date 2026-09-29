@@ -14,6 +14,9 @@ import {
   type TaskSection,
 } from "../core/tasks";
 import { store, useVaultVersion } from "../state/vaultStore";
+import { localDay } from "../core/taskDates";
+import { orderTasks } from "../core/taskViews";
+import { DueChip, DueCount, SortToggle, currentSort, dated, dueRow, useTaskSort } from "./TaskDue";
 
 /* The Tasks panel — every to-do in the project, one place.
 
@@ -61,6 +64,7 @@ function readMode(): DoneMode {
 /** What a section shows under the current mode. Nothing is dropped from
     the note — only from this render. */
 function shownTasks(tasks: BodyTask[], mode: DoneMode): BodyTask[] {
+  tasks = orderTasks(tasks, localDay(new Date()), currentSort()); // done tasks keep their slots
   if (mode === "bottom") return [...tasks.filter((t) => !t.done), ...tasks.filter((t) => t.done)];
   if (mode === "archive") return tasks.filter((t) => !t.done);
   return tasks;
@@ -79,7 +83,7 @@ function shownTasks(tasks: BodyTask[], mode: DoneMode): BodyTask[] {
 function addLooseTask(noteId: string, text: string): void {
   const note = store.vault.get(noteId);
   if (!note) return;
-  const next = appendLooseTask(note.body, text);
+  const next = appendLooseTask(note.body, dated(text));
   if (next !== null) store.setBody(noteId, next);
 }
 
@@ -99,7 +103,7 @@ function captureTask(text: string): void {
 function addTaskUnderHeader(noteId: string, header: TaskHeader, text: string): void {
   const note = store.vault.get(noteId);
   if (!note) return;
-  const next = insertTaskUnderHeaderAt(note.body, header.lineFrom, header.text, text);
+  const next = insertTaskUnderHeaderAt(note.body, header.lineFrom, header.text, dated(text));
   if (next !== null) store.setBody(noteId, next);
 }
 
@@ -109,14 +113,14 @@ function addTaskUnderHeader(noteId: string, header: TaskHeader, text: string): v
 function addHeaderWithTask(noteId: string, name: string, text: string): void {
   const note = store.vault.get(noteId);
   if (!note) return;
-  const next = createHeaderWithTask(note.body, name, text);
+  const next = createHeaderWithTask(note.body, name, dated(text));
   if (next !== null) store.setBody(noteId, next);
 }
 
 function renameTask(noteId: string, lineFrom: number, text: string): void {
   const note = store.vault.get(noteId);
   if (!note) return;
-  const next = replaceTaskTextAt(note.body, lineFrom, text);
+  const next = replaceTaskTextAt(note.body, lineFrom, dated(text));
   if (next !== null) store.setBody(noteId, next);
 }
 
@@ -429,6 +433,7 @@ interface HeaderDraft {
 export function TasksPanel() {
   useVaultVersion();
   const [mode, setMode] = useState<DoneMode>(readMode);
+  const [sort, pickSort] = useTaskSort();
   const [finishedOpen, setFinishedOpen] = useState(false);
   const [draft, setDraft] = useState<HeaderDraft | null>(null);
   const [menu, setMenu] = useState<MenuTarget | null>(null);
@@ -496,6 +501,7 @@ export function TasksPanel() {
         <span className="hint tasks-summary">
           {open.length} open · {done.length} done
         </span>
+        <DueCount tasks={open.map((o) => o.task)} />
         <div className="tasks-mode-field">
           <span className="hint tasks-mode-label" id="tasks-done-mode">
             Done tasks
@@ -515,6 +521,7 @@ export function TasksPanel() {
             ))}
           </div>
         </div>
+        <SortToggle sort={sort} onPick={pickSort} />
       </div>
 
       {shownGroups.length === 0 ? (
@@ -788,6 +795,7 @@ function TaskRow({
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(task.text);
   const live = useRef(false);
+  const row = dueRow(task); // display only — the file and the edit draft keep the token
 
   const begin = () => {
     setDraft(task.text);
@@ -811,7 +819,7 @@ function TaskRow({
         className={`task-check ${task.done ? "on" : ""}`}
         role="checkbox"
         aria-checked={task.done}
-        aria-label={task.text || "Untitled task"}
+        aria-label={row.text || "Untitled task"}
         onClick={() => store.toggleTask(note.id, task.checkbox)}
       >
         {task.done ? "✓" : ""}
@@ -844,9 +852,10 @@ function TaskRow({
             }
           }}
         >
-          {task.text || <em className="muted">(empty)</em>}
+          {row.text || <em className="muted">(empty)</em>}
         </span>
       )}
+      {!editing && <DueChip row={row} />}
     </li>
   );
 }
