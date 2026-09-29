@@ -24,6 +24,7 @@ import {
 import { BeatsPanel } from "./BeatsPanel";
 import { critiqueExtension, setCritiqueKinds } from "./critiqueExtension";
 import { taskCheckboxes } from "./taskCheckboxes";
+import { wikiLinkExtension } from "./wikiLinkExtension";
 import { moveParagraph } from "../core/paragraphs";
 import { markdownFromPaste } from "../import/pasteMarkdown";
 import { boardStore, useBoards } from "../state/boards";
@@ -435,6 +436,7 @@ export function EditorPane() {
         syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
         critiqueExtension(),
         taskCheckboxes,
+        wikiLinkExtension(),
         highlightActiveLine(),
         EditorView.lineWrapping,
         placeholder("Begin the chapter…"),
