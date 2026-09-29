@@ -8,3 +8,6 @@ src-tauri/target/
 !.env.example
 supabase/.temp/
 supabase/.branches/
+
+# Agent worktrees made by multi-agent runs; each is its own checkout.
+.claude/worktrees/

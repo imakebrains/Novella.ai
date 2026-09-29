@@ -118,7 +118,11 @@ export default defineConfig(({ mode }) => ({
       // "plugins/story-skills" until the stat call fails and takes the whole
       // dev server down with it. Nothing in there is app source, so the fix
       // is simply not to look.
-      ignored: ["**/src-tauri/**", "**/writing-skills/**"],
+      //
+      // .claude/worktrees/ holds whole checkouts made by parallel agent
+      // runs. Watching them would reload the app on every edit an agent
+      // makes to its own copy.
+      ignored: ["**/src-tauri/**", "**/writing-skills/**", "**/.claude/worktrees/**"],
     },
   },
 }));

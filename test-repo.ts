@@ -79,6 +79,10 @@ function walk(dir: string, out: Found, depth = 0): void {
     if (SKIP.has(e.name)) continue;
     const full = join(dir, e.name);
     const rel = relative(ROOT, full);
+    // Agent worktrees are whole second checkouts of this repo, each with
+    // its own copy of the known story-skills loop. They get checked as
+    // their own trees; walking them from here reports every copy as new.
+    if (rel === join(".claude", "worktrees")) continue;
 
     // lstat, never stat: the whole point is to see the link, not through it.
     let st;
