@@ -12,6 +12,7 @@ import {
   useCloudSession,
   verifyEmailCode,
 } from "./auth";
+import { CloudBooksSection } from "./CloudBooksSection";
 import {
   initialOf,
   looksLikeEmail,
@@ -445,7 +446,7 @@ function SignedInAccount({ user, onDeleted }: { user: CloudUser; onDeleted: (mes
         )}
       </section>
 
-      {/* CloudBooksSection mounts here — "Sync this book" / "Open a book from the cloud" is another item's work. */}
+      <CloudBooksSection />
 
       <section className="ap-section">
         <h3 className="ap-title">Take everything with you</h3>

@@ -6,6 +6,7 @@ import { ErrorBoundary } from "./ui/ErrorBoundary";
 import { installDevtools } from "./devtools";
 import { bootPersonalization } from "./ui/personalize";
 import { bootCloudAuthAtStartup } from "./cloud/auth";
+import { wireCloud } from "./cloud/wiring";
 import { pluginHost } from "./plugins/runtime";
 import { ollamaStreamingProvider } from "./plugins/providers/ollama";
 import { openAICompatibleProvider } from "./plugins/providers/openaiCompatible";
@@ -36,6 +37,10 @@ installDevtools();
 // build returns from Google with ?code= in the address, and only a live
 // client exchanges it.
 bootCloudAuthAtStartup();
+
+// Hand that sign-in to sync and to the Novella AI connection. Loads
+// nothing by itself; see cloud/wiring.ts.
+wireCloud();
 
 // Saved accent/font/size overrides, before first paint.
 bootPersonalization();

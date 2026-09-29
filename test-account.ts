@@ -306,6 +306,14 @@ async function main(): Promise<void> {
     ["src/cloud/auth.ts", "src/cloud/supabaseRemote.ts"],
   );
 
+  // The sync host and the Novella AI connection each wait for a seam to
+  // be filled; nothing fails loudly if the one call that fills both goes
+  // missing in a merge — sync just never starts and Novella AI reads as
+  // signed out forever.
+  const mainSource = readFileSync("src/main.tsx", "utf8");
+  check("main.tsx hands the sign-in to sync and Novella AI", /^wireCloud\(\);$/m.test(mainSource), true);
+  check("the Account tab shows cloud books", /<CloudBooksSection \/>/.test(readFileSync("src/cloud/AccountTab.tsx", "utf8")), true);
+
   if (failures > 0) {
     console.error(`\ntest-account: ${failures} of ${checks} checks failed`);
     process.exit(1);
