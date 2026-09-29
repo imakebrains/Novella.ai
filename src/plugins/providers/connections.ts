@@ -23,6 +23,7 @@ import {
 import { makeOllamaProvider, listOllamaModels } from "./ollama";
 import { makeAnthropicProvider, listClaudeModels } from "./anthropic";
 import { makeOpenAICompatibleProvider, listRemoteModels } from "./openaiCompatible";
+import { redactSecret } from "./redact";
 import { makeHostedProvider } from "../../cloud/hostedAi";
 import { cloudEnabled } from "../../cloud/config";
 import {
@@ -492,7 +493,7 @@ export async function testConnection(conn: Connection): Promise<TestResult> {
    words, which are usually good — pass those through untouched rather
    than replacing them with something vaguer. */
 function humanTestError(err: unknown, conn: Connection): string {
-  const raw = err instanceof Error ? err.message : String(err);
+  const raw = redactSecret(err instanceof Error ? err.message : String(err), keyFor(conn.id));
   const looksLikeNetwork =
     err instanceof TypeError || /failed to fetch|networkerror|ECONNREFUSED|load failed/i.test(raw);
   if (!looksLikeNetwork) return raw;
@@ -510,7 +511,7 @@ function humanTestError(err: unknown, conn: Connection): string {
 export function noteResult(id: string, ok: boolean, detail?: string): void {
   const before = probes.get(id);
   if (before?.reachable === ok && !detail) return; // nothing new to say
-  probes.set(id, { hasKey: hasKey(id), reachable: ok, detail: ok ? undefined : detail, checkedAt: Date.now() });
+  probes.set(id, { hasKey: hasKey(id), reachable: ok, detail: ok || detail === undefined ? undefined : redactSecret(detail, keyFor(id)), checkedAt: Date.now() });
   emit();
 }
 
