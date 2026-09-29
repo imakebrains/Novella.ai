@@ -2,7 +2,15 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- viewport-fit=cover is what makes env(safe-area-inset-*) non-zero,
+         so the phone's bottom format bar can clear the home indicator;
+         interactive-widget lets Android Chrome shrink the layout viewport
+         under the keyboard so that bar sits above the keys. Browsers that
+         don't know either ignore them. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content"
+    />
     <!-- Relative, never root-absolute: vite.config sets base: "./" so the
          same file has to resolve under the /Novella.ai/ Pages subpath, at a
          future domain root, and under Tauri's custom protocol. A leading

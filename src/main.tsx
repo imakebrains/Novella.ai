@@ -9,6 +9,7 @@ import { pluginHost } from "./plugins/runtime";
 import { ollamaStreamingProvider } from "./plugins/providers/ollama";
 import { openAICompatibleProvider } from "./plugins/providers/openaiCompatible";
 import { anthropicProvider } from "./plugins/providers/anthropic";
+import { requestPersistentStorage } from "./storage/persistence";
 import "./ui/theme.css";
 import "./ui/app.css";
 
@@ -32,6 +33,11 @@ installDevtools();
 
 // Saved accent/font/size overrides, before first paint.
 bootPersonalization();
+
+// Web build only: ask the browser to stop treating IndexedDB as evictable.
+// The desktop app writes real files and has nothing to ask. Fire-and-forget
+// — the answer lands in persistenceAnswer() for the storage-status UI.
+if (import.meta.env.MODE === "web") void requestPersistentStorage();
 
 const root = document.getElementById("root");
 if (!root) throw new Error("Missing #root element");
