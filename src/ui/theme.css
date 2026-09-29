@@ -1,7 +1,8 @@
 /* ============================================================
    Novella themes
 
-   Five palettes drawn from the genre cards, not a light/dark
+   Four palettes drawn from the genre cards, plus the system-light
+   fallback, not a light/dark
    switch. Each one is a complete world: a writer working on a
    paranormal romance shouldn't have to look at the same chrome
    as someone writing inspirational fiction.
@@ -139,6 +140,11 @@
    ============================================================ */
 :root,
 :root[data-theme="ember"] {
+  /* Native controls (select popups, scrollbars, date/time pickers,
+     autofill) follow this, not the tokens. Without it they draw the OS
+     light scheme over a near-black theme. The bare :root here also makes
+     it the answer for OS-dark with no theme chosen yet. */
+  color-scheme: dark;
   --bg-app: #100e10;
   --bg-pane: #171417;
   --bg-editor: #131113;
@@ -178,6 +184,7 @@
    VELLUM — parchment, pressed flowers, bronze
    ============================================================ */
 :root[data-theme="vellum"] {
+  color-scheme: light;
   --bg-app: #e9e0cd;
   --bg-pane: #f2ead9;
   --bg-editor: #faf5e9;
@@ -217,6 +224,7 @@
    NOCTURNE — deep water, moonlight, something below it
    ============================================================ */
 :root[data-theme="nocturne"] {
+  color-scheme: dark;
   --bg-app: #0f151c;
   --bg-pane: #141d27;
   --bg-editor: #111922;
@@ -256,6 +264,7 @@
    DRIFTWOOD — warm concrete, coffee, soft wool
    ============================================================ */
 :root[data-theme="driftwood"] {
+  color-scheme: dark;
   --bg-app: #262220;
   --bg-pane: #2e2a27;
   --bg-editor: #2a2623;
@@ -298,6 +307,7 @@
    rather than the near-black default. */
 @media (prefers-color-scheme: light) {
   :root:not([data-theme]) {
+    color-scheme: light;
     --bg-app: #e9e0cd;
     --bg-pane: #f2ead9;
     --bg-editor: #faf5e9;
@@ -345,6 +355,8 @@ body {
   font-size: var(--text-base);
   color: var(--fg-primary);
   background: var(--bg-app);
+  /* Checkboxes and radios take the theme's accent instead of platform blue. */
+  accent-color: var(--accent);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -362,6 +374,29 @@ select,
 textarea {
   font: inherit;
   color: inherit;
+}
+
+/* The open list of a <select> is drawn by the platform. WebView2 (the
+   Windows shell) honours these colours; WKWebView and WebKitGTK draw
+   their own menu and go by color-scheme alone. Either way the popup
+   stops flashing OS white under light theme text, which is what the
+   selects' inherited --fg-primary produced in every dark theme. */
+option,
+optgroup {
+  background-color: var(--bg-raised);
+  color: var(--fg-primary);
+}
+
+option:disabled {
+  color: var(--fg-muted);
+}
+
+/* An embed's own document decides its colours. Letting our dark scheme
+   reach the frame element makes the browser paint an opaque backdrop
+   behind a light embed — the music dock would grow a box. `normal` keeps
+   today's rendering exactly. */
+iframe {
+  color-scheme: normal;
 }
 
 ::selection {
