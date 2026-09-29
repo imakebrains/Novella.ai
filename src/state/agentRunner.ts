@@ -1,5 +1,6 @@
 import { generate, NoProviderError } from "../ai/generate";
 import { store } from "./vaultStore";
+import { isSyncReload } from "./reloadReason";
 import { agentIsDue, agentStore, describeTrigger, type Agent, type AgentScope } from "./agents";
 
 /* ============================================================
@@ -143,6 +144,8 @@ export function installAgentRunner(): void {
   // The vault swap that opens a project counts as "the app opened" for
   // that project's agents — it's the moment their world exists.
   store.onVaultReplaced(() => {
+    // A cloud pull reloading the same book is not the app opening.
+    if (isSyncReload()) return;
     // Give the swap a beat to settle (active note, banners) before
     // spending the writer's CPU on background work.
     window.setTimeout(() => void runDue("app-open"), 4_000);
