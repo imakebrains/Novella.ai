@@ -156,6 +156,14 @@ export function isDarkHex(hex: string): boolean {
   return luminanceOf(hex) < 0.22;
 }
 
+/** Native controls (select popups, scrollbars, pickers) go by
+    color-scheme, not by our tokens. A custom theme matches no theme.css
+    block, so without this Ember's dark shows through under a parchment
+    palette. Same fallback as themeCssVars, so the two never disagree. */
+export function colorSchemeOf(colors: CustomThemeColors): "dark" | "light" {
+  return isDarkHex(normalizeHex(colors.bgApp) ?? FALLBACK_COLORS.bgApp) ? "dark" : "light";
+}
+
 export function hslToHex(h: number, s: number, l: number): string {
   const hue = ((h % 360) + 360) % 360;
   const c = (1 - Math.abs(2 * l - 1)) * s;
@@ -560,6 +568,7 @@ export function applyCustomTheme(theme: CustomTheme | null): void {
   active = theme;
   if (!theme) {
     for (const name of THEME_VAR_NAMES) root.removeProperty(name);
+    root.removeProperty("color-scheme");
     return;
   }
   const vars = themeCssVars(theme.colors);
@@ -567,6 +576,7 @@ export function applyCustomTheme(theme: CustomTheme | null): void {
     const value = vars[name];
     if (value) root.setProperty(name, value);
   }
+  root.setProperty("color-scheme", colorSchemeOf(theme.colors));
   /* Accent is the one token both layers own. The writer's own accent
      choice is the more specific statement — they picked it after the
      theme — so it goes back on top. */
