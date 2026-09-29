@@ -35,6 +35,7 @@ import { probeSetup } from "./setupProbe";
 import { installAgentRunner } from "./state/agentRunner";
 import { useTheme } from "./ui/useTheme";
 import { store, useVaultVersion } from "./state/vaultStore";
+import { manuscriptNotes, manuscriptWordCount } from "./analysis/wordCounts";
 import { isTauri, storage } from "./storage";
 import {
   loadPersonalization,
@@ -280,9 +281,7 @@ export default function App() {
   const root = store.vaultRoot();
   const dirty = store.dirtyCount();
   const persistent = store.isPersistent();
-  const totalWords = store.vault
-    .byType("chapter")
-    .reduce((sum, n) => sum + (n.body.trim() ? n.body.trim().split(/\s+/).length : 0), 0);
+  const totalWords = manuscriptWordCount(manuscriptNotes(store.vault));
 
   const vaultLabel = root ? (root.split(/[\\/]/).pop() ?? root) : "Seed World";
 
