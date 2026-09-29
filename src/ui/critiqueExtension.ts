@@ -1,27 +1,20 @@
-import { Decoration, EditorView, ViewPlugin, hoverTooltip, type DecorationSet, type ViewUpdate } from "@codemirror/view";
-import { StateEffect, StateField, Compartment, RangeSetBuilder } from "@codemirror/state";
-import { findInlineIssues, type InlineIssue, type IssueKind } from "../analysis/prose";
+import { EditorView, ViewPlugin, hoverTooltip, type ViewUpdate } from "@codemirror/view";
+import { Compartment } from "@codemirror/state";
+import { findInlineIssues, type IssueKind } from "../analysis/prose";
 import { store } from "../state/vaultStore";
+import { critiqueField, critiqueHitAt, echoStale, setEchoIssues } from "./critiqueField";
 
 /* Inline critique for the manuscript.
 
    Sticky sentences get a soft background; adverbs, passive constructions
    and echoes get an underline. Hovering explains why. Everything is
-   advisory — this never changes the text. */
+   advisory — this never changes the text.
 
-export const setCritiqueKinds = StateEffect.define<Set<IssueKind> | null>();
+   Adverbs, passives and sticky sentences rescan only the sentences an
+   edit touched (critiquePlan.ts); echoes, being document-global, rescan
+   when typing pauses. */
 
-/** Which issue kinds to show, or null for off. Held in editor state so a
-    toggle re-renders decorations without rebuilding the whole editor. */
-export const critiqueKinds = StateField.define<Set<IssueKind> | null>({
-  create: () => null,
-  update(value, tr) {
-    for (const e of tr.effects) {
-      if (e.is(setCritiqueKinds)) return e.value;
-    }
-    return value;
-  },
-});
+export { setCritiqueKinds } from "./critiqueField";
 
 /* Every name the book knows — titles and aliases of every codex entry.
    The echo check uses this so a character called Sparrow isn't underlined
@@ -35,61 +28,98 @@ export function codexNames(): string[] {
   return namesCache.names;
 }
 
-const marks: Record<IssueKind, Decoration> = {
-  adverb: Decoration.mark({ class: "cm-issue cm-issue-adverb" }),
-  passive: Decoration.mark({ class: "cm-issue cm-issue-passive" }),
-  echo: Decoration.mark({ class: "cm-issue cm-issue-echo" }),
-  sticky: Decoration.mark({ class: "cm-issue cm-issue-sticky" }),
-};
+/* Echoes are document-global (see critiquePlan.ts), so they are rechecked
+   once typing pauses rather than per keystroke, and mapped through the
+   edits in between. The max wait stops a writer who never pauses from
+   never seeing them refresh. */
+const ECHO_IDLE_MS = 400;
+const ECHO_MAX_WAIT_MS = 2000;
 
-function buildDecorations(view: EditorView): DecorationSet {
-  const kinds = view.state.field(critiqueKinds, false);
-  if (!kinds || kinds.size === 0) return Decoration.none;
+const echoOn = (view: EditorView) => view.state.field(critiqueField, false)?.kinds?.has("echo") ?? false;
 
-  const text = view.state.doc.toString();
-  const issues = findInlineIssues(text, kinds, { known: codexNames() });
-  const builder = new RangeSetBuilder<Decoration>();
-  const docLength = view.state.doc.length;
+/* Also rescans when the codex's names move — a new entry exempts its name
+   from echoes without any editor transaction. The store emits on every
+   keystroke, so it compares the names, not the version; codexNames() is
+   cached per version and shared with the wiki-link watcher.
 
-  // RangeSetBuilder requires strictly sorted, non-overlapping-by-start
-  // ranges. Sticky sentences span other issues, so they're layered by
-  // sorting on `from` and skipping anything that would go backwards.
-  let lastFrom = -1;
-  for (const issue of issues.sort((a, b) => a.from - b.from || a.to - b.to)) {
-    const from = Math.max(0, Math.min(issue.from, docLength));
-    const to = Math.max(from, Math.min(issue.to, docLength));
-    if (from === to || from < lastFrom) continue;
-    builder.add(from, to, marks[issue.kind]);
-    lastFrom = from;
-  }
-  return builder.finish();
-}
-
-const critiquePlugin = ViewPlugin.fromClass(
+   Every dispatch here comes from a timer, never from inside an editor
+   update, which CodeMirror would throw on. */
+const echoScheduler = ViewPlugin.fromClass(
   class {
-    decorations: DecorationSet;
-    constructor(view: EditorView) {
-      this.decorations = buildDecorations(view);
+    private timer: ReturnType<typeof setTimeout> | null = null;
+    private idle: number | null = null;
+    private firstQueuedAt = 0;
+    private gone = false;
+    private signature: string;
+    private seenVersion: number;
+    private readonly stop: () => void;
+
+    constructor(private readonly view: EditorView) {
+      this.seenVersion = store.getSnapshot();
+      this.signature = codexNames().join("\n");
+      this.stop = store.subscribe(() => {
+        const version = store.getSnapshot();
+        if (version === this.seenVersion) return;
+        this.seenVersion = version;
+        const next = codexNames().join("\n");
+        if (next === this.signature) return;
+        this.signature = next;
+        if (echoOn(this.view)) this.schedule(ECHO_IDLE_MS);
+      });
+      if (echoStale(view.state)) this.schedule(0);
     }
+
     update(u: ViewUpdate) {
-      if (u.docChanged || u.viewportChanged || u.startState.field(critiqueKinds, false) !== u.state.field(critiqueKinds, false)) {
-        this.decorations = buildDecorations(u.view);
-      }
+      if (echoStale(u.state)) this.schedule(u.state.field(critiqueField).echoDoc === null ? 0 : ECHO_IDLE_MS);
+    }
+
+    private schedule(ms: number) {
+      // A scan already waiting for idle time will read the doc as it is then.
+      if (this.idle !== null) return;
+      if (this.timer !== null) clearTimeout(this.timer);
+      const now = Date.now();
+      if (!this.firstQueuedAt) this.firstQueuedAt = now;
+      if (now - this.firstQueuedAt >= ECHO_MAX_WAIT_MS) ms = 0;
+      this.timer = setTimeout(() => {
+        this.timer = null;
+        // WKWebView (the macOS shell) has no requestIdleCallback.
+        if (typeof requestIdleCallback === "function") {
+          this.idle = requestIdleCallback(() => {
+            this.idle = null;
+            this.run();
+          }, { timeout: 500 });
+        } else {
+          this.run();
+        }
+      }, ms);
+    }
+
+    private run() {
+      this.firstQueuedAt = 0;
+      if (this.gone || !echoOn(this.view)) return;
+      const doc = this.view.state.doc;
+      const names = codexNames();
+      this.signature = names.join("\n");
+      const issues = findInlineIssues(doc.toString(), new Set<IssueKind>(["echo"]), { known: names });
+      this.view.dispatch({ effects: setEchoIssues.of({ doc, issues }) });
+    }
+
+    destroy() {
+      this.gone = true;
+      if (this.timer !== null) clearTimeout(this.timer);
+      if (this.idle !== null && typeof cancelIdleCallback === "function") cancelIdleCallback(this.idle);
+      this.stop();
     }
   },
-  { decorations: (v) => v.decorations },
 );
 
 const critiqueTooltip = hoverTooltip((view, pos) => {
-  const kinds = view.state.field(critiqueKinds, false);
-  if (!kinds || kinds.size === 0) return null;
-
-  const issues = findInlineIssues(view.state.doc.toString(), kinds, { known: codexNames() });
+  const v = view.state.field(critiqueField, false);
+  if (!v?.kinds || v.kinds.size === 0) return null;
   // Innermost match wins, so hovering an adverb inside a sticky sentence
-  // explains the adverb rather than the sentence.
-  const hit = issues
-    .filter((i: InlineIssue) => pos >= i.from && pos <= i.to)
-    .sort((a, b) => a.to - a.from - (b.to - b.from))[0];
+  // explains the adverb rather than the sentence. Read from what is
+  // painted, so the tooltip never disagrees with a mapped echo underline.
+  const hit = critiqueHitAt(v, pos);
   if (!hit) return null;
 
   return {
@@ -142,7 +172,7 @@ export const critiqueTheme = EditorView.baseTheme({
 export const critiqueCompartment = new Compartment();
 
 export function critiqueExtension() {
-  return [critiqueKinds, critiquePlugin, critiqueTooltip, critiqueTheme];
+  return [critiqueField, echoScheduler, critiqueTooltip, critiqueTheme];
 }
 
 export const ALL_KINDS: IssueKind[] = ["sticky", "adverb", "passive", "echo"];
