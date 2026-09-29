@@ -63,6 +63,7 @@ test when the server is missing reports green for a test that never ran.
           │  Pro only: prompt + session token  │   ai  ──▶ Anthropic (key     │
           └──────────────────────────────────▶ │          held here only)     │
                                                │   billing-webhook ◀── Paddle │
+                                               │   gc-blobs ◀── hourly cron   │
                                                └──────────────────────────────┘
 ```
 
@@ -111,6 +112,52 @@ it is written, so a truncated transfer can never become the chapter.
 | This computer only | window and pane sizes, crash-recovery drafts | No — they describe the machine, not the writer |
 | API keys (Claude, OpenAI…) | | **Never.** They stay in the OS keychain on each device (CLAUDE.md). Pro users don't need one at all |
 | The cloud session | | Refresh token in the OS keychain on desktop; the rest in local storage |
+
+## Reclaiming storage
+
+Blobs are content-addressed and never overwritten, so a replaced cover
+or a deleted book leaves its old bytes in the bucket. Once an hour the
+`gc-blobs` function removes what nothing points at: `unreferenced_blob_keys()`
+(service-role only, like `account_blob_keys()`) lists, per account, every
+object in the vault bucket that no live `project_files` row references
+and that is older than an hour — the hour covers a client that has
+uploaded but not yet called `push_file`. Removal goes through the
+Storage API so the bytes go with the rows. A run is best-effort and
+rerun-safe, capped at 2,000 keys so a backlog drains over a few runs
+instead of timing one out.
+
+Deploy it with JWT verification off — a scheduler has no session; the
+secret is the authentication:
+
+    npx supabase secrets set CRON_SECRET=$(openssl rand -hex 32)
+    npx supabase functions deploy gc-blobs --no-verify-jwt
+
+Then schedule it, either way:
+
+- **Supabase cron** (Dashboard → Integrations → Cron turns on `pg_cron`
+  and `pg_net`). Keep the secret in Vault rather than in the job's own
+  text, which anyone who can read `cron.job` can see:
+
+      select vault.create_secret('<the CRON_SECRET value>', 'cron_secret');
+      select cron.schedule('gc-blobs', '17 * * * *', $$
+        select net.http_post(
+          url := 'https://<ref>.supabase.co/functions/v1/gc-blobs',
+          headers := jsonb_build_object(
+            'Content-Type', 'application/json',
+            'x-cron-secret', (select decrypted_secret from vault.decrypted_secrets where name = 'cron_secret')),
+          body := '{}'::jsonb);
+      $$);
+
+- **An external scheduler** — a GitHub Actions `schedule:` workflow or
+  any cron — POSTing the same header from its own secret store:
+
+      curl -sS -X POST -H "x-cron-secret: $CRON_SECRET" https://<ref>.supabase.co/functions/v1/gc-blobs
+
+The reply is a tally (`users`, `listed`, `removed`, `deferred`, `failed`)
+and the function log carries the same numbers — never a key. Running it
+by hand with the header is safe at any time. Both schedules above are
+written from Supabase's documentation and have not yet run against a
+live project; the first real run's tally is the check.
 
 ## Plans
 
@@ -212,6 +259,7 @@ account, card or identity. In order:
    uses the same `ALLOWED_ORIGINS` secret). Writers can then delete their
    account and every stored file from Settings, and download everything
    first as one zip.
+   Also deploy and schedule `gc-blobs` — see "Reclaiming storage".
 10. **Before anyone outside the owner signs in**: a privacy policy and
    terms (Paddle and Google both require them), and README.md and
    SECURITY.md rewritten — both currently promise "no account, no cloud
@@ -254,8 +302,7 @@ that push rather than risk a merge that loses either side's work.
 6. **Upgrade flow**: Paddle checkout opened with the writer's user id in
    `customData`, and a "Manage subscription" link to Paddle's portal.
 
-Known limitations, kept on purpose for v1: blobs replaced by newer
-versions are not yet garbage-collected; two files
+Known limitations, kept on purpose for v1: two files
 whose paths differ only by letter case collide on Windows and macOS;
 changes arrive by polling (on open, on focus, every minute), not by
 realtime push.

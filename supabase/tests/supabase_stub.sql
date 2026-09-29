@@ -16,7 +16,8 @@
 --               the point: a test that passes because a grant was
 --               never given proves nothing about the policies.
 --   storage     buckets, objects (with metadata->>'size', which
---               push_file trusts over the client), foldername().
+--               push_file trusts over the client, and created_at,
+--               which unreferenced_blob_keys ages by), foldername().
 -- ============================================================
 
 do $$
