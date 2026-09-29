@@ -36,6 +36,7 @@ import { installAgentRunner } from "./state/agentRunner";
 import { useTheme } from "./ui/useTheme";
 import { store, useVaultVersion } from "./state/vaultStore";
 import { isTauri, storage } from "./storage";
+import { SyncStatusLine } from "./cloud/SyncStatusLine";
 import {
   loadPersonalization,
   overridingReducedMotion,
@@ -424,6 +425,7 @@ export default function App() {
         <div className="titlebar-right">
           <span className="stat">{totalWords.toLocaleString()} words</span>
           <SaveStatus state={saveState} lastSaved={lastSaved} dirty={dirty} persistent={persistent} />
+          <SyncStatusLine />
           {dirty > 0 && (
             <button
               className="save-btn"

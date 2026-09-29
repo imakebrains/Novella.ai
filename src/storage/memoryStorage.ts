@@ -28,14 +28,28 @@ export class MemoryStorage implements VaultStorage {
 
   async write(_root: string, relPath: string, contents: string): Promise<void> {
     this.files.set(relPath, contents);
+    // One path is one file, as on disk and in IndexedDB (a put replaces
+    // the entry whatever its shape). Without this, a path rewritten in
+    // the other shape would answer with whichever copy is read first.
+    this.blobs.delete(relPath);
   }
 
   async writeBytes(_root: string, relPath: string, bytes: Uint8Array): Promise<void> {
     this.blobs.set(relPath, bytes);
+    this.files.delete(relPath);
   }
 
   async readBytes(_root: string, relPath: string): Promise<Uint8Array | null> {
     return this.blobs.get(relPath) ?? null;
+  }
+
+  /** Any file as bytes, whichever shape it was stored in — see
+      WebStorage.readFile for why readBytes alone is not enough. */
+  async readFile(_root: string, relPath: string): Promise<Uint8Array | null> {
+    const blob = this.blobs.get(relPath);
+    if (blob) return blob;
+    const text = this.files.get(relPath);
+    return text === undefined ? null : new TextEncoder().encode(text);
   }
 
   async remove(_root: string, relPath: string): Promise<void> {

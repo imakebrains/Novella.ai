@@ -116,6 +116,17 @@ export class WebStorage implements VaultStorage {
     return entry?.bytes ?? null;
   }
 
+  /** Any file as bytes, whichever shape it was stored in. readBytes
+      answers only for byte entries, on purpose; the sync engine
+      genuinely wants both, hashed the same way on every device. */
+  async readFile(root: string, relPath: string): Promise<Uint8Array | null> {
+    const entry = (await withStore("readonly", (s) => s.get(fileKey(root, relPath)))) as
+      | Entry
+      | undefined;
+    if (entry?.bytes) return entry.bytes;
+    return typeof entry?.text === "string" ? new TextEncoder().encode(entry.text) : null;
+  }
+
   async remove(root: string, relPath: string): Promise<void> {
     await withStore("readwrite", (s) => s.delete(fileKey(root, relPath)));
   }

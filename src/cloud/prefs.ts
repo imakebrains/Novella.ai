@@ -91,6 +91,7 @@ export const STORAGE_KEYS: KeyRule[] = [
   { key: "novella.connections.seeded", home: "device", why: "First-run seeding already happened here." },
   { key: "novella.updateRepo", home: "device", why: "Update-check source for this install." },
   { key: "novella.cloud.session", home: "device", why: "The sign-in. A credential; never synced." },
+  { key: "novella.cloudBindings", home: "device", why: "Which local folder is which cloud book, on this machine. Folders differ per device, so this cannot follow the writer." },
 ];
 
 /** PURE. Where does this key belong? Exact rules win over prefixes;
