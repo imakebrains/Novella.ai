@@ -5,6 +5,7 @@ import App from "./App";
 import { ErrorBoundary } from "./ui/ErrorBoundary";
 import { installDevtools } from "./devtools";
 import { bootPersonalization } from "./ui/personalize";
+import { bootCloudAuthAtStartup } from "./cloud/auth";
 import { pluginHost } from "./plugins/runtime";
 import { ollamaStreamingProvider } from "./plugins/providers/ollama";
 import { openAICompatibleProvider } from "./plugins/providers/openaiCompatible";
@@ -29,6 +30,11 @@ pluginHost.register(openAICompatibleProvider);
 
 // Dev-only; the bundler drops this entirely in production builds.
 installDevtools();
+
+// The cloud sign-in, if this build has one. At startup because the web
+// build returns from Google with ?code= in the address, and only a live
+// client exchanges it.
+bootCloudAuthAtStartup();
 
 // Saved accent/font/size overrides, before first paint.
 bootPersonalization();
