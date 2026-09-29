@@ -39,6 +39,8 @@ values are set (`.env.example`).
 | Session storage (refresh token in the OS keychain) | `src/cloud/sessionStorage.ts` | `test-cloud-server.ts` |
 | Built-in AI for Pro (server holds the key, meters use) | `supabase/functions/ai/`, `_shared/aiCore.ts`, `src/cloud/hostedAi.ts` | `test-cloud-server.ts` for every rule and the stream protocol; function typechecked against @anthropic-ai/sdk 0.112.4. **Not yet run live** — needs the owner's Anthropic key |
 | Billing webhook (Paddle → plan) | `supabase/functions/billing-webhook/`, `_shared/billingCore.ts` | `test-cloud-server.ts`: forged, altered, replayed and rotated-secret signatures; every status; out-of-order and superseded subscriptions. **Payload field names not yet checked against a live Paddle sandbox delivery** |
+| Sign-in and Settings → Account (emailed code everywhere, Google in the browser; plan, storage and AI meters; download everything; delete account) | `src/cloud/auth.ts`, `authCore.ts`, `AccountTab.tsx` | `test-account.ts` for every pure rule (who the user is, which sentence each auth failure becomes, what a function reply means, which plan buttons show) and a scan that fails if anything but `auth.ts` creates the client. **Not yet seen against a live project** — needs the owner's project |
+| Checkout and Manage subscription | `supabase/functions/create-checkout/`, `_shared/checkoutCore.ts`, `src/cloud/checkout.ts` | `test-account.ts`, including that a writer with a live subscription is never sold a second one; function typechecked. **Paddle's transaction fields not yet checked against a live sandbox** |
 | Plan table | `src/cloud/plans.ts` | `test-cloud.ts` parses the migration and fails if the app and the server disagree on any limit |
 
 Run the database tests with any Postgres 15+ you can create databases
@@ -233,10 +235,21 @@ account, card or identity. In order:
    would never reach a real writer. Add a transactional email provider
    (Resend, Postmark, SendGrid…) under Authentication → Emails → SMTP.
    This needs a domain you control.
+   Then, under Authentication → Email Templates, put `{{ .Token }}` in
+   **both** the Magic Link and the Confirm signup templates (or turn
+   off Confirm email, so new writers get Magic Link too). The app signs
+   in with an emailed code (the desktop has no way to receive a link),
+   and a first-time writer is sent Confirm signup, not Magic Link — a
+   template without the code leaves them at a dead end. The code's
+   length and expiry are project settings (Authentication → Providers →
+   Email); the app accepts six digits or more and names neither.
 5. **Google sign-in**: in Google Cloud Console, create an OAuth client
    (Web application), add Supabase's callback URL, and paste the client
    id and secret into Authentication → Providers → Google. The consent
    screen needs an app name, support email and privacy-policy link.
+   Add the web build's address (origin plus path, e.g. the Pages URL)
+   under Authentication → URL Configuration → Redirect URLs, or Google
+   sign-in will refuse to return there. Desktop uses the emailed code.
 6. **App values**: copy the project URL and publishable (anon) key into
    `.env.local` for local builds and into the repo's Actions secrets for
    CI builds. These two are public by design.
@@ -254,6 +267,12 @@ account, card or identity. In order:
    **Send one test event from Paddle's simulator and confirm a row lands
    in `entitlements`** — the payload field names in `billingCore.ts`
    have not yet been checked against a live delivery.
+   For the Upgrade and Manage subscription buttons: set a default
+   payment link under Paddle → Checkout → Checkout settings (without
+   one Paddle returns no checkout URL), then
+   `npx supabase secrets set PADDLE_API_KEY=… PADDLE_PRICES='{"plusMonthly":"pri_…","plusYearly":"pri_…","proMonthly":"pri_…","proYearly":"pri_…"}' PADDLE_PORTAL_URL=… PADDLE_SANDBOX=1`
+   (drop `PADDLE_SANDBOX` for live) and
+   `npx supabase functions deploy create-checkout` (JWT verification on).
 9. **Deploy the account-deletion function**:
    `npx supabase functions deploy delete-account` (JWT verification on;
    uses the same `ALLOWED_ORIGINS` secret). Writers can then delete their
@@ -279,11 +298,12 @@ These touch files the owner's unpushed work also changed (App.tsx,
 Settings, the vault store, the pane and draft keys), so they wait for
 that push rather than risk a merge that loses either side's work.
 
-1. **Sign-in and account screen.** Settings → Account: sign in with
-   Google or an email link, plan and meter, storage used, sign out.
-   Desktop sign-in opens the system browser (Google refuses sign-in
-   inside embedded webviews) and returns through a `novella://` link —
-   needs the Tauri deep-link plugin.
+1. **Sign-in and account screen.** *Built* (Settings → Account): an
+   emailed code on every platform, Google in the browser build, plan
+   and meters, download everything, delete account, sign out. Still
+   open: Google on the desktop opens the system browser (Google refuses
+   sign-in inside embedded webviews) and returns through a `novella://`
+   link — needs the Tauri deep-link plugin.
 2. **Wire the engine into storage.** `storage()` hands back a wrapper
    that tells the engine about every write and delete; the engine gets
    the raw adapter. After each pull, reload changed notes and route an
@@ -299,8 +319,13 @@ that push rather than risk a merge that loses either side's work.
 5. **Novella AI as a connection** in Settings → Connections, available
    to Pro, with the meter; the existing role fallback takes over when
    the allowance is spent.
-6. **Upgrade flow**: Paddle checkout opened with the writer's user id in
-   `customData`, and a "Manage subscription" link to Paddle's portal.
+6. **Upgrade flow**: *Built* — `create-checkout` makes a Paddle
+   transaction with the writer's user id in `custom_data`, refuses a
+   second subscription while one is live, and hands out the portal
+   link. Still open: on the desktop, links go through `window.open`,
+   which without the Tauri opener plugin may not reach the system
+   browser; the Account tab always shows the link and a Copy button
+   as the fallback.
 
 Known limitations, kept on purpose for v1: two files
 whose paths differ only by letter case collide on Windows and macOS;

@@ -52,6 +52,7 @@ import { openTour } from "./TourOverlay";
 import { INTRO_SWATCHES } from "./introScript";
 import { tabPrefs, useTabPrefs, type TabId } from "./inspectorTabs";
 import { toBannerDataUrl } from "../state/projects";
+import { AccountTab } from "../cloud/AccountTab";
 import { BACKDROP_PRESETS, presetMarker } from "./backdrops";
 import {
   glowModeOf,
@@ -86,13 +87,15 @@ import {
    Tabbed rather than one long scroll, because "where do I change my pen
    name" and "which model am I using" are different errands.
 
-   There is no account tab. Novella has no server, so a login would be
-   theatre — see SECURITY.md. Profile is local metadata for title pages. */
+   Account signs in to the optional cloud (src/cloud/AccountTab.tsx) and
+   says so plainly in any build without one. Profile is local metadata for
+   title pages. */
 
-type Tab = "profile" | "appearance" | "shortcuts" | "connections" | "agents" | "plugins" | "about";
+type Tab = "profile" | "account" | "appearance" | "shortcuts" | "connections" | "agents" | "plugins" | "about";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "profile", label: "Profile" },
+  { id: "account", label: "Account" },
   { id: "appearance", label: "Appearance" },
   { id: "shortcuts", label: "Shortcuts" },
   { id: "connections", label: "Connections" },
@@ -138,6 +141,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
 
           <div className="modal-body">
             {tab === "profile" && <ProfileTab />}
+            {tab === "account" && <AccountTab />}
             {tab === "appearance" && <AppearanceTab />}
             {tab === "shortcuts" && <ShortcutsTab />}
             {tab === "connections" && <ConnectionsTab />}
