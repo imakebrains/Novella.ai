@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { store } from "../state/vaultStore";
+import { useDialogFocus } from "./Modal";
 
 /* Other surfaces (the codex pane's own + button) can pop this open
    without owning the component. */
@@ -39,6 +40,11 @@ export function QuickCreate({
   const [error, setError] = useState<string | null>(null);
   const wrap = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLInputElement>(null);
+  const pop = useRef<HTMLDivElement>(null);
+  // The trap without Modal's shell: this is an anchored popover, and a
+  // backdrop would move it. Declared before the effect below so the name
+  // field's focus runs last and wins over the popover's own.
+  useDialogFocus(pop, { active: open, onClose: () => setOpen(false) });
 
   useEffect(() => {
     opener = () => setOpen(true);
@@ -53,15 +59,8 @@ export function QuickCreate({
     const onDown = (e: MouseEvent) => {
       if (!wrap.current?.contains(e.target as Node)) setOpen(false);
     };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
     window.addEventListener("mousedown", onDown);
-    window.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("mousedown", onDown);
-      window.removeEventListener("keydown", onKey);
-    };
+    return () => window.removeEventListener("mousedown", onDown);
   }, [open]);
 
   const create = () => {
@@ -102,7 +101,14 @@ export function QuickCreate({
       </button>
 
       {open && (
-        <div className="quick-create-pop">
+        <div
+          className="quick-create-pop"
+          ref={pop}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Create something new"
+          tabIndex={-1}
+        >
           <input
             ref={input}
             className="quick-create-name"

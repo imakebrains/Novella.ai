@@ -341,7 +341,8 @@ export function EditorPane() {
 
            The corrections themselves live in the browser's context menu,
            which is why the right-click handler below no longer eats it. */
-        EditorView.contentAttributes.of({ spellcheck: "true" }),
+        // The label is read once per mount, so a rename shows up at the next note switch.
+        EditorView.contentAttributes.of({ spellcheck: "true", "aria-label": store.vault.get(activeId)?.title ?? "Chapter text" }),
         history(),
         closeBrackets(),
         autocompletion({ override: [wikiLinkSource, slashCommandSource], activateOnTyping: true }),

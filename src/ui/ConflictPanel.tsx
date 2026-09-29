@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Modal } from "./Modal";
 import { store, useVaultVersion, type SaveConflict } from "../state/vaultStore";
 import { trashStore } from "../state/trash";
 import { parseNote } from "../core/vault";
@@ -148,23 +149,13 @@ export function ConflictModal({ onClose }: { onClose: () => void }) {
   const clashes = store.conflicts();
   const copies = store.conflictCopies();
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal conflict-modal" onClick={(e) => e.stopPropagation()}>
-        <header className="modal-head">
-          <h2>Your folder synced while you were writing</h2>
-          <button className="icon-btn" onClick={onClose} title="Decide later (Esc)">
-            ✕
-          </button>
-        </header>
+    <Modal
+      title="Your folder synced while you were writing"
+      className="conflict-modal"
+      closeTitle="Decide later (Esc)"
+      onClose={onClose}
+    >
 
         <div className="modal-body">
           <p className="hint">
@@ -188,8 +179,7 @@ export function ConflictModal({ onClose }: { onClose: () => void }) {
             </div>
           )}
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }
 

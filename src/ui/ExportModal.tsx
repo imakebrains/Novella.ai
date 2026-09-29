@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Modal } from "./Modal";
 import { compileManuscript, defaultTitle } from "../export/compile";
 import { backupProject } from "../export/backup";
 import { openPrintWindow } from "../export/printPdf";
@@ -54,14 +55,6 @@ export function ExportModal({ onClose }: { onClose: () => void }) {
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
 
   // Last-used options come back on reopen — retyping the byline for the
   // fourth export of the same book is pure friction. Per project, in
@@ -135,14 +128,7 @@ export function ExportModal({ onClose }: { onClose: () => void }) {
   const empty = manuscript.chapters.length === 0;
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal export-modal" onClick={(e) => e.stopPropagation()}>
-        <header className="modal-head">
-          <h2>Export manuscript</h2>
-          <button className="icon-btn" onClick={onClose} title="Close (Esc)">
-            ✕
-          </button>
-        </header>
+    <Modal title="Export manuscript" className="export-modal" onClose={onClose}>
 
         <div className="modal-body">
           {format !== "backup" && (
@@ -252,7 +238,6 @@ export function ExportModal({ onClose }: { onClose: () => void }) {
             </button>
           </div>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

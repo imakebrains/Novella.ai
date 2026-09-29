@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { resizeDelta } from "./resizerKeys";
 
 /* Draggable pane dividers.
 
@@ -29,11 +30,20 @@ export function usePaneWidth(key: string, initial: number) {
 
 export function Resizer({
   side,
+  value,
+  min = MIN,
+  max = MAX,
   onResize,
   onReset,
 }: {
   /** Which pane this handle belongs to — decides which way the delta runs. */
   side: "left" | "right";
+  /** The pane's current width in px. Optional: without it the handle still
+      resizes and Home/End still reach the limits through the caller's
+      clamp — only aria-valuenow goes quiet. */
+  value?: number;
+  min?: number;
+  max?: number;
   onResize: (delta: number) => void;
   onReset: () => void;
 }) {
@@ -67,15 +77,14 @@ export function Resizer({
     setDragStyle(false);
   };
 
-  // Keyboard resizing, because a 4px target is not an accessible control.
+  // Keyboard resizing, because a 4px target is not an accessible control:
+  // 16px per arrow, 64 with Shift, Home/End to the limits. The arithmetic
+  // lives in resizerKeys.ts so test-a11y.ts can check it headless.
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    const step = e.shiftKey ? 40 : 12;
-    if (e.key === "ArrowLeft") {
+    const delta = resizeDelta(e.key, side, e.shiftKey, value, min, max);
+    if (delta !== null) {
       e.preventDefault();
-      onResize(side === "left" ? -step : step);
-    } else if (e.key === "ArrowRight") {
-      e.preventDefault();
-      onResize(side === "left" ? step : -step);
+      onResize(delta);
     } else if (e.key === "Enter") {
       e.preventDefault();
       onReset();
@@ -88,6 +97,9 @@ export function Resizer({
       role="separator"
       aria-orientation="vertical"
       aria-label={`Resize ${side} panel`}
+      aria-valuemin={min}
+      aria-valuemax={max}
+      aria-valuenow={value}
       tabIndex={0}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
@@ -95,7 +107,7 @@ export function Resizer({
       onPointerCancel={stop}
       onDoubleClick={onReset}
       onKeyDown={onKeyDown}
-      title="Drag to resize · double-click to reset"
+      title="Drag to resize · arrows nudge · Home/End · double-click to reset"
     >
       <span className="resizer-grip" />
     </div>

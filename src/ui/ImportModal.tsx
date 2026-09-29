@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { Modal } from "./Modal";
 import { store } from "../state/vaultStore";
 import { readDocx } from "../import/docx";
 import {
@@ -35,14 +36,6 @@ export function ImportModal({ onClose }: { onClose: () => void }) {
   const [types, setTypes] = useState<Record<string, EntityGuess>>({});
   const [summary, setSummary] = useState<{ chapters: number; codex: number } | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
 
   const handleFile = async (file: File | undefined) => {
     if (!file) return;
@@ -150,14 +143,7 @@ export function ImportModal({ onClose }: { onClose: () => void }) {
     });
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal import-modal" onClick={(e) => e.stopPropagation()}>
-        <header className="modal-head">
-          <h2>Import a manuscript</h2>
-          <button className="icon-btn" onClick={onClose} title="Close (Esc)">
-            ✕
-          </button>
-        </header>
+    <Modal title="Import a manuscript" className="import-modal" onClose={onClose}>
 
         <div className="modal-body">
           {error && <div className="notice error-notice">{error}</div>}
@@ -339,7 +325,6 @@ export function ImportModal({ onClose }: { onClose: () => void }) {
             </>
           )}
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }
