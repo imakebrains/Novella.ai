@@ -1,5 +1,6 @@
 import type { NovellaPlugin } from "../../core/plugins";
 import type { StreamingAIProvider } from "../runtime";
+import { isLocalHost } from "../../ai/roles";
 
 /* Any OpenAI-compatible endpoint.
 
@@ -121,8 +122,10 @@ export function makeOpenAICompatibleProvider(
     async generateStream(req, onChunk, signal) {
       const cfg = config();
       const url = (cfg.baseUrl || "https://api.openai.com/v1").replace(/\/+$/, "");
-      const isLocal = /^https?:\/\/(localhost|127\.0\.0\.1)/i.test(url);
-      if (!isLocal && !url.startsWith("https://")) {
+      // Same rule validateDraft applies in the form. A prefix match used to
+      // take "localhost.evil.com" for local and would have sent the key over
+      // plain HTTP — the host has to BE localhost, not start with it.
+      if (!isLocalHost(url) && !url.startsWith("https://")) {
         throw new Error(
           "Refusing to send your writing and API key over plain HTTP. Use an https:// endpoint.",
         );
