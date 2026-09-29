@@ -274,7 +274,7 @@ function watchAuth(client: SupabaseClient): void {
 /** Realtime is a nudge, never the transport: push_file bumps the
     project row's seq, the UPDATE arrives here, a round pulls. The poll,
     focus and online triggers all stay, so a dropped socket — or a
-    Supabase project without migration 20260924000000 applied — costs
+    Supabase project without migration 20260924010000 applied — costs
     at most one POLL_MS. Our own pushes nudge us too; that round finds
     only rows it already has and pulls nothing. */
 function subscribeRealtime(client: SupabaseClient, cloudProjectId: string): RealtimeChannel {

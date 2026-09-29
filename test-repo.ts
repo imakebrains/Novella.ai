@@ -217,6 +217,25 @@ ok(
   'base is "./", so a root-absolute start_url breaks under the Pages subpath.',
 );
 
+/* ============================================================
+   Every migration has its own version
+
+   The Supabase CLI records a migration by the number before its first
+   underscore, not by its file name. Two branches built the same day both
+   picked 20260924000000; the second would have failed `db push` on the
+   owner's first real deploy, long after both had merged green here.
+   ============================================================ */
+
+const migrationVersions = readdirSync(join("supabase", "migrations"))
+  .filter((f) => f.endsWith(".sql"))
+  .map((f) => f.split("_")[0]!);
+const repeated = migrationVersions.filter((v, i) => migrationVersions.indexOf(v) !== i);
+ok(
+  "no two migrations share a version",
+  repeated.length === 0,
+  `${[...new Set(repeated)].join(", ")} used twice — give the newer file a later timestamp.`,
+);
+
 if (failures > 0) {
   console.error(`\n${failures} of ${checks} checks failed.`);
   process.exit(1);

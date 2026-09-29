@@ -31,8 +31,8 @@ values are set (`.env.example`).
 
 | Piece | Where | Verified by |
 |---|---|---|
-| Database schema, privacy rules, plan limits, save function | `supabase/migrations/20260923000000_cloud_sync.sql` | `supabase/tests/isolation_test.sql`: 74 checks on Postgres 16, run against a stub that reproduces Supabase's permissive default grants. Mutation-tested: letting one writer read another's projects, skipping the version check, or letting anyone look up another account's plan each fails the suite |
-| Sync engine (offline copy, conflicts, deletions) | `src/cloud/syncEngine.ts` | `test-cloud.ts`: 157 checks, several devices against an in-memory server. Eight deliberate sabotages of the engine, each caught (one only after its test was tightened) |
+| Database schema, privacy rules, plan limits, save function | `supabase/migrations/20260923000000_cloud_sync.sql` | `supabase/tests/isolation_test.sql`: 94 checks on Postgres 16, run against a stub that reproduces Supabase's permissive default grants. Mutation-tested: letting one writer read another's projects, skipping the version check, or letting anyone look up another account's plan each fails the suite |
+| Sync engine (offline copy, conflicts, deletions) | `src/cloud/syncEngine.ts` | `test-cloud.ts`: 176 checks, several devices against an in-memory server; history and the trash index merge as a union instead of newest-wins. Eight deliberate sabotages of the engine, each caught (one only after its test was tightened) |
 | Engine against the real database | `supabase/tests/contract.ts` | 17 checks: the engine drives the real `push_file()` through psql, including an outsider who can neither read nor write the book |
 | Row parsing, config, errors | `src/cloud/wire.ts`, `config.ts` | `test-cloud-server.ts` |
 | Supabase connection (sign-in client, projects, files, blobs) | `src/cloud/supabaseRemote.ts` | Typechecked against supabase-js 2.116.0. **Not yet run against a live project** — needs the owner's project |
@@ -41,6 +41,10 @@ values are set (`.env.example`).
 | Billing webhook (Paddle → plan) | `supabase/functions/billing-webhook/`, `_shared/billingCore.ts` | `test-cloud-server.ts`: forged, altered, replayed and rotated-secret signatures; every status; out-of-order and superseded subscriptions. **Payload field names not yet checked against a live Paddle sandbox delivery** |
 | Sign-in and Settings → Account (emailed code everywhere, Google in the browser; plan, storage and AI meters; download everything; delete account) | `src/cloud/auth.ts`, `authCore.ts`, `AccountTab.tsx` | `test-account.ts` for every pure rule (who the user is, which sentence each auth failure becomes, what a function reply means, which plan buttons show) and a scan that fails if anything but `auth.ts` creates the client. **Not yet seen against a live project** — needs the owner's project |
 | Checkout and Manage subscription | `supabase/functions/create-checkout/`, `_shared/checkoutCore.ts`, `src/cloud/checkout.ts` | `test-account.ts`, including that a writer with a live subscription is never sold a second one; function typechecked. **Paddle's transaction fields not yet checked against a live sandbox** |
+| Sync host: binds a book to the cloud per device, reloads pulled notes, realtime nudge over polling, the titlebar status line, cloud books in Account | `src/cloud/syncHost.ts`, `projectBinding.ts`, `SyncStatusLine.tsx`, `CloudBooksSection.tsx`, `migrations/20260924010000_realtime_projects.sql` | `test-synchost.ts`: 171 checks on every decision the host makes. **The components themselves are typechecked only, and nothing has synced between two real devices** |
+| Novella AI as a connection (offered only in builds with the cloud; signed out and not-Pro read as such; a 402/403 falls through to the next role) | `src/cloud/hostedAccess.ts`, `src/plugins/providers/connections.ts`, `src/ai/roles.ts` | `test-novellaai.ts`: 114 checks. **Not run with a real session** |
+| Reclaiming storage | `supabase/functions/gc-blobs/`, `migrations/20260924000000_blob_gc.sql` | `test-gc.ts` and the isolation suite. **Not deployed or scheduled** |
+| Where the pieces meet (sign-in → sync, sign-in → Novella AI) | `src/cloud/wiring.ts`, one call in `main.tsx` | `test-account.ts` fails if the call or the Account mount goes missing |
 | Plan table | `src/cloud/plans.ts` | `test-cloud.ts` parses the migration and fails if the app and the server disagree on any limit |
 
 Run the database tests with any Postgres 15+ you can create databases
@@ -228,8 +232,11 @@ account, card or identity. In order:
    Until then the app code in the cloud is weeks behind the owner's PC.
 2. **Create a Supabase project** (free to start) at supabase.com.
    Region near most writers. Save the database password somewhere safe.
-3. **Run the migration**: `npx supabase link --project-ref <ref>` then
-   `npx supabase db push`, or paste the migration file into the SQL editor.
+3. **Run the migrations**: `npx supabase link --project-ref <ref>` then
+   `npx supabase db push`, which applies all four in order. Pasting
+   them into the SQL editor works too, oldest first. The realtime one
+   (`20260924010000`) only adds `projects` to Supabase's realtime
+   publication; without it sync still works, by polling.
 4. **Email that actually sends**: Supabase's built-in mailer sends two
    emails an hour and only to the project's own team, so sign-in links
    would never reach a real writer. Add a transactional email provider
@@ -294,43 +301,33 @@ repository needs a paid GitHub plan.
 
 ## What comes next in code, in order
 
-These touch files the owner's unpushed work also changed (App.tsx,
-Settings, the vault store, the pane and draft keys), so they wait for
-that push rather than risk a merge that loses either side's work.
+Sign-in, the Account screen, sync wired into storage, cloud books,
+Novella AI as a connection and the upgrade flow are built (table
+above). None of them can be called done until they run against a real
+project; what is left in code is:
 
-1. **Sign-in and account screen.** *Built* (Settings → Account): an
-   emailed code on every platform, Google in the browser build, plan
-   and meters, download everything, delete account, sign out. Still
-   open: Google on the desktop opens the system browser (Google refuses
+1. **Settings that follow the writer.** Every localStorage key is
+   classified and the three-way merge is tested (`prefs.ts`); still to
+   do is uploading and applying `user_settings` on sign-in and on
+   change, and moving book-level state into the book folder.
+2. **Google on the desktop.** Opens the system browser (Google refuses
    sign-in inside embedded webviews) and returns through a `novella://`
-   link — needs the Tauri deep-link plugin.
-2. **Wire the engine into storage.** `storage()` hands back a wrapper
-   that tells the engine about every write and delete; the engine gets
-   the raw adapter. After each pull, reload changed notes and route an
-   unsaved one through the existing conflict flow. A status line in the
-   same voice as autosave: "Synced", "3 changes waiting — offline".
-3. **"Sync this book" / "Open a book from the cloud"** on the projects
-   screen, with the one-book Free limit explained before it bites.
-4. **Settings that follow the writer.** Classify every localStorage key
-   as account / book / this-device, move book-level state into the book
-   folder so the file sync carries it, and sync account-level keys
-   through `user_settings`. A guard test that fails on any key nobody
-   classified.
-5. **Novella AI as a connection** in Settings → Connections, available
-   to Pro, with the meter; the existing role fallback takes over when
-   the allowance is spent.
-6. **Upgrade flow**: *Built* — `create-checkout` makes a Paddle
-   transaction with the writer's user id in `custom_data`, refuses a
-   second subscription while one is live, and hands out the portal
-   link. Still open: on the desktop, links go through `window.open`,
-   which without the Tauri opener plugin may not reach the system
-   browser; the Account tab always shows the link and a Copy button
-   as the fallback.
+   link — needs the Tauri deep-link plugin. The emailed code works
+   everywhere meanwhile.
+3. **Links on the desktop.** Upgrade and Manage subscription go through
+   `window.open`, which without the Tauri opener plugin may not reach
+   the system browser; the Account tab always shows the link and a Copy
+   button as the fallback.
+4. **Keystrokes during a sync reload.** Text typed while a pull's read
+   is in flight survives only in the recovery draft. A 3-second
+   stillness wait narrows the window; closing it needs a `vaultStore`
+   swap that re-checks for unsaved edits after the read, which is a file
+   the owner's local work changed, so it waits for that merge.
 
-Known limitations, kept on purpose for v1: two files
-whose paths differ only by letter case collide on Windows and macOS;
-changes arrive by polling (on open, on focus, every minute), not by
-realtime push.
+Known limitations, kept on purpose for v1: two files whose paths differ
+only by letter case collide on Windows and macOS; realtime is a nudge
+on top of polling (on open, on focus, every minute), not the only way
+changes arrive.
 
 ## Moving development to the cloud
 
