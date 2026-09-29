@@ -1,5 +1,6 @@
 import type { VaultFile, VaultStorage } from "./adapter";
 import { isTempPath, tempPathFor } from "./vaultSafety";
+import { vaultGranter } from "./reauthorize";
 
 /* Real disk access via the Tauri shell. Imports are dynamic so the
    web build never pulls Tauri internals into its bundle. */
@@ -43,6 +44,12 @@ interface Seen {
     that a writer hitting Ctrl+S never notices it happened. */
 const RENAME_RETRY_MS = 40;
 
+/** One granter, and so one confirmation queue, for the whole app. */
+const grantVault = vaultGranter(async (cmd, args) => {
+  const { invoke } = await import("@tauri-apps/api/core");
+  return invoke(cmd, args);
+});
+
 let tempCounter = 0;
 
 /** Unique per call within a process, and unlikely to collide across two
@@ -64,22 +71,19 @@ export class TauriStorage implements VaultStorage {
   }
 
   async pickFolder(): Promise<string | null> {
-    const { open } = await import("@tauri-apps/plugin-dialog");
-    const picked = await open({
-      directory: true,
-      multiple: false,
-      title: "Choose your vault folder",
-    });
-    if (typeof picked !== "string") return null;
-    await this.grantAccess(picked);
-    return picked;
+    // The picker runs in Rust, not the dialog plugin: the folder it returns
+    // is recorded there as the only kind of folder allow_vault will ever
+    // widen the scope to. Nothing the webview says can add to that record.
+    const { invoke } = await import("@tauri-apps/api/core");
+    const picked = await invoke<string | null>("pick_vault_folder");
+    return picked ?? null;
   }
 
   /** The app ships with no filesystem scope. Widen it to this one folder,
-      otherwise every read is denied by the capability system. */
+      otherwise every read is denied by the capability system — and Rust
+      only agrees for a folder the picker once returned. */
   async grantAccess(root: string): Promise<void> {
-    const { invoke } = await import("@tauri-apps/api/core");
-    await invoke("allow_vault", { path: root });
+    await grantVault(root);
   }
 
   async readAll(root: string): Promise<VaultFile[]> {

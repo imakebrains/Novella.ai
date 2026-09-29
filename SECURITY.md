@@ -16,12 +16,47 @@ plainly so it can be checked against reality rather than trusted.
 
 ## What is in place
 
-**Filesystem access is scoped at runtime.** The desktop app ships with *no*
-filesystem permissions. `src-tauri/capabilities/default.json` grants the fs
-verbs but no path scope, so every read is denied until the writer picks a
-folder. The `allow_vault` command in `src-tauri/src/lib.rs` then widens the
-scope to that one directory for the session. A folder never opened stays
-unreadable, even to a compromised webview.
+**Filesystem access is scoped at runtime, and only to folders a native
+picker returned.** The desktop app ships with *no* filesystem permissions.
+`src-tauri/capabilities/default.json` grants the fs verbs but no path scope,
+so every read is denied until the writer picks a folder. The folder picker
+itself runs in Rust — `pick_vault_folder` in `src-tauri/src/lib.rs` — and
+the folder the OS dialog returns is recorded in `known_vaults.json` in the
+app's config directory (`src-tauri/src/known_vaults.rs`) before the scope is
+widened to that one directory. Reopening a remembered project goes through
+`allow_vault`, which compares canonical paths and refuses anything that is
+not in that record or inside one. The webview can ask for the picker as
+often as it likes, but it cannot choose what the picker returns, so a folder
+the writer never chose in an OS dialog stays unreadable even to a
+compromised webview. Before this, `allow_vault` widened the scope to any
+path the webview named, which made the empty capability scope decorative.
+
+The record is guarded twice, because a webview that could write to it could
+grant itself anything: the config directory is forbidden in the fs scope at
+startup (forbidden beats allowed), and the picker refuses a folder that
+contains the config directory — a home folder, a drive root — or sits
+inside it. What the gate cannot stop is a compromised page persuading the
+writer to pick a folder they would not otherwise open; the OS dialog is the
+writer's own consent, and that is the line this draws.
+
+**Every project opened before this change needs one confirmation.** Its
+folder was chosen by the old JS dialog, so it is not in the record, and
+trusting the webview's project list to fill the record would reopen the
+hole. Instead, when `allow_vault` refuses a remembered project
+(`src/storage/reauthorize.ts`), the picker opens already standing in that
+project's folder under the title "Confirm your project folder"; one click
+confirms it, and it is remembered from then on. Cancelling leaves the
+project closed, with a message pointing at Projects → Open a folder…
+
+Two honest caveats. The export save path (`allow_export_file`) still takes a
+path from the webview. The dialog plugin's own `save` command already scopes
+the chosen file itself, so the fix is to delete that command and its one
+call in `src/export/save.ts`; it is next. And this change was written on a
+machine without the desktop toolchain: the record's path logic is covered
+by Rust unit tests and the webview side by `test-vaultscope.ts`, and the
+crate type-checks against the Windows target, but it had not been built or
+run when this paragraph was written — until the owner's build confirms it,
+read it as the design rather than a verified property.
 
 **Content Security Policy.** `tauri.conf.json` sets a strict policy:
 `script-src 'self'`, `object-src 'none'`, `frame-ancestors 'none'`, and

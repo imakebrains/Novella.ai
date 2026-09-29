@@ -1,15 +1,114 @@
+mod known_vaults;
+
+use std::path::{Path, PathBuf};
+use tauri::Manager;
+use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_fs::FsExt;
 
-/// Grant filesystem access to exactly the folder the user chose.
+/// The app's config directory — `%APPDATA%\ai.novella.app` on Windows —
+/// created if missing and canonicalized, so it can be compared against
+/// canonical vault paths and forbidden in the scope by its real name.
+fn config_dir(app: &tauri::AppHandle) -> Result<PathBuf, String> {
+    let dir = app.path().app_config_dir().map_err(|e| e.to_string())?;
+    std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+    std::fs::canonicalize(&dir).map_err(|e| e.to_string())
+}
+
+/// Where the record of picker-returned folders lives. Inside the config
+/// directory, which `run` forbids in the fs scope — see known_vaults.rs.
+fn known_vaults_file(app: &tauri::AppHandle) -> Result<PathBuf, String> {
+    Ok(config_dir(app)?.join(known_vaults::FILE_NAME))
+}
+
+/// Open the OS folder picker from Rust, record the choice, widen the fs
+/// scope to it and hand the path back. The webview may ask for the picker
+/// as often as it likes; it cannot choose what the picker returns.
+///
+/// `default_path` only sets where the dialog starts — the writer still has
+/// to confirm a folder, so it grants nothing. It exists so a project picked
+/// before this record did can be re-confirmed in one click. The title is
+/// fixed here rather than taken from the webview, so the dialog's wording
+/// is ours even when the page asking for it is not.
+///
+/// `async` so the blocking picker runs on the async runtime's pool rather
+/// than the main thread — the dialog plugin's own `open` command is built
+/// the same way. Returns `None` when the writer cancels.
+#[tauri::command]
+async fn pick_vault_folder(
+    app: tauri::AppHandle,
+    window: tauri::Window,
+    default_path: Option<String>,
+) -> Result<Option<String>, String> {
+    let title = if default_path.is_some() {
+        "Confirm your project folder — Novella now asks once per folder"
+    } else {
+        "Choose your vault folder"
+    };
+    let dialog = app.dialog().file().set_title(title);
+    // Parenting makes the picker modal to the main window. The plugin only
+    // does this on Windows and macOS, so match it: on Linux a parented GTK
+    // dialog from a non-main thread is the case that hangs.
+    #[cfg(any(windows, target_os = "macos"))]
+    let dialog = dialog.set_parent(&window);
+    #[cfg(not(any(windows, target_os = "macos")))]
+    let _ = &window;
+    let dialog = match default_path.as_deref().map(Path::new) {
+        Some(start) if start.is_dir() => dialog.set_directory(start),
+        _ => dialog,
+    };
+
+    let Some(picked) = dialog.blocking_pick_folder() else {
+        return Ok(None);
+    };
+    // simplified() drops the Windows verbatim prefix, so the string the
+    // project list stores looks like the one the JS picker used to return —
+    // projectStore dedupes by exact path, so a re-confirmed project keeps
+    // its one entry instead of gaining a twin.
+    let path = picked.simplified().into_path().map_err(|e| e.to_string())?;
+    let canonical = std::fs::canonicalize(&path).map_err(|e| e.to_string())?;
+    if known_vaults::overlaps(&canonical, &config_dir(&app)?) {
+        return Err(format!(
+            "Novella can't use {} as a project folder: it holds, or sits inside, \
+             Novella's own settings. Choose a folder of its own for the project.",
+            path.display()
+        ));
+    }
+    known_vaults::remember(&known_vaults_file(&app)?, &path).map_err(|e| e.to_string())?;
+    app.fs_scope()
+        .allow_directory(&canonical, true)
+        .map_err(|e| e.to_string())?;
+    Ok(Some(path.to_string_lossy().into_owned()))
+}
+
+/// Re-grant a folder the writer chose in an earlier session.
 ///
 /// The capability file deliberately ships no path scope, so the app starts
-/// with access to nothing. After the folder picker returns, the frontend
-/// calls this to widen the scope to that one directory for this session.
-/// A vault the user never opened stays unreadable.
+/// with access to nothing. This widens it — but only to a folder a native
+/// picker returned (recorded by `pick_vault_folder`), or somewhere inside
+/// one. Anything else is refused, whatever the webview says: a folder the
+/// writer never chose stays unreadable even to a compromised webview.
+/// Canonical on both sides, so `..`, symlinks and mixed separators cannot
+/// talk their way past the comparison.
+///
+/// src/storage/reauthorize.ts recognises the refusal by its wording to offer
+/// the one-click re-confirm, so change the two together.
 #[tauri::command]
 fn allow_vault(app: tauri::AppHandle, path: String) -> Result<(), String> {
+    let asked = std::fs::canonicalize(&path).map_err(|_| {
+        format!(
+            "Novella can't find the folder {path}. It may have been moved or renamed — \
+             choose it again from Projects → Open a folder…"
+        )
+    })?;
+    let known = known_vaults::canonical_known(&known_vaults_file(&app)?);
+    if !known_vaults::covered_by(&known, &asked) {
+        return Err(format!(
+            "Novella won't open {path}: it isn't a folder you chose with the folder picker. \
+             Choose it again from Projects → Open a folder…"
+        ));
+    }
     app.fs_scope()
-        .allow_directory(&path, true)
+        .allow_directory(&asked, true)
         .map_err(|e| e.to_string())
 }
 
@@ -18,6 +117,10 @@ fn allow_vault(app: tauri::AppHandle, path: String) -> Result<(), String> {
 /// Exports land outside the vault, which the scope from `allow_vault`
 /// doesn't cover — so without this every export would be denied. Scoped to
 /// the single file the user actually picked, not its directory.
+///
+/// Same shape of trust as the old allow_vault: it believes the webview's
+/// path. The dialog plugin's own `save` command already scopes the file the
+/// writer picked, so closing this is a deletion — see SECURITY.md.
 #[tauri::command]
 fn allow_export_file(app: tauri::AppHandle, path: String) -> Result<(), String> {
     app.fs_scope()
@@ -181,6 +284,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![
             allow_vault,
+            pick_vault_folder,
             allow_export_file,
             debug_log,
             ollama_installed,
@@ -207,7 +311,6 @@ pub fn run() {
             // every case instead of a big one. Explorer still reads the
             // executable's .ico, which carries a native 256.
             {
-                use tauri::Manager;
                 if let Some(window) = app.get_webview_window("main") {
                     match tauri::image::Image::from_bytes(include_bytes!("../icons/128x128.png")) {
                         Ok(icon) => {
@@ -221,6 +324,22 @@ pub fn run() {
                         Err(e) => log::warn!("could not decode the window icon: {e}"),
                     }
                 }
+            }
+
+            // Keep the record of picker-returned folders out of the webview's
+            // reach. Forbidden beats allowed in the fs plugin, so even a vault
+            // that somehow contained the config directory could not expose
+            // known_vaults.json. pick_vault_folder refuses such a vault too;
+            // this is the second lock, and failing to set it is logged rather
+            // than fatal because the first one still holds.
+            match (config_dir(app.handle()), app.try_fs_scope()) {
+                (Ok(dir), Some(scope)) => {
+                    if let Err(e) = scope.forbid_directory(&dir, true) {
+                        log::warn!("could not fence off the config directory: {e}");
+                    }
+                }
+                (Err(e), _) => log::warn!("could not resolve the config directory: {e}"),
+                (_, None) => log::warn!("fs scope missing at setup; config directory not fenced"),
             }
 
             if cfg!(debug_assertions) {
