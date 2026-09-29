@@ -389,7 +389,14 @@ export function ensureHostedConnection(): Connection | null {
 }
 
 async function syncHosted(): Promise<void> {
+  const before = JSON.stringify(hostedStatus() ?? null);
   await refreshHostedAccount();
+  // A probe taken under another sign-in or plan — a "Sign in to Novella
+  // first" from Test connection, say — would otherwise leave the card
+  // reading "Can't reach it" the moment the writer signs in.
+  if (JSON.stringify(hostedStatus() ?? null) !== before) {
+    for (const c of cache ?? []) if (c.kind === "novella") probes.delete(c.id);
+  }
   ensureHostedConnection();
   emit();
 }
