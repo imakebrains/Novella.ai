@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { store } from "../state/vaultStore";
+import { KINDS } from "./quickCreateKinds";
 
 /* Other surfaces (the codex pane's own + button) can pop this open
    without owning the component. */
@@ -16,14 +17,6 @@ export function openQuickCreate(): boolean {
    No hunting through panes for the right section. Everything it makes is
    an ordinary vault note, so it shows up in the codex, the board, links
    and search like anything written the slow way. */
-
-const KINDS: { type: string; label: string; hint: string }[] = [
-  { type: "chapter", label: "Chapter", hint: "Lands at the end of the manuscript" },
-  { type: "scene", label: "Scene", hint: "A smaller unit — also on the board" },
-  { type: "character", label: "Character", hint: "Codex entry, linkable with [[name]]" },
-  { type: "location", label: "Location", hint: "Codex entry for a place" },
-  { type: "note", label: "Note", hint: "Checklists, research, anything" },
-];
 
 export function QuickCreate({
   onCreated,
@@ -95,7 +88,7 @@ export function QuickCreate({
       <button
         className={`quick-create-btn ${open ? "on" : ""}`}
         onClick={() => setOpen((v) => !v)}
-        title="Create a chapter, character, location or note — or start from a template"
+        title="Create a chapter, codex entry, note or prompt — or start from a template"
         aria-expanded={open}
       >
         + <span className="quick-create-word">New</span>
