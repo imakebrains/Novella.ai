@@ -170,12 +170,12 @@ export function Modal({
           onClick?.(e);
         }}
       >
-        <header className="modal-head">
+        <div className="modal-head">
           <h2 id={titleId}>{title}</h2>
-          <button className="icon-btn" onClick={onClose} title={closeTitle}>
+          <button className="icon-btn" onClick={onClose} title={closeTitle} aria-label="Close">
             ✕
           </button>
-        </header>
+        </div>
         {children}
       </div>
     </div>

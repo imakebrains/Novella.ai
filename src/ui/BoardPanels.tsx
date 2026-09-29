@@ -184,6 +184,8 @@ export function BoardPanels({ onShowMusicPlayer }: { onShowMusicPlayer?: () => v
               className="icon-btn"
               onClick={() => setPanels((ps) => toggleCollapse(ps, p.id))}
               title={p.collapsed ? "Unfold" : "Fold to the title bar"}
+              aria-label={`Fold ${TAB_DEFS[p.tool].label}`}
+              aria-expanded={!p.collapsed}
             >
               {p.collapsed ? "⌄" : "⌃"}
             </button>
@@ -191,6 +193,7 @@ export function BoardPanels({ onShowMusicPlayer }: { onShowMusicPlayer?: () => v
               className="icon-btn"
               onClick={() => setPanels((ps) => removePanel(ps, p.id))}
               title="Take this off the board"
+              aria-label={`Take ${TAB_DEFS[p.tool].label} off the board`}
             >
               ✕
             </button>
