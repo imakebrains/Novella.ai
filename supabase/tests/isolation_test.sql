@@ -11,7 +11,8 @@
 -- plant a blob in A's storage folder, read A's plan or usage, promote
 -- themselves to Pro. Each must fail. Then the sync contract itself:
 -- versions, conflicts, tombstones, the change counter, and the plan
--- limits the server enforces rather than trusting the app to.
+-- limits the server enforces rather than trusting the app to, and
+-- which stored blobs the collector may take.
 -- ============================================================
 
 \set ON_ERROR_STOP 1
@@ -392,6 +393,87 @@ select tests.login('bbbbbbbb-0000-0000-0000-000000000002');
 select tests.ok((select count(*) from public.user_settings) = 0, 'B cannot read A''s settings');
 select tests.ok((select public.put_settings(0, '{"theme": "noir"}')) ->> 'ok' = 'true',
   'B''s settings are B''s own row');
+
+-- ============================================================
+-- Reclaiming storage
+--
+-- A's folder holds four objects here: beef and big are pointed at by
+-- live files, c0ffee and big2 by nothing (big2's push was refused by
+-- the quota). All four were "uploaded" moments ago.
+-- ============================================================
+
+select tests.login('bbbbbbbb-0000-0000-0000-000000000002');
+select tests.refused($$select public.unreferenced_blob_keys('aaaaaaaa-0000-0000-0000-000000000001')$$,
+  'permission denied', 'nobody can ask which of another account''s blobs are unreferenced');
+select tests.refused($$select public.unreferenced_blob_keys('bbbbbbbb-0000-0000-0000-000000000002')$$,
+  'permission denied', 'or their own: only the gc function may');
+select tests.anon();
+select tests.refused($$select public.unreferenced_blob_keys('aaaaaaaa-0000-0000-0000-000000000001')$$,
+  'permission denied', 'signed out: not this either');
+
+select tests.admin();
+select tests.ok((select count(*) from public.unreferenced_blob_keys('aaaaaaaa-0000-0000-0000-000000000001')) = 0,
+  'nothing uploaded within the hour is listed, referenced or not');
+
+update storage.objects set created_at = now() - interval '2 hours'
+  where bucket_id = 'vault' and (storage.foldername(name))[1] = 'aaaaaaaa-0000-0000-0000-000000000001';
+
+select tests.ok(
+  (select array_agg(k order by k) from public.unreferenced_blob_keys('aaaaaaaa-0000-0000-0000-000000000001') k)
+  = array['aaaaaaaa-0000-0000-0000-000000000001/11111111-0000-0000-0000-00000000000a/big2',
+          'aaaaaaaa-0000-0000-0000-000000000001/11111111-0000-0000-0000-00000000000a/c0ffee'],
+  'old blobs no live file points at are listed, and only those');
+
+-- A tombstone keeps no body, so its blob is no longer spoken for.
+select tests.login('aaaaaaaa-0000-0000-0000-000000000001');
+select tests.ok(
+  (select public.push_file('11111111-0000-0000-0000-00000000000a', '.novella/cover.jpg', 1, '', true)) ->> 'ok' = 'true',
+  'the cover can be deleted');
+select tests.admin();
+select tests.ok(
+  'aaaaaaaa-0000-0000-0000-000000000001/11111111-0000-0000-0000-00000000000a/beef'
+    in (select k from public.unreferenced_blob_keys('aaaaaaaa-0000-0000-0000-000000000001') k),
+  'a blob only a tombstone remembers is collectable');
+select tests.ok(
+  'aaaaaaaa-0000-0000-0000-000000000001/11111111-0000-0000-0000-00000000000a/big'
+    not in (select k from public.unreferenced_blob_keys('aaaaaaaa-0000-0000-0000-000000000001') k),
+  'a blob a live file points at is not');
+
+-- The hour is the race guard: an upload whose push_file is still in
+-- flight is unreferenced by definition and must not be listed.
+insert into storage.objects (bucket_id, name, metadata, created_at) values
+  ('vault', 'aaaaaaaa-0000-0000-0000-000000000001/11111111-0000-0000-0000-00000000000a/inflight', '{"size": 8}',
+   now() - interval '59 minutes');
+select tests.ok(
+  'aaaaaaaa-0000-0000-0000-000000000001/11111111-0000-0000-0000-00000000000a/inflight'
+    not in (select k from public.unreferenced_blob_keys('aaaaaaaa-0000-0000-0000-000000000001') k),
+  'an upload from 59 minutes ago is left alone');
+update storage.objects set created_at = now() - interval '61 minutes'
+  where name = 'aaaaaaaa-0000-0000-0000-000000000001/11111111-0000-0000-0000-00000000000a/inflight';
+select tests.ok(
+  'aaaaaaaa-0000-0000-0000-000000000001/11111111-0000-0000-0000-00000000000a/inflight'
+    in (select k from public.unreferenced_blob_keys('aaaaaaaa-0000-0000-0000-000000000001') k),
+  'and one from 61 minutes ago is not');
+
+-- B's orphans are B's: never in A's list, and A's never in B's.
+insert into storage.objects (bucket_id, name, metadata, created_at) values
+  ('vault', 'bbbbbbbb-0000-0000-0000-000000000002/22222222-0000-0000-0000-00000000000b/stale', '{"size": 8}',
+   now() - interval '2 hours');
+select tests.ok(
+  (select count(*) from public.unreferenced_blob_keys('aaaaaaaa-0000-0000-0000-000000000001') k
+   where k like 'bbbbbbbb%') = 0,
+  'B''s blobs are never listed for A');
+select tests.ok(
+  (select array_agg(k) from public.unreferenced_blob_keys('bbbbbbbb-0000-0000-0000-000000000002') k)
+  = array['bbbbbbbb-0000-0000-0000-000000000002/22222222-0000-0000-0000-00000000000b/stale'],
+  'and are listed for B, and only B''s');
+
+-- The stub has no Storage API to remove through, so the two planted
+-- objects go by hand: Leaving below counts on A's four originals and
+-- none of B's.
+delete from storage.objects where name in (
+  'aaaaaaaa-0000-0000-0000-000000000001/11111111-0000-0000-0000-00000000000a/inflight',
+  'bbbbbbbb-0000-0000-0000-000000000002/22222222-0000-0000-0000-00000000000b/stale');
 
 -- ============================================================
 -- Leaving
