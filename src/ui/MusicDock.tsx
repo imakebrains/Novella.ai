@@ -93,10 +93,11 @@ export function MusicDock({ open, onClose }: { open: boolean; onClose: () => voi
               onClick={() => setMini((v) => !v)}
               title={mini ? "Expand the player" : "Shrink to a mini bar (keeps playing)"}
               aria-pressed={mini}
+              aria-label="Mini player"
             >
               {mini ? "▔" : "▁"}
             </button>
-            <button className="icon-btn" onClick={onClose} title="Tuck the player away — the music keeps playing; reopen from the Music tab">
+            <button className="icon-btn" onClick={onClose} title="Tuck the player away — the music keeps playing; reopen from the Music tab" aria-label="Hide the player">
               ✕
             </button>
           </div>

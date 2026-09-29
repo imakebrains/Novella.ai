@@ -109,7 +109,7 @@ export function CodexPane({
   const allFolded = filledTypes.length > 0 && filledTypes.every((t) => collapsed.has(t));
 
   return (
-    <nav className="pane pane-left">
+    <nav className="pane pane-left" aria-label="Codex">
       <div className="pane-head codex-head">
         <span className="pane-title" title="This project">
           {project?.name ?? "Project"}
@@ -156,7 +156,7 @@ export function CodexPane({
           spellCheck={false}
         />
         {query && (
-          <button className="search-clear" onClick={() => setQuery("")} title="Clear">
+          <button className="search-clear" onClick={() => setQuery("")} title="Clear" aria-label="Clear search">
             ×
           </button>
         )}

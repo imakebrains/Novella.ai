@@ -56,6 +56,7 @@ import { toBannerDataUrl } from "../state/projects";
 import { AccountTab } from "../cloud/AccountTab";
 import { SecretField } from "./SecretField";
 import { readPlain } from "./secretFieldCore";
+import { StorageDurabilityLine } from "./StorageDurabilityLine";
 import { BACKDROP_PRESETS, presetMarker } from "./backdrops";
 import {
   glowModeOf,
@@ -124,7 +125,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
       <div className="modal settings-modal" onClick={(e) => e.stopPropagation()}>
         <header className="modal-head">
           <h2>Settings</h2>
-          <button className="icon-btn" onClick={onClose} title="Close (Esc)">
+          <button className="icon-btn" onClick={onClose} title="Close (Esc)" aria-label="Close settings">
             ✕
           </button>
         </header>
@@ -145,6 +146,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
           <div className="modal-body">
             {tab === "profile" && <ProfileTab />}
             {tab === "account" && <AccountTab />}
+            {tab === "account" && <StorageDurabilityLine />}
             {tab === "appearance" && <AppearanceTab />}
             {tab === "shortcuts" && <ShortcutsTab />}
             {tab === "connections" && <ConnectionsTab />}
@@ -1450,6 +1452,8 @@ function PluginRow({ plugin }: { plugin: NovellaPlugin }) {
             className="icon-btn"
             onClick={() => setExpanded((v) => !v)}
             title={expanded ? "Hide settings" : "Show settings"}
+            aria-label={`${plugin.name} settings`}
+            aria-expanded={expanded}
           >
             {expanded ? "▴" : "▾"}
           </button>

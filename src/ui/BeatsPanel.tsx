@@ -180,6 +180,7 @@ export function BeatsPanel() {
                   onClick={() => commit(beats.filter((_, j) => j !== i))}
                   disabled={busyIndex !== null}
                   title="Remove this step"
+                  aria-label={`Remove step ${i + 1}`}
                 >
                   ✕
                 </button>

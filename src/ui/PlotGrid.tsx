@@ -429,7 +429,7 @@ function PlotCell({
           }}
         />
       ) : (
-        <button className="pg-point-add" data-no-drag onClick={() => startEdit("new")} title="Add a plot point">
+        <button className="pg-point-add" data-no-drag onClick={() => startEdit("new")} title="Add a plot point" aria-label="Add a plot point">
           +
         </button>
       )}

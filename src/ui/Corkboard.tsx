@@ -437,7 +437,7 @@ function AddCardsPicker({ boardId, onClose }: { boardId: string; onClose: () => 
       <div className="modal add-cards-modal" onClick={(e) => e.stopPropagation()}>
         <header className="modal-head">
           <h2>Add to “{board?.name ?? "board"}”</h2>
-          <button className="icon-btn" onClick={onClose} data-tip="Done (Esc)">
+          <button className="icon-btn" onClick={onClose} data-tip="Done (Esc)" aria-label="Done">
             ✕
           </button>
         </header>
@@ -583,6 +583,7 @@ function Card({
           <button
             className="card-art-remove"
             data-tip="Remove this image"
+            aria-label={`Remove the image from ${note.title}`}
             onClick={(e) => {
               e.stopPropagation();
               void removeCardImage(note.id);
@@ -656,6 +657,7 @@ function Card({
             className="chip tag-add"
             data-no-drag
             data-tip="Add a tag"
+            aria-label={`Add a tag to ${note.title}`}
             onClick={(e) => {
               e.stopPropagation();
               setAddingTag(true);
@@ -684,6 +686,7 @@ function Card({
             className="chip board-remove"
             data-no-drag
             data-tip="Take this card off the board (the note itself stays)"
+            aria-label={`Take ${note.title} off the board`}
             onClick={(e) => {
               e.stopPropagation();
               boardStore.removeNote(boardId, note.id);

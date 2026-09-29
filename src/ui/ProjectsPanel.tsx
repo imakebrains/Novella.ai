@@ -184,12 +184,12 @@ export function ProjectsPanel({ onClose }: { onClose: () => void }) {
     <>
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal projects-modal" onClick={(e) => e.stopPropagation()}>
-        <header className="modal-head">
+        <div className="modal-head">
           <h2>Projects</h2>
-          <button className="icon-btn" onClick={onClose} title="Close (Esc)">
+          <button className="icon-btn" onClick={onClose} title="Close (Esc)" aria-label="Close">
             ✕
           </button>
-        </header>
+        </div>
 
         <div className="modal-body">
           <p className="hint">

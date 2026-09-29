@@ -14,6 +14,7 @@ import {
   onPersistenceAnswer,
   type PersistenceAnswer,
 } from "./src/storage/persistence";
+import { persistenceLine, type StorageBacking } from "./src/storage/persistenceCopy";
 
 let failures = 0;
 let checks = 0;
@@ -115,6 +116,42 @@ try {
   check("default argument under Node", await requestPersistentStorage(), "unsupported");
 } catch {
   ok("default argument under Node does not throw", false);
+}
+
+/* ---------- the sentence the writer sees ---------- */
+
+const ANSWERS: PersistenceAnswer[] = ["granted", "denied", "unsupported"];
+const BACKINGS: StorageBacking[] = ["web", "tauri", "memory"];
+
+for (const a of ANSWERS) {
+  check(`desktop says nothing (${a})`, persistenceLine(a, "tauri"), null);
+  check(`memory fallback says nothing (${a})`, persistenceLine(a, "memory"), null);
+}
+check("web before the ask settles says nothing", persistenceLine(null, "web"), null);
+
+const granted = persistenceLine("granted", "web");
+check("granted reads as ok", granted?.tone, "ok");
+ok("granted says the browser agreed", /agreed/.test(granted?.text ?? ""));
+
+// persistence.ts: denied is Chrome's normal first answer, so neither the
+// tone nor the words may read as a failure.
+const FAILURE_WORDS = /denied|fail|error|refus|couldn|can't|cannot|lost/i;
+for (const a of ["denied", "unsupported"] as const) {
+  const line = persistenceLine(a, "web");
+  check(`${a} is quiet, not a warning`, line?.tone, "quiet");
+  ok(`${a} copy does not read as a failure`, !FAILURE_WORDS.test(line?.text ?? "x denied"));
+}
+
+for (const a of ANSWERS) {
+  const line = persistenceLine(a, "web");
+  ok(`${a} copy is a real sentence about the browser`, !!line && line.text.length > 20 && /browser/.test(line.text));
+}
+
+for (const a of [...ANSWERS, null]) {
+  for (const b of BACKINGS) {
+    const line = persistenceLine(a, b);
+    ok(`tone is ok or quiet (${a}, ${b})`, line === null || line.tone === "ok" || line.tone === "quiet");
+  }
 }
 
 /* ---------- report ---------- */
