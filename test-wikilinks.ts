@@ -196,10 +196,13 @@ const ext = [wikiLinkField, linkExists.of((n) => known.has(n.toLowerCase()))];
 
 const shape = (spans: WikiSpan[]) => spans.map((s) => [s.from, s.to, s.kind, s.dangling]);
 
+/* "hidden" must mean a replace decoration, not merely one without a class —
+   a classless mark hides nothing, and inferring from the missing class let
+   exactly that swap pass. */
 function decorationsOf(state: EditorState): [number, number, string][] {
   const out: [number, number, string][] = [];
   state.field(wikiLinkField).decorations.between(0, state.doc.length, (from, to, d) => {
-    out.push([from, to, (d.spec.class as string | undefined) ?? "hidden"]);
+    out.push([from, to, d.point ? "hidden" : ((d.spec.class as string | undefined) ?? "(classless mark)")]);
   });
   return out;
 }
