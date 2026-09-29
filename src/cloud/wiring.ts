@@ -11,13 +11,15 @@
    Neither seam loads supabase-js on its own: the sync host asks for a
    client only when this device has a book bound to the cloud, and the
    hosted-AI source checks signedIn() first. A writer who never signs in
-   downloads none of it.
+   downloads none of it. Settings sync is the fourth seam, on the same
+   terms: it asks for the client only while someone is signed in.
    ============================================================ */
 
 import { appClient, authStore, hostedAccess } from "./auth";
 import { setHostedAccessSource } from "./hostedAccess";
 import { myAccount } from "./supabaseRemote";
 import { provideCloudAccess } from "./syncHost";
+import { installSettingsSync } from "./settingsHost";
 
 export function wireCloud(): void {
   provideCloudAccess({
@@ -32,5 +34,10 @@ export function wireCloud(): void {
       return client ? myAccount(client) : null;
     },
     onChange: (fn) => authStore.subscribe(fn),
+  });
+  installSettingsSync({
+    client: appClient,
+    session: () => authStore.getSnapshot(),
+    onAuthChange: (fn) => authStore.subscribe(fn),
   });
 }

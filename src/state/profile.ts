@@ -71,6 +71,11 @@ export const profileStore = {
     localStorage.removeItem(KEY);
     emit();
   },
+  /** Settings sync rewrote the key underneath the cache. */
+  reload(): void {
+    cached = read();
+    emit();
+  },
 };
 
 export function useProfile(): [AuthorProfile, (patch: Partial<AuthorProfile>) => void] {

@@ -173,6 +173,13 @@ export function resetPersonalization(): void {
   for (const l of listeners) l();
 }
 
+/** Settings sync rewrote the key; paint and tell subscribers. */
+export function reloadPersonalization(): void {
+  applyPersonalization(loadPersonalization());
+  version++;
+  for (const l of listeners) l();
+}
+
 /** Black or white, whichever reads on the given hex background. */
 export function readableOn(hex: string): string {
   const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());

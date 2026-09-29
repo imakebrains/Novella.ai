@@ -60,6 +60,12 @@ export const plannerStore = {
     return { ...intents };
   },
 
+  /** Settings sync rewrote the key underneath the cache. */
+  reload(): void {
+    intents = read();
+    emit();
+  },
+
   setIntent(day: string, text: string): void {
     if (text.trim()) intents = { ...intents, [day]: text };
     else {

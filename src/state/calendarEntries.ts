@@ -1069,6 +1069,20 @@ export function useCalendarFeeds(): number {
   return useSyncExternalStore(calendarStore.subscribe, calendarStore.getVersion, calendarStore.getVersion);
 }
 
+/** Settings sync rewrote the calendar keys underneath the caches. Every
+    half goes back to not-loaded; `feeds` too, because ensureFeeds()
+    keeps the old array when the key is gone. */
+export function reloadCalendarStores(): void {
+  entries = [];
+  entriesReady = false;
+  labelBook = emptyLabelBook();
+  resolvedLabels = resolveLabels(labelBook);
+  labelsReady = false;
+  feeds = [];
+  feedsReady = false;
+  emit();
+}
+
 /** Today's key, for callers that shouldn't have to know sessions owns it. */
 export function todayKey(now = new Date()): string {
   return dayKey(now);

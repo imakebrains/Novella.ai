@@ -77,6 +77,14 @@ function persist(): void {
   for (const l of listeners) l();
 }
 
+/** Settings sync rewrote the history underneath `state`. Must run before
+    the next recordProgress(), which writes the whole blob back. */
+export function reloadSessions(): void {
+  state = read();
+  version++;
+  for (const l of listeners) l();
+}
+
 /** Total words across every chapter and scene — the manuscript, not the
     codex. Same counter and same selection as the titlebar, so the two
     numbers can't disagree. Cached per note; see analysis/wordCounts. */

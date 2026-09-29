@@ -334,6 +334,15 @@ function commit(next: TimersState): void {
   syncTicker();
 }
 
+/** Settings sync rewrote the key underneath `state`; an alarm armed on
+    the other device starts the ticker here too. */
+export function reloadTimers(): void {
+  state = read();
+  version++;
+  for (const l of listeners) l();
+  syncTicker();
+}
+
 export function timersState(): TimersState {
   return state;
 }

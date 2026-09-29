@@ -546,6 +546,13 @@ export function customThemesVersion(): number {
   return version;
 }
 
+/** Settings sync rewrote the key underneath the cache. */
+export function reloadCustomThemes(): void {
+  cache = null;
+  version++;
+  for (const l of listeners) l();
+}
+
 /* ---- applying ---- */
 
 /** The custom theme currently painted on the document, if any. Kept so
