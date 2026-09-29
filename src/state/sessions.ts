@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { store } from "./vaultStore";
+import { manuscriptNotes, manuscriptWordCount as countManuscript } from "../analysis/wordCounts";
 
 /* ============================================================
    Writing sessions, goals and streaks
@@ -77,14 +78,10 @@ function persist(): void {
 }
 
 /** Total words across every chapter and scene — the manuscript, not the
-    codex. Matches what the titlebar counts. */
+    codex. Same counter and same selection as the titlebar, so the two
+    numbers can't disagree. Cached per note; see analysis/wordCounts. */
 export function manuscriptWordCount(): number {
-  let total = 0;
-  for (const note of [...store.vault.byType("chapter"), ...store.vault.byType("scene")]) {
-    const t = note.body.trim();
-    if (t) total += t.split(/\s+/).length;
-  }
-  return total;
+  return countManuscript(manuscriptNotes(store.vault));
 }
 
 /** Record where the manuscript stands now, attributing any change to today.
