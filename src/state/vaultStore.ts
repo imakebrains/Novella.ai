@@ -15,6 +15,7 @@ import { SEED_FILES } from "../seed/seedWorld";
 import { desktopLog } from "../debug";
 import { BUILTIN_PROMPTS, promptSeedToMarkdown } from "../ai/prompts";
 import { extractTasks, toggleTaskAt, type BodyTask } from "../core/tasks";
+import { folderForType } from "./noteFolders";
 
 /* A thin reactive shell around the Phase 1 Vault engine.
    vault.ts stays untouched — it holds Note objects by reference, so
@@ -1046,16 +1047,7 @@ export class VaultStore {
   }
 
   createFromDanglingLink(name: string, type: string): Note {
-    const folder =
-      type === "character"
-        ? "Codex/Characters"
-        : type === "location"
-          ? "Codex/Locations"
-          : type === "chapter"
-            ? "Manuscript"
-            : type === "prompt"
-              ? "Prompts"
-              : "Codex/Lore";
+    const folder = folderForType(type);
     const filename = name.trim().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
     const note = parseNote(
       `${folder}/${filename}.md`,
