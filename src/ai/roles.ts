@@ -18,11 +18,17 @@
    be a Google login on their website, but what Novella holds is a
    key. Ollama needs no account at all. Anything that looked like
    an OAuth button in this app would be a drawing of one.
+
+   The fourth kind, Novella AI, is the exception that proves it: the
+   writer is already signed into Novella itself, and the model key
+   sits on our server (cloud/hostedAi.ts). Whether that account is
+   signed in and on Pro is injected through Probe.hosted, so this
+   file still imports nothing.
    ============================================================ */
 
 /* ---------------- what kinds of thing can be connected ---------------- */
 
-export type ProviderKind = "ollama" | "anthropic" | "openai";
+export type ProviderKind = "ollama" | "anthropic" | "openai" | "novella";
 
 export interface ProviderKindInfo {
   kind: ProviderKind;
@@ -89,6 +95,22 @@ export const PROVIDER_KINDS: ProviderKindInfo[] = [
     defaultBaseUrl: "https://api.openai.com/v1",
     keyPrefix: "sk-",
   },
+  {
+    kind: "novella",
+    label: "Novella AI",
+    blurb: "Built in, no key — included with Pro. A strong model, metered against a monthly allowance.",
+    requiresKey: false,
+    keyUrl: "",
+    keyLabel: "",
+    signInNote:
+      "Nothing to paste. Novella AI comes with the Pro plan and uses the account you are already signed into Novella with — the model key lives on our server, never on this machine. When the month's allowance is spent, your other connections answer until it resets on the 1st.",
+    costNote: "Included with Pro — a monthly allowance with a meter you can see.",
+    // Not sent anywhere: the server picks the model. It is here so the
+    // card has something true to print after the health label.
+    defaultModel: "built-in",
+    defaultBaseUrl: "",
+    keyPrefix: "",
+  },
 ];
 
 export function kindInfo(kind: ProviderKind): ProviderKindInfo {
@@ -127,7 +149,7 @@ export function keyPageFor(
   kind: ProviderKind,
   baseUrl = "",
 ): { url: string; who: string } | null {
-  if (kind === "ollama") return null;
+  if (kind === "ollama" || kind === "novella") return null;
   if (kind === "anthropic") return { url: kindInfo("anthropic").keyUrl, who: "Anthropic" };
   if (isLocalHost(baseUrl)) return null; // LM Studio, llama.cpp — no key, no page
   const host = hostOf(baseUrl);
@@ -158,11 +180,32 @@ export interface Probe {
   /** The real message from the last failed test, for the card. */
   detail?: string;
   checkedAt?: number;
+  /** The built-in kind only: what the Novella account looks like right
+      now. Absent means nobody has looked yet. */
+  hosted?: HostedStatus;
 }
 
-export type Health = "ready" | "untested" | "needs-key" | "unreachable";
+/** Mirrors Tier in cloud/plans.ts. Duplicated on purpose — this file
+    may import nothing (test-roles "pure") — and cloud/hostedAccess.ts
+    fails to compile if the two ever disagree. */
+export type HostedTier = "free" | "plus" | "pro";
+
+export interface HostedStatus {
+  signedIn: boolean;
+  /** null while signed out, or when the account couldn't be read. */
+  tier: HostedTier | null;
+}
+
+export type Health = "ready" | "untested" | "needs-key" | "unreachable" | "needs-signin" | "needs-pro";
 
 export function connectionHealth(conn: Connection, probe?: Probe): Health {
+  if (conn.kind === "novella") {
+    const hosted = probe?.hosted;
+    if (hosted && !hosted.signedIn) return "needs-signin";
+    if (hosted && hosted.tier !== "pro") return "needs-pro";
+    // Status not known yet: stay in the chain. The server checks the
+    // plan on every call, and its refusal falls through like any other.
+  }
   if (kindInfo(conn.kind).requiresKey && !probe?.hasKey) return "needs-key";
   if (probe?.reachable === false) return "unreachable";
   if (probe?.reachable === true) return "ready";
@@ -182,14 +225,18 @@ export function healthLabel(health: Health): string {
       return "Not connected";
     case "unreachable":
       return "Can't reach it";
+    case "needs-signin":
+      return "Sign in to Novella";
+    case "needs-pro":
+      return "Needs Pro";
   }
 }
 
 /** Can this connection plausibly answer a request? A key it doesn't have
-    is fatal; a failed probe from ten minutes ago is not — laptops sleep,
+    is fatal, and so is a sign-in or a plan it doesn't have; a failed probe from ten minutes ago is not — laptops sleep,
     daemons restart, and refusing to retry would strand a writer. */
 export function usable(health: Health): boolean {
-  return health !== "needs-key";
+  return health !== "needs-key" && health !== "needs-signin" && health !== "needs-pro";
 }
 
 /* ---------------- roles ---------------- */
@@ -206,7 +253,12 @@ export function usable(health: Health): boolean {
 
    The owner's own example maps onto it exactly: Ollama for Ideas,
    Claude for Drafting, ChatGPT for Research. "Copyright check" lands in
-   Critique — it is a reading job, not a writing one. */
+   Critique — it is a reading job, not a writing one.
+
+   Novella AI sits second everywhere: behind the kind each job was
+   built around, ahead of the rest. A Pro writer with only the local
+   engine and the built-in model should find prose going to the
+   built-in one without touching this screen. */
 
 export type RoleId = "drafting" | "ideas" | "research" | "critique" | "quick";
 
@@ -224,31 +276,31 @@ export const ROLES: RoleDef[] = [
     id: "drafting",
     label: "Drafting",
     blurb: "Prose that goes in the book. Worth the best model you have.",
-    prefers: ["anthropic", "openai", "ollama"],
+    prefers: ["anthropic", "novella", "openai", "ollama"],
   },
   {
     id: "ideas",
     label: "Ideas & brainstorming",
     blurb: "What happens next, twenty ways. Cheap and plentiful beats perfect.",
-    prefers: ["ollama", "openai", "anthropic"],
+    prefers: ["ollama", "novella", "openai", "anthropic"],
   },
   {
     id: "research",
     label: "Research",
     blurb: "Questions about the world outside your book.",
-    prefers: ["openai", "anthropic", "ollama"],
+    prefers: ["openai", "novella", "anthropic", "ollama"],
   },
   {
     id: "critique",
     label: "Critique & editing",
     blurb: "Reading back what you wrote — notes, continuity, checks.",
-    prefers: ["anthropic", "openai", "ollama"],
+    prefers: ["anthropic", "novella", "openai", "ollama"],
   },
   {
     id: "quick",
     label: "Quick tasks",
     blurb: "Reword a line, name a thing. Speed matters more than depth.",
-    prefers: ["ollama", "openai", "anthropic"],
+    prefers: ["ollama", "novella", "openai", "anthropic"],
   },
 ];
 
@@ -450,7 +502,7 @@ export function defaultDraft(kind: ProviderKind, existing: Connection[] = []): C
 }
 
 function shortName(kind: ProviderKind): string {
-  return kind === "ollama" ? "Local" : kind === "anthropic" ? "Claude" : "ChatGPT";
+  return kind === "ollama" ? "Local" : kind === "anthropic" ? "Claude" : kind === "novella" ? "Novella AI" : "ChatGPT";
 }
 
 /** "Claude", then "Claude 2" — a second account of the same service is
@@ -468,7 +520,7 @@ export function uniqueLabel(base: string, taken: string[]): string {
 /** Ids are stable and never shown. The three seeded ones keep their
     historical names so an upgrade doesn't orphan anyone's settings. */
 export function newConnectionId(taken: string[], kind: ProviderKind, seed = 0): string {
-  const base = kind === "ollama" ? "local" : kind === "anthropic" ? "claude" : "custom";
+  const base = kind === "ollama" ? "local" : kind === "anthropic" ? "claude" : kind === "novella" ? "novella" : "custom";
   if (!taken.includes(base)) return base;
   for (let n = seed + 2; n < 10_000; n++) {
     const candidate = `${base}-${n}`;
@@ -490,7 +542,9 @@ export function validateDraft(
   }
   if (!draft.model.trim()) problems.push("Pick a model — Test connection lists what this account offers.");
   const url = draft.baseUrl.trim();
-  if (draft.kind !== "anthropic") {
+  // Neither has an address to type: Anthropic's is fixed, and the
+  // built-in model's is the cloud project this build was made with.
+  if (draft.kind !== "anthropic" && draft.kind !== "novella") {
     if (!url) problems.push("An address is needed, like https://api.openai.com/v1.");
     else if (!/^https?:\/\//i.test(url)) problems.push("The address has to start with http:// or https://.");
     else if (draft.kind === "openai" && !isLocalHost(url) && !/^https:\/\//i.test(url)) {
@@ -601,6 +655,20 @@ export function migrateLegacy(legacy: LegacySetup): {
   return { connections, routing };
 }
 
+/** Should a "Novella AI" card be created now? Only for a signed-in Pro
+    writer, only once, and never again after they delete it — the
+    flag is what remembers that, since an absent card and a deleted one
+    look the same from here. */
+export function shouldSeedHostedConnection(
+  status: HostedStatus | undefined,
+  existing: Connection[],
+  alreadySeeded: boolean,
+): boolean {
+  if (alreadySeeded) return false;
+  if (!status?.signedIn || status.tier !== "pro") return false;
+  return !existing.some((c) => c.kind === "novella");
+}
+
 /** Guard for anything read back off disk. A hand-edited or half-written
     store must not take the app down. */
 export function parseConnections(raw: unknown): Connection[] {
@@ -611,7 +679,7 @@ export function parseConnections(raw: unknown): Connection[] {
     const c = item as Record<string, unknown>;
     const id = typeof c.id === "string" ? c.id : "";
     const kind = c.kind;
-    if (!id || (kind !== "ollama" && kind !== "anthropic" && kind !== "openai")) continue;
+    if (!id || (kind !== "ollama" && kind !== "anthropic" && kind !== "openai" && kind !== "novella")) continue;
     if (out.some((existing) => existing.id === id)) continue;
     out.push({
       id,

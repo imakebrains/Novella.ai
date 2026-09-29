@@ -3,23 +3,35 @@ import { pluginHost, type StreamingAIProvider } from "../runtime";
 import { isTauri } from "../../storage";
 import {
   connectionHealth,
+  defaultDraft,
   kindInfo,
   migrateLegacy,
   newConnectionId,
   normalizeRouting,
   parseConnections,
   routingAfterAdding,
+  shouldSeedHostedConnection,
   suggestRouting,
   type Connection,
   type ConnectionDraft,
   type Health,
   type Probe,
+  type ProviderKindInfo,
   type RoleId,
   type Routing,
 } from "../../ai/roles";
 import { makeOllamaProvider, listOllamaModels } from "./ollama";
 import { makeAnthropicProvider, listClaudeModels } from "./anthropic";
 import { makeOpenAICompatibleProvider, listRemoteModels } from "./openaiCompatible";
+import { makeHostedProvider } from "../../cloud/hostedAi";
+import { cloudEnabled } from "../../cloud/config";
+import {
+  getHostedAccess,
+  hostedStatus,
+  noteHostedMeter,
+  onHostedChange,
+  refreshHostedAccount,
+} from "../../cloud/hostedAccess";
 
 /* ============================================================
    Connections — the impure half of ai/roles.ts.
@@ -42,6 +54,10 @@ import { makeOpenAICompatibleProvider, listRemoteModels } from "./openaiCompatib
      Browser: memory only, for the life of the tab. There is no
      safe store in a browser, so nothing pretends there is.
 
+     Novella AI: no key on this device at all. The session token is
+     asked of cloud/hostedAccess.ts per request and handed only to
+     hostedAi's request; the model key is on the server.
+
    Connection records themselves (name, model, endpoint) are plain
    localStorage — they are not secrets, and losing them to a
    cleared browser store should cost a writer thirty seconds.
@@ -54,6 +70,9 @@ const SECRET_PREFIX = "novella.connection";
    every connection would find them all back after a restart — an empty
    list and a fresh install look identical otherwise. */
 const SEEDED_KEY = "novella.connections.seeded";
+/* The built-in card is offered once per account, not once per install:
+   a writer who deletes it has answered, and must not find it back. */
+const HOSTED_SEEDED_KEY = "novella.connections.hostedSeeded";
 
 /* Three connections predate this file, as plugins. Their ids are kept
    so an upgrade doesn't orphan a key someone already typed, and their
@@ -208,6 +227,10 @@ let hydration: Promise<void> | null = null;
     on the web there is nothing to pull, and nothing was ever written. */
 export function ready(): Promise<void> {
   hydration ??= (async () => {
+    // Not awaited: an account RPC hanging offline must never hold up a
+    // local model that could answer right now.
+    void syncHosted();
+    onHostedChange(() => void syncHosted());
     if (!isTauri()) return;
     try {
       const kc = await keychain();
@@ -283,7 +306,16 @@ export function baseUrlOf(conn: Connection): string {
 
 export function probeOf(id: string): Probe {
   const probe = probes.get(id);
-  return { hasKey: hasKey(id), reachable: probe?.reachable ?? null, detail: probe?.detail, checkedAt: probe?.checkedAt };
+  // cache, not connections(): this runs inside seeding, and connections()
+  // can itself seed.
+  const hosted = cache?.find((c) => c.id === id)?.kind === "novella" ? hostedStatus() : undefined;
+  return {
+    hasKey: hasKey(id),
+    reachable: probe?.reachable ?? null,
+    detail: probe?.detail,
+    checkedAt: probe?.checkedAt,
+    hosted,
+  };
 }
 
 export function healthOf(conn: Connection): Health {
@@ -332,6 +364,41 @@ export function removeConnection(id: string): void {
   // never keeps a dangling id.
   routingCache = normalizeRouting(routing(), cache);
   persist();
+}
+
+/** Create the "Novella AI" card for a signed-in Pro writer. The decision
+    is roles.shouldSeedHostedConnection; this only reads the flag, adds
+    the card, and sets the flag. addConnection re-derives an untouched
+    routing, so drafting moves to it; a hand-set one is left alone. */
+export function ensureHostedConnection(): Connection | null {
+  let seeded = false;
+  try {
+    seeded = localStorage.getItem(HOSTED_SEEDED_KEY) === "1";
+  } catch {
+    /* no storage: the decision below still refuses a second card */
+  }
+  const list = connections();
+  if (!shouldSeedHostedConnection(hostedStatus(), list, seeded)) return null;
+  const conn = addConnection(defaultDraft("novella", list));
+  try {
+    localStorage.setItem(HOSTED_SEEDED_KEY, "1");
+  } catch {
+    /* it would be offered again next launch only if it was deleted */
+  }
+  return conn;
+}
+
+async function syncHosted(): Promise<void> {
+  await refreshHostedAccount();
+  ensureHostedConnection();
+  emit();
+}
+
+/** Is this kind worth offering in "Add a connection"? Novella AI needs
+    the cloud; a build without it has no way to sign in, and a card that
+    can never connect is a drawing of a feature. */
+export function kindOffered(info: ProviderKindInfo): boolean {
+  return info.kind !== "novella" || cloudEnabled();
 }
 
 /** Mirror the fields the old plugin surfaces still read, so nothing a
@@ -383,6 +450,17 @@ export async function testConnection(conn: Connection): Promise<TestResult> {
       }
     } else if (conn.kind === "anthropic") {
       models = await listClaudeModels(keyFor(conn.id));
+    } else if (conn.kind === "novella") {
+      // Nothing to list and nothing to spend: the honest test is whether
+      // the account could use it. The server re-checks on every call.
+      const hosted = await refreshHostedAccount();
+      if (!hosted?.signedIn) throw new Error("Sign in to Novella first — Settings → Account does it in one step.");
+      if (hosted.tier !== "pro") {
+        throw new Error("Novella AI is part of Pro. Your own connections still work on every plan.");
+      }
+      probes.set(conn.id, { hasKey: false, reachable: true, checkedAt: Date.now() });
+      emit();
+      return { ok: true, detail: "Connected · included with your Pro plan", models: [] };
     } else {
       models = await listRemoteModels(baseUrlOf(conn), keyFor(conn.id));
     }
@@ -415,6 +493,8 @@ function humanTestError(err: unknown, conn: Connection): string {
   if (conn.kind === "ollama") {
     return "Nothing answered on this machine. Ollama isn't running — start it, or install it from Local AI below.";
   }
+  // It has no address of its own to print.
+  if (conn.kind === "novella") return "Couldn't reach Novella's servers. Check your internet connection.";
   return `Couldn't reach ${baseUrlOf(conn)}. Check the address and your internet connection.`;
 }
 
@@ -432,6 +512,9 @@ export function noteResult(id: string, ok: boolean, detail?: string): void {
 /** A live provider for one connection. Built per call rather than
     cached: a key or model changed a second ago must take effect now. */
 export function providerForConnection(conn: Connection): StreamingAIProvider {
+  if (conn.kind === "novella") {
+    return makeHostedProvider({ access: getHostedAccess, onMeter: noteHostedMeter, slash: `/${conn.id}` });
+  }
   const model = modelOf(conn);
   const baseUrl = baseUrlOf(conn);
   const key = keyFor(conn.id);
