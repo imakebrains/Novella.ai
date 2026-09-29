@@ -4,6 +4,7 @@ import { store, useVaultVersion } from "../state/vaultStore";
 import { useActiveProject } from "../state/projects";
 import { NoteMenu } from "./NoteMenu";
 import { openQuickCreate } from "./QuickCreate";
+import { searchCodex } from "../state/codexSearch";
 
 /* Order matters — manuscript sits above the world bible, because
    that's what a writer reaches for most. */
@@ -58,10 +59,10 @@ export function CodexPane({
   const [menu, setMenu] = useState<{ id: string; x: number; y: number } | null>(null);
 
   const activeId = store.activeIdOrUndefined();
-  const matches = useMemo(
-    () => (query.trim() ? new Set(store.vault.search(query).map((n) => n.id)) : null),
-    [query, store.getSnapshot()],
-  );
+  const matches = useMemo(() => {
+    const hits = searchCodex(store.vault.all(), query, query.trim() ? store.vault.search(query) : []);
+    return hits ? new Map(hits.map((h, i) => [h.id, { ...h, order: i }] as const)) : null;
+  }, [query, store.getSnapshot()]);
 
   const dangling = store.vault.danglingLinks();
 
@@ -95,7 +96,9 @@ export function CodexPane({
   };
 
   const visible = (notes: Note[]) =>
-    matches ? notes.filter((n) => matches.has(n.id)) : notes;
+    matches
+      ? notes.filter((n) => matches.has(n.id)).sort((a, b) => matches.get(a.id)!.order - matches.get(b.id)!.order)
+      : notes;
 
   /* Declared AFTER `visible`, deliberately: this calls it, and a const arrow
      function is in the temporal dead zone until its own line. Reading it from
@@ -149,7 +152,7 @@ export function CodexPane({
           className="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search titles, tags, prose…"
+          placeholder="Search names, aliases, tags, prose…"
           spellCheck={false}
         />
         {query && (
@@ -161,7 +164,9 @@ export function CodexPane({
 
       <div className="pane-scroll">
         {GROUPS.map(({ type, label }) => {
-          const notes = sortForType(type, visible(store.vault.byType(type)));
+          // Under a query the list is in match order, not book or alphabetical
+          // order — the name you typed should be first.
+          const notes = matches ? visible(store.vault.byType(type)) : sortForType(type, visible(store.vault.byType(type)));
           if (!notes.length) return null;
           const isCollapsed = collapsed.has(type);
           // A 40-character cast is a wall of names; letters give the eye
@@ -201,6 +206,9 @@ export function CodexPane({
                           title={note.path}
                         >
                           <span className="note-name">{note.title}</span>
+                          {matches?.get(note.id)?.alias && (
+                            <span className="note-alias">matched alias: {matches.get(note.id)!.alias}</span>
+                          )}
                           {store.isDirty(note.id) && <span className="dot-dirty" />}
                         </button>
                       </li>
