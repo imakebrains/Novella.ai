@@ -567,6 +567,7 @@ export default function App() {
         {!focus && !compact && leftOpen && (
           <Resizer
             side="left"
+            value={left.width}
             onResize={(d) => left.setWidth((w) => left.clamp(w + d))}
             onReset={left.reset}
           />
@@ -580,6 +581,7 @@ export default function App() {
         {!focus && !compact && rightOpen && (
           <Resizer
             side="right"
+            value={right.width}
             onResize={(d) => right.setWidth((w) => right.clamp(w + d))}
             onReset={right.reset}
           />

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Modal } from "./Modal";
 import { isTauri, storage } from "../storage";
 import { SEED_FILES } from "../seed/seedWorld";
 import { hydrateProjectBanner, projectStore, type Project } from "../state/projects";
@@ -208,42 +209,30 @@ export function ProjectPreviewModal({
     return () => window.removeEventListener("keydown", onKey);
   }, [count]);
 
-  // Take focus so the arrow keys work without a click, and so the writer
-  // isn't still typing into the card's name field underneath.
-  useEffect(() => {
-    shell.current?.focus();
-  }, []);
-
   const current = frames?.[Math.min(index, count - 1)];
   const openLabel = active ? "Open" : "Open this project";
 
   return (
-    <div className="modal-backdrop project-preview-backdrop" onClick={onClose}>
-      <div
-        ref={shell}
-        tabIndex={-1}
-        className="modal project-preview"
-        role="dialog"
-        aria-modal="true"
-        aria-label={`Preview of ${project.name}`}
-        onClick={(e) => e.stopPropagation()}
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
-        // Focus pauses too — but not the shell's own focus-on-open, which
-        // would stop the slideshow before it ever started.
-        onFocusCapture={(e) => {
-          if (e.target !== shell.current) setPaused(true);
-        }}
-        onBlurCapture={(e) => {
-          if (e.target !== shell.current) setPaused(false);
-        }}
-      >
-        <header className="modal-head">
-          <h2>{project.name}</h2>
-          <button className="icon-btn" onClick={onClose} title="Close (Esc)">
-            ✕
-          </button>
-        </header>
+    // Modal takes focus on open, so the arrow keys work without a click and
+    // the writer isn't still typing into the card's name field underneath.
+    <Modal
+      ref={shell}
+      title={project.name}
+      label={`Preview of ${project.name}`}
+      className="project-preview"
+      backdropClassName="project-preview-backdrop"
+      onClose={onClose}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      // Focus pauses too — but not the shell's own focus-on-open, which
+      // would stop the slideshow before it ever started.
+      onFocusCapture={(e) => {
+        if (e.target !== shell.current) setPaused(true);
+      }}
+      onBlurCapture={(e) => {
+        if (e.target !== shell.current) setPaused(false);
+      }}
+    >
 
         <div className="modal-body preview-body">
           <p className="hint preview-where">
@@ -327,8 +316,7 @@ export function ProjectPreviewModal({
             Not now
           </button>
         </footer>
-      </div>
-    </div>
+    </Modal>
   );
 }
 

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Modal } from "./Modal";
 
 import { store, useVaultVersion } from "../state/vaultStore";
 import { NoProviderError, generate } from "../ai/generate";
@@ -102,14 +103,6 @@ export function StyleMeModal({
   const [savedPath, setSavedPath] = useState<string | null>(null);
   const abort = useRef<AbortController | null>(null);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
   // Stop a run in flight if the writer closes the window on it.
   useEffect(() => () => abort.current?.abort(), []);
 
@@ -206,14 +199,7 @@ export function StyleMeModal({
     setStyle((s) => (s ? { ...s, [key]: value } : s));
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal styleme-modal" onClick={(e) => e.stopPropagation()}>
-        <header className="modal-head">
-          <h2>Style me</h2>
-          <button className="icon-btn" onClick={onClose} title="Close (Esc)">
-            ✕
-          </button>
-        </header>
+    <Modal title="Style me" className="styleme-modal" onClose={onClose}>
 
         <div className="modal-body">
           {stage === "choose" && (
@@ -456,7 +442,6 @@ export function StyleMeModal({
             </>
           )}
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }
