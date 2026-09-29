@@ -4,13 +4,20 @@ Synthesized from external research (Craft/iA/Ulysses/Bear/Type.ai; Linear/Raycas
 premium-vs-cheap tells) and four internal audits (tokens, surfaces, interactions, typography).
 This is the single source of truth for the polish pass. Evidence citations are
 `app.css:NNN` = `src/ui/app.css`, `theme.css:NNN` = `src/ui/theme.css` unless another file is named.
+Line numbers are historical. They were taken against an earlier app.css (citations run to about
+line 6,000; the file was 8,614 lines when this doc was committed on 2026-08-19 and is 12,560 on
+2026-09-29), so find the rule by its selector. Structural references below use section headers
+instead.
 
-**How to ship this:** app.css is an append-only override stack (base + cozy:974 + comfy:3844 +
-round-7:5808 + round-8:5952) and that stack is *why* surfaces drift — components built between
+**How to ship this:** app.css is an append-only override stack (base, then the "Cozy premium
+pass", "the comfy-premium pass", "Premium pass (owner round 7)" and "Backdrop + glass (owner
+round 8)" sections) and that stack is *why* surfaces drift — components built between
 passes inherit only the layers that existed then. This pass works differently: bug fixes and
 dedupes edit the original rule in place; all NEW primitives land in ONE final block
 (`/* === system pass (round 9) === */`) at the end of app.css; the dead pre-premium duplicate
 blocks (app.css:76-79, 187-193, 454-464, 696-700) get deleted, not overridden again.
+The round-9 block now exists under the header "System pass (round 9) — one recipe per role.";
+later rounds have appended after it, so it is no longer the last block in the file.
 
 ---
 
@@ -26,7 +33,7 @@ blocks (app.css:76-79, 187-193, 454-464, 696-700) get deleted, not overridden ag
 
 ## 2. TOKENS — theme.css changes
 
-### 2a. REPLACE the shadow base sets (theme.css:60-66)
+### 2a. REPLACE the shadow base sets (the --shadow-* sets in theme.css :root) — landed; theme.css carries these values
 
 Same token names, so every existing `var(--shadow-sm/--shadow/--shadow-lg)` upgrades for free.
 Three levels: **1 = resting cards/chips · 2 = popovers/menus/toasts/docked chrome · 3 = modals/palette.**
@@ -66,7 +73,7 @@ stay warm-tinted (`rgb(90 70 50)`), never pure black — the Things rule.
 app.css:2028/2078 vs 3025/3404/4162/4876); modals AND the command palette use `--shadow-lg`
 (fixes palette/undo-toast lag at app.css:777/730 vs modal at 3878). No bespoke shadows.
 
-### 2b. ADD to the `:root` block (after theme.css:58)
+### 2b. ADD to the `:root` block (the "system pass (round 9) additions" group in theme.css :root) — landed
 
 All derive from theme tokens, so no per-theme edits are needed — they re-resolve under every
 theme and under accent personalization.
@@ -105,7 +112,7 @@ theme and under accent personalization.
      For semantic glows, substitute --success/--danger for --accent. */
   --glow-accent: 0 4px 18px color-mix(in srgb, var(--accent) 28%, transparent);
 
-  /* scrims: modal backdrop tinted by the theme (flat black over vellum/linen
+  /* scrims: modal backdrop tinted by the theme (flat black over vellum
      parchment reads harsh — audit 1.3); photo overlays stay true black
      because cover art is arbitrary. */
   --scrim: color-mix(in srgb, var(--bg-app) 22%, rgb(0 0 0 / 0.5));
@@ -126,7 +133,7 @@ theme and under accent personalization.
 | nested-radius calcs | `calc(var(--radius-md) - 2px)` / `(--radius-sm) - 2px` | app.css:3339 (currently −3px), 4556, 4764 |
 | `rgb(0 0 0 / 0.5)` backdrop | `var(--scrim)` | app.css:673 |
 | `rgb(0 0 0 / 0.55/.75)` + `#fff` photo overlays | `var(--scrim-image)` / `var(--fg-on-image)` | app.css:1470-1476, 1549, 1558-1559, 2176-2177 |
-| theme-blind literals | `color-mix(in srgb, var(--fg-primary) 12%, transparent)` (per .thread-dot:4818) | app.css:1573 (white ring — wrong on vellum/linen), 1609 (gray border) |
+| theme-blind literals | `color-mix(in srgb, var(--fg-primary) 12%, transparent)` (per .thread-dot:4818) | app.css:1573 (white ring — wrong on vellum), 1609 (gray border) |
 | gap/padding `2px`/`3px` | `var(--space-05)` (3px rounds to 2 or 4) | ~74 sites (audit cat. 4.1) |
 | `padding: 6px 16px` | `var(--space-2) var(--space-4)` | app.css:3338 (main view-switch) |
 
@@ -135,7 +142,7 @@ theme and under accent personalization.
 ## 3. SURFACE PUNCH LIST — ranked by first-time-user exposure
 
 ### P0 · Broken glass — fix before any styling ships
-1. `--bg-primary` undefined → sprint presets render transparent in all 5 themes (app.css:4361).
+1. `--bg-primary` undefined → sprint presets render transparent in every theme (app.css:4361) (fixed: --bg-primary no longer appears anywhere in src/).
 2. `.banner-btn` class collision: app.css:3733 (music-dock ghost) clobbers app.css:1465 (photo-overlay scrim button) — rename the dock one `.dock-btn`; cover-art buttons get their dark wash back.
 3. Invisible control: agent-detail enable toggle renders nothing — `<label class="switch">` missing its `<span class="switch-track"/>` (AgentsPanel.tsx:311-317; `.switch input` is opacity:0 at app.css:910-917).
 4. `.settings-section-label` has zero CSS anywhere; 7 uses render unstyled, including a browser-default serif `<h2>` (SettingsModal.tsx:166; AgentsPanel.tsx:260, 263, 356, 361; BoardStats.tsx:127; MusicTab.tsx:74). Define once as the overline style (§4.10).
@@ -154,11 +161,11 @@ theme and under accent personalization.
 1. Streaming caret on `.generated` (app.css:637-651) and Beats placeholder (BeatsPanel.tsx:216 — a literal "…" string) per §4.6. Never inside `.cm-editor`.
 2. Busy buttons stop reflowing: "Writing…"/"Working…"/"Running…" label swaps (InspectorPane.tsx:485, ExportModal.tsx:229, AgentsPanel.tsx:155, 337) get `min-width` locked and the 14px spinner (§4.6).
 3. "Checking for Ollama…" (InspectorPane.tsx:520) becomes spinner + hint, reusing the existing `.agent-state-dot.busy` pulse vocabulary (app.css:4600-4608, its duration `1s` → tokens).
-4. `.select` in the Assistant tab (app.css:614-629) gets `appearance: none` + themed chevron so the native control stops leaking through all 5 themes.
+4. `.select` in the Assistant tab (app.css:614-629) gets `appearance: none` + themed chevron so the native control stops leaking through every theme.
 
 ### 3 · Command palette
 *Flagship Ctrl+K surface, visually the oldest modal interior (app.css:762-846; CommandPalette.tsx:100-143).*
-1. Kind column uses the `--type-*` colors that already exist per theme (theme.css:100-107) instead of a bare glyph (app.css:817-835).
+1. Kind column uses the `--type-*` colors that already exist per theme (the --type-* tokens in every theme block) instead of a bare glyph (app.css:817-835).
 2. `.picked` state: `--accent-soft` fill + `--radius-sm` (app.css:813-815), matching menu-item selection everywhere else.
 3. Surface promotion: `--shadow-lg` + `--border-soft` (from `--shadow` + `--border-strong` at app.css:775).
 4. Footer hint (app.css:841-846): `--text-2xs`, `--fg-muted`, overline tracking.
@@ -261,7 +268,7 @@ Hover on colored elements is `brightness()`, never a second color token (Linear 
 Hover on neutral rows stays `bg-hover` — one rung up the existing ladder.
 
 ### 4.3 Scrollbars
-Keep `scrollbar-width: thin` (theme.css:340-343); add the pill thumb with invisible hit-padding:
+Keep `scrollbar-width: thin` (the * scrollbar rule in theme.css); add the pill thumb with invisible hit-padding:
 
 ```css
 ::-webkit-scrollbar { width: 10px; height: 10px; }
@@ -385,14 +392,14 @@ Apply `--font-ui` 600 + `.tnum` to: `.cal-clock-time` (app.css:4202-4206), `.goa
 tabular in chrome, `--font-mono` in data tables — retiring the five current stylings (audit F5).
 
 ### 4.8 Selection + caret
-`::selection` already passes (theme.css:336-338). Complete it:
+`::selection` already passes (::selection in theme.css). Complete it:
 
 ```css
 .cm-content, input, textarea { caret-color: var(--accent); }
 ```
 
 ### 4.9 Tooltips
-127 native `title=` attributes leak the OS-default tooltip through all 5 themes. CSS-only primitive:
+127 native `title=` attributes leak the OS-default tooltip through every theme. CSS-only primitive:
 
 ```css
 [data-tip] { position: relative; }
@@ -442,12 +449,48 @@ view-switch 3327. Small form controls (switch-track 923, kbd 3520, intro-field 5
 `--border`. The 2px dashed ghost-card (2127) matches the 1px dashed `.ap-swatch-custom` (5911).
 `--border-strong` remains for interactive/hover edges and drag targets only.
 
+### 4.12 Native controls
+Select popups, scrollbars, date/time pickers and autofill are drawn by the platform, which goes
+by `color-scheme`, not by our tokens. Every theme block declares `color-scheme` matching its
+brightness — dark: Ember (whose bare `:root` also covers OS-dark with no theme chosen),
+Nocturne, Driftwood; light: Vellum and the system-light `:root:not([data-theme])` block. Custom
+themes set it inline via `colorSchemeOf` in customThemes.ts, from the same `isDarkHex` call
+that picks their shadow set. `option`/`optgroup` take `--bg-raised`/`--fg-primary`: WebView2
+honours this; WKWebView and WebKitGTK draw their own menu and go by `color-scheme` alone.
+`iframe` stays `color-scheme: normal`, so an embed never grows an opaque backdrop. This is
+consistent with §5.3: a per-block declaration every theme carries, not special-cased
+component CSS.
+
 ---
 
 ## 5. OUT OF SCOPE — research ideas that fight Novella's DNA
 
 1. **New fonts.** No iA Quattro, Bear Sans, Inter, or any shipped webfont. The Iowan Old Style/Palatino stack IS the identity; measured type values from research inform sizing only.
 2. **Editor dimming/typewriter/focus modes and any animated treatment inside CodeMirror.** `.cm-editor` content must never animate (the exclusion at app.css:5800-5806 is law; typing latency is the product). Paragraph-opacity focus modes, animated AI-text tinting, markdown syntax-hiding, WYSIWYG hybrids — all rejected for this pass.
-3. **Light/dark binary, LCH-generated palettes, theme marketplaces.** Novella has five hand-tuned worlds, not a settings matrix. All work happens through the existing token names so every theme inherits it; no theme gets special-cased CSS.
+3. **Light/dark binary, LCH-generated palettes, theme marketplaces.** Novella has four hand-tuned worlds (Ember, Vellum, Nocturne, Driftwood; Linen retired 2026-08) plus writer-built custom themes, not a settings matrix. All work happens through the existing token names so every theme inherits it; no theme gets special-cased CSS.
 4. **Chrome auto-hide on typing (iA) and card-zoom spatial transitions (Craft).** The persistent three-pane workspace is Novella's model, and the motion budget is capped at `--motion-slow` with `--motion-intro` reserved for the welcome flow. No springs libraries, no per-item list staggers outside the intro, no scroll-linked effects.
 5. **Glassmorphism and texture as default.** Frosted glass exists only in `:root.has-backdrop` mode (app.css:5987-6001) where the writer chose an image; no paper-texture PNGs, no new asset or JS dependencies of any kind. Every fix in this spec is CSS + existing markup (plus the small `data-tip`/class swaps named above).
+
+---
+
+## 6. GUARDS
+
+`test-css.ts` holds the parts of this spec a machine can check:
+
+- **Duplicates only shrink.** Every selector-in-context (selector plus its enclosing at-rule
+  chain) defined in more than one app.css block is listed with its block count in
+  `src/ui/css-duplicates.baseline.json`. A count that grows, or a new duplicate, fails; a count
+  that drops prints one line, and `npx tsx test-css.ts --write-baseline` locks the reduction in.
+  Edit the existing rule in place rather than restating its selector in a new block.
+- **Keyframe names are unique** — a second `@keyframes` of the same name silently replaces the
+  first.
+- **No transition on `grid-template-columns`**, and no `transition: all` on `.workspace`, in
+  the stylesheets or inline in src.
+- **Every reduced-motion block is guarded** with `:root:not(.motion-full)`.
+- **No raw hex outside theme.css** (baseline: none in app.css).
+- **Every theme block declares `color-scheme`** matching its `--bg-app` brightness, and
+  `option` popups are themed (§4.12).
+
+After a large merge into app.css the baseline will report the merged side's duplicates as new.
+Rebaseline deliberately: delete the file, rerun `--write-baseline`, review the diff, and name
+the grown keys in the commit.

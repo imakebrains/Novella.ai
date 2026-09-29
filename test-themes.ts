@@ -20,6 +20,7 @@ import {
   atLeast,
   bestOn,
   channelDistance,
+  colorSchemeOf,
   contrastRatio,
   contrastWarnings,
   dedupeSwatches,
@@ -173,6 +174,19 @@ const EMBER: CustomThemeColors = {
   );
 }
 
+{
+  // A custom theme's native controls (select popups, scrollbars) follow
+  // the same dark/light call as its shadow set, or a parchment palette
+  // opens Ember's black dropdowns.
+  check("scheme: Ember's palette is dark", colorSchemeOf(EMBER), "dark");
+  check("scheme: a parchment palette is light", colorSchemeOf({ ...EMBER, bgApp: "#e9e0cd" }), "light");
+  check(
+    "scheme: an unparseable window falls back to Ember's dark",
+    colorSchemeOf({ ...EMBER, bgApp: "" }),
+    "dark",
+  );
+}
+
 /* ---------- contrast safety: the promise ----------
 
    A writer may choose any five colors. What they may not do is end up
@@ -195,6 +209,7 @@ const EMBER: CustomThemeColors = {
   let worstSecondary = Infinity;
   let worstMuted = Infinity;
   let unreadable = 0;
+  let schemeMismatch = 0;
 
   for (let i = 0; i < 400; i++) {
     const colors: CustomThemeColors = {
@@ -205,6 +220,7 @@ const EMBER: CustomThemeColors = {
       accent: nextHex(),
     };
     const vars = themeCssVars(colors);
+    if ((colorSchemeOf(colors) === "dark") !== (vars["--shadow"] === "var(--shadow-dark)")) schemeMismatch++;
     const editor = vars["--bg-editor"]!;
     const pane = vars["--bg-pane"]!;
 
@@ -227,6 +243,7 @@ const EMBER: CustomThemeColors = {
   }
 
   check("contrast: no palette is ever unreadable", unreadable, 0);
+  check("scheme: native controls agree with the shadow set on every palette", schemeMismatch, 0);
   ok(`contrast: worst prose ratio stays over 3 (${worstPrimary.toFixed(2)})`, worstPrimary >= 3);
   ok(`contrast: worst secondary stays over 3 (${worstSecondary.toFixed(2)})`, worstSecondary >= 3);
   ok(`contrast: worst muted stays over 3 (${worstMuted.toFixed(2)})`, worstMuted >= 3);
