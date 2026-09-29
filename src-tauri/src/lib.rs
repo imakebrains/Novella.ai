@@ -74,10 +74,22 @@ async fn pick_vault_folder(
         ));
     }
     known_vaults::remember(&known_vaults_file(&app)?, &path).map_err(|e| e.to_string())?;
-    app.fs_scope()
-        .allow_directory(&canonical, true)
-        .map_err(|e| e.to_string())?;
+    widen_scope(&app, &path, &canonical)?;
     Ok(Some(path.to_string_lossy().into_owned()))
+}
+
+/// Allow a vetted vault under both its spellings. The fs scope canonicalizes
+/// a requested path only when it already exists, so every save — a temp file
+/// that does not exist yet — is matched against the literal string the
+/// webview builds from its root. A canonical-only grant breaks every save
+/// whose root is not already canonical: a mapped drive (canonical is
+/// `\\?\UNC\…`), a subst drive, a symlinked Dropbox folder on macOS. The
+/// literal spelling is safe to add once its canonical form has passed the
+/// check, since it names the same folder.
+fn widen_scope(app: &tauri::AppHandle, literal: &Path, canonical: &Path) -> Result<(), String> {
+    let scope = app.fs_scope();
+    scope.allow_directory(canonical, true).map_err(|e| e.to_string())?;
+    scope.allow_directory(literal, true).map_err(|e| e.to_string())
 }
 
 /// Re-grant a folder the writer chose in an earlier session.
@@ -107,9 +119,7 @@ fn allow_vault(app: tauri::AppHandle, path: String) -> Result<(), String> {
              Choose it again from Projects → Open a folder…"
         ));
     }
-    app.fs_scope()
-        .allow_directory(&asked, true)
-        .map_err(|e| e.to_string())
+    widen_scope(&app, Path::new(&path), &asked)
 }
 
 /// Grant write access to one file the user chose in a save dialog.
