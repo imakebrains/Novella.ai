@@ -33,6 +33,7 @@ import { type IssueKind } from "../analysis/prose";
 import { RewordPopover } from "./RewordPopover";
 import { FormatBar } from "./FormatBar";
 import { rewordable } from "./rewordCore";
+import { keepNoteState, openNoteState } from "./noteStates";
 
 /* Autocomplete inside [[ ]]. Sourced from the live vault every
    keystroke, so a character you created a moment ago is offered
@@ -328,7 +329,7 @@ export function EditorPane() {
 
     mountedNoteId.current = activeId;
 
-    const state = EditorState.create({
+    const state: EditorState = openNoteState(activeId, {
       doc: store.vault.get(activeId)?.body ?? "",
       extensions: [
         /* Spellcheck, which the editor has never had.
@@ -457,6 +458,7 @@ export function EditorPane() {
     view.current = instance;
     registerFormatTarget(instance);
     instance.focus();
+    instance.dispatch({ effects: EditorView.scrollIntoView(state.selection.main, { y: "center" }) });
 
     // Re-apply the critique toggles to the fresh view.
     instance.dispatch({
@@ -493,6 +495,7 @@ export function EditorPane() {
       window.clearTimeout(chipTimer.current);
       setRewordChip(null);
       setReword(null);
+      keepNoteState(activeId, instance.state);
       instance.destroy();
       view.current = null;
     };
