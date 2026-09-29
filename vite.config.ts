@@ -54,7 +54,13 @@ export default defineConfig(({ mode }) => ({
             // business in the desktop bundle, which is already local and
             // already offline by construction.
             registerType: "autoUpdate",
-            includeAssets: ["favicon.png", "favicon-32.png"],
+            includeAssets: [
+              "favicon.png",
+              "favicon-32.png",
+              "icon-192.png",
+              "icon-512.png",
+              "icon-512-maskable.png",
+            ],
             manifest: {
               name: "Novella",
               short_name: "Novella",
@@ -69,12 +75,18 @@ export default defineConfig(({ mode }) => ({
               orientation: "any",
               background_color: "#100e10",
               theme_color: "#100e10",
+              // Chrome's install criteria want 192 and 512, plus a maskable
+              // one for Android. The old maskable entry was the 180px favicon
+              // with no safe-zone padding, so launchers cropped the gates;
+              // scripts/make-pwa-icons.cjs draws the real one.
               icons: [
                 { src: "./favicon-32.png", sizes: "32x32", type: "image/png" },
                 { src: "./favicon.png", sizes: "180x180", type: "image/png" },
+                { src: "./icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+                { src: "./icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
                 {
-                  src: "./favicon.png",
-                  sizes: "180x180",
+                  src: "./icon-512-maskable.png",
+                  sizes: "512x512",
                   type: "image/png",
                   purpose: "maskable",
                 },

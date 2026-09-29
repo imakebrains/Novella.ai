@@ -3,6 +3,7 @@ import { store, useVaultVersion } from "../state/vaultStore";
 import { buildFromTemplate } from "../ai/prompts";
 import { generate } from "../ai/generate";
 import { insertIntoEditor, registerBeatFocus } from "./editorBridge";
+import { COMPACT_QUERY } from "./useCompact";
 
 /* Scene beats — the drafting loop.
 
@@ -24,7 +25,11 @@ Write only the prose. Match the established voice, tense and point of view. Do n
 export function BeatsPanel() {
   useVaultVersion();
   const active = store.active();
-  const [open, setOpen] = useState(true);
+  // Folded on one-column layouts: a half-screen plan above the keyboard
+  // leaves no room for prose. "/beat" and a tap on the head still open it.
+  const [open, setOpen] = useState(
+    () => typeof window === "undefined" || !window.matchMedia(COMPACT_QUERY).matches,
+  );
   const [draft, setDraft] = useState("");
   const [busyIndex, setBusyIndex] = useState<number | null>(null);
   const [suggesting, setSuggesting] = useState(false);
