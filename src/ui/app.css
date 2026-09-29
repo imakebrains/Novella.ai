@@ -12168,3 +12168,393 @@ body:has(.col-divider.dragging) {
     transition: none;
   }
 }
+
+/* ============================================================
+   9.66 PHONE — the writing layout at 390px
+
+   One column is decided in JS at 899px (useCompact.ts); this block is
+   the chrome that only makes sense on a phone. The format bar moves to
+   the bottom, where the thumb is and where the keyboard pushes it; the
+   title shrinks to one line; the scene plan stops taking half the
+   screen. 480, not 899: a 700px tablet window still has room for the
+   desktop editor head and a top toolbar. Two breakpoints far apart with
+   different jobs are fine — it is two a hundred pixels apart that bites.
+
+   Two pieces live outside this file: index.html's viewport meta
+   (viewport-fit=cover, interactive-widget=resizes-content) and
+   BeatsPanel's folded default. docs/MOBILE-LAYOUT.md has the why.
+   ============================================================ */
+
+@media (max-width: 480px) {
+  /* The URL bar collapsing on scroll changes 100vh; dvh follows it.
+     Browsers without dvh drop the line and keep .app's height: 100%. */
+  .app {
+    height: 100dvh;
+  }
+
+  /* 44px buttons plus the view switch's own padding and border are taller
+     than the 46px basis, so the bar grows to its content instead of
+     clipping it. The safe-area insets are zero until viewport-fit=cover,
+     and only matter in landscape on a notched phone. */
+  .titlebar {
+    flex: 0 0 auto;
+    min-height: 52px;
+    padding-left: max(var(--space-2), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--space-2), env(safe-area-inset-right, 0px));
+  }
+
+  /* The head is a flex child of .editor and the only scroller is
+     .editor-surface .cm-scroller, so the title is already pinned — no
+     position: sticky. It just has to stop costing a sixth of the screen. */
+  .editor-head {
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+  }
+  .editor-title {
+    font-size: var(--text-lg);
+    line-height: 1.3;
+    text-overflow: ellipsis;
+  }
+  /* The mono file path is desktop information; on a phone it is a
+     second line under every title. */
+  .editor-path {
+    display: none;
+  }
+  .editor-meta {
+    gap: var(--space-1);
+  }
+
+  /* The format bar becomes a bottom toolbar. flex `order` moves it below
+     .editor-surface without touching EditorPane's JSX. One scrolling row,
+     not the desktop's wrap: at 390 with 44px controls the wrap is two
+     rows, 101px, and two rows plus a keyboard leaves a phone about a
+     third of its height for prose. */
+  .format-bar {
+    order: 10;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    /* The height a 44px row makes on touch, held for a narrow mouse window
+       too, so the popover offset below is right in both. */
+    min-height: 53px;
+    padding: var(--space-1) var(--space-2);
+    padding-bottom: max(var(--space-1), env(safe-area-inset-bottom, 0px));
+    border-bottom: 0;
+    border-top: 1px solid var(--border);
+  }
+  .format-bar::-webkit-scrollbar {
+    display: none;
+  }
+  /* The idle dim wakes on :hover, which a phone never sends; a
+     half-visible toolbar under the thumb reads as disabled. */
+  .format-bar[data-idle="true"] {
+    opacity: 1;
+  }
+  .fb-sep {
+    height: 24px;
+  }
+
+  /* A scroller clips any absolute child whose containing block is inside
+     it, so the style and link menus would open INTO the now-scrolling bar
+     and vanish. Unpositioning the anchor hands them to .editor, outside
+     the scroller, and they open upward as a sheet just above the bar. The
+     offset is the bar's own height: a 44px row, the top padding, the
+     bottom padding above, and the 1px top border. */
+  .fb-anchor {
+    position: static;
+  }
+  .fb-pop {
+    top: auto;
+    left: var(--space-2);
+    right: var(--space-2);
+    bottom: calc(44px + var(--space-1) + max(var(--space-1), env(safe-area-inset-bottom, 0px)) + 1px + var(--space-1));
+    min-width: 0;
+    max-height: 50dvh;
+    overflow-y: auto;
+  }
+
+  /* The scene plan is folded by default (BeatsPanel state, not CSS), and
+     when open it takes a third of the screen, not half. */
+  .beats {
+    max-height: 34vh;
+  }
+  .beats-head {
+    padding: var(--space-2) var(--space-3);
+  }
+  .beats-body {
+    padding: 0 var(--space-3) var(--space-3);
+  }
+
+  /* iOS Safari zooms the page when a field under 16px takes focus and
+     does not zoom back out. Both of these are 13px on desktop. */
+  .beat-text,
+  .fb-link-input {
+    font-size: 1rem;
+  }
+}
+
+/* The 44px floor for everything 9.62 does not reach. By input AND width,
+   keeping 9.62's rule: a narrow window on a mouse machine has none of
+   these problems, and a touch laptop at full width keeps its desktop
+   titlebar. min-size so nothing re-centres; .icon-btn and .fb-btn are
+   already covered by 9.62. */
+@media (max-width: 480px) and (hover: none) {
+  .brand-vault,
+  .quick-create-btn,
+  .view-switch.main-views button,
+  .beats-head,
+  .beat-action,
+  .banner-action,
+  .editor-menu-item,
+  .fb-pop-item,
+  .fb-link-go {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  /* baseline pins the label to the top of a 44px row. */
+  .fb-pop-item {
+    align-items: center;
+  }
+}
+
+/* ---- 9.67 due dates on tasks ---- */
+.task-due {
+  flex: none;
+  margin-top: 2px;
+  padding: 0 var(--space-2);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  line-height: 1.7;
+  white-space: nowrap;
+  color: var(--fg-muted);
+  background: color-mix(in srgb, var(--fg-primary) 6%, transparent);
+}
+.task-due.soon {
+  color: var(--fg-secondary);
+}
+.task-due.today {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.task-due.overdue {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+}
+/* A ticked task is not late any more, whatever its date says. */
+.task-row.done .task-due {
+  color: var(--fg-muted);
+  background: none;
+}
+.tasks-due-summary {
+  font-family: var(--font-mono);
+}
+.tasks-due-summary .overdue {
+  color: var(--danger);
+}
+.tasks-due-summary .today {
+  color: var(--accent);
+}
+
+/* ---- 9.68 Settings → Account ----
+   The avatar is an initial, not Google's picture: both CSPs would block
+   the image host, and a broken image is worse than a letter. Sized in em
+   so it scales with the text on a 250% display. */
+.account-identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0 var(--space-3);
+}
+.account-avatar {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5em;
+  height: 2.5em;
+  border-radius: 999px;
+  background: var(--bg-active);
+  color: var(--fg-primary);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+}
+.account-who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.account-name {
+  font-size: var(--text-sm);
+  color: var(--fg-primary);
+}
+.account-email {
+  font-size: var(--text-xs);
+  color: var(--fg-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.account-plan-name {
+  margin: 0 0 var(--space-1);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+}
+.account-plan-tagline {
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--fg-secondary);
+}
+.account-meters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: var(--space-2) 0 var(--space-3);
+}
+/* The shared meter pads for the side pane; inside a settings section it
+   sits flush with the text above it. */
+.account-meters .meter-wrap {
+  padding: 0;
+}
+.account-code {
+  max-width: 12ch;
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  letter-spacing: 0.35em;
+  text-align: center;
+}
+.account-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 420px;
+}
+/* .btn-primary is a full-width block for the pane; here it is one action
+   among several. */
+.account-form .btn-primary,
+.account-actions .btn-primary {
+  width: auto;
+  margin: 0;
+}
+.account-form .btn-primary {
+  align-self: flex-start;
+}
+.account-actions,
+.account-handoff {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+.account-handoff a {
+  word-break: break-all;
+}
+.account-danger {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+}
+.account-danger .field-input {
+  max-width: 320px;
+}
+@media (max-width: 720px) {
+  .account-identity {
+    align-items: flex-start;
+  }
+  .account-code {
+    max-width: none;
+  }
+}
+
+/* ---- 9.69 cloud sync: the titlebar line and the Account tab's books ----
+   Same voice and size as the autosave line beside it. */
+.sync-status {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums lining-nums;
+  white-space: nowrap;
+  color: var(--fg-muted);
+}
+.sync-status::before {
+  content: "·";
+  margin-right: 0.5em;
+  opacity: 0.6;
+}
+.sync-status.synced {
+  color: var(--success);
+}
+.sync-status.error {
+  color: var(--danger);
+}
+.cloud-books {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.cloud-books h3 {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-sm);
+  color: var(--fg-muted);
+}
+.cloud-book-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border);
+}
+.cloud-book-row:last-child {
+  border-bottom: 0;
+}
+.cloud-book-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cloud-book-meta {
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-muted);
+}
+.cloud-book-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+/* In a row the status stands alone; the dot is for the titlebar, where
+   it follows the save line. */
+.cloud-book-actions .sync-status::before {
+  content: none;
+}
+.cloud-books-error {
+  font-size: var(--text-sm);
+  color: var(--danger);
+}
+.cloud-books-hold {
+  font-size: var(--text-sm);
+}
+@media (max-width: 600px) {
+  .cloud-book-row {
+    flex-wrap: wrap;
+  }
+  .cloud-book-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+/* ---- 9.70 dialog shells take focus without a ring ----
+   Modal focuses its own panel (tabIndex -1) so a screen reader lands
+   inside it, and the global [tabindex]:focus-visible ring would then
+   outline the whole dialog. The panel is not a control; everything
+   inside it keeps its ring. */
+.modal:focus-visible,
+.quick-create-pop:focus-visible {
+  outline: none;
+}
