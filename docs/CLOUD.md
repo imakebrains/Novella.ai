@@ -287,9 +287,12 @@ account, card or identity. In order:
    first as one zip.
    Also deploy and schedule `gc-blobs` — see "Reclaiming storage".
 10. **Before anyone outside the owner signs in**: a privacy policy and
-   terms (Paddle and Google both require them), and README.md and
-   SECURITY.md rewritten — both currently promise "no account, no cloud
-   sync", which stops being true the day this switches on.
+   terms (Paddle and Google both require them); drafts are in
+   `docs/legal/`. README.md and SECURITY.md were rewritten on 2026-09-29
+   to describe both states — local-first without an account, and what the
+   optional account puts on the server, including that synced books are
+   not end-to-end encrypted — and `test-docs.ts` fails if either goes back
+   to an unqualified "no account" or asserts end-to-end encryption.
 11. **Upgrade Supabase to Pro** ($25/mo) before launch, for the reason
     in "What a subscriber costs".
 

@@ -1,8 +1,11 @@
 # Novella
 
 A writing app for novelists that keeps your book on your own disk, as plain
-Markdown files, in a folder you choose. No account. No subscription. No
-per-word charge. It works with the internet unplugged.
+Markdown files, in a folder you choose. No account needed, no subscription
+needed, no per-word charge, and it works with the internet unplugged — that
+is the default, and it stays fully usable that way. In builds with the
+cloud switched on, an optional account can sync books between your
+devices; no book goes to the cloud until you sign in and choose it.
 
 It is also the worldbuilding tool, the task list, the sprint timer and the
 word-count tracker — the four other apps most writers keep open — in the same
@@ -21,16 +24,22 @@ note is a `.md` file with a small YAML header. Open the folder in Obsidian,
 edit it in Notepad, put it in Dropbox, grep it, diff it in git. Novella is a
 way of working with those files, not a place they are trapped.
 
-**No account, ever.** There is no sign-up screen, no email confirmation, no
-password, no Google or Apple sign-in, no cloud sync, no telemetry. Nothing
-about your writing leaves the machine unless you connect an AI service and
-press a button.
+**No account needed — and an optional one if you want it.** Without an
+account there is no sign-in, no sync and no telemetry, and nothing about
+your writing leaves the machine unless you connect an AI service and press
+a button. In builds with the cloud switched on, Settings → Account offers
+an account — an emailed code anywhere, Google in the browser build — that
+syncs the books you pick between your devices, private to that account.
+[Privacy and security](#privacy-and-security) below says exactly what that
+puts on a server.
 
 **The AI is optional, and local first.** Install [Ollama](https://ollama.com)
 and a model runs on your own computer: free, offline, unlimited, and nobody
 else's business. If you would rather use Claude or ChatGPT, you paste your own
 API key and pay your own provider directly — Novella takes no cut and adds no
-markup, because there is no Novella server in the path.
+markup, because there is no Novella server in the path. In builds with the
+cloud, a Pro account can also use Novella AI, which needs no key; its
+requests go through Novella's `ai` function to Anthropic (see below).
 
 **You can leave.** Export the whole manuscript to Word, EPUB, Markdown, print
 PDF, or a zip of everything, in one dialog. The files were always yours; the
@@ -64,8 +73,9 @@ software you actually meant to download.
   download. **Right-click** (or Control-click) the app in Applications,
   choose **Open**, then **Open** again in the dialog. You only do this once.
 
-Novella checks the Releases page for updates and offers them in-app; it never
-installs one without asking.
+When you press **Check for updates** (Settings → Connections, under App
+updates), Novella reads the Releases page and offers a newer version
+in-app; it never installs one without asking.
 
 ### In a browser, without installing
 
@@ -130,15 +140,24 @@ board, prose analysis, tasks and export need nothing.
 
 When you do want it, **Settings → Connections**:
 
-- **Local models (Ollama)** — free, offline, no account and no key. If Ollama
-  is not installed, Settings → Local AI walks through it, states the download
-  size before fetching anything, and never downloads on its own.
+- **Local models (Ollama)** — free, offline, nothing to sign up for and no
+  key. If Ollama is not installed, Settings → Local AI walks through it,
+  states the download size before fetching anything, and never downloads
+  on its own.
 - **Claude (Anthropic)** or **ChatGPT and anything OpenAI-compatible**
   (OpenRouter, Groq, DeepSeek, LM Studio, …) — you paste an **API key** you
-  create on that provider's own site. There is no "sign in with Google" here
-  and there never will be: what these services hand out is a key, and drawing
-  an OAuth button over that would be a lie about where your text goes. Keys
-  are held in the OS keychain, not in a file Novella writes.
+  create on that provider's own site. There is no "sign in with Google" for
+  these providers and there never will be: what these services hand out is
+  a key, and drawing an OAuth button over that would be a lie about where
+  your text goes. (The optional Novella account's Google sign-in is a
+  different thing — it signs you in to Novella, not to an AI provider.)
+  Keys are held in the OS keychain, not in a file Novella writes, and
+  requests go straight from your device to that provider.
+- **Novella AI** (Pro, builds with the cloud only) — no key on your device.
+  The text of the request — the passage and the codex entries it names —
+  goes with your session to the `ai` function in Novella's Supabase
+  project, which sends it to Anthropic with a key held only on the server
+  and records the cost and token counts, not the text.
 
 You can connect several and say which one does which job — drafting, ideas,
 research, critique, quick fixes. If the one you picked cannot answer, the next
@@ -186,19 +205,33 @@ comment convention, and why the commit log reads the way it does.
 
 ## Privacy and security
 
-The short version: your writing stays in the folder you chose. There is no
-telemetry and no analytics, and your manuscript is sent nowhere unless you
-connect an AI service and press a button — in which case it goes to that
-provider and nowhere else, because there is no Novella server in between.
+**By default — without an account — your writing stays in the folder you
+chose.** There is no telemetry and no analytics, and your manuscript is
+sent nowhere unless you connect an AI service and press a button — in which
+case it goes straight to that provider and nowhere else.
 
-Two network calls happen without you asking, and both are worth naming: an
-unauthenticated read of GitHub's public API to see whether a newer release
-exists, and — only if you turn it on — fetching a calendar feed you
-subscribed to. Neither sends anything about your book.
+**With the optional account**, the books you choose to sync are stored in
+Novella's Supabase project: their text in its Postgres database, images
+such as covers in a private storage bucket. They are visible only to your
+account — row-level security on every table of writers' data, proven by
+`supabase/tests/isolation_test.sql`. They are **not end-to-end encrypted**:
+Novella adds no encryption of its own, so whoever runs that project can
+read what is stored there. API keys never sync; they stay in the OS
+keychain. On the desktop the sign-in's refresh token is in the keychain
+too; in the browser build the whole session sits in that browser's
+storage. Settings → Account has **Download everything** and **Delete
+account**.
 
-The desktop build ships with **no** filesystem permission at all. Picking a
-vault widens its access to that one directory for that session, so a folder
-you never opened is unreadable to it, even to a compromised webview.
+Without an account, nothing reaches the network unless you click for it:
+the update check and a subscribed calendar feed each fetch only when you
+press their button, and neither sends anything about your book. With an
+account, sync talks to the Supabase project in the background — on open,
+after your edits, on focus and about once a minute.
+
+The desktop build ships with **no** filesystem permission at all. It can
+reach only folders you picked in the OS folder dialog, remembered in a
+record the webview itself cannot write, so a folder you never chose stays
+unreadable to it — even to a compromised webview.
 
 [SECURITY.md](SECURITY.md) has the full audit, the network calls that do
 exist and what triggers each one, and how to report a vulnerability.
