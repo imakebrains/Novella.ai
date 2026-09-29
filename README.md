@@ -74,8 +74,8 @@ software you actually meant to download.
   choose **Open**, then **Open** again in the dialog. You only do this once.
 
 When you press **Check for updates** (Settings → Connections, under App
-updates), Novella reads the Releases page and offers a newer version in-app; it never installs one
-without asking.
+updates), Novella reads the Releases page and offers a newer version
+in-app; it never installs one without asking.
 
 ### In a browser, without installing
 
