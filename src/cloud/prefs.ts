@@ -43,6 +43,7 @@ export const STORAGE_KEYS: KeyRule[] = [
   { key: "novella.profile", home: "account", why: "Name and byline for exports." },
   { key: "novella.roleRouting", home: "account", why: "Which connection does which job." },
   { key: "novella.connections", home: "account", why: "Connection settings. Keys are not in here; they live in the keychain." },
+  { key: "novella.connections.hostedSeeded", home: "account", why: "The Novella AI card was offered once for this account; travels with the list so a deleted card stays deleted and a second device doesn't add another." },
   { key: "novella.connection", home: "account", why: "Legacy single-connection setting." },
   { key: "novella.activeProvider", home: "account", why: "The provider picked last." },
   { key: "novella.enabledPlugins", home: "account", why: "Which plugins are on." },

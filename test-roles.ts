@@ -118,7 +118,7 @@ const allWell = probes({
 /* ---------- the kinds, and the honesty rule ---------- */
 
 {
-  check("kinds: three of them", PROVIDER_KINDS.length, 3);
+  check("kinds: four of them", PROVIDER_KINDS.length, 4);
 
   const kinds = PROVIDER_KINDS.map((k) => k.kind);
   check("kinds: no duplicates", new Set(kinds).size, kinds.length);
@@ -256,7 +256,7 @@ const allWell = probes({
     ok(`roles: ${role.id} explains itself in a writer's terms`, role.blurb.trim().length > 20);
     // Every kind must appear in every ranking, or a writer with only one
     // sort of connection would find a role that can never be filled.
-    check(`roles: ${role.id} ranks every kind`, new Set(role.prefers).size, 3);
+    check(`roles: ${role.id} ranks every kind`, new Set(role.prefers).size, PROVIDER_KINDS.length);
   }
 
   check("roles: the default is drafting", DEFAULT_ROLE, "drafting");

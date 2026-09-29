@@ -26,6 +26,7 @@ import {
   connections,
   hasKey,
   healthOf,
+  kindOffered,
   modelOf,
   probeOf,
   ready,
@@ -1000,7 +1001,7 @@ function KindPicker({
   return (
     <div className="conn-panel">
       <div className="radio-list">
-        {PROVIDER_KINDS.map((info) => (
+        {PROVIDER_KINDS.filter(kindOffered).map((info) => (
           <button key={info.kind} className="radio-row" onClick={() => onPick(info.kind)}>
             <span className="radio-text">
               <span className="radio-label">{info.label}</span>
@@ -1089,7 +1090,9 @@ function ConnectionPanel({ conn, onClose }: { conn: Connection; onClose: () => v
         <li className="conn-step">
           {info.requiresKey
             ? "Paste it below, then press Save key and test. A list of models coming back is proof it works — and it costs nothing."
-            : "Press Test connection. It asks the local engine what models you have installed."}
+            : conn.kind === "novella"
+              ? "Press Test connection. It checks your sign-in and plan — nothing is charged."
+              : "Press Test connection. It asks the local engine what models you have installed."}
         </li>
       </ol>
 
@@ -1142,7 +1145,7 @@ function ConnectionPanel({ conn, onClose }: { conn: Connection; onClose: () => v
         </Field>
       )}
 
-      {conn.kind !== "anthropic" && (
+      {conn.kind !== "anthropic" && conn.kind !== "novella" && (
         <Field label="Address">
           <input
             className="field-input"
