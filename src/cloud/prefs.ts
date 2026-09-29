@@ -92,6 +92,8 @@ export const STORAGE_KEYS: KeyRule[] = [
   { key: "novella.calendar.feedsOpen", home: "device", why: "Whether the feeds list is expanded here." },
   { key: "novella.connections.seeded", home: "device", why: "First-run seeding already happened here." },
   { key: "novella.updateRepo", home: "device", why: "Update-check source for this install." },
+  { key: "novella.settingsSync", home: "device", why: "The settings document this device last agreed with the cloud, its version, and whose account it was — the merge base. Meaningless on another machine." },
+  { key: "novella.settingsSync.replaced", home: "device", why: "What the first settings sync on this machine replaced with the account's values, kept so nothing set here is lost unseen." },
   { key: "novella.cloud.session", home: "device", why: "The sign-in. A credential; never synced." },
   { key: "novella.cloudBindings", home: "device", why: "Which local folder is which cloud book, on this machine. Folders differ per device, so this cannot follow the writer." },
 ];
@@ -100,13 +102,19 @@ export const STORAGE_KEYS: KeyRule[] = [
     among prefixes the longest wins, so "novella.pane.left" is never
     mistaken for a dynamic "novella.pane.<name>". */
 export function homeOf(key: string, rules: KeyRule[] = STORAGE_KEYS): Home | null {
+  return ruleOf(key, rules)?.home ?? null;
+}
+
+/** PURE. The rule homeOf() decided by — settings sync keys its refresh
+    table on the rule, so every "novella.plugin.<id>.<field>" shares one. */
+export function ruleOf(key: string, rules: KeyRule[] = STORAGE_KEYS): KeyRule | null {
   const exact = rules.find((r) => !r.prefix && r.key === key);
-  if (exact) return exact.home;
+  if (exact) return exact;
   let best: KeyRule | null = null;
   for (const r of rules) {
     if (r.prefix && key.startsWith(r.key) && key.length > r.key.length && (!best || r.key.length > best.key.length)) best = r;
   }
-  return best ? best.home : null;
+  return best;
 }
 
 /** The subset of Web Storage these helpers need. */

@@ -180,6 +180,15 @@ subscribeCustomThemes(() => {
   for (const l of listeners) l();
 });
 
+/** Settings sync rewrote novella.theme (and maybe the custom themes)
+    underneath `current`. `saved` is read by the caller BEFORE the custom
+    themes reload, because that reload's listener may already have moved
+    an unknown `current` to the OS default and written it over the key. */
+export function adoptStoredTheme(saved: string | null): void {
+  refreshThemes();
+  if (saved && known(saved) && saved !== current) applyWithCrossfade(saved);
+}
+
 const themeStore = {
   subscribe(fn: () => void) {
     listeners.add(fn);

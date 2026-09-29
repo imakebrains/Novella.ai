@@ -197,6 +197,14 @@ function persist(): void {
   emit();
 }
 
+/** Settings sync rewrote the list or the routing underneath the caches;
+    the next read re-parses both. */
+export function reloadConnections(): void {
+  cache = null;
+  routingCache = null;
+  emit();
+}
+
 /* ---------------- secrets ---------------- */
 
 const secrets = new Map<string, string>();

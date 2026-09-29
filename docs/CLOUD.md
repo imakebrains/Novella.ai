@@ -44,6 +44,7 @@ values are set (`.env.example`).
 | Sync host: binds a book to the cloud per device, reloads pulled notes, realtime nudge over polling, the titlebar status line, cloud books in Account | `src/cloud/syncHost.ts`, `projectBinding.ts`, `SyncStatusLine.tsx`, `CloudBooksSection.tsx`, `migrations/20260924010000_realtime_projects.sql` | `test-synchost.ts`: 171 checks on every decision the host makes. **The components themselves are typechecked only, and nothing has synced between two real devices** |
 | Novella AI as a connection (offered only in builds with the cloud; signed out and not-Pro read as such; a 402/403 falls through to the next role) | `src/cloud/hostedAccess.ts`, `src/plugins/providers/connections.ts`, `src/ai/roles.ts` | `test-novellaai.ts`: 114 checks. **Not run with a real session** |
 | Reclaiming storage | `supabase/functions/gc-blobs/`, `migrations/20260924000000_blob_gc.sql` | `test-gc.ts` and the isolation suite. **Not deployed or scheduled** |
+| Settings sync (three-way merge against the last document this device agreed with; session, calendar, planner and sprint records merged per record; conflicts re-merged up to three times; 256 KB refused before the server is asked) | `src/cloud/settingsSync.ts`, `settingsMergers.ts`, `settingsRemote.ts`, `settingsHost.ts`, `settingsRefresh.ts`, `SettingsSyncBanner.tsx` | `test-settingssync.ts`: two devices against an in-memory `put_settings` with the real compare-and-swap; credentials, device and book keys never leave; a guard fails on an account key that hasn't said how the running app hears about it. **The host, the store refreshes and the banner are typechecked only; nothing has synced settings between two real devices** |
 | Where the pieces meet (sign-in → sync, sign-in → Novella AI) | `src/cloud/wiring.ts`, one call in `main.tsx` | `test-account.ts` fails if the call or the Account mount goes missing |
 | Plan table | `src/cloud/plans.ts` | `test-cloud.ts` parses the migration and fails if the app and the server disagree on any limit |
 
@@ -113,7 +114,7 @@ it is written, so a truncated transfer can never become the chapter.
 |---|---|---|
 | The book | chapters, codex entries, notes, prompts, templates | Yes — the file sync above |
 | Book settings and history | `.novella/boards.json`, covers, card images, history, trash | Yes — same mechanism |
-| Settings that follow the writer | theme, accent, prose font, motion | Yes — `user_settings`; **wiring is the next step** (see below) |
+| Settings that follow the writer | theme, accent, prose font, motion, calendar, writing-session history, timers | Yes — `user_settings`, on sign-in and within seconds of a change; credentials never, by key name or by value |
 | Per-book state kept in the browser today | chat threads, calendar entries, sprint history | Yes, once moved into the book folder; **next step** |
 | This computer only | window and pane sizes, crash-recovery drafts | No — they describe the machine, not the writer |
 | API keys (Claude, OpenAI…) | | **Never.** They stay in the OS keychain on each device (CLAUDE.md). Pro users don't need one at all |
@@ -309,10 +310,22 @@ Novella AI as a connection and the upgrade flow are built (table
 above). None of them can be called done until they run against a real
 project; what is left in code is:
 
-1. **Settings that follow the writer.** Every localStorage key is
-   classified and the three-way merge is tested (`prefs.ts`); still to
-   do is uploading and applying `user_settings` on sign-in and on
-   change, and moving book-level state into the book folder.
+1. **Settings that follow the writer.** `user_settings` now uploads and
+   applies on sign-in and on change (table above). Still to do:
+   - moving book-level state (chat, agents, boards, plot, music) into
+     the book folder; settings sync deliberately leaves those keys out;
+   - a device-local baseline for `novella.sessions`: today's record
+     carries a manuscript baseline that is only right on the machine
+     that took it, and two devices typing on the same day between
+     syncs keep one device's count for that day;
+   - moving the parsed events out of `novella.calendarFeeds` into a
+     device key — a heavy .ics feed is the likeliest way past 256 KB;
+   - reload hooks for `novella.sprints` (an owner-modified file) and
+     `novella.enabledPlugins`, which today ask for a reload instead;
+   - a way to restore what the first sync on a machine replaced
+     (`novella.settingsSync.replaced` keeps it, nothing shows it yet);
+   - other tabs of the web build re-reading their stores on the
+     `storage` event.
 2. **Google on the desktop.** Opens the system browser (Google refuses
    sign-in inside embedded webviews) and returns through a `novella://`
    link — needs the Tauri deep-link plugin. The emailed code works

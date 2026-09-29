@@ -38,6 +38,7 @@ import { store, useVaultVersion } from "./state/vaultStore";
 import { manuscriptNotes, manuscriptWordCount } from "./analysis/wordCounts";
 import { isTauri, storage } from "./storage";
 import { SyncStatusLine } from "./cloud/SyncStatusLine";
+import { SettingsSyncBanner } from "./cloud/SettingsSyncBanner";
 import {
   loadPersonalization,
   overridingReducedMotion,
@@ -493,6 +494,7 @@ export default function App() {
 
       <RecoveryBanner />
       <MotionNotice />
+      <SettingsSyncBanner />
 
       {!persistent && (
         <div className="banner">
