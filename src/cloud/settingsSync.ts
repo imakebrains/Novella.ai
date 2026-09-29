@@ -26,7 +26,8 @@
    not look like a pasted API key or token. A key held back for its
    value is also never overwritten or removed here, and its server copy
    is left as it was — dropping it from the document would read as a
-   deletion on every other device.
+   deletion on every other device. A key only a newer build knows is
+   carried back up the same way and never applied here.
 
    PURE apart from the injected store and remote, so test-settingssync.ts
    runs the whole round in Node against a fake put_settings with the real
@@ -115,6 +116,18 @@ export function syncable(doc: SettingsDoc): SettingsDoc {
   return out;
 }
 
+/* A key a NEWER build classified as account and uploaded, which this
+   build has no rule for. It is never applied here, but it goes back up
+   as it came: dropping it would read on the newer device as "deleted
+   over there" and remove the writer's setting from that machine too. */
+function unclassified(doc: SettingsDoc): SettingsDoc {
+  const out: SettingsDoc = {};
+  for (const [key, value] of Object.entries(doc)) {
+    if (/^novella\./.test(key) && homeOf(key) === null && !isCredentialKey(key) && !looksLikeCredential(value)) out[key] = value;
+  }
+  return out;
+}
+
 /** Account keys this device has but syncable() dropped for their VALUE.
     The round treats them as untouched on this side. */
 function heldBack(raw: SettingsDoc, clean: SettingsDoc): string[] {
@@ -127,7 +140,7 @@ export function parseSettingsDoc(raw: unknown): SettingsDoc {
   if (typeof raw !== "object" || raw === null || Array.isArray(raw)) return {};
   const out: SettingsDoc = {};
   for (const [k, v] of Object.entries(raw as Record<string, unknown>)) if (typeof v === "string") out[k] = v;
-  return syncable(out);
+  return { ...unclassified(out), ...syncable(out) };
 }
 
 export function parseSettingsRow(raw: unknown): SettingsRow | null {
@@ -265,6 +278,7 @@ export async function syncSettingsRound(deps: RoundDeps): Promise<RoundResult> {
     // an older build, or a remote that skipped parseSettingsRow, must not
     // get a device key or a credential onto this machine.
     const theirs = syncable(row?.doc ?? {});
+    const carried = unclassified(row?.doc ?? {});
     version = row?.version ?? 0;
 
     if (row === null || base === null) {
@@ -288,6 +302,8 @@ export async function syncSettingsRound(deps: RoundDeps): Promise<RoundResult> {
       if (k in theirs) merged[k] = theirs[k]!;
       else delete merged[k];
     }
+    // settingsDiff() writes account keys only, so these never land here.
+    Object.assign(merged, carried);
 
     const { set, remove } = settingsDiff(mine, merged);
     const wrote: string[] = [];
@@ -334,7 +350,8 @@ export async function syncSettingsRound(deps: RoundDeps): Promise<RoundResult> {
       ...extra,
     });
 
-    if (row !== null && stableJson(merged) === stableJson(theirs)) return done("in-sync", { doc: theirs });
+    const cloud = { ...carried, ...theirs };
+    if (row !== null && stableJson(merged) === stableJson(cloud)) return done("in-sync", { doc: cloud });
     if (row === null && Object.keys(merged).length === 0) return done("in-sync");
 
     const big = oversize(merged);

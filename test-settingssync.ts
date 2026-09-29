@@ -518,6 +518,29 @@ check(
   check("quota: last seen matches the store", stableJson(r.local), stableJson(full.account()));
 }
 
+// A key only a newer build knows survives a push from this one, or the
+// newer device would read its absence as a deletion and lose it too.
+{
+  const FUTURE = "novella.someFutureSetting";
+  check("fixture: this build has no rule for the future key", homeOf(FUTURE), null);
+  const d0 = { [THEME]: "ember", [FUTURE]: "on" };
+  const server = new FakeServer();
+  server.row = { doc: { ...d0, "novella.future.token": "t", "novella.futureNotes": SK, "other.thing": "x" }, version: 1 };
+  const a = synced({ [THEME]: "ember" }, 1);
+  check("newer key: nothing changed is still in-sync", (await round(server, a)).outcome, "in-sync");
+  check("newer key: no put for it", server.putCalls, 0);
+  a.setItem(THEME, "vellum");
+  await round(server, a);
+  check("newer key: carried back up", server.row?.doc[FUTURE], "on");
+  check("newer key: A's theme went up with it", server.row?.doc[THEME], "vellum");
+  check("newer key: never applied here", a.getItem(FUTURE), null);
+  check(
+    "newer key: credential-shaped and foreign keys are not carried",
+    ["novella.future.token", "novella.futureNotes", "other.thing"].map((k) => k in (server.row?.doc ?? {})),
+    [false, false, false],
+  );
+}
+
 // Oversize is refused locally, every time, without a put.
 {
   const server = new FakeServer();
